@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+build
+dist
+.turbo
+
+# Logs
+*.log
+
+# Misc
+.DS_Store
+*.pem
+
+# Environment
+.env
+.env*.local
+
+# Coverage
+coverage
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+*.db
+*.db-journal
+
+# IDE
+.vscode
+.idea
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
