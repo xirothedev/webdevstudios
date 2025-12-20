@@ -32,6 +32,9 @@ next-env.d.ts
 *.db
 *.db-journal
 
+# Generated
+**/generated
+
 # IDE
 .vscode
 .idea
