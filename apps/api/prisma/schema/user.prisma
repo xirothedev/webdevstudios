@@ -1,0 +1,53 @@
+// =========================================
+// USER & AUTHENTICATION
+// =========================================
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique @db.VarChar(255)
+  password String?  @db.Text // Nullable vì OAuth users không có password
+  fullName String?  @db.VarChar(100)
+  phone    String?  @db.VarChar(15)
+  avatar   String?  @db.Text
+  role     UserRole @default(CUSTOMER)
+
+  // MFA fields
+  mfaEnabled Boolean @default(false)
+  mfaSecret  String? @db.Text // TOTP secret (encrypted)
+
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  addresses        Address[]
+  orders           Order[]
+  reviews          Review[]
+  cart             Cart? // 1 User chỉ có 1 giỏ hàng active
+  externalAccounts ExternalAccount[] // OAuth accounts
+  mfaMethods       UserMFAMethod[] // MFA methods
+  mfaBackupCodes   MFABackupCode[] // MFA backup codes
+  devices          Device[] // Logged devices
+  sessions         Session[] // Active sessions
+
+  @@map("users") // Tên bảng trong DB là 'users'
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  recipient String  @db.VarChar(100) // Tên người nhận
+  phone     String  @db.VarChar(15)
+  street    String  @db.Text
+  city      String  @db.VarChar(50)
+  district  String  @db.VarChar(50)
+  ward      String  @db.VarChar(50)
+  isDefault Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
+}

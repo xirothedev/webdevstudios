@@ -1,0 +1,57 @@
+// =========================================
+// ENUMS (Định nghĩa các tập giá trị cố định)
+// =========================================
+
+enum UserRole {
+  ADMIN // Chủ shop
+  CUSTOMER // Khách mua hàng
+}
+
+enum OrderStatus {
+  PENDING // Chờ thanh toán
+  CONFIRMED // Đã xác nhận
+  PROCESSING // Đang đóng gói
+  SHIPPING // Đang giao
+  DELIVERED // Giao thành công
+  CANCELLED // Đã hủy
+  RETURNED // Trả hàng
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum DiscountType {
+  PERCENTAGE // Giảm theo %
+  FIXED_AMOUNT // Giảm số tiền cụ thể
+}
+
+enum OAuthProvider {
+  GOOGLE
+  FACEBOOK
+  GITHUB
+  APPLE
+}
+
+enum MFAMethod {
+  TOTP // Time-based One-Time Password (Google Authenticator, Authy)
+  SMS // SMS OTP
+  EMAIL // Email OTP
+  BACKUP_CODE // Backup codes
+}
+
+enum DeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  UNKNOWN
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}

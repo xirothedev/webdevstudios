@@ -1,0 +1,38 @@
+// =========================================
+// MARKETING & SOCIAL
+// =========================================
+
+model Voucher {
+  id    String       @id @default(cuid())
+  code  String       @unique @db.VarChar(20)
+  type  DiscountType
+  value Decimal      @db.Decimal(12, 2) // Giá trị giảm (số tiền hoặc %)
+
+  minSpend    Decimal? @db.Decimal(12, 2) // Đơn tối thiểu
+  maxDiscount Decimal? @db.Decimal(12, 2) // Giảm tối đa (cho loại %)
+
+  usageLimit Int @default(100) // Tổng số lần dùng
+  usedCount  Int @default(0) // Đã dùng
+
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+
+  @@map("vouchers")
+}
+
+model Review {
+  id      String  @id @default(cuid())
+  rating  Int     @default(5) // 1-5 sao
+  comment String? @db.Text
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("reviews")
+}
