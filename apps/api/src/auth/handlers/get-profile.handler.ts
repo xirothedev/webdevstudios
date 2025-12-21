@@ -3,18 +3,18 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { AuthUserDto } from '../dto/auth-user.dto';
+import { userInfoDto } from '../dto/userInfo.dto';
 import { GetProfileQuery } from '../queries/get-profile.query';
 
 @Injectable()
 @QueryHandler(GetProfileQuery)
 export class GetProfileHandler implements IQueryHandler<
   GetProfileQuery,
-  AuthUserDto
+  userInfoDto
 > {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(query: GetProfileQuery): Promise<AuthUserDto> {
+  async execute(query: GetProfileQuery): Promise<userInfoDto> {
     const user = await this.prisma.user.findUnique({
       where: { id: query.userId },
       select: {

@@ -1,5 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
 import { PrismaService } from '@/prisma/prisma.service';
@@ -13,7 +15,11 @@ export class LoginHandler implements ICommandHandler<
   LoginCommand,
   AuthUserDto
 > {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService
+  ) {}
 
   async execute(command: LoginCommand) {
     const { email, password } = command.dto;
@@ -41,13 +47,19 @@ export class LoginHandler implements ICommandHandler<
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // rely on JwtModule configuration for secret and options
     return {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      avatar: user.avatar,
-      role: user.role,
-      createdAt: user.createdAt,
+      token: this.jwt.sign(
+        {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          avatar: user.avatar,
+          role: user.role,
+          createdAt: user.createdAt,
+        },
+        { secret: this.config.getOrThrow<string>('JWT_SECRET_KEY') }
+      ),
     };
   }
 }

@@ -40,12 +40,13 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  // Swagger UI available under the API global prefix: /v1/docs
   SwaggerModule.setup('v1/docs', app, document);
 
   const port = configService.get<number>('PORT', 4000);
   await app.listen(port);
   console.log(`🚀 API server running on http://localhost:${port}/v1`);
-  console.log(`📚 Swagger docs available at http://localhost:${port}/docs`);
+  console.log(`📚 Swagger docs available at http://localhost:${port}/v1/docs`);
 }
 
 void bootstrap();

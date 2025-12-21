@@ -1,8 +1,8 @@
-import { Command } from '@nestjs/cqrs';
+import { Query } from '@nestjs/cqrs';
 
-import { AuthUserDto } from '../dto/auth-user.dto';
+import { userInfoDto } from '../dto/userInfo.dto';
 
-export class GetProfileQuery extends Command<AuthUserDto> {
+export class GetProfileQuery extends Query<userInfoDto> {
   constructor(public readonly userId: string) {
     super();
   }

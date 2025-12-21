@@ -1,5 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
 import { PrismaService } from '@/prisma/prisma.service';
@@ -13,7 +14,10 @@ export class RegisterUserHandler implements ICommandHandler<
   RegisterUserCommand,
   AuthUserDto
 > {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private jwt: JwtService
+  ) {}
 
   async execute(command: RegisterUserCommand): Promise<AuthUserDto> {
     const { email, password, fullName, phone } = command.dto;
@@ -45,13 +49,16 @@ export class RegisterUserHandler implements ICommandHandler<
       },
     });
 
+    // sign uses JwtModule configuration (secret, expiresIn)
     return {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      avatar: user.avatar,
-      role: user.role,
-      createdAt: user.createdAt,
+      token: this.jwt.sign({
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        avatar: user.avatar,
+        role: user.role,
+        createdAt: user.createdAt,
+      }),
     };
   }
 }
