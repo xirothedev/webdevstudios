@@ -21,10 +21,10 @@ export function TrustSection() {
                 key={idx}
                 className="group flex cursor-default items-center gap-3"
               >
-                <div className="rounded-lg bg-white/5 p-2 text-zinc-500 transition-all duration-300 group-hover:bg-indigo-500/10 group-hover:text-indigo-400">
+                <div className="rounded-lg bg-white/5 p-2 text-white/70 transition-all duration-300 group-hover:bg-[#f7931e]/10 group-hover:text-[#f7931e]">
                   <Icon className="h-5 w-5" strokeWidth={1.5} />
                 </div>
-                <span className="text-sm font-medium text-zinc-500 transition-colors group-hover:text-zinc-300">
+                <span className="text-sm font-medium text-white/70 transition-colors group-hover:text-[#f7931e]">
                   {item.text}
                 </span>
               </div>

@@ -2,12 +2,28 @@
 
 import { motion } from 'framer-motion';
 import { Package, Users } from 'lucide-react';
+import Image from 'next/image';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-20">
+    <section className="relative min-h-screen overflow-hidden pt-32 pb-20">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/image/hero-image.png"
+          alt="Background"
+          fill
+          priority
+          className="object-cover object-center"
+          quality={90}
+          sizes="100vw"
+        />
+        {/* Dark Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/80"></div>
+      </div>
+
       {/* Retro Grid Background */}
-      <div className="retro-grid pointer-events-none absolute inset-0 z-0 opacity-40"></div>
+      <div className="retro-grid pointer-events-none absolute inset-0 z-1 opacity-40"></div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
         {/* Badge */}
@@ -17,8 +33,8 @@ export function Hero() {
           transition={{ duration: 0.5 }}
           className="mb-8 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur-sm"
         >
-          <span className="flex h-2 w-2 rounded-full bg-indigo-500"></span>
-          <span className="text-[10px] font-medium tracking-wider text-zinc-300 uppercase">
+          <span className="bg-wds-accent flex h-2 w-2 rounded-full"></span>
+          <span className="text-[10px] font-medium tracking-wider text-white uppercase">
             SaviOS 2.0 is live
           </span>
         </motion.div>
@@ -38,7 +54,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mx-auto mb-12 max-w-xl text-lg text-zinc-500"
+          className="mx-auto mb-12 max-w-xl text-lg text-white/70"
         >
           Crafted for high-end lifestyle brands. Manage real-time inventory,
           global shipping, and exclusive collections with a single robust OS.
@@ -52,13 +68,13 @@ export function Hero() {
           className="group relative mx-auto max-w-4xl perspective-distant"
         >
           {/* Glow behind */}
-          <div className="absolute top-1/2 left-1/2 h-[50%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-[100px]"></div>
+          <div className="bg-wds-accent/20 absolute top-1/2 left-1/2 h-[50%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px]"></div>
 
           {/* Main Interface */}
           <div className="tilt-card bg-card relative z-10 transform-gpu overflow-hidden rounded-xl border border-white/10 shadow-2xl">
             {/* Border Beam Effect */}
             <div className="pointer-events-none absolute inset-0 z-20">
-              <div className="absolute top-0 left-1/4 h-px w-1/2 bg-linear-to-r from-transparent via-indigo-500 to-transparent opacity-50 blur-sm"></div>
+              <div className="via-wds-accent absolute top-0 left-1/4 h-px w-1/2 bg-linear-to-r from-transparent to-transparent opacity-50 blur-sm"></div>
             </div>
 
             {/* Mockup Header */}
@@ -99,13 +115,13 @@ export function Hero() {
                       ₫ 124,500,000
                     </div>
                   </div>
-                  <div className="flex h-8 w-24 items-center justify-center rounded-md border border-indigo-500/20 bg-indigo-500/10 text-xs text-indigo-400">
+                  <div className="border-wds-accent/20 bg-wds-accent/10 text-wds-accent flex h-8 w-24 items-center justify-center rounded-md border text-xs">
                     +12.5%
                   </div>
                 </div>
 
                 {/* Chart Placeholder */}
-                <div className="relative flex h-48 w-full items-end gap-2 overflow-hidden rounded-lg border border-white/5 bg-linear-to-b from-indigo-500/5 to-transparent px-4 pb-2">
+                <div className="from-wds-accent/5 relative flex h-48 w-full items-end gap-2 overflow-hidden rounded-lg border border-white/5 bg-linear-to-b to-transparent px-4 pb-2">
                   {[40, 60, 45, 80, 55, 90, 70, 60, 50, 75, 85, 95].map(
                     (h, i) => (
                       <motion.div
@@ -116,7 +132,7 @@ export function Hero() {
                           duration: 1,
                           delay: 0.5 + i * 0.05,
                         }}
-                        className="flex-1 rounded-t-sm bg-indigo-500/40 transition-colors hover:bg-indigo-500/60"
+                        className="bg-wds-accent/40 hover:bg-wds-accent/60 flex-1 rounded-t-sm transition-colors"
                       ></motion.div>
                     )
                   )}

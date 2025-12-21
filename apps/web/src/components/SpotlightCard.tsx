@@ -29,7 +29,7 @@ export function SpotlightCard({
 
   return (
     <div
-      className={`${colSpan} group border-border bg-card relative overflow-hidden rounded-2xl border`}
+      className={`${colSpan} group relative overflow-hidden rounded-2xl border border-white/10 bg-black/50`}
       onMouseMove={handleMouseMove}
     >
       <motion.div
@@ -38,7 +38,7 @@ export function SpotlightCard({
           background: useMotionTemplate`
             radial-gradient(
               650px circle at ${mouseX}px ${mouseY}px,
-              rgba(99, 102, 241, 0.1),
+              rgba(247, 147, 30, 0.1),
               transparent 80%
             )
           `,

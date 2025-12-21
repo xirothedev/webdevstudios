@@ -10,9 +10,9 @@ export function FeaturesGrid() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16">
           <h2 className="mb-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Engineered for <span className="text-zinc-500">Scale.</span>
+            Engineered for <span className="text-white/50">Scale.</span>
           </h2>
-          <p className="max-w-lg text-zinc-400">
+          <p className="max-w-lg text-white/70">
             Powerful tools designed for premium single-store brands. No clutter,
             just performance.
           </p>
@@ -25,13 +25,13 @@ export function FeaturesGrid() {
             className="relative flex flex-col justify-between overflow-hidden"
           >
             <div className="relative z-10">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-indigo-500">
+              <div className="text-wds-accent mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-black/50">
                 <Timer className="h-5 w-5" />
               </div>
-              <h3 className="mb-2 text-xl font-medium text-zinc-100">
+              <h3 className="mb-2 text-xl font-medium text-white">
                 Flash Sale Engine
               </h3>
-              <p className="max-w-sm text-sm text-zinc-500">
+              <p className="max-w-sm text-sm text-white/70">
                 Automated countdowns, inventory reservation, and
                 high-concurrency handling for drops.
               </p>
@@ -58,10 +58,10 @@ export function FeaturesGrid() {
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-emerald-500">
               <Layers className="h-5 w-5" />
             </div>
-            <h3 className="mb-2 text-xl font-medium text-zinc-100">
+            <h3 className="mb-2 text-xl font-medium text-white">
               Real-time Inventory
             </h3>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-white/70">
               Sync stock across all channels instantly. Never oversell again.
             </p>
 
@@ -86,10 +86,10 @@ export function FeaturesGrid() {
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-violet-500">
               <Gem className="h-5 w-5" />
             </div>
-            <h3 className="mb-2 text-xl font-medium text-zinc-100">
+            <h3 className="mb-2 text-xl font-medium text-white">
               Signature Series
             </h3>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-white/70">
               Curate exclusive drops for VIP members with password protection.
             </p>
             <div className="mt-6 flex items-center gap-2">
@@ -110,10 +110,10 @@ export function FeaturesGrid() {
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-blue-500">
                 <BarChart2 className="h-5 w-5" />
               </div>
-              <h3 className="mb-2 text-xl font-medium text-zinc-100">
+              <h3 className="mb-2 text-xl font-medium text-white">
                 Deep Analytics
               </h3>
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-white/70">
                 Understand your customer LTV, acquisition channels, and product
                 performance in VND.
               </p>
