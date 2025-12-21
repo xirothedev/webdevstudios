@@ -15,7 +15,7 @@ export class LoginHandler implements ICommandHandler<
 > {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(command: LoginCommand): Promise<AuthUserDto> {
+  async execute(command: LoginCommand) {
     const { email, password } = command.dto;
 
     const user = await this.prisma.user.findUnique({
