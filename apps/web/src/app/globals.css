@@ -1,68 +1,98 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #0b0c0f;
-  --foreground: #e5e7eb;
-  --surface: #0f1116;
-  --surface-2: #0b0c0f;
+  --background: #08090a;
+  --foreground: #e4e4e7;
+  --card: #0f1011;
   --border: #23252a;
+  --accent: #6366f1;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: #08090a;
+  --color-card: #0f1011;
+  --color-border: #23252a;
+  --color-accent: #6366f1;
+  --font-sans: var(--font-inter);
+
+  /* Animations */
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-beam: beam 4s linear infinite;
 }
 
 body {
-  background: radial-gradient(
-    circle at 50% 20%,
-    #0e1016 0%,
-    #05060a 50%,
-    #05060a 100%
-  );
-  color: var(--foreground);
+  background-color: #08090a;
+  color: #e4e4e7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
   font-family:
-    var(--font-geist-sans),
+    var(--font-inter),
     system-ui,
     -apple-system,
     sans-serif;
 }
 
-.tilt-hero {
-  transform: perspective(1000px) rotateX(15deg);
-  transform-style: preserve-3d;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-.mockup-shadow {
-  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+::-webkit-scrollbar-track {
+  background: #08090a;
 }
 
-.radial-spotlight {
-  background: radial-gradient(circle at 50% 45%, #1a1b1e 0%, transparent 60%);
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
 }
 
-@keyframes pull-up {
-  0% {
-    transform: translateY(100%);
+/* Retro Grid Pattern */
+.retro-grid {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  mask-image: radial-gradient(
+    ellipse 60% 50% at 50% 0%,
+    #000 70%,
+    transparent 100%
+  );
+}
+
+/* Utility for 3D Tilt */
+.tilt-card {
+  transform: perspective(1200px) rotateX(15deg);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(11, 11, 11, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: rgb(196, 181, 253);
+}
+
+/* Keyframes */
+@keyframes shimmer {
+  from {
+    background-position: 0 0;
   }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-@keyframes shine {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(120%);
-  }
-}
-
-@keyframes spin {
   to {
-    transform: rotate(360deg);
+    background-position: -200% 0;
+  }
+}
+
+@keyframes beam {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
   }
 }

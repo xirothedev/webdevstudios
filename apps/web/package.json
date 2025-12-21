@@ -11,6 +11,8 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\""
   },
   "dependencies": {
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.562.0",
     "next": "16.1.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"

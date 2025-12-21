@@ -1,24 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Savi E-commerce Web App
+
+This is the web application for Savi - Premium Commerce platform, built with [Next.js](https://nextjs.org).
+
+## Features
+
+- **Modern Landing Page**: Premium commerce landing page with 3D mockup and animations
+- **Dark Mode**: Built-in dark theme with custom color scheme
+- **Animations**: Smooth animations powered by Framer Motion
+- **Responsive Design**: Fully responsive across all devices
+- **Component Library**: Reusable React components
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+```
+
+Then, run the development server:
+
+```bash
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **Tailwind CSS v4**: Utility-first CSS framework
+- **Framer Motion**: Animation library
+- **Lucide React**: Icon library
+
+## Project Structure
+
+```
+src/
+├── app/              # Next.js app directory
+│   ├── layout.tsx    # Root layout
+│   ├── page.tsx      # Home page
+│   └── globals.css   # Global styles
+├── components/       # React components
+│   ├── Navbar.tsx
+│   ├── Hero.tsx
+│   ├── TrustSection.tsx
+│   ├── FeaturesGrid.tsx
+│   ├── SpotlightCard.tsx
+│   └── Footer.tsx
+└── lib/              # Utility functions
+```
 
 ## Learn More
 
@@ -26,8 +58,6 @@ To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel
 
