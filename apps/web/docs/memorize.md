@@ -32,6 +32,8 @@
 2. **Created WebDev Studios components** (`src/components/wds/`):
    - `Header.tsx`: Navigation with logo and menu items
    - `Hero.tsx`: Hero section with heading and illustration
+   - `AboutHero.tsx`: Hero section for About page
+   - `AboutSections.tsx`: 5 content sections with icons for About page
    - `ContactGrid.tsx`: 6 contact information cards
    - `ClientsSection.tsx`: Clients/Partners section
    - `MissionSection.tsx`: Mission/Values section
@@ -43,18 +45,25 @@
 4. **Route restructuring**:
    - Moved shop page to `/shop`
    - Created new home page at `/` with WebDev Studios design
-   - Home page redirects to `/shop` initially, then replaced with WDS page
+   - Created About page at `/about` with hero and 5 content sections
+   - Added Shop link to navigation menu
 5. **Navigation Menu Integration**:
    - Updated shadcn/ui navigation-menu component
    - Applied WDS style (white theme) to navigation-menu
    - Integrated navigation-menu into WDSHeader
    - Added active state detection with `usePathname()`
    - Navigation-menu now works for both white and dark themes
+   - Navigation items: Trang chủ, Về chúng tôi, Shop, Thế hệ, WDS chia sẻ, FAQ
 6. **Images from Unsplash**:
    - Hero illustration: team collaboration image
    - Clients section: team meeting image
    - Mission section: team discussion image
    - Configured Next.js to allow Unsplash images
+7. **About Page** (`/about`):
+   - Created About page with hero section
+   - Added 5 content sections: Tiểu sử, Định hướng, Tầm nhìn, Sứ mệnh, Phạm vi hoạt động
+   - Each section has icon and description
+   - Responsive 2-column layout
 
 ## Current State of Codebase
 
@@ -76,6 +85,8 @@ apps/web/
 │   ├── app/
 │   │   ├── layout.tsx          # Root layout with Inter font
 │   │   ├── page.tsx            # WebDev Studios home page
+│   │   ├── about/
+│   │   │   └── page.tsx        # About page
 │   │   ├── shop/
 │   │   │   └── page.tsx        # Shop/Commerce landing page
 │   │   └── globals.css          # Global styles with custom utilities
@@ -85,6 +96,8 @@ apps/web/
 │   │   ├── wds/                 # WebDev Studios components
 │   │   │   ├── Header.tsx
 │   │   │   ├── Hero.tsx
+│   │   │   ├── AboutHero.tsx
+│   │   │   ├── AboutSections.tsx
 │   │   │   ├── ContactGrid.tsx
 │   │   │   ├── ClientsSection.tsx
 │   │   │   ├── MissionSection.tsx
@@ -107,14 +120,19 @@ apps/web/
 ### Routes
 
 - `/` - WebDev Studios home page (white theme)
+- `/about` - About page with history, vision, mission (white theme)
 - `/shop` - Commerce/Savi landing page (dark theme)
+- `/generation` - Generation page (to be created)
+- `/share` - WDS Share page (to be created)
+- `/faq` - FAQ page (to be created)
+- `/login` - Login page (to be created)
 
 ## Next Steps
 
 ### Immediate Tasks
 
 1. **Complete WebDev Studios pages**:
-   - Create `/about` page
+   - ✅ Create `/about` page (completed - includes hero and 5 sections)
    - Create `/generation` page
    - Create `/share` page
    - Create `/faq` page

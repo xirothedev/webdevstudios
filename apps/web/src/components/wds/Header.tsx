@@ -18,6 +18,7 @@ export function WDSHeader() {
   const navItems = [
     { label: 'Trang chủ', href: '/' },
     { label: 'Về chúng tôi', href: '/about' },
+    { label: 'Shop', href: '/shop' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'WDS chia sẻ', href: '/share' },
     { label: 'FAQ', href: '/faq' },
