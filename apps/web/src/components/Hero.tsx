@@ -35,7 +35,7 @@ export function Hero() {
         >
           <span className="bg-wds-accent flex h-2 w-2 rounded-full"></span>
           <span className="text-[10px] font-medium tracking-wider text-white uppercase">
-            SaviOS 2.0 is live
+            WebDev Studios Official Store
           </span>
         </motion.div>
 
@@ -46,8 +46,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-6 bg-linear-to-b from-white to-white/60 bg-clip-text text-5xl leading-[1.1] font-semibold tracking-tight text-transparent md:text-7xl"
         >
-          The new standard for <br />
-          modern commerce.
+          Vật phẩm câu lạc bộ <br />
+          chính thức của WDS.
         </motion.h1>
 
         <motion.p
@@ -56,8 +56,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mx-auto mb-12 max-w-xl text-lg text-white/70"
         >
-          Crafted for high-end lifestyle brands. Manage real-time inventory,
-          global shipping, and exclusive collections with a single robust OS.
+          Khám phá bộ sưu tập độc quyền áo thun, mũ, túi và nhiều vật phẩm khác
+          mang đậm dấu ấn WebDev Studios.
         </motion.p>
 
         {/* 3D Mockup */}
@@ -85,7 +85,7 @@ export function Hero() {
                 <div className="h-2.5 w-2.5 rounded-full bg-zinc-700"></div>
               </div>
               <div className="flex-1 text-center font-mono text-[10px] text-zinc-600">
-                savi.store/dashboard
+                wds.shop/products
               </div>
             </div>
 
@@ -109,14 +109,14 @@ export function Hero() {
                 <div className="flex items-end justify-between">
                   <div>
                     <div className="mb-1 text-xs text-zinc-500">
-                      Total Revenue
+                      Sản phẩm đã bán
                     </div>
                     <div className="text-2xl font-medium tracking-tight text-white">
-                      ₫ 124,500,000
+                      1,247 sản phẩm
                     </div>
                   </div>
                   <div className="border-wds-accent/20 bg-wds-accent/10 text-wds-accent flex h-8 w-24 items-center justify-center rounded-md border text-xs">
-                    +12.5%
+                    Mới
                   </div>
                 </div>
 

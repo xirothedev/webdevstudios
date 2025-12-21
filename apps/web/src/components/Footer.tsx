@@ -1,47 +1,144 @@
 'use client';
 
 import { Box } from 'lucide-react';
+import Link from 'next/link';
 
-export function Footer() {
+interface FooterProps {
+  variant?: 'dark' | 'light';
+}
+
+export function Footer({ variant = 'dark' }: FooterProps) {
+  const isDark = variant === 'dark';
+
   return (
-    <footer className="bg-wds-background border-t border-white/5 py-12">
-      <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-6 md:flex-row">
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-5 w-5 items-center justify-center rounded bg-white/10 text-white/70">
-              <Box className="h-3 w-3" />
+    <footer
+      className={`${isDark ? 'bg-wds-background border-white/5' : 'border-gray-200 bg-white'} border-t py-12`}
+    >
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <div
+                className={`flex h-5 w-5 items-center justify-center rounded ${isDark ? 'bg-white/10 text-white/70' : 'bg-wds-accent text-black'}`}
+              >
+                <Box className="h-3 w-3" />
+              </div>
+              <span
+                className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
+              >
+                WDS Shop
+              </span>
             </div>
-            <span className="text-sm font-semibold text-white">Savi</span>
+            <p
+              className={`text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+            >
+              © 2025 WebDev Studios. Vật phẩm chính thức của CLB.
+            </p>
           </div>
-          <p className="text-xs text-white/70">© 2025 Savi Commerce Inc.</p>
-        </div>
-        <div className="flex gap-12 text-xs text-white/70">
-          <div className="flex flex-col gap-3">
-            <span className="font-medium text-white">Product</span>
-            <a href="#" className="hover:text-wds-accent transition-colors">
-              Changelog
-            </a>
-            <a href="#" className="hover:text-wds-accent transition-colors">
-              Documentation
-            </a>
+
+          <div>
+            <h4
+              className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
+            >
+              SẢN PHẨM
+            </h4>
+            <ul
+              className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+            >
+              <li>
+                <a href="#" className="hover:text-wds-accent transition-colors">
+                  Áo thun
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-wds-accent transition-colors">
+                  Mũ & Phụ kiện
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-wds-accent transition-colors">
+                  Túi & Balo
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-wds-accent transition-colors">
+                  Bộ sưu tập đặc biệt
+                </a>
+              </li>
+            </ul>
           </div>
-          <div className="flex flex-col gap-3">
-            <span className="font-medium text-white">Company</span>
-            <a href="#" className="hover:text-wds-accent transition-colors">
-              Careers
-            </a>
-            <a href="#" className="hover:text-wds-accent transition-colors">
-              Legal
-            </a>
+
+          <div>
+            <h4
+              className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
+            >
+              LIÊN HỆ
+            </h4>
+            <ul
+              className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+            >
+              <li>
+                <span className="font-medium">Email:</span>{' '}
+                <a
+                  href="mailto:webdevstudios.org@gmail.com"
+                  className="hover:text-wds-accent transition-colors"
+                >
+                  webdevstudios.org@gmail.com
+                </a>
+              </li>
+              <li>
+                <span className="font-medium">Chủ nhiệm:</span> Lâm Chí Dĩnh -
+                0794161275
+              </li>
+              <li>
+                <span className="font-medium">Fanpage:</span>{' '}
+                <a
+                  href="https://facebook.com/webdevstudios.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-wds-accent transition-colors"
+                >
+                  facebook.com/webdevstudios.org
+                </a>
+              </li>
+              <li>
+                <span className="font-medium">Văn phòng:</span> B8.04, tòa B,
+                trường Đại học Công nghệ Thông tin – ĐHQG TP.HCM.
+              </li>
+            </ul>
           </div>
-          <div className="flex flex-col gap-3">
-            <span className="font-medium text-white">Connect</span>
-            <a href="#" className="hover:text-wds-accent transition-colors">
-              Twitter
-            </a>
-            <a href="#" className="hover:text-wds-accent transition-colors">
-              GitHub
-            </a>
+
+          <div>
+            <h4
+              className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
+            >
+              VỀ CLB
+            </h4>
+            <ul
+              className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+            >
+              <li>
+                <Link
+                  href="/about"
+                  className="hover:text-wds-accent transition-colors"
+                >
+                  Về chúng tôi
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/faq"
+                  className="hover:text-wds-accent transition-colors"
+                >
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <a href="#" className="hover:text-wds-accent transition-colors">
+                  Chính sách đổi trả
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
