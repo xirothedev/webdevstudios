@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
@@ -16,6 +25,7 @@ import { Public } from '@/common/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { LoginCommand } from './commands/impl/login.command';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
+import { verifyUserCommand } from './commands/impl/verifyUser.command';
 import { AuthUserResponseDto } from './dto/auth-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -75,8 +85,27 @@ export class AuthController {
     status: 400,
     description: 'Invalid input data',
   })
-  register(@Body() dto: RegisterDto): Promise<AuthUserResponseDto> {
-    return this.commandBus.execute(new RegisterUserCommand(dto));
+  async register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<AuthUserResponseDto> {
+    const data = await this.commandBus.execute(new RegisterUserCommand(dto));
+
+    const token = await this.authService.generateTokenFromUser(data.data);
+
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: this.config.get<number>('JWT_EXPIRES_IN', 1000 * 60 * 60 * 24), // 24 hours
+    });
+
+    return {
+      ...data,
+      token: {
+        access_token: token,
+        // refresh_token: refreshToken,
+      },
+    };
   }
 
   @Public()
@@ -186,8 +215,34 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response): { message: string } {
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
     });
     return { message: 'Logout successful' };
+  }
+
+  @Get('/verify')
+  @ApiOperation({
+    summary: 'Verify user email',
+    description: 'Verify user email using the verification token',
+  })
+  @ApiParam({
+    name: 'token',
+    description: 'Verification token sent to user email',
+    example: '123456',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Email verified successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid verification token',
+  })
+  async verifyEmail(
+    @Query('token') token: string
+  ): Promise<AuthUserResponseDto> {
+    console.log(token);
+    return this.commandBus.execute(
+      new verifyUserCommand({ verficationCode: token })
+    );
   }
 }

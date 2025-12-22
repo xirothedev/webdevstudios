@@ -40,10 +40,6 @@ export class LoginHandler implements ICommandHandler<
       throw new NotFoundException('User not found');
     }
 
-    if (!user.emailVerified) {
-      throw new UnauthorizedException('Email not verified');
-    }
-
     if (!user.password) {
       throw new MethodNotAllowedException('Passwordless login is not allowed');
     }
@@ -51,6 +47,10 @@ export class LoginHandler implements ICommandHandler<
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.emailVerified) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
