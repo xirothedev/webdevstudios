@@ -5,8 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { userInfoDto } from '../dto/userInfo.dto';
-import { GetProfileQueryByToken } from '../queries/getProfileByToken.query';
+import { userInfoDto } from '../../dto/userInfo.dto';
+import { GetProfileQueryByToken } from '../impl/getProfileByToken.query';
 
 @Injectable()
 @QueryHandler(GetProfileQueryByToken)

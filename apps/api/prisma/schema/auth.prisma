@@ -79,7 +79,7 @@ model Device {
   createdAt  DateTime @default(now())
 
   // Relations
-  sessions Session[] // Sessions từ thiết bị này
+  session Session? // Session hiện tại của thiết bị này (one-to-one)
 
   @@index([userId])
   @@index([fingerprint])
@@ -95,7 +95,7 @@ model Session {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  deviceId String? // Link với Device
+  deviceId String? @unique // Link với Device (unique: một device chỉ có một session)
   device   Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
 
   ipAddress String? @db.VarChar(45)

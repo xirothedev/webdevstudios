@@ -3,8 +3,8 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { PrismaService } from '@/prisma/prisma.service';
 
-import { userInfoDto } from '../dto/userInfo.dto';
-import { GetProfileQuery } from '../queries/get-profile.query';
+import { userInfoDto } from '../../dto/userInfo.dto';
+import { GetProfileQuery } from '../impl/get-profile.query';
 
 @Injectable()
 @QueryHandler(GetProfileQuery)
