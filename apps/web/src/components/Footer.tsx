@@ -29,13 +29,36 @@ export function Footer({ variant = 'dark' }: FooterProps) {
               <span
                 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
               >
+                WebDev Studios
+              </span>
+            </div>
+            <p
+              className={`mb-10 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+            >
+              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với
+              Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để
+              các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.
+            </p>
+
+            <div className="mb-4 flex items-center gap-2">
+              <div className="relative h-5 w-5">
+                <Image
+                  src="/image/wds-logo.svg"
+                  alt="WDS Shop"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <span
+                className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
+              >
                 WDS Shop
               </span>
             </div>
             <p
               className={`text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
-              © 2025 WebDev Studios. Vật phẩm chính thức của CLB.
+              WebDev Studios Shop là nơi bán các sản phẩm chính thức của CLB.
             </p>
           </div>
 
@@ -48,26 +71,21 @@ export function Footer({ variant = 'dark' }: FooterProps) {
             <ul
               className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
-              <li>
-                <a href="#" className="hover:text-wds-accent transition-colors">
-                  Áo thun
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-wds-accent transition-colors">
-                  Mũ & Phụ kiện
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-wds-accent transition-colors">
-                  Túi & Balo
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-wds-accent transition-colors">
-                  Bộ sưu tập đặc biệt
-                </a>
-              </li>
+              {[
+                { label: 'Áo thun', href: '#' },
+                { label: 'Mũ & Phụ kiện', href: '#' },
+                { label: 'Túi & Balo', href: '#' },
+                { label: 'Bộ sưu tập đặc biệt', href: '#' },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="hover:text-wds-accent transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -82,12 +100,14 @@ export function Footer({ variant = 'dark' }: FooterProps) {
             >
               <li>
                 <span className="font-medium">Email:</span>{' '}
-                <a
+                <Link
                   href="mailto:webdevstudios.org@gmail.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-wds-accent transition-colors"
                 >
                   webdevstudios.org@gmail.com
-                </a>
+                </Link>
               </li>
               <li>
                 <span className="font-medium">Chủ nhiệm:</span> Lâm Chí Dĩnh -
@@ -95,14 +115,14 @@ export function Footer({ variant = 'dark' }: FooterProps) {
               </li>
               <li>
                 <span className="font-medium">Fanpage:</span>{' '}
-                <a
+                <Link
                   href="https://facebook.com/webdevstudios.org"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-wds-accent transition-colors"
                 >
                   facebook.com/webdevstudios.org
-                </a>
+                </Link>
               </li>
               <li>
                 <span className="font-medium">Văn phòng:</span> B8.04, tòa B,
@@ -137,13 +157,19 @@ export function Footer({ variant = 'dark' }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-wds-accent transition-colors">
+                <Link
+                  href="#"
+                  className="hover:text-wds-accent transition-colors"
+                >
                   Chính sách đổi trả
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
         </div>
+      </div>
+      <div className="mt-10 text-center text-xs text-gray-500">
+        © 2025 WebDev Studios. All rights reserved.
       </div>
     </footer>
   );

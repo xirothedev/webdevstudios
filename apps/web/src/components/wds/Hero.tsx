@@ -18,7 +18,7 @@ const scaleIn = {
 
 export function WDSHero() {
   return (
-    <section className="relative overflow-hidden bg-white py-10 sm:py-30 md:py-24 lg:py-12">
+    <section className="relative overflow-hidden bg-white py-10 sm:py-30 md:py-24 lg:py-1">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10">
         <div className="bg-wds-secondary absolute top-1/4 right-0 h-96 w-96 rounded-full opacity-30 blur-[120px]"></div>

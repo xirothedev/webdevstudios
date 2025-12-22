@@ -1,4 +1,5 @@
 import { ArrowRightIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -89,10 +90,10 @@ const BentoCard = ({
               size="sm"
               className="pointer-events-auto p-0"
             >
-              <a href={href}>
+              <Link href={href!}>
                 {cta}
                 <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-              </a>
+              </Link>
             </Button>
           )
         ) : null}
@@ -122,10 +123,10 @@ const BentoCard = ({
             size="sm"
             className="pointer-events-auto p-0"
           >
-            <a href={href}>
+            <Link href={href!}>
               {cta}
               <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-            </a>
+            </Link>
           </Button>
         )
       ) : null}

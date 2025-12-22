@@ -4,6 +4,7 @@ import { WDSClientsSection } from '@/components/wds/ClientsSection';
 import { WDSContactGrid } from '@/components/wds/ContactGrid';
 import { WDSHero } from '@/components/wds/Hero';
 import { WDSMissionSection } from '@/components/wds/MissionSection';
+import { WDSStatsSection } from '@/components/wds/StatsSection';
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <WDSContactGrid />
       <WDSClientsSection />
       <WDSMissionSection />
+      <WDSStatsSection />
       <Footer variant="light" />
     </div>
   );
