@@ -1,27 +1,18 @@
 import './globals.css';
 
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter } from 'next/font/google';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+import { Inter } from 'next/font/google';
 
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600'],
 });
 
 export const metadata: Metadata = {
-  title: 'Linear-inspired workspace',
-  description: 'A Linear.app inspired landing experience built with Next.js',
+  title: 'Savi | Premium Commerce',
+  description:
+    'The new standard for modern commerce. Crafted for high-end lifestyle brands.',
 };
 
 export default function RootLayout({
@@ -30,12 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} antialiased`}>{children}</body>
     </html>
   );
 }
