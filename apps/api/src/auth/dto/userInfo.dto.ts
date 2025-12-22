@@ -1,7 +1,7 @@
-import { UserRole } from '@generated/prisma';
+import { UserRole } from '@generated/prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AuthUserDto {
+export class userInfoDto {
   @ApiProperty({
     description: 'User ID',
     example: 'clx1234567890abcdef',
@@ -15,14 +15,14 @@ export class AuthUserDto {
   email!: string;
 
   @ApiProperty({
-    description: 'User full name',
+    description: 'Full name of the user',
     example: 'John Doe',
     nullable: true,
   })
   fullName!: string | null;
 
   @ApiProperty({
-    description: 'User avatar',
+    description: 'Avatar image URL',
     example: 'https://example.com/avatar.jpg',
     nullable: true,
   })
@@ -41,27 +41,4 @@ export class AuthUserDto {
     type: Date,
   })
   createdAt!: Date;
-}
-
-export class AuthUserResponseDto {
-  @ApiProperty({
-    description: 'Message',
-    example: 'User registered successfully',
-  })
-  message!: string;
-
-  @ApiProperty({
-    description: 'User data',
-    type: AuthUserDto,
-  })
-  data!: AuthUserDto;
-
-  @ApiProperty({
-    description: 'Timestamp',
-    example: 1719000000000,
-    type: Number,
-  })
-  timestamp!: number;
-
-  [x: string]: any;
 }

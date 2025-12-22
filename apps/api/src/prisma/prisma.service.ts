@@ -1,5 +1,6 @@
 import { PrismaClient } from '@generated/prisma/client';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
 export class PrismaService
@@ -8,7 +9,7 @@ export class PrismaService
 {
   constructor() {
     super({
-      accelerateUrl: process.env.ACCELERATE_URL ?? '',
+      adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
       log: ['query', 'info', 'warn', 'error'],
       errorFormat: 'pretty',
       omit: {

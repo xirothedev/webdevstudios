@@ -1,28 +1,41 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 
-import { LoginCommand } from './commands/login.command';
-import { RegisterUserCommand } from './commands/register-user.command';
-import { AuthUserDto } from './dto/auth-user.dto';
+import { Public } from '@/common/decorators/public.decorator';
+
+import { AuthService } from './auth.service';
+import { LoginCommand } from './commands/impl/login.command';
+import { RegisterUserCommand } from './commands/impl/register-user.command';
+import { AuthUserResponseDto } from './dto/auth-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { GetProfileQuery } from './queries/get-profile.query';
+import { TokenRequestDto } from './dto/tokenRequest.dto';
+import { userInfoDto } from './dto/userInfo.dto';
+import { GetProfileQuery } from './queries/impl/get-profile.query';
+import { GetProfileQueryByToken } from './queries/impl/getProfileByToken.query';
 
 @ApiTags('auth')
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
+    private readonly authService: AuthService,
+    private readonly config: ConfigService
   ) {}
 
+  @Public()
   @Post('register')
   @ApiOperation({
     summary: 'Register new account',
@@ -52,7 +65,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'Registration successful',
-    type: AuthUserDto,
+    type: AuthUserResponseDto,
   })
   @ApiResponse({
     status: 409,
@@ -62,10 +75,11 @@ export class AuthController {
     status: 400,
     description: 'Invalid input data',
   })
-  register(@Body() dto: RegisterDto): Promise<AuthUserDto> {
+  register(@Body() dto: RegisterDto): Promise<AuthUserResponseDto> {
     return this.commandBus.execute(new RegisterUserCommand(dto));
   }
 
+  @Public()
   @Post('login')
   @ApiOperation({
     summary: 'User login',
@@ -86,7 +100,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Login successful',
-    type: AuthUserDto,
+    type: AuthUserResponseDto,
   })
   @ApiResponse({
     status: 401,
@@ -96,8 +110,43 @@ export class AuthController {
     status: 400,
     description: 'Invalid input data',
   })
-  login(@Body() dto: LoginDto): Promise<AuthUserDto> {
-    return this.commandBus.execute(new LoginCommand(dto));
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<AuthUserResponseDto> {
+    const data: AuthUserResponseDto = await this.commandBus.execute(
+      new LoginCommand(dto)
+    );
+
+    const token = await this.authService.generateTokenFromUser(data.data);
+
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: this.config.get<number>('JWT_EXPIRES_IN', 1000 * 60 * 60 * 24), // 24 hours
+    });
+
+    return {
+      ...data,
+      token: {
+        access_token: token,
+        // refresh_token: refreshToken,
+      },
+    };
+  }
+
+  @Get('profile/me')
+  @ApiOperation({
+    summary: 'Get my profile',
+    description: 'Retrieve detailed information about the authenticated user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile retrieved successfully',
+    type: userInfoDto,
+  })
+  getMyProfile(@Req() req: TokenRequestDto): Promise<userInfoDto> {
+    return this.queryBus.execute(new GetProfileQueryByToken(req.userToken));
   }
 
   @Get('profile/:id')
@@ -114,13 +163,31 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Profile retrieved successfully',
-    type: AuthUserDto,
+    type: userInfoDto,
   })
   @ApiResponse({
     status: 404,
     description: 'User not found',
   })
-  getProfile(@Param('id') id: string): Promise<AuthUserDto> {
+  getProfile(@Param('id') id: string): Promise<userInfoDto> {
     return this.queryBus.execute(new GetProfileQuery(id));
+  }
+
+  @Post('logout')
+  @ApiOperation({
+    summary: 'User logout',
+    description:
+      'Logout the authenticated user by clearing the access token cookie',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout successful',
+  })
+  logout(@Res({ passthrough: true }) res: Response): { message: string } {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return { message: 'Logout successful' };
   }
 }
