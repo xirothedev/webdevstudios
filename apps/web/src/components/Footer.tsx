@@ -1,6 +1,6 @@
 'use client';
 
-import { Box } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface FooterProps {
@@ -18,10 +18,13 @@ export function Footer({ variant = 'dark' }: FooterProps) {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <div
-                className={`flex h-5 w-5 items-center justify-center rounded ${isDark ? 'bg-white/10 text-white/70' : 'bg-wds-accent text-black'}`}
-              >
-                <Box className="h-3 w-3" />
+              <div className="relative h-5 w-5">
+                <Image
+                  src="/image/wds-logo.svg"
+                  alt="WDS Shop"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <span
                 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
