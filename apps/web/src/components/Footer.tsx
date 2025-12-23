@@ -63,11 +63,11 @@ export function Footer({ variant = 'dark' }: FooterProps) {
           </div>
 
           <div>
-            <h4
+            <h3
               className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
             >
               SẢN PHẨM
-            </h4>
+            </h3>
             <ul
               className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
@@ -90,11 +90,11 @@ export function Footer({ variant = 'dark' }: FooterProps) {
           </div>
 
           <div>
-            <h4
+            <h3
               className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
             >
               LIÊN HỆ
-            </h4>
+            </h3>
             <ul
               className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
@@ -132,11 +132,11 @@ export function Footer({ variant = 'dark' }: FooterProps) {
           </div>
 
           <div>
-            <h4
+            <h3
               className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
             >
               VỀ CLB
-            </h4>
+            </h3>
             <ul
               className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >

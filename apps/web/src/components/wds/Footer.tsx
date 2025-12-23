@@ -12,7 +12,7 @@ export function WDSFooter() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-lg font-semibold">LIÊN HỆ</h4>
+            <h3 className="mb-4 text-lg font-semibold">LIÊN HỆ</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <span className="font-medium">Email:</span>{' '}
@@ -46,7 +46,7 @@ export function WDSFooter() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-lg font-semibold">VỀ CLB</h4>
+            <h3 className="mb-4 text-lg font-semibold">VỀ CLB</h3>
             <ul className="space-y-2">
               <li>
                 <Link
