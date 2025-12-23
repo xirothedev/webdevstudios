@@ -2,24 +2,20 @@
 
 ## Tổng quan
 
-Dự án đã được cấu hình để sử dụng logo WDS (`wds-logo.svg`) làm favicon và các icon cho Android, iOS và các nền tảng khác.
+Dự án đã được cấu hình để sử dụng logo WDS (`wds-logo.png`) làm favicon và các icon cho Android, iOS và các nền tảng khác.
 
 ## Cấu trúc Files
 
 ### Favicon Files
 
-- `src/app/favicon.ico` - Favicon chính (multi-size ICO)
-- `src/app/icon-*.png` - Các icon với kích thước khác nhau (16x16, 32x32, 96x96, 192x192, 512x512)
-- `src/app/apple-icon.png` - Apple touch icon (180x180)
+Script `generate-icons.py` tạo các file sau trong `public/` directory:
+
+- `public/favicon.ico` - Favicon chính (multi-size ICO: 16x16, 32x32, 48x48)
+- `public/favicon-16x16.png` - Favicon PNG 16x16
 - `public/favicon-32x32.png` - Favicon PNG 32x32
-- `public/icons/apple-icon.png` - Apple icon trong public directory
-
-### Android Icons
-
-- `public/icons/android-chrome-192x192.png` - Android Chrome icon 192x192
-- `public/icons/android-chrome-512x512.png` - Android Chrome icon 512x512
-- `public/icons/icon-192x192.png` - Manifest icon 192x192
-- `public/icons/icon-512x512.png` - Manifest icon 512x512
+- `public/icon-192x192.png` - Icon 192x192 cho Android Chrome và manifest
+- `public/icon-512x512.png` - Icon 512x512 cho Android Chrome và manifest
+- `public/apple-touch-icon.png` - Apple touch icon (180x180)
 
 ### Manifest File
 
@@ -38,45 +34,47 @@ File `src/app/layout.tsx` đã được cấu hình với metadata đầy đủ 
 
 ### Next.js App Directory
 
-Next.js 13+ tự động nhận diện các file sau trong `app/` directory:
+Next.js 16 tự động nhận diện các file favicon trong `public/` directory:
 
-- `favicon.ico`
-- `icon.png` (hoặc các file icon-\*.png)
-- `apple-icon.png`
+- `favicon.ico` - Được sử dụng tự động
+- `apple-touch-icon.png` - Được sử dụng cho iOS devices
+- Các file icon khác được tham chiếu trong metadata
 
 ## Script Generation
 
-Script `scripts/generate-icons.sh` được sử dụng để tạo tất cả các icon từ file SVG gốc.
+Script `scripts/generate-icons.py` được sử dụng để tạo tất cả các icon từ file PNG logo.
 
 ### Sử dụng script:
 
 ```bash
 cd apps/web
-bash scripts/generate-icons.sh
+python3 scripts/generate-icons.py
 ```
 
 ### Yêu cầu:
 
-- ImageMagick (`convert` command) phải được cài đặt
-- File SVG gốc: `public/image/wds-logo.svg`
+- Python 3
+- PIL/Pillow library (`pip install Pillow`)
+- File logo PNG: `public/wds-logo.png`
 
 ## Cập nhật Icon
 
 Để cập nhật icon:
 
-1. Thay thế file `public/image/wds-logo.svg` với logo mới
-2. Chạy script: `bash scripts/generate-icons.sh`
-3. Tất cả các icon sẽ được tự động tạo lại
+1. Thay thế file `public/wds-logo.png` với logo mới (PNG format)
+2. Chạy script: `python3 scripts/generate-icons.py`
+3. Tất cả các icon sẽ được tự động tạo lại trong `public/` directory
 
 ## Browser Support
 
 - **Chrome/Edge**: Sử dụng favicon.ico và các PNG icons
 - **Firefox**: Sử dụng favicon.ico
-- **Safari (iOS)**: Sử dụng apple-icon.png
-- **Android Chrome**: Sử dụng android-chrome icons và manifest
+- **Safari (iOS)**: Sử dụng apple-touch-icon.png
+- **Android Chrome**: Sử dụng icon-192x192.png và icon-512x512.png trong manifest
 
 ## Notes
 
-- Tất cả icons được tạo từ cùng một file SVG gốc để đảm bảo tính nhất quán
+- Tất cả icons được tạo từ cùng một file PNG gốc để đảm bảo tính nhất quán
 - Icons được tối ưu hóa kích thước file
 - Web manifest hỗ trợ PWA functionality
+- Metadata trong `layout.tsx` và `site.webmanifest` đã được cấu hình để sử dụng đúng các file icon

@@ -1,0 +1,132 @@
+import { siteUrl } from './metadata';
+
+export interface OrganizationSchema {
+  '@context': string;
+  '@type': string;
+  name: string;
+  url: string;
+  logo: string;
+  description: string;
+  sameAs?: string[];
+  contactPoint?: {
+    '@type': string;
+    contactType: string;
+    email?: string;
+    url?: string;
+  };
+}
+
+export interface WebSiteSchema {
+  '@context': string;
+  '@type': string;
+  name: string;
+  url: string;
+  description: string;
+  potentialAction?: {
+    '@type': string;
+    target: {
+      '@type': string;
+      urlTemplate: string;
+    };
+    'query-input': string;
+  };
+}
+
+export interface BreadcrumbSchema {
+  '@context': string;
+  '@type': string;
+  itemListElement: Array<{
+    '@type': string;
+    position: number;
+    name: string;
+    item?: string;
+  }>;
+}
+
+export function getOrganizationSchema(): OrganizationSchema {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'WebDev Studios',
+    url: siteUrl,
+    logo: `${siteUrl}/icons/icon-512x512.png`,
+    description:
+      'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.',
+    sameAs: [
+      // Add social media links here
+      // 'https://www.facebook.com/webdevstudios',
+      // 'https://twitter.com/webdevstudios',
+      // 'https://github.com/webdevstudios',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      // email: 'contact@webdevstudios.org',
+      // url: `${siteUrl}/contact`,
+    },
+  };
+}
+
+export function getWebSiteSchema(): WebSiteSchema {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'WebDev Studios',
+    url: siteUrl,
+    description:
+      'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+}
+
+export function getBreadcrumbSchema(
+  items: Array<{ name: string; url?: string }>
+): BreadcrumbSchema {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      ...(item.url && { item: item.url }),
+    })),
+  };
+}
+
+export function getPageSchema({
+  title,
+  description,
+  url,
+  image,
+  datePublished,
+  dateModified,
+}: {
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  datePublished?: string;
+  dateModified?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    description,
+    url,
+    ...(image && {
+      image: image.startsWith('http') ? image : `${siteUrl}${image}`,
+    }),
+    ...(datePublished && { datePublished }),
+    ...(dateModified && { dateModified }),
+    publisher: getOrganizationSchema(),
+  };
+}

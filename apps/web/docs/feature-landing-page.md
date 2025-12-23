@@ -11,7 +11,7 @@ A multi-theme website built with Next.js, featuring:
 
 - `/` - WebDev Studios home page (white theme)
 - `/about` - About page with history, vision, mission (white theme)
-- `/shop` - Commerce/Savi landing page (dark theme)
+- `/shop` - E-commerce landing page (dark theme)
 
 ## Components
 
@@ -122,7 +122,7 @@ A multi-theme website built with Next.js, featuring:
 
 ### Hero Section
 
-- Animated badge announcing "SaviOS 2.0"
+- Animated badge announcing "WDS Platform 2.0"
 - Large gradient heading
 - Descriptive subtitle
 - 3D dashboard mockup with:
