@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/about',
     '/shop',
+    '/faq',
     // Add more routes as they are created
     // '/generation',
     // '/share',
