@@ -1,7 +1,0 @@
-# Git aliases for multi-remote setup
-# Copy these to your global .gitconfig or run:
-# git config --global alias.push-all '!f() { branch=${1:-$(git symbolic-ref --short HEAD)}; git push origin $branch && git push xirothedev $branch; }; f'
-
-[alias]
-    push-all = !f() { branch=${1:-$(git symbolic-ref --short HEAD)}; git push origin $branch && git push xirothedev $branch; }; f
-
