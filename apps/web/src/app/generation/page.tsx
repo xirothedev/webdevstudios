@@ -140,6 +140,7 @@ function ExpandableGenerationSection({
                     alt={member.name}
                     width={64}
                     height={64}
+                    sizes="(max-width: 768px) 144px, 288px"
                     className="h-14 w-14 object-cover transition-transform duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
                   />
                 </div>
@@ -345,6 +346,7 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
                     alt={member.name}
                     width={64}
                     height={64}
+                    sizes="(max-width: 768px) 144px, 288px"
                     className="h-28 w-28 object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>
