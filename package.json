@@ -9,7 +9,10 @@
     "format": "prettier --write \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && pnpm format",
     "format:check": "prettier --check \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && pnpm format:check",
     "clean": "turbo run clean",
-    "prepare": "husky"
+    "prepare": "husky",
+    "push:all": "bash scripts/push-all.sh",
+    "push:origin": "git push origin",
+    "push:xirothedev": "git push xirothedev"
   },
   "devDependencies": {
     "husky": "^9.1.7",
