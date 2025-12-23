@@ -162,7 +162,7 @@ export function WDSContactGrid() {
       className: 'col-span-3 lg:col-span-2',
       background: (
         <div className="absolute inset-0">
-          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/uit-school.png')] bg-cover bg-center opacity-50" />
+          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/uit-school.webp')] bg-cover bg-center opacity-50" />
           <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/60 to-white/30" />
         </div>
       ),
@@ -176,7 +176,7 @@ export function WDSContactGrid() {
       className: 'col-span-3 lg:col-span-1',
       background: (
         <div className="absolute inset-0">
-          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/chunhiem-lamchidinh.png')] bg-cover bg-center opacity-50" />
+          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/chunhiem-lamchidinh.webp')] bg-cover bg-center opacity-50" />
           <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/60 to-white/30" />
         </div>
       ),

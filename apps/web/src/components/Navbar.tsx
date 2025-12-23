@@ -229,7 +229,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           ) : (
             <Link
               href="/login"
-              className="bg-wds-accent hover:bg-wds-accent/90 hidden rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors sm:inline-block"
+              className="bg-wds-accent hover:bg-wds-accent/90 hidden rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors sm:inline-block"
             >
               Đăng nhập
             </Link>
@@ -369,9 +369,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
                         'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
-                        isDark
-                          ? 'bg-wds-accent hover:bg-wds-accent/90 text-black'
-                          : 'bg-wds-accent hover:bg-wds-accent/90 text-white'
+                        'bg-wds-accent hover:bg-wds-accent/90 text-black'
                       )}
                     >
                       Đăng nhập

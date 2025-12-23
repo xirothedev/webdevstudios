@@ -68,7 +68,7 @@ export function WDSMissionSection() {
 
             <Link
               href="/mission"
-              className="group border-wds-accent text-wds-accent hover:bg-wds-accent focus:ring-wds-accent relative inline-flex items-center gap-2 overflow-hidden rounded-lg border-2 bg-transparent px-8 py-4 text-base font-semibold transition-all duration-300 hover:text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              className="group border-wds-accent text-wds-accent hover:bg-wds-accent focus:ring-wds-accent relative inline-flex items-center gap-2 overflow-hidden rounded-lg border-2 bg-transparent px-8 py-4 text-base font-semibold transition-all duration-300 hover:text-black focus:ring-2 focus:ring-offset-2 focus:outline-none"
             >
               <span className="relative z-10">Đọc thêm</span>
               <motion.span
