@@ -57,6 +57,7 @@ src/
 │   ├── layout.tsx    # Root layout with SEO metadata
 │   ├── page.tsx      # WebDev Studios home page
 │   ├── sitemap.ts    # Dynamic sitemap generation
+│   ├── robots.ts    # Dynamic robots.txt generation
 │   ├── about/        # About page
 │   ├── shop/         # E-commerce landing page
 │   └── globals.css   # Global styles
@@ -88,7 +89,6 @@ public/
 │   ├── apple-icon.png
 │   └── icon-*.png
 ├── favicon-32x32.png
-├── robots.txt        # SEO robots.txt
 └── site.webmanifest  # PWA manifest
 scripts/
 └── generate-icons.sh # Script to generate icons from SVG

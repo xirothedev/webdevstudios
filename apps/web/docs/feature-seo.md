@@ -19,7 +19,7 @@ Dự án đã được cấu hình đầy đủ SEO với các tính năng:
 - `src/lib/structured-data.ts` - Structured data (JSON-LD) schemas
 - `src/components/StructuredData.tsx` - Component để inject structured data
 - `src/app/sitemap.ts` - Dynamic sitemap generation
-- `public/robots.txt` - Robots.txt file
+- `src/app/robots.ts` - Dynamic robots.txt generation
 
 ### Page Metadata
 
@@ -203,7 +203,7 @@ pnpm start
 # Test sitemap
 curl http://localhost:3000/sitemap.xml
 
-# Test robots.txt
+# Test robots.txt (auto-generated với domain động)
 curl http://localhost:3000/robots.txt
 ```
 
@@ -211,6 +211,7 @@ curl http://localhost:3000/robots.txt
 
 - Metadata được tự động merge với defaultMetadata
 - Sitemap tự động generate từ routes trong sitemap.ts
+- **Robots.txt tự động generate** từ `src/app/robots.ts` với domain động từ `NEXT_PUBLIC_SITE_URL`
 - Structured data được inject vào mọi trang qua StructuredData component
 - Robots.txt cho phép tất cả crawlers, chỉ disallow admin và API routes
 
