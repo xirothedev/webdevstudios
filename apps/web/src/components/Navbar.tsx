@@ -58,7 +58,8 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
               <div className="relative h-6 w-6">
                 <Image
                   src="/image/wds-logo.svg"
-                  alt="WDS Shop"
+                  alt=""
+                  aria-hidden="true"
                   fill
                   className="object-contain"
                   priority
@@ -73,7 +74,8 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
               <div className="relative h-12 w-12">
                 <Image
                   src="/image/wds-logo.svg"
-                  alt="WebDev Studios"
+                  alt=""
+                  aria-hidden="true"
                   fill
                   className="object-contain"
                   priority

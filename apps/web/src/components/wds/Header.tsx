@@ -32,7 +32,8 @@ export function WDSHeader() {
           <div className="relative h-12 w-12">
             <Image
               src="/image/wds-logo.svg"
-              alt="WebDev Studios"
+              alt=""
+              aria-hidden="true"
               fill
               className="object-contain"
               priority
