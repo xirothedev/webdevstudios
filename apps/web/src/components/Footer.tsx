@@ -72,10 +72,10 @@ export function Footer({ variant = 'dark' }: FooterProps) {
               className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
               {[
-                { label: 'Áo thun', href: '#' },
-                { label: 'Mũ & Phụ kiện', href: '#' },
-                { label: 'Túi & Balo', href: '#' },
-                { label: 'Bộ sưu tập đặc biệt', href: '#' },
+                { label: 'Áo thun', href: '/shop/ao-thun' },
+                { label: 'Huy hiệu', href: '/shop/huy-hieu' },
+                { label: 'Dây đeo', href: '/shop/day-deo' },
+                { label: 'Pad chuột', href: '/shop/pad-chuot' },
               ].map((item) => (
                 <li key={item.label}>
                   <Link

@@ -289,6 +289,81 @@ export const generations: Generation[] = [
       },
     ],
   },
+  {
+    gen: 7,
+    period: '2024 - 2025',
+    members: [
+      {
+        id: '7-1',
+        name: 'Phương Dung',
+        role: 'Chủ Nhiệm',
+        avatar: '/avatars/gen-7/phuong-dung.png',
+        isLeader: true,
+      },
+      {
+        id: '7-2',
+        name: 'Minh Quân',
+        role: 'Phó Chủ Nhiệm',
+        avatar: '/avatars/gen-7/minh-quan.png',
+        isLeader: true,
+      },
+      {
+        id: '7-3',
+        name: 'Quang Đăng',
+        role: 'Phó Chủ Nhiệm',
+        avatar: '/avatars/gen-7/quang-dang.png',
+        isLeader: true,
+      },
+      {
+        id: '7-4',
+        name: 'Chí Dĩnh',
+        role: 'Thành viên ban chủ nhiệm',
+        avatar: '/avatars/gen-7/chi-dinh.png',
+      },
+      {
+        id: '7-5',
+        name: 'Bình Nguyên',
+        role: 'Thành viên ban chủ nhiệm',
+        avatar: '/avatars/gen-7/binh-nguyen.png',
+      },
+    ],
+  },
+  {
+    gen: 8,
+    period: '2025 - 2026',
+    members: [
+      {
+        id: '8-1',
+        name: 'Chướng Hồng Văn',
+        role: 'Trưởng ban Lập trình',
+        avatar: '/avatars/gen-8/chuong-hong-van.png',
+      },
+      {
+        id: '8-2',
+        name: 'Huỳnh Quốc Sang',
+        role: 'Trưởng ban Nhân sự',
+        avatar: '/avatars/gen-8/huynh-quoc-sang.png',
+      },
+      {
+        id: '8-3',
+        name: 'Linh Thị Huyễn',
+        role: 'Trưởng ban Quản lý dự án',
+        avatar: '/avatars/gen-8/linh-thi-huyen.png',
+      },
+      {
+        id: '8-4',
+        name: 'Nguyễn Tuấn Vũ',
+        role: 'Trưởng ban Sự kiện',
+        avatar: '/avatars/gen-8/nguyen-tuan-vu.png',
+      },
+      {
+        id: '8-5',
+        name: 'Phan Chí Kiên',
+        role: 'Trưởng ban Truyền thông',
+        avatar: '/avatars/gen-8/phan-chi-kien.png',
+      },
+    ],
+  },
 ];
 
 // Helper function to get initials from name
