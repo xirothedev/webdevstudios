@@ -49,7 +49,7 @@ export default function RootLayout({
     <html lang="vi" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
         <StructuredData />
-        {children}
+        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   );
