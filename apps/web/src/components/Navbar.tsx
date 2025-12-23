@@ -165,9 +165,16 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                     className={cn(
                       navigationMenuTriggerStyle(),
                       'h-8 text-xs font-medium',
-                      isActive
-                        ? 'text-wds-accent hover:bg-white/5 hover:text-white'
-                        : 'hover:text-wds-accent text-white/70'
+                      isDark
+                        ? isActive
+                          ? 'text-wds-accent hover:bg-white/5 hover:text-white'
+                          : 'hover:text-wds-accent text-white/70'
+                        : cn(
+                            'bg-transparent',
+                            isActive
+                              ? 'border-wds-accent rounded-none border-b-2 pb-1 text-black'
+                              : 'text-gray-600 hover:text-black'
+                          )
                     )}
                   >
                     <Link href={item.href}>{item.label}</Link>
