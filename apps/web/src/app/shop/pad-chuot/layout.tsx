@@ -7,7 +7,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     'Pad chuột cỡ lớn phiên bản giới hạn với thiết kế WebDev Studios, tối ưu cho developer và designer thường xuyên dùng chuột.',
   path: '/shop/pad-chuot',
-  image: SEO_IMAGES['/shop'],
+  image: SEO_IMAGES['/shop/pad-chuot'],
   keywords: [
     'Pad chuột WDS',
     'WebDev Studios',

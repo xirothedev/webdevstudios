@@ -7,7 +7,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     'Dây đeo (lanyard) nằm ngang với branding WebDev Studios, tiện lợi cho thẻ nhân viên, thẻ hội viên hoặc keychain. Chất liệu bền chắc, thiết kế chuyên nghiệp.',
   path: '/shop/day-deo',
-  image: SEO_IMAGES['/shop'],
+  image: SEO_IMAGES['/shop/day-deo'],
   keywords: [
     'Dây đeo WDS',
     'Lanyard WebDev Studios',

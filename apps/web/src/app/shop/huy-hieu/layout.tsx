@@ -7,7 +7,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     'Huy hiệu kim loại với logo WebDev Studios, phù hợp gắn balo, áo khoác hoặc túi laptop cho member WDS. Thiết kế tinh xảo, chất liệu kim loại cao cấp.',
   path: '/shop/huy-hieu',
-  image: SEO_IMAGES['/shop'],
+  image: SEO_IMAGES['/shop/huy-hieu'],
   keywords: [
     'Huy hiệu WDS',
     'WebDev Studios',
