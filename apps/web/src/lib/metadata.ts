@@ -3,6 +3,15 @@ import type { Metadata } from 'next';
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://webdevstudios.org';
 const siteName = 'WebDev Studios';
+
+// SEO Images mapping: route path → SEO image path
+export const SEO_IMAGES: Record<string, string> = {
+  '/': '/seo/landing.png',
+  '/about': '/seo/about.png',
+  '/shop': '/seo/shop.png',
+  '/generation': '/seo/generation.png',
+  '/faq': '/seo/faq.png',
+};
 const siteDescription =
   'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.';
 const siteKeywords = [

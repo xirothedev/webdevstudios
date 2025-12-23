@@ -2,7 +2,6 @@ import Link from 'next/link';
 
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
-import { createPageMetadata } from '@/lib/metadata';
 
 const faqItems = [
   {
@@ -45,14 +44,6 @@ const faqItems = [
     answer: 'Khởi nguồn - Sáng tạo - Nắm bắt.',
   },
 ];
-
-export const metadata = createPageMetadata({
-  title: 'FAQ',
-  description:
-    'Câu hỏi thường gặp về WebDev Studios: tuyển thành viên, hoạt động, cơ hội phát triển và cách tham gia câu lạc bộ.',
-  path: '/faq',
-  keywords: ['FAQ WebDev Studios', 'Câu hỏi thường gặp', 'CLB lập trình web'],
-});
 
 export default function FAQPage() {
   return (

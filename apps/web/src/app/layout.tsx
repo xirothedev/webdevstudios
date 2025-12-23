@@ -4,7 +4,11 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import { StructuredData } from '@/components/StructuredData';
-import { defaultMetadata } from '@/lib/metadata';
+import {
+  createPageMetadata,
+  defaultMetadata,
+  SEO_IMAGES,
+} from '@/lib/metadata';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -12,8 +16,22 @@ const inter = Inter({
   weight: ['300', '400', '500', '600'],
 });
 
+// Root layout metadata - applies to root page (/)
 export const metadata: Metadata = {
   ...defaultMetadata,
+  ...createPageMetadata({
+    title: 'Trang chủ',
+    description:
+      'WebDev Studios - Câu lạc bộ lập trình web của sinh viên UIT. Nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web để học hỏi, trau dồi kỹ năng và phát triển bản thân.',
+    path: '/',
+    image: SEO_IMAGES['/'],
+    keywords: [
+      'WebDev Studios',
+      'Câu lạc bộ lập trình web UIT',
+      'Học lập trình web',
+      'Cộng đồng lập trình viên',
+    ],
+  }),
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
