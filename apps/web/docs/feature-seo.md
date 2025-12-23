@@ -36,10 +36,10 @@ Mỗi trang có metadata riêng được định nghĩa trong file page:
 Thêm vào `.env.local`:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://webdevstudios.org
+NEXT_PUBLIC_SITE_URL=https://webdevstudios.xirothedev.site/
 ```
 
-Nếu không có, sẽ sử dụng default: `https://webdevstudios.org`
+Nếu không có, sẽ sử dụng default: `https://webdevstudios.xirothedev.site/`
 
 ### Metadata Configuration
 

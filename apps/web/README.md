@@ -112,7 +112,7 @@ See [docs/feature-seo.md](./docs/feature-seo.md) for detailed SEO documentation.
 Add to `.env.local`:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://webdevstudios.org
+NEXT_PUBLIC_SITE_URL=https://webdevstudios.xirothedev.site/
 ```
 
 ## Learn More

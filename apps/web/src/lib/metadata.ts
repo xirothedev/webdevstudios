@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://webdevstudios.org';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://webdevstudios.xirothedev.site/';
 const siteName = 'WebDev Studios';
 
 // SEO Images mapping: route path → SEO image path

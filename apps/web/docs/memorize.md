@@ -375,7 +375,7 @@ apps/web/
 
 ### Required
 
-- `NEXT_PUBLIC_SITE_URL` - Base URL of the website (default: `https://webdevstudios.org`)
+- `NEXT_PUBLIC_SITE_URL` - Base URL of the website (default: `https://webdevstudios.xirothedev.site/`)
 
 ### Configuration Files
 
