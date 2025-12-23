@@ -758,29 +758,6 @@ export default function GenerationPage() {
         </div>
       </section>
 
-      {/* Footer note */}
-      <section className="relative py-16">
-        <div className="to-wds-secondary/10 absolute inset-0 bg-linear-to-b from-transparent" />
-        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <div className="bg-wds-accent/5 border-wds-accent/20 inline-flex flex-col items-center gap-3 rounded-2xl border px-6 py-6 backdrop-blur-sm sm:gap-4 sm:px-8 sm:py-8">
-            <p className="text-sm font-semibold text-black sm:text-base">
-              Mỗi thế hệ đều đóng góp vào giá trị cốt lõi của chúng tôi
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-              <span className="bg-wds-accent rounded-full px-3 py-1.5 text-xs font-bold tracking-wide text-black uppercase shadow-sm">
-                Khởi nguồn
-              </span>
-              <span className="bg-wds-accent rounded-full px-3 py-1.5 text-xs font-bold tracking-wide text-black uppercase shadow-sm">
-                Sáng tạo
-              </span>
-              <span className="bg-wds-accent rounded-full px-3 py-1.5 text-xs font-bold tracking-wide text-black uppercase shadow-sm">
-                Nắm bắt
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <Footer variant="light" />
 
       {/* Custom animations */}
