@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Auto-push to xirothedev when pushing to origin (if remote exists)
 
 remote_name="$1"
