@@ -90,6 +90,7 @@ export function WDSHero() {
                 fill
                 className="object-contain object-center"
                 priority
+                fetchPriority="high"
               />
               {/* Gradient overlay for better text contrast */}
               {/* <div className="absolute inset-0 bg-linear-to-t from-black/10 via-transparent to-transparent"></div> */}
