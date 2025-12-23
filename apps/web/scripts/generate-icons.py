@@ -4,7 +4,7 @@ Generate favicon.ico and touch icons from logo.png
 Creates multiple sizes for SEO and mobile support
 """
 
-from PIL import Image
+from PIL import Image  # pyright: ignore[reportMissingImports]
 import os
 import sys
 
