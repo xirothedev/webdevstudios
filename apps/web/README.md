@@ -14,6 +14,7 @@ This is a multi-theme web application featuring WebDev Studios club pages and Sa
 - **Enhanced UX/UI**: Improved typography, spacing, and visual hierarchy
 - **Responsive Design**: Mobile-first approach with full responsiveness
 - **Accessibility**: Proper alt texts and semantic HTML
+- **Favicon & App Icons**: Complete favicon and app icon setup for all platforms (iOS, Android, Web)
 
 ### Savi E-commerce (Dark Theme)
 
@@ -72,11 +73,19 @@ src/
 │   └── Footer.tsx
 └── lib/              # Utility functions
 public/
-└── image/            # Optimized images
-    ├── HeroImage.webp
-    ├── TonChiImage.webp
-    ├── KhachHangImage.webp
-    └── wds-logo.svg
+├── image/            # Optimized images
+│   ├── HeroImage.webp
+│   ├── TonChiImage.webp
+│   ├── KhachHangImage.webp
+│   └── wds-logo.svg
+├── icons/            # App icons and favicons
+│   ├── android-chrome-*.png
+│   ├── apple-icon.png
+│   └── icon-*.png
+├── favicon-32x32.png
+└── site.webmanifest  # PWA manifest
+scripts/
+└── generate-icons.sh # Script to generate icons from SVG
 ```
 
 ## Learn More

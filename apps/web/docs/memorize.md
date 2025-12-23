@@ -84,6 +84,35 @@
    - ✅ Updated all imports across components
    - ✅ Package `motion` v12.23.26 installed
 
+### Phase 5: Favicon & App Icons Setup
+
+1. **Icon Generation Script**:
+   - ✅ Created `scripts/generate-icons.sh` to convert SVG to all required icon sizes
+   - ✅ Uses ImageMagick (`convert` command) for conversion
+   - ✅ Generates favicon.ico, PNG icons, Apple icons, and Android Chrome icons
+
+2. **Favicon Files**:
+   - ✅ `src/app/favicon.ico` - Multi-size ICO file (16x16, 32x32, 48x48)
+   - ✅ `src/app/icon-*.png` - Various PNG sizes (16x16, 32x32, 96x96, 192x192, 512x512)
+   - ✅ `src/app/apple-icon.png` - Apple touch icon (180x180)
+   - ✅ `public/favicon-32x32.png` - Standard favicon PNG
+
+3. **Android Icons**:
+   - ✅ `public/icons/android-chrome-192x192.png` - Android Chrome icon
+   - ✅ `public/icons/android-chrome-512x512.png` - Android Chrome icon
+   - ✅ `public/icons/icon-192x192.png` - Manifest icon
+   - ✅ `public/icons/icon-512x512.png` - Manifest icon
+
+4. **Web Manifest**:
+   - ✅ Created `public/site.webmanifest` for PWA support
+   - ✅ Configured with app name, icons, theme colors
+
+5. **Layout Metadata**:
+   - ✅ Updated `src/app/layout.tsx` with complete icon metadata
+   - ✅ Configured favicon, Apple icons, Android Chrome icons
+   - ✅ Added manifest link and Apple Web App metadata
+   - ✅ All icons reference `wds-logo.svg` as source
+
 ### Phase 1: Initial Landing Page (Shop Page)
 
 1. **Rebuilt the landing page** based on the provided HTML code
@@ -167,8 +196,11 @@
 apps/web/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx          # Root layout with Inter font
+│   │   ├── layout.tsx          # Root layout with Inter font and icon metadata
 │   │   ├── page.tsx            # WebDev Studios home page
+│   │   ├── favicon.ico         # Multi-size favicon
+│   │   ├── icon-*.png          # Various icon sizes
+│   │   ├── apple-icon.png      # Apple touch icon
 │   │   ├── about/
 │   │   │   └── page.tsx        # About page
 │   │   ├── shop/
@@ -195,6 +227,17 @@ apps/web/
 │   └── lib/
 │       ├── utils.ts             # cn() utility for class merging
 │       └── animations.ts        # (empty, reserved for future use)
+├── public/
+│   ├── image/
+│   │   └── wds-logo.svg         # Source SVG for icons
+│   ├── icons/
+│   │   ├── android-chrome-*.png
+│   │   ├── apple-icon.png
+│   │   └── icon-*.png
+│   ├── favicon-32x32.png
+│   └── site.webmanifest         # PWA manifest
+├── scripts/
+│   └── generate-icons.sh        # Script to generate icons from SVG
 ├── components.json               # shadcn/ui configuration
 ├── package.json
 ├── tsconfig.json
@@ -220,6 +263,7 @@ apps/web/
    - ✅ Improve landing page UX/UI (completed)
    - ✅ Add mobile navigation menu (completed)
    - ✅ Replace logo with SVG (completed)
+   - ✅ Setup favicon and app icons (completed)
    - Create `/generation` page
    - Create `/share` page
    - Create `/faq` page
@@ -236,6 +280,7 @@ apps/web/
    - ✅ Optimize images (completed - using WebP format)
    - ✅ Implement lazy loading for sections (completed - using whileInView)
    - ✅ Migrate to motion/react (completed)
+   - ✅ Setup favicon and app icons (completed)
    - Add loading states for images
 
 ### Future Enhancements
