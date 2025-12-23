@@ -1,12 +1,83 @@
 'use client';
 
 import { Circle, Shirt, ShoppingBag, Star } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
+import Image from 'next/image';
+import { useRef } from 'react';
 
-import { SpotlightCard } from './SpotlightCard';
+interface GlassCardProps {
+  children: React.ReactNode;
+  className?: string;
+  colSpan?: string;
+}
+
+function GlassCard({
+  children,
+  className = '',
+  colSpan = 'col-span-1',
+}: GlassCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [8, -8]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-8, 8]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={`${colSpan} ${className}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <motion.div
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="relative h-full"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
 export function FeaturesGrid() {
   return (
     <section className="relative py-24">
+      {/* Background ambient glow */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="bg-wds-accent/20 absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[120px]" />
+        <div className="absolute right-[-10%] bottom-[-10%] h-[40%] w-[40%] rounded-full bg-purple-500/20 blur-[120px]" />
+      </div>
+
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16">
           <h2 className="mb-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
@@ -18,124 +89,200 @@ export function FeaturesGrid() {
           </p>
         </div>
 
-        <div className="grid auto-rows-[300px] grid-cols-1 gap-6 md:grid-cols-3">
-          {/* Feature 1: Flash Sale Engine (Large) */}
-          <SpotlightCard
-            colSpan="md:col-span-2"
-            className="relative flex flex-col justify-between overflow-hidden"
-          >
-            <div className="relative z-10">
-              <div className="text-wds-accent mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-black/50">
-                <Shirt className="h-5 w-5" />
-              </div>
-              <h3 className="mb-2 text-xl font-medium text-white">
-                Áo thun WDS
-              </h3>
-              <p className="max-w-sm text-sm text-white/70">
-                Áo thun chất lượng cao với logo WebDev Studios, nhiều màu sắc và
-                size đa dạng. Thiết kế độc đáo, phù hợp mọi phong cách.
-              </p>
-            </div>
-            <div className="mask-image-gradient from-wds-accent/20 absolute right-0 bottom-0 h-full w-1/2 bg-linear-to-l to-transparent opacity-50">
-              {/* Product mockup */}
-              <div className="bg-primary absolute top-1/2 right-[-20px] h-40 w-64 translate-y-12 rounded-tl-xl border border-zinc-800 p-4 shadow-xl">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="h-2 w-20 rounded bg-zinc-800"></div>
-                  <div className="bg-wds-accent/20 text-wds-accent flex h-6 w-16 items-center justify-center rounded px-2 text-[10px]">
-                    Hot
-                  </div>
-                </div>
-                {/* T-shirt visual */}
-                <div className="space-y-2">
-                  <div className="bg-wds-accent/10 flex h-16 w-full items-center justify-center rounded border border-zinc-800/50">
-                    <Shirt className="text-wds-accent/50 h-8 w-8" />
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="bg-wds-accent/20 h-4 w-8 rounded"></div>
-                    <div className="h-4 w-8 rounded bg-zinc-800"></div>
-                    <div className="h-4 w-8 rounded bg-zinc-700"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SpotlightCard>
+        <div className="grid auto-rows-[340px] grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Feature 1: Áo thun WDS (Large) */}
+          <GlassCard colSpan="md:col-span-2">
+            <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
+              {/* Animated border gradient */}
+              <div className="from-wds-accent to-wds-accent absolute inset-0 bg-linear-to-r via-purple-500 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-50" />
 
-          {/* Feature 2: Mũ & Phụ kiện */}
-          <SpotlightCard className="relative flex flex-col">
-            <div className="text-wds-accent mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900">
-              <Circle className="h-5 w-5" />
-            </div>
-            <h3 className="mb-2 text-xl font-medium text-white">
-              Mũ & Phụ kiện
-            </h3>
-            <p className="text-sm text-white/70">
-              Bộ sưu tập mũ snapback, bucket hat và các phụ kiện khác với logo
-              WDS nổi bật.
-            </p>
+              {/* Glass shine effect */}
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent" />
 
-            <div className="mt-8 flex flex-1 items-center justify-center">
-              <div className="relative">
-                <div className="bg-wds-accent/10 absolute inset-0 top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"></div>
-                <div className="relative z-10 flex items-center justify-center">
-                  {/* Hat visual */}
-                  <div className="flex flex-col items-center">
-                    <div className="bg-wds-accent/20 border-wds-accent/30 mb-1 h-8 w-16 rounded-t-full border"></div>
-                    <div className="bg-wds-accent/10 border-wds-accent/20 h-4 w-12 rounded border"></div>
+              {/* Content */}
+              <div className="relative z-10 flex h-full flex-col justify-between p-8">
+                <div className="flex-1">
+                  <div className="border-wds-accent/30 bg-wds-accent/10 text-wds-accent shadow-wds-accent/20 mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border shadow-lg">
+                    <Shirt className="h-7 w-7" />
                   </div>
+                  <h3 className="mb-2 text-2xl font-bold text-white">
+                    Áo thun WDS
+                  </h3>
+                  <p className="max-w-md text-sm text-white/60">
+                    Áo thun chất lượng cao với logo WebDev Studios, size đa
+                    dạng. Thiết kế độc đáo.
+                  </p>
+                </div>
+
+                {/* Product Image with Parallax (Hero-style, larger + stronger hover) */}
+                <div className="relative flex justify-end">
+                  <motion.div
+                    className="relative h-60 w-80 md:h-72 md:w-104 lg:h-80 lg:w-120"
+                    whileHover={{ scale: 1.12, y: -16, rotate: -2 }}
+                    transition={{ duration: 0.45, ease: 'easeOut' }}
+                    style={{
+                      translateZ: 70,
+                    }}
+                  >
+                    <div className="from-wds-accent/40 via-wds-accent/15 absolute inset-0 bg-linear-to-t to-transparent blur-3xl" />
+                    <Image
+                      src="/shop/ao-thun.webp"
+                      alt="Áo thun WebDev Studios"
+                      fill
+                      className="relative z-10 object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
+                    />
+                  </motion.div>
                 </div>
               </div>
             </div>
-          </SpotlightCard>
+          </GlassCard>
 
-          {/* Feature 3: Túi & Balo */}
-          <SpotlightCard className="relative flex flex-col">
-            <div className="text-wds-accent mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900">
-              <ShoppingBag className="h-5 w-5" />
-            </div>
-            <h3 className="mb-2 text-xl font-medium text-white">Túi & Balo</h3>
-            <p className="text-sm text-white/70">
-              Túi đeo chéo và balo laptop với thiết kế hiện đại, phù hợp cho
-              developer và sinh viên IT.
-            </p>
-            <div className="mt-6 flex flex-1 items-center justify-center">
-              <div className="relative">
-                <div className="bg-wds-accent/10 absolute inset-0 top-1/2 left-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl"></div>
-                <div className="relative z-10 flex items-center justify-center">
-                  <ShoppingBag className="text-wds-accent/60 h-12 w-12" />
+          {/* Feature 2: Huy hiệu WebDev Studios */}
+          <GlassCard>
+            <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
+              <div className="absolute inset-0 bg-linear-to-r from-purple-500 via-pink-500 to-purple-500 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-50" />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent" />
+
+              <div className="relative z-10 flex h-full flex-col p-6">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-400/30 bg-purple-400/10 text-purple-400 shadow-lg shadow-purple-400/20">
+                  <Circle className="h-6 w-6" />
                 </div>
-              </div>
-            </div>
-          </SpotlightCard>
+                <h3 className="mb-2 text-xl font-bold text-white">
+                  Huy hiệu WebDev Studios
+                </h3>
+                <p className="mb-4 flex-1 text-sm text-white/60">
+                  Huy hiệu kim loại với logo WebDev Studios, phù hợp gắn balo,
+                  áo khoác hoặc túi laptop cho member WDS.
+                </p>
 
-          {/* Feature 4: Bộ sưu tập đặc biệt */}
-          <SpotlightCard
-            colSpan="md:col-span-2"
-            className="flex flex-row items-center gap-8"
-          >
-            <div className="flex-1">
-              <div className="text-wds-accent mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900">
-                <Star className="h-5 w-5" />
+                <motion.div
+                  className="relative mx-auto h-40 w-40"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ translateZ: 40 }}
+                >
+                  <div className="absolute inset-0 bg-linear-to-t from-purple-500/30 to-transparent blur-2xl" />
+                  <Image
+                    src="/shop/huy-hieu.webp"
+                    alt="Huy hiệu WebDev Studios"
+                    fill
+                    className="relative z-10 object-contain drop-shadow-xl"
+                    sizes="160px"
+                  />
+                </motion.div>
               </div>
-              <h3 className="mb-2 text-xl font-medium text-white">
-                Bộ sưu tập đặc biệt
-              </h3>
-              <p className="text-sm text-white/70">
-                Các sản phẩm giới hạn và phiên bản đặc biệt chỉ dành cho thành
-                viên WebDev Studios. Số lượng có hạn.
-              </p>
             </div>
-            <div className="relative hidden h-full flex-1 sm:block">
-              <div className="from-card absolute inset-0 z-10 bg-linear-to-r to-transparent"></div>
-              <div className="bg-primary border-wds-accent/20 flex h-full w-full scale-90 rotate-3 items-center justify-center rounded-lg border opacity-60">
-                <div className="flex flex-col items-center gap-2">
-                  <Star className="text-wds-accent/60 fill-wds-accent/20 h-12 w-12" />
-                  <div className="text-wds-accent/60 text-[10px] font-medium">
-                    LIMITED
+          </GlassCard>
+
+          {/* Feature 3: Dây đeo WebDev Studios */}
+          <GlassCard>
+            <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
+              <div className="absolute inset-0 bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-500 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-50" />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent" />
+
+              <div className="relative z-10 flex h-full flex-col p-6">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 shadow-lg shadow-emerald-400/20">
+                  <ShoppingBag className="h-6 w-6" />
+                </div>
+                <h3 className="mb-2 text-xl font-bold text-white">
+                  Dây đeo WebDev Studios
+                </h3>
+                <p className="mb-4 flex-1 text-sm text-white/60">
+                  Dây đeo (lanyard) nằm ngang với branding WebDev Studios, tiện
+                  lợi cho thẻ nhân viên, thẻ hội viên hoặc keychain.
+                </p>
+
+                <motion.div
+                  className="relative h-44 w-full"
+                  whileHover={{ scale: 1.06, y: -8 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ translateZ: 40 }}
+                >
+                  <div className="absolute inset-0 bg-linear-to-t from-emerald-500/30 to-transparent blur-2xl" />
+                  <Image
+                    src="/shop/day-deo.webp"
+                    alt="Dây đeo WebDev Studios"
+                    fill
+                    className="relative z-10 object-contain drop-shadow-xl"
+                    sizes="320px"
+                  />
+                </motion.div>
+              </div>
+            </div>
+          </GlassCard>
+
+          {/* Feature 4: Pad chuột WebDev Studios Limited Edition (Large) */}
+          <GlassCard colSpan="md:col-span-2">
+            <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
+              {/* Shimmer effect */}
+              <motion.div
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent"
+                animate={{
+                  x: ['-100%', '200%'],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: 'linear',
+                }}
+              />
+
+              <div className="absolute inset-0 bg-linear-to-r from-amber-500 via-orange-500 to-amber-500 opacity-30 blur-sm" />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent" />
+
+              <div className="relative z-10 flex h-full flex-row items-center gap-8 p-8">
+                <div className="flex-1">
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-400/30 bg-amber-400/10 text-amber-400 shadow-lg shadow-amber-400/20">
+                    <Star className="h-7 w-7" />
                   </div>
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 shadow-lg shadow-amber-400/20">
+                    <motion.div
+                      className="h-2 w-2 rounded-full bg-amber-400"
+                      animate={{ opacity: [0.4, 1, 0.4] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <span className="text-xs font-bold tracking-widest text-amber-300 uppercase">
+                      Limited Edition
+                    </span>
+                  </div>
+                  <h3 className="mb-2 text-2xl font-bold text-white">
+                    Pad chuột WebDev Studios Limited Edition
+                  </h3>
+                  <p className="text-sm text-white/60">
+                    Pad chuột cỡ lớn phiên bản giới hạn với thiết kế WebDev
+                    Studios, tối ưu cho developer và designer thường xuyên dùng
+                    chuột.
+                  </p>
                 </div>
+
+                <motion.div
+                  className="relative hidden h-56 w-56 sm:block"
+                  whileHover={{ scale: 1.08, rotate: 360 }}
+                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                  style={{ translateZ: 60 }}
+                >
+                  <div className="absolute inset-0 bg-linear-to-t from-amber-500/40 via-orange-500/20 to-transparent blur-3xl" />
+                  <motion.div
+                    className="absolute inset-0 rounded-full border border-amber-400/30"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 20,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+                  <Image
+                    src="/shop/pad-chuot.webp"
+                    alt="Pad chuột WebDev Studios Limited Edition"
+                    fill
+                    className="relative z-10 object-contain drop-shadow-2xl"
+                    sizes="224px"
+                  />
+                </motion.div>
               </div>
             </div>
-          </SpotlightCard>
+          </GlassCard>
         </div>
       </div>
     </section>

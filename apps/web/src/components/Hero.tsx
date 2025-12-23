@@ -10,14 +10,14 @@ export function Hero() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/image/hero-image.png"
+          src="/shop/ao-thun.webp"
           alt="Background"
           fill
           priority
           className="object-cover object-center"
         />
         {/* Dark Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/80"></div>
+        <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
       {/* Retro Grid Background */}

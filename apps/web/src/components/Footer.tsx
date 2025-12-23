@@ -111,7 +111,13 @@ export function Footer({ variant = 'dark' }: FooterProps) {
               </li>
               <li>
                 <span className="font-medium">Chủ nhiệm:</span> Lâm Chí Dĩnh -
-                0794161275
+                <Link
+                  href="tel:0794161275"
+                  className="hover:text-wds-accent transition-colors"
+                >
+                  {' '}
+                  0794161275
+                </Link>
               </li>
               <li>
                 <span className="font-medium">Fanpage:</span>{' '}

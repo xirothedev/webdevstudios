@@ -26,7 +26,7 @@
 
 ### Step 1: Context Retrieval
 
-- Bắt đầu session bằng việc đọc `MEMORIZE.md` và `FEATURES.log`.
+- Bắt đầu session bằng việc đọc `docs/memorize.md` (ở web hoặc api tùy trường hợp) và `FEATURES.log`.
 
 ### Step 2: Brainstorming
 
