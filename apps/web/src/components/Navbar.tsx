@@ -36,6 +36,14 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'FAQ', href: '/faq' },
   ];
 
+  const shopItems = [
+    { label: 'Tất cả sản phẩm', href: '/shop' },
+    { label: 'Áo thun', href: '/shop/ao-thun' },
+    { label: 'Huy hiệu', href: '/shop/huy-hieu' },
+    { label: 'Dây đeo', href: '/shop/day-deo' },
+    { label: 'Pad chuột', href: '/shop/pad-chuot' },
+  ];
+
   return (
     <nav
       className={cn(
@@ -98,58 +106,21 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-card/95 backdrop-blur-md">
                   <ul className="grid w-[200px] gap-1 p-2">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/shop"
-                          className={cn(
-                            'hover:text-wds-accent block rounded-sm px-3 py-2 text-xs transition-colors select-none hover:bg-white/5',
-                            isDark ? 'text-white/70' : 'text-gray-600'
-                          )}
-                        >
-                          Tất cả sản phẩm
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="#"
-                          className={cn(
-                            'hover:text-wds-accent block rounded-sm px-3 py-2 text-xs transition-colors select-none hover:bg-white/5',
-                            isDark ? 'text-white/70' : 'text-gray-600'
-                          )}
-                        >
-                          Áo thun
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="#"
-                          className={cn(
-                            'hover:text-wds-accent block rounded-sm px-3 py-2 text-xs transition-colors select-none hover:bg-white/5',
-                            isDark ? 'text-white/70' : 'text-gray-600'
-                          )}
-                        >
-                          Mũ & Phụ kiện
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="#"
-                          className={cn(
-                            'hover:text-wds-accent block rounded-sm px-3 py-2 text-xs transition-colors select-none hover:bg-white/5',
-                            isDark ? 'text-white/70' : 'text-gray-600'
-                          )}
-                        >
-                          Túi & Balo
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
+                    {shopItems.map((item) => (
+                      <li key={item.href}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              'hover:text-wds-accent block rounded-sm px-3 py-2 text-xs transition-colors select-none hover:bg-white/5',
+                              isDark ? 'text-white/70' : 'text-gray-600'
+                            )}
+                          >
+                            {item.label}
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
