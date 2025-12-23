@@ -54,8 +54,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mx-auto mb-12 max-w-xl text-lg text-white/70"
         >
-          Khám phá bộ sưu tập độc quyền áo thun, mũ, túi và nhiều vật phẩm khác
-          mang đậm dấu ấn WebDev Studios.
+          Khám phá bộ sưu tập độc quyền áo thun, huy hiệu, dây đeo, pad chuột và
+          nhiều vật phẩm khác mang đậm dấu ấn WebDev Studios.
         </motion.p>
 
         {/* 3D Mockup */}

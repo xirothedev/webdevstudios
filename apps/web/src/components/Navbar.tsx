@@ -93,24 +93,10 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
             {/* Shop dropdown - only show on shop page or when variant is dark */}
             {(isDark || pathname === '/shop') && (
               <NavigationMenuItem>
-                <NavigationMenuTrigger
-                  className={cn(
-                    'hover:text-wds-accent data-[state=open]:text-wds-accent h-8 bg-transparent text-xs font-medium hover:bg-white/5 data-[state=open]:bg-white/5',
-                    isDark
-                      ? 'text-white/70'
-                      : 'text-gray-600 hover:text-black data-[state=open]:text-black'
-                  )}
-                >
+                <NavigationMenuTrigger className="h-8 bg-transparent text-xs font-medium text-white/70!">
                   Sản phẩm
                 </NavigationMenuTrigger>
-                <NavigationMenuContent
-                  className={cn(
-                    'backdrop-blur-md',
-                    isDark
-                      ? 'glass bg-card/95 border border-white/10'
-                      : 'border border-gray-200 bg-white shadow-lg'
-                  )}
-                >
+                <NavigationMenuContent className="bg-card/95 backdrop-blur-md">
                   <ul className="grid w-[200px] gap-1 p-2">
                     <li>
                       <NavigationMenuLink asChild>
@@ -179,19 +165,9 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                     className={cn(
                       navigationMenuTriggerStyle(),
                       'h-8 text-xs font-medium',
-                      isDark
-                        ? cn(
-                            'bg-transparent hover:bg-white/5',
-                            isActive
-                              ? 'text-wds-accent'
-                              : 'hover:text-wds-accent text-white/70'
-                          )
-                        : cn(
-                            'bg-transparent',
-                            isActive
-                              ? 'border-wds-accent rounded-none border-b-2 pb-1 text-black'
-                              : 'text-gray-600 hover:text-black'
-                          )
+                      isActive
+                        ? 'text-wds-accent hover:bg-white/5 hover:text-white'
+                        : 'hover:text-wds-accent text-white/70'
                     )}
                   >
                     <Link href={item.href}>{item.label}</Link>
