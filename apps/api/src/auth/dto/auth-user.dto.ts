@@ -67,3 +67,22 @@ export class AuthUserResponseDto {
 }
 
 export class GoogleAuthDto {}
+
+export class VerifiedUserResponseDto {
+  @ApiProperty({
+    description: 'Message',
+    example: 'User registered successfully',
+  })
+  message!: string;
+
+  data!: null;
+
+  @ApiProperty({
+    description: 'Timestamp',
+    example: 1719000000000,
+    type: Number,
+  })
+  timestamp!: number;
+
+  [x: string]: any;
+}

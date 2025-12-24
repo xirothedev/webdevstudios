@@ -1,39 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception';
-import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { JwtService } from '@nestjs/jwt';
 
-import { AuthUserResponseDto } from '@/auth/dto/auth-user.dto';
+import { VerifiedUserResponseDto } from '@/auth/dto/auth-user.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { VerificationDto } from '@/redis/redis.dto';
 import { RedisService } from '@/redis/redis.service';
 
-import { verifyUserCommand } from '../impl/verifyUser.command';
+import { verifyUserCommand } from '../impl/verify-user.command';
 
 @Injectable()
 @CommandHandler(verifyUserCommand)
 export class verifyUserHandler implements ICommandHandler<
   verifyUserCommand,
-  AuthUserResponseDto
+  VerifiedUserResponseDto
 > {
   constructor(
-    private readonly config: ConfigService,
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService,
     private readonly redis: RedisService
   ) {}
 
-  async execute(command: verifyUserCommand): Promise<AuthUserResponseDto> {
+  async execute(command: verifyUserCommand): Promise<VerifiedUserResponseDto> {
     const token = command.dto.verificationCode;
-
-    console.log(1);
 
     const { id, tries }: VerificationDto = await this.redis.hGetAll(
       `user-verify:${token}`
     );
-
-    console.log(command, id, tries);
 
     if (!id || !tries) {
       if (tries === 5) {
@@ -59,7 +51,7 @@ export class verifyUserHandler implements ICommandHandler<
     });
 
     if (!user) {
-      throw new Error('Invalid or expired token');
+      throw new BadRequestException('User not found');
     }
 
     await this.prisma.user.update({
@@ -71,14 +63,7 @@ export class verifyUserHandler implements ICommandHandler<
 
     return {
       message: 'User verified successfully',
-      data: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        avatar: user.avatar,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
+      data: null,
       timestamp: new Date().getTime(),
     };
   }

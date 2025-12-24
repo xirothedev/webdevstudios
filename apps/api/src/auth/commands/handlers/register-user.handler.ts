@@ -1,10 +1,14 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { MailerService } from '@nestjs-modules/mailer';
 import { hash } from 'argon2';
-import * as crypto from 'crypto';
+import { randomBytes } from 'crypto';
 
+import { MailService } from '@/mail/mail.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { RedisService } from '@/redis/redis.service';
 
@@ -17,11 +21,11 @@ export class RegisterUserHandler implements ICommandHandler<
   RegisterUserCommand,
   AuthUserResponseDto
 > {
+  private readonly logger = new Logger(RegisterUserHandler.name);
   constructor(
-    private readonly mailer: MailerService,
+    private readonly mailService: MailService,
     private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
-    private readonly config: ConfigService
+    private readonly redis: RedisService
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<AuthUserResponseDto> {
@@ -53,22 +57,21 @@ export class RegisterUserHandler implements ICommandHandler<
       },
     });
 
-    const hashedToken = await hash(crypto.randomBytes(32).toString('hex'));
+    const hashedToken = await hash(randomBytes(32).toString('hex'));
 
     await this.redis.hSet(`user-verify:${hashedToken}`, {
       id: user.id,
       tries: 0,
     });
 
-    // use node mailer to send verification link to user email with the token
-    await this.mailer.sendMail({
-      to: user.email,
-      subject: 'Webdev Studio - Verify your email',
-      text:
-        'Press the link below to verify your email: \n' +
-        `${this.config.get<string>('FRONTEND_URL', `http://localhost:${this.config.getOrThrow<string>('PORT', '3000')}`)}/verify?token=${encodeURIComponent(hashedToken)}`, // plaintext body
-      html: `<b>Press the link below to verify your email: \n <a href="${this.config.get<string>('FRONTEND_URL', `http://localhost:${this.config.getOrThrow<string>('PORT', '3000')}`)}/verify?token=${encodeURIComponent(hashedToken)}">Verify Email</a></b>`, // HTML body content
-    });
+    try {
+      await this.mailService.sendVerificationEmail(user.email, hashedToken);
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(
+        'Failed to send verification email'
+      );
+    }
 
     return {
       message: 'User registered successfully',

@@ -34,7 +34,7 @@ import { AuthService, cookieOptions, TokenType } from './auth.service';
 import { GoogleLoginCommand } from './commands/impl/google-login.command';
 import { LoginCommand } from './commands/impl/login.command';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
-import { verifyUserCommand } from './commands/impl/verifyUser.command';
+import { verifyUserCommand } from './commands/impl/verify-user.command';
 import { AuthUserResponseDto } from './dto/auth-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';

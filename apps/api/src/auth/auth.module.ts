@@ -1,11 +1,11 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
-import { MailerModule } from '@nestjs-modules/mailer/dist/mailer.module';
 
 import { SessionSerializer } from '@/common/utils/session.serializer';
+import { MailModule } from '@/mail/mail.module';
 import { RedisModule } from '@/redis/redis.module';
 
 import { PrismaModule } from '../prisma/prisma.module';
@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
 import { GoogleLoginHandler } from './commands/handlers/google-login.handler';
 import { LoginHandler } from './commands/handlers/login.handler';
 import { RegisterUserHandler } from './commands/handlers/register-user.handler';
-import { verifyUserHandler } from './commands/handlers/verifyUser.handler';
+import { verifyUserHandler } from './commands/handlers/verify-user.handler';
 import { GetProfileHandler } from './queries/handlers/get-profile.handler';
 import { GetProfileByTokenHandler } from './queries/handlers/getProfileByToken.handler';
 import { GoogleStrategy } from './strategies/google.strategy';
@@ -36,24 +36,7 @@ const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
     RedisModule,
     JwtModule,
     HttpModule,
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        transport: {
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false, // true for 465
-          auth: {
-            user: config.getOrThrow<string>('MAIL_USER'),
-            pass: config.getOrThrow<string>('MAIL_PASS'),
-          },
-        },
-        defaults: {
-          from: `"My App" <${config.get<string>('MAIL_USER')}>`,
-        },
-      }),
-    }),
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [
