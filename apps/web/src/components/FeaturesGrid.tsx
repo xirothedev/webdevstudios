@@ -137,7 +137,7 @@ export function FeaturesGrid() {
             </div>
           </GlassCard>
 
-          {/* Feature 2: Huy hiệu WebDev Studios */}
+          {/* Feature 2: Móc khóa WebDev Studios */}
           <GlassCard>
             <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
               <div className="absolute inset-0 bg-linear-to-r from-purple-500 via-pink-500 to-purple-500 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-50" />
@@ -148,11 +148,12 @@ export function FeaturesGrid() {
                   <Circle className="h-6 w-6" />
                 </div>
                 <h3 className="mb-2 text-xl font-bold text-white">
-                  Huy hiệu WebDev Studios
+                  Móc khóa WebDev Studios
                 </h3>
                 <p className="mb-4 flex-1 text-sm text-white/60">
-                  Huy hiệu kim loại với logo WebDev Studios, phù hợp gắn balo,
-                  áo khoác hoặc túi laptop cho member WDS.
+                  Móc khóa kim loại với logo WebDev Studios, thiết kế độc đáo và
+                  bền chắc. Phù hợp để treo chìa khóa, túi xách hoặc làm vật
+                  trang trí.
                 </p>
 
                 <motion.div
@@ -163,8 +164,8 @@ export function FeaturesGrid() {
                 >
                   <div className="absolute inset-0 bg-linear-to-t from-purple-500/30 to-transparent blur-2xl" />
                   <Image
-                    src="/shop/huy-hieu.webp"
-                    alt="Huy hiệu WebDev Studios"
+                    src="/shop/moc-khoa.webp"
+                    alt="Móc khóa WebDev Studios"
                     fill
                     className="relative z-10 object-contain drop-shadow-xl"
                     sizes="160px"

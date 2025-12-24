@@ -10,7 +10,7 @@ export const SEO_IMAGES: Record<string, string> = {
   '/about': '/seo/about.png',
   '/shop': '/seo/shop.png',
   '/shop/ao-thun': '/seo/shop/ao-thun.png',
-  '/shop/huy-hieu': '/seo/shop/huy-hieu.png',
+  '/shop/moc-khoa': '/seo/shop/moc-khoa.png',
   '/shop/day-deo': '/seo/shop/day-deo.png',
   '/shop/pad-chuot': '/seo/shop/pad-chuot.png',
   '/generation': '/seo/generation.png',

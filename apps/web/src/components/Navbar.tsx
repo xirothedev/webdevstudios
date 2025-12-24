@@ -39,7 +39,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
   const shopItems = [
     { label: 'Tất cả sản phẩm', href: '/shop' },
     { label: 'Áo thun', href: '/shop/ao-thun' },
-    { label: 'Huy hiệu', href: '/shop/huy-hieu' },
+    { label: 'Móc khóa', href: '/shop/moc-khoa' },
     { label: 'Dây đeo', href: '/shop/day-deo' },
     { label: 'Pad chuột', href: '/shop/pad-chuot' },
   ];

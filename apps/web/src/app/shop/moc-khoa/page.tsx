@@ -10,9 +10,9 @@ import { ProductFeatures } from '@/components/shop/ProductFeatures';
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery';
 import { ProductInfo } from '@/components/shop/ProductInfo';
 import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
-import { huyHieuProduct } from '@/data/products/huy-hieu';
+import { mocKhoaProduct } from '@/data/products/moc-khoa';
 
-export default function HuyHieuPage() {
+export default function MocKhoaPage() {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -55,33 +55,33 @@ export default function HuyHieuPage() {
               Shop
             </a>
             <span>/</span>
-            <span className="text-white/90">Huy hiệu</span>
+            <span className="text-white/90">Móc khóa</span>
           </nav>
 
           {/* Product Section */}
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
             {/* Left: Product Image */}
             <ProductImageGallery
-              images={huyHieuProduct.images}
-              badge={huyHieuProduct.badge}
+              images={mocKhoaProduct.images}
+              badge={mocKhoaProduct.badge}
             />
 
             {/* Right: Product Info */}
             <div className="flex flex-col justify-center">
               <ProductInfo
-                name={huyHieuProduct.name}
-                rating={huyHieuProduct.rating}
-                price={huyHieuProduct.price}
-                description={huyHieuProduct.description}
+                name={mocKhoaProduct.name}
+                rating={mocKhoaProduct.rating}
+                price={mocKhoaProduct.price}
+                description={mocKhoaProduct.description}
                 priceNote="Giá đã bao gồm VAT. Miễn phí vận chuyển cho đơn hàng trên 500.000₫"
               />
 
-              {/* Quantity Selector - No size selector for badges */}
+              {/* Quantity Selector - No size selector for keychain */}
               <ProductQuantitySelector
                 quantity={quantity}
                 onIncrease={increaseQuantity}
                 onDecrease={decreaseQuantity}
-                stock={huyHieuProduct.stock}
+                stock={mocKhoaProduct.stock}
               />
 
               {/* Add to Cart Button */}
@@ -92,12 +92,12 @@ export default function HuyHieuPage() {
               />
 
               {/* Product Features */}
-              <ProductFeatures features={huyHieuProduct.features} />
+              <ProductFeatures features={mocKhoaProduct.features} />
             </div>
           </div>
 
           {/* Additional Info Section */}
-          <ProductAdditionalInfo info={huyHieuProduct.additionalInfo} />
+          <ProductAdditionalInfo info={mocKhoaProduct.additionalInfo} />
         </div>
       </main>
 
