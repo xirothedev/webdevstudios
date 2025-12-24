@@ -3,6 +3,7 @@
 import { Circle, Shirt, ShoppingBag, Star } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRef } from 'react';
 
 interface GlassCardProps {
@@ -106,7 +107,7 @@ export function FeaturesGrid() {
                     <Shirt className="h-7 w-7" />
                   </div>
                   <h3 className="mb-2 text-2xl font-bold text-white">
-                    Áo thun WDS
+                    Áo thun WebDev Studios
                   </h3>
                   <p className="max-w-md text-sm text-white/60">
                     Áo thun chất lượng cao với logo WebDev Studios, size đa
@@ -116,22 +117,25 @@ export function FeaturesGrid() {
 
                 {/* Product Image with Parallax (Hero-style, larger + stronger hover) */}
                 <div className="relative flex justify-end">
-                  <motion.div
-                    className="relative h-60 w-80 md:h-72 md:w-104 lg:h-80 lg:w-120"
-                    whileHover={{ scale: 1.12, y: -16, rotate: -2 }}
-                    transition={{ duration: 0.45, ease: 'easeOut' }}
-                    style={{
-                      translateZ: 70,
-                    }}
-                  >
-                    <div className="from-wds-accent/40 via-wds-accent/15 absolute inset-0 bg-linear-to-t to-transparent blur-3xl" />
-                    <Image
-                      src="/shop/ao-thun.webp"
-                      alt="Áo thun WebDev Studios"
-                      fill
-                      className="relative z-10 object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
-                    />
-                  </motion.div>
+                  <Link href="/shop/ao-thun" className="cursor-pointer">
+                    <motion.div
+                      className="relative h-60 w-80 md:h-72 md:w-104 lg:h-80 lg:w-120"
+                      whileHover={{ scale: 1.12, y: -16, rotate: -2 }}
+                      transition={{ duration: 0.45, ease: 'easeOut' }}
+                      style={{
+                        translateZ: 70,
+                      }}
+                    >
+                      <div className="from-wds-accent/40 via-wds-accent/15 absolute inset-0 bg-linear-to-t to-transparent blur-3xl" />
+                      <Image
+                        src="/shop/ao-thun.webp"
+                        alt="Áo thun WebDev Studios"
+                        fill
+                        sizes="(max-width: 768px) 320px, (max-width: 1024px) 416px, 480px"
+                        className="relative z-10 object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
+                      />
+                    </motion.div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -156,21 +160,23 @@ export function FeaturesGrid() {
                   trang trí.
                 </p>
 
-                <motion.div
-                  className="relative mx-auto h-40 w-40"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ translateZ: 40 }}
-                >
-                  <div className="absolute inset-0 bg-linear-to-t from-purple-500/30 to-transparent blur-2xl" />
-                  <Image
-                    src="/shop/moc-khoa.webp"
-                    alt="Móc khóa WebDev Studios"
-                    fill
-                    className="relative z-10 object-contain drop-shadow-xl"
-                    sizes="160px"
-                  />
-                </motion.div>
+                <Link href="/shop/moc-khoa" className="cursor-pointer">
+                  <motion.div
+                    className="relative mx-auto h-40 w-40"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ translateZ: 40 }}
+                  >
+                    <div className="absolute inset-0 bg-linear-to-t from-purple-500/30 to-transparent blur-2xl" />
+                    <Image
+                      src="/shop/moc-khoa.webp"
+                      alt="Móc khóa WebDev Studios"
+                      fill
+                      className="relative z-10 object-contain drop-shadow-xl"
+                      sizes="160px"
+                    />
+                  </motion.div>
+                </Link>
               </div>
             </div>
           </GlassCard>
@@ -193,21 +199,23 @@ export function FeaturesGrid() {
                   lợi cho thẻ nhân viên, thẻ hội viên hoặc keychain.
                 </p>
 
-                <motion.div
-                  className="relative h-44 w-full"
-                  whileHover={{ scale: 1.06, y: -8 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ translateZ: 40 }}
-                >
-                  <div className="absolute inset-0 bg-linear-to-t from-emerald-500/30 to-transparent blur-2xl" />
-                  <Image
-                    src="/shop/day-deo.webp"
-                    alt="Dây đeo WebDev Studios"
-                    fill
-                    className="relative z-10 object-contain drop-shadow-xl"
-                    sizes="320px"
-                  />
-                </motion.div>
+                <Link href="/shop/day-deo" className="cursor-pointer">
+                  <motion.div
+                    className="relative h-44 w-full"
+                    whileHover={{ scale: 1.06, y: -8 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ translateZ: 40 }}
+                  >
+                    <div className="absolute inset-0 bg-linear-to-t from-emerald-500/30 to-transparent blur-2xl" />
+                    <Image
+                      src="/shop/day-deo.webp"
+                      alt="Dây đeo WebDev Studios"
+                      fill
+                      className="relative z-10 object-contain drop-shadow-xl"
+                      sizes="320px"
+                    />
+                  </motion.div>
+                </Link>
               </div>
             </div>
           </GlassCard>
@@ -257,30 +265,35 @@ export function FeaturesGrid() {
                   </p>
                 </div>
 
-                <motion.div
-                  className="relative hidden h-56 w-56 sm:block"
-                  whileHover={{ scale: 1.08, rotate: 360 }}
-                  transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  style={{ translateZ: 60 }}
+                <Link
+                  href="/shop/pad-chuot"
+                  className="hidden cursor-pointer sm:block"
                 >
-                  <div className="absolute inset-0 bg-linear-to-t from-amber-500/40 via-orange-500/20 to-transparent blur-3xl" />
                   <motion.div
-                    className="absolute inset-0 rounded-full border border-amber-400/30"
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 20,
-                      repeat: Infinity,
-                      ease: 'linear',
-                    }}
-                  />
-                  <Image
-                    src="/shop/pad-chuot.webp"
-                    alt="Pad chuột WebDev Studios Limited Edition"
-                    fill
-                    className="relative z-10 object-contain drop-shadow-2xl"
-                    sizes="224px"
-                  />
-                </motion.div>
+                    className="relative h-56 w-56"
+                    whileHover={{ scale: 1.08, rotate: 360 }}
+                    transition={{ duration: 0.6, ease: 'easeInOut' }}
+                    style={{ translateZ: 60 }}
+                  >
+                    <div className="absolute inset-0 bg-linear-to-t from-amber-500/40 via-orange-500/20 to-transparent blur-3xl" />
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-amber-400/30"
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: 'linear',
+                      }}
+                    />
+                    <Image
+                      src="/shop/pad-chuot.webp"
+                      alt="Pad chuột WebDev Studios Limited Edition"
+                      fill
+                      className="relative z-10 object-contain drop-shadow-2xl"
+                      sizes="224px"
+                    />
+                  </motion.div>
+                </Link>
               </div>
             </div>
           </GlassCard>
