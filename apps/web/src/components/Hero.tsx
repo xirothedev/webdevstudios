@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Package, Users } from 'lucide-react';
+import { motion } from 'motion/react';
 import Image from 'next/image';
 
 export function Hero() {
@@ -15,8 +15,6 @@ export function Hero() {
           fill
           priority
           className="object-cover object-center"
-          quality={90}
-          sizes="100vw"
         />
         {/* Dark Overlay for better text readability */}
         <div className="absolute inset-0 bg-black/80"></div>

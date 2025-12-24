@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -28,8 +29,14 @@ export function WDSHeader() {
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-3">
-          <div className="bg-wds-accent flex h-12 w-12 items-center justify-center rounded-lg">
-            <span className="text-2xl font-bold text-white">W</span>
+          <div className="relative h-12 w-12">
+            <Image
+              src="/image/wds-logo.svg"
+              alt="WebDev Studios"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
           <span className="text-xl font-bold text-black">WebDev Studios</span>
         </Link>

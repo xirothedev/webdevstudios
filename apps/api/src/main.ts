@@ -43,7 +43,7 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('Savi API')
+    .setTitle('WebDev Studios API')
     .setVersion('1.0.0')
     .addBearerAuth()
     .addCookieAuth('access_token')
