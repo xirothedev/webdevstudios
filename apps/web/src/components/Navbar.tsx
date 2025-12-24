@@ -250,7 +250,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
               className={cn(
                 'fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto shadow-2xl md:hidden',
                 isDark
-                  ? 'glass bg-card/95 border-l border-white/10'
+                  ? 'glass border-l border-white/10 bg-black/98 backdrop-blur-xl'
                   : 'border-l border-gray-200 bg-white'
               )}
             >
