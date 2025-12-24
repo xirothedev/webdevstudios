@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { contactInfo, footerSections } from '@/data/footer';
+
 interface FooterProps {
   variant?: 'dark' | 'light';
 }
@@ -15,7 +17,7 @@ export function Footer({ variant = 'dark' }: FooterProps) {
       className={`${isDark ? 'bg-wds-background border-white/5' : 'border-gray-200 bg-white'} border-t py-12`}
     >
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
           <div>
             <div className="mb-4 flex items-center gap-2">
               <div className="relative h-5 w-5">
@@ -62,32 +64,31 @@ export function Footer({ variant = 'dark' }: FooterProps) {
             </p>
           </div>
 
-          <div>
-            <h3
-              className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
-            >
-              SẢN PHẨM
-            </h3>
-            <ul
-              className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
-            >
-              {[
-                { label: 'Áo thun', href: '/shop/ao-thun' },
-                { label: 'Móc khóa', href: '/shop/moc-khoa' },
-                { label: 'Dây đeo', href: '/shop/day-deo' },
-                { label: 'Pad chuột', href: '/shop/pad-chuot' },
-              ].map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="hover:text-wds-accent transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {footerSections.map((section) => (
+            <div key={section.title}>
+              <h3
+                className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
+              >
+                {section.title}
+              </h3>
+              <ul
+                className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+              >
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      target={link.target}
+                      rel={link.rel}
+                      className="hover:text-wds-accent transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
           <div>
             <h3
@@ -98,84 +99,52 @@ export function Footer({ variant = 'dark' }: FooterProps) {
             <ul
               className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
-              <li>
-                <span className="font-medium">Email:</span>{' '}
-                <Link
-                  href="mailto:webdevstudios.org@gmail.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-wds-accent transition-colors"
-                >
-                  webdevstudios.org@gmail.com
-                </Link>
-              </li>
-              <li>
-                <span className="font-medium">Chủ nhiệm:</span> Lâm Chí Dĩnh -
-                <Link
-                  href="tel:0794161275"
-                  className="hover:text-wds-accent transition-colors"
-                >
-                  {' '}
-                  0794161275
-                </Link>
-              </li>
-              <li>
-                <span className="font-medium">Fanpage:</span>{' '}
-                <Link
-                  href="https://facebook.com/webdevstudios.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-wds-accent transition-colors"
-                >
-                  facebook.com/webdevstudios.org
-                </Link>
-              </li>
-              <li>
-                <span className="font-medium">Văn phòng:</span> B8.04, tòa B,
-                trường Đại học Công nghệ Thông tin – ĐHQG TP.HCM.
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3
-              className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
-            >
-              VỀ CLB
-            </h3>
-            <ul
-              className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
-            >
-              <li>
-                <Link
-                  href="/about"
-                  className="hover:text-wds-accent transition-colors"
-                >
-                  Về chúng tôi
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/faq"
-                  className="hover:text-wds-accent transition-colors"
-                >
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="hover:text-wds-accent transition-colors"
-                >
-                  Chính sách đổi trả
-                </Link>
-              </li>
+              {contactInfo.map((item, index) => (
+                <li key={index}>
+                  {item.href ? (
+                    <>
+                      <span className="font-medium">{item.label}</span>{' '}
+                      <Link
+                        href={item.href}
+                        target={item.target}
+                        rel={item.rel}
+                        className="hover:text-wds-accent transition-colors"
+                      >
+                        {item.content}
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-medium">{item.label}</span>{' '}
+                      {item.content}
+                    </>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
-      <div className="mt-10 text-center text-xs text-gray-500">
-        © 2025 WebDev Studios. All rights reserved.
+      <div className="mt-10 space-y-2 text-center text-xs text-gray-500">
+        <div>© 2025 WebDev Studios. All rights reserved.</div>
+        <div className="flex items-center justify-center gap-2">
+          <span>Developed & Designed by</span>
+          <Link
+            href="mailto:working@xirothedev.site"
+            className="hover:text-wds-accent transition-colors"
+          >
+            Xiro The Dev
+          </Link>
+          <span>•</span>
+          <Link
+            href="https://github.com/xirothedev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-wds-accent transition-colors"
+          >
+            github/xirothedev
+          </Link>
+        </div>
       </div>
     </footer>
   );
