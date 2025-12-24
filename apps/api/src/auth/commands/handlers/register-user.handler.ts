@@ -25,7 +25,7 @@ export class RegisterUserHandler implements ICommandHandler<
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<AuthUserResponseDto> {
-    const { email, password, fullName, phone } = command.dto;
+    const { email, password } = command.dto;
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -52,8 +52,6 @@ export class RegisterUserHandler implements ICommandHandler<
       data: {
         email,
         password: hashedPassword,
-        fullName,
-        phone,
       },
     });
 

@@ -65,3 +65,5 @@ export class AuthUserResponseDto {
 
   [x: string]: any;
 }
+
+export class GoogleAuthDto {}

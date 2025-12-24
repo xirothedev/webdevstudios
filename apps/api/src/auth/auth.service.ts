@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { OAuthProvider } from '@generated/prisma';
+import { HttpService } from '@nestjs/axios';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions, JwtVerifyOptions } from '@nestjs/jwt';
 import { hash } from 'argon2';
+import { AxiosResponse } from 'axios';
+import { firstValueFrom } from 'rxjs';
 
 import { PrismaService } from '@/prisma/prisma.service';
 
@@ -24,7 +28,8 @@ export class AuthService {
   constructor(
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService
   ) {}
 
   async generateTokenFromUser(
@@ -96,5 +101,91 @@ export class AuthService {
     this.prisma.session.deleteMany({
       where: { userId },
     });
+  }
+
+  async findUserById(userId: string, email: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId, email },
+    });
+  }
+
+  async createUser(email: string, password?: string) {
+    const hashedPassword = password ? await hash(password) : undefined;
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    return user;
+  }
+
+  async findExternalAccount(provider: OAuthProvider, providerId: string) {
+    return this.prisma.externalAccount.findFirst({
+      where: {
+        provider,
+        providerId,
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  async createExternalAccount(req: any) {
+    const { access_token, refresh_token, ...AuthInfo } = req.user;
+
+    console.log(AuthInfo);
+
+    const account = await this.findExternalAccount(
+      AuthInfo.provider.toUpperCase(),
+      AuthInfo.id
+    );
+
+    if (account) {
+      return account;
+    }
+    console.log(1);
+
+    const tokenInfo: AxiosResponse = await firstValueFrom(
+      this.httpService.get(
+        `https://oauth2.googleapis.com/tokeninfo?access_token=${access_token}`
+      )
+    );
+    console.log(AuthInfo.provider);
+    console.log(tokenInfo.data);
+
+    let user = await this.findUserById(
+      AuthInfo.userId,
+      AuthInfo.emails[0].value
+    );
+
+    if (!user) {
+      try {
+        user = await this.createUser(AuthInfo.emails[0].value);
+      } catch {
+        throw new InternalServerErrorException('Internal Server Error');
+      }
+    }
+
+    const payload: any = {
+      provider: 'GOOGLE',
+      providerId: AuthInfo.id,
+      providerEmail: AuthInfo.emails[0].value,
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      expiresAt: new Date(parseInt(tokenInfo.data.exp) * 1000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: user.id,
+    };
+
+    const ExternalAccount = await this.prisma.externalAccount.create({
+      data: payload,
+    });
+
+    return ExternalAccount;
   }
 }

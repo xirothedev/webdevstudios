@@ -1,8 +1,10 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Post,
   Query,
@@ -53,7 +55,8 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService
+    private readonly jwt: JwtService,
+    private readonly httpService: HttpService
   ) {}
 
   @Public()
@@ -354,7 +357,47 @@ export class AuthController {
   @Public()
   @Get('/google/callback')
   @UseGuards(AuthGuard('google-auth'))
-  async googleAuthRedirect(@Req() req: any) {
-    console.log(req.user);
+  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
+    const externalAccount = await this.authService.createExternalAccount(req);
+
+    console.log(2);
+    let user = await this.authService.findUserById(
+      externalAccount.userId,
+      externalAccount.providerEmail as string
+    );
+
+    try {
+      if (!user) {
+        user = await this.authService.createUser(
+          externalAccount.providerEmail as string
+        );
+      }
+    } catch {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+
+    console.log(3);
+
+    const jwtPayload: Payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const new_access_token = await this.authService.generateTokenFromUser(
+      jwtPayload,
+      TokenType.ACCESS
+    );
+
+    const new_refresh_token = await this.authService.generateTokenFromUser(
+      jwtPayload,
+      TokenType.REFRESH
+    );
+
+    res.cookie('access_token', new_access_token, cookieOptions);
+    res.cookie('refresh_token', new_refresh_token, cookieOptions);
+
+    console.log(4);
+    return res.json({ access_token: new_access_token });
   }
 }
