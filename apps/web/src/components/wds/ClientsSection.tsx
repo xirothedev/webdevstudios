@@ -76,6 +76,7 @@ export function WDSClientsSection() {
                 src="/image/KhachHangImage.webp"
                 alt="Đối tác và khách hàng của WebDev Studios"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-contain object-center"
               />
               {/* Gradient overlay */}

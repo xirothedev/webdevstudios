@@ -14,6 +14,7 @@ export function Hero() {
           alt="Background"
           fill
           priority
+          sizes="100vw"
           className="object-cover object-center"
         />
         {/* Dark Overlay for better text readability */}

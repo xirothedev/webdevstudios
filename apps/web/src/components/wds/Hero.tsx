@@ -88,6 +88,7 @@ export function WDSHero() {
                 src="/image/HeroImage.webp"
                 alt="WebDev Studios - Câu lạc bộ lập trình web của sinh viên UIT"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-contain object-center"
                 priority
                 fetchPriority="high"

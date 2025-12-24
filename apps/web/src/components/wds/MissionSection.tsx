@@ -34,6 +34,7 @@ export function WDSMissionSection() {
                 src="/image/TonChiImage.webp"
                 alt="Tôn chỉ của WebDev Studios - Tuân thủ quy định, học hỏi và phát triển"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-contain object-center"
               />
               {/* Gradient overlay */}

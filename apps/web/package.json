@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\""
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
+    "analyze": "next experimental-analyze",
+    "debug": "next dev --inspect"
   },
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.2",
@@ -18,7 +20,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
     "motion": "^12.23.26",
-    "next": "16.1.0",
+    "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.0"

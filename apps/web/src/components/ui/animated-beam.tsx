@@ -32,7 +32,7 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   toRef,
   curvature = 0,
   reverse = false, // Include the reverse prop
-  duration = Math.random() * 3 + 4,
+  duration: durationProp,
   delay = 0,
   pathColor = 'gray',
   pathWidth = 2,
@@ -47,6 +47,14 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   const id = useId();
   const [pathD, setPathD] = useState('');
   const [svgDimensions, setSvgDimensions] = useState({ width: 0, height: 0 });
+  const [duration, setDuration] = useState(durationProp ?? 4);
+
+  // Generate random duration only on client side after mount
+  useEffect(() => {
+    if (durationProp === undefined) {
+      setDuration(Math.random() * 3 + 4);
+    }
+  }, [durationProp]);
 
   // Calculate the gradient coordinates based on the reverse prop
   const gradientCoordinates = reverse
