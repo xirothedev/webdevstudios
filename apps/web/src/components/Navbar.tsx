@@ -182,7 +182,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
             </>
           ) : (
             <Link
-              href="/login"
+              href="/auth/login"
               className="bg-wds-accent hover:bg-wds-accent/90 hidden rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors sm:inline-block"
             >
               Đăng nhập
