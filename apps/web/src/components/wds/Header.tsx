@@ -67,7 +67,7 @@ export function WDSHeader() {
         </NavigationMenu>
 
         <Link
-          href="/login"
+          href="/auth/login"
           className="bg-wds-accent hover:bg-wds-accent/90 rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors"
         >
           Đăng nhập

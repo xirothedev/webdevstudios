@@ -160,7 +160,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           {isDark ? (
             <>
               <Link
-                href="/login"
+                href="/auth/login"
                 className={cn(
                   'hidden text-xs font-medium transition-colors sm:block',
                   'hover:text-wds-accent',
@@ -319,7 +319,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                     }}
                   >
                     <Link
-                      href="/login"
+                      href="/auth/login"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
                         'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
