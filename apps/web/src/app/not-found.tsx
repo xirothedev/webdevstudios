@@ -10,6 +10,15 @@ import { Navbar } from '@/components/Navbar';
 
 export default function NotFound() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [floatingElements, setFloatingElements] = useState<
+    Array<{
+      initialX: number;
+      initialY: number;
+      animateX: number;
+      animateY: number;
+      duration: number;
+    }>
+  >([]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -21,6 +30,19 @@ export default function NotFound() {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    // Generate random positions only on client side
+    setFloatingElements(
+      Array.from({ length: 6 }, () => ({
+        initialX: Math.random() * 400 - 200,
+        initialY: Math.random() * 400 - 200,
+        animateX: Math.random() * 400 - 200,
+        animateY: Math.random() * 400 - 200,
+        duration: 3 + Math.random() * 2,
+      }))
+    );
   }, []);
 
   return (
@@ -117,24 +139,24 @@ export default function NotFound() {
 
           {/* Animated Floating Elements */}
           <div className="relative mb-12">
-            {[...Array(6)].map((_, i) => (
+            {floatingElements.map((element, i) => (
               <motion.div
                 key={i}
                 className="absolute"
                 initial={{
                   opacity: 0,
                   scale: 0,
-                  x: Math.random() * 400 - 200,
-                  y: Math.random() * 400 - 200,
+                  x: element.initialX,
+                  y: element.initialY,
                 }}
                 animate={{
                   opacity: [0, 0.3, 0],
                   scale: [0, 1, 0],
-                  x: Math.random() * 400 - 200,
-                  y: Math.random() * 400 - 200,
+                  x: element.animateX,
+                  y: element.animateY,
                 }}
                 transition={{
-                  duration: 3 + Math.random() * 2,
+                  duration: element.duration,
                   repeat: Infinity,
                   delay: i * 0.5,
                   ease: 'easeInOut',
