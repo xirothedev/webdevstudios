@@ -237,7 +237,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-40 bg-black/50 md:hidden"
+              className="fixed inset-0 z-9998 bg-black/50 md:hidden"
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
@@ -248,7 +248,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className={cn(
-                'fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto shadow-2xl md:hidden',
+                'fixed top-0 right-0 z-9999 h-full w-80 max-w-[85vw] overflow-y-auto shadow-2xl md:hidden',
                 isDark
                   ? 'glass border-l border-white/10 bg-black/98 backdrop-blur-xl'
                   : 'border-l border-gray-200 bg-white'
