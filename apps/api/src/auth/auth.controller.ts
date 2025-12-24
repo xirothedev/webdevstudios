@@ -24,8 +24,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { hash, verify } from 'argon2';
-import * as crypto from 'crypto';
+import { verify } from 'argon2';
 import type { Response } from 'express';
 
 import { Cookies } from '@/common/decorators/cookies.decorators';
@@ -33,7 +32,7 @@ import { Public } from '@/common/decorators/public.decorator';
 import { PrismaService } from '@/prisma/prisma.service';
 
 import { Payload } from './auth.interface';
-import { AuthService } from './auth.service';
+import { AuthService, cookieOptions, TokenType } from './auth.service';
 import { LoginCommand } from './commands/impl/login.command';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
 import { verifyUserCommand } from './commands/impl/verifyUser.command';
@@ -109,17 +108,12 @@ export class AuthController {
       role: data.data.role,
     };
 
-    const new_access_token =
-      await this.authService.generateTokenFromUser(payload);
+    const new_access_token = await this.authService.generateTokenFromUser(
+      payload,
+      TokenType.ACCESS
+    );
 
-    res.cookie('access_token', new_access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge:
-        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
-      path: '/',
-    });
+    res.cookie('access_token', new_access_token, cookieOptions);
 
     return {
       ...data,
@@ -174,54 +168,26 @@ export class AuthController {
       role: data.data.role,
     };
 
-    const token = await this.authService.generateTokenFromUser(payload);
+    const token = await this.authService.generateTokenFromUser(
+      payload,
+      TokenType.ACCESS
+    );
+    res.cookie('access_token', token, cookieOptions);
 
-    res.cookie('access_token', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge:
-        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
-      path: '/',
-    });
+    const refresh_token = await this.authService.generateTokenFromUser(
+      payload,
+      TokenType.REFRESH
+    );
 
-    const refresh_token = this.jwt.sign(payload, {
-      secret: this.config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
-      expiresIn: this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN'),
-    });
-
-    res.cookie('refresh_token', refresh_token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge:
-        this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN') * 1000,
-      path: '/',
-    });
+    res.cookie('refresh_token', refresh_token, cookieOptions);
 
     const old_session = await this.prisma.session.findFirst({
       where: { userId: payload.sub },
     });
 
     if (!old_session)
-      await this.prisma.session.create({
-        data: {
-          userId: payload.sub,
-          token: await hash(crypto.randomUUID()),
-          expiresAt: new Date(
-            Date.now() +
-              this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN')
-          ),
-          refreshToken: await hash(refresh_token),
-        },
-      });
-    else
-      this.prisma.session.updateMany({
-        where: { userId: payload.sub },
-        data: {
-          refreshToken: await hash(refresh_token),
-        },
-      });
+      this.authService.createUserSession(payload, refresh_token);
+    else this.authService.updateUserSession(payload, refresh_token);
 
     return {
       ...data,
@@ -287,22 +253,18 @@ export class AuthController {
     @Cookies('access_token') token: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    const user = await this.jwt.verify(token, {
-      secret: this.config.getOrThrow<string>('JWT_SECRET_KEY'),
-    });
+    const user = await this.authService.extractUserFromToken(
+      token,
+      TokenType.ACCESS
+    );
 
     if (user) {
-      await this.prisma.session.deleteMany({
-        where: { userId: user.sub },
-      });
+      this.authService.deleteUserSession(user.sub);
     }
 
-    res.clearCookie('access_token', {
-      httpOnly: true,
-    });
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-    });
+    res.clearCookie('access_token', { httpOnly: true });
+    res.clearCookie('refresh_token', { httpOnly: true });
+
     return { message: 'Logout successful' };
   }
 
@@ -337,9 +299,10 @@ export class AuthController {
     @Cookies('refresh_token') token: string,
     @Res({ passthrough: true }) res: Response
   ) {
-    const payload = await this.jwt.verify(token, {
-      secret: this.config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
-    });
+    const payload = await this.authService.extractUserFromToken(
+      token,
+      TokenType.REFRESH
+    );
     const user = {
       sub: payload.sub,
       email: payload.email,
@@ -362,50 +325,19 @@ export class AuthController {
       throw new BadRequestException('Invalid Refresh Token');
     }
 
-    const new_access_token = await this.authService.generateTokenFromUser(user);
-    const new_refresh_token = this.jwt.sign(user, {
-      secret: this.config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
-      expiresIn: this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN'),
-    });
+    const new_access_token = await this.authService.generateTokenFromUser(
+      user,
+      TokenType.ACCESS
+    );
+    const new_refresh_token = await this.authService.generateTokenFromUser(
+      user,
+      TokenType.REFRESH
+    );
 
-    res.cookie('access_token', new_access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge:
-        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
-      path: '/',
-    });
+    res.cookie('access_token', new_access_token, cookieOptions);
+    res.cookie('refresh_token', new_refresh_token, cookieOptions);
 
-    res.cookie('refresh_token', new_refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge:
-        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
-      path: '/',
-    });
-
-    if (!old_session)
-      await this.prisma.session.create({
-        data: {
-          userId: user.sub,
-          token: await hash(crypto.randomUUID()),
-          expiresAt: new Date(
-            Date.now() +
-              1000 *
-                this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN')
-          ),
-          refreshToken: await hash(new_refresh_token),
-        },
-      });
-
-    this.prisma.session.updateMany({
-      where: { userId: user.sub },
-      data: {
-        refreshToken: await hash(new_refresh_token),
-      },
-    });
+    this.authService.updateUserSession(user, new_refresh_token);
 
     return {
       access_token: new_access_token,
