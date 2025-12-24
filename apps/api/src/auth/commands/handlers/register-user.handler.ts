@@ -42,7 +42,7 @@ export class RegisterUserHandler implements ICommandHandler<
 
     console.log(existingUser);
 
-    if (existingUser && existingUser.emailVerified) {
+    if (existingUser) {
       throw new ConflictException('Email already registered');
     }
 

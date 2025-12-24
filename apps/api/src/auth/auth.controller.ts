@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,21 +8,31 @@ import {
   Query,
   Req,
   Res,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { hash, verify } from 'argon2';
+import * as crypto from 'crypto';
 import type { Response } from 'express';
 
+import { Cookies } from '@/common/decorators/cookies.decorators';
 import { Public } from '@/common/decorators/public.decorator';
+import { PrismaService } from '@/prisma/prisma.service';
 
+import { Payload } from './auth.interface';
 import { AuthService } from './auth.service';
 import { LoginCommand } from './commands/impl/login.command';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
@@ -29,7 +40,6 @@ import { verifyUserCommand } from './commands/impl/verifyUser.command';
 import { AuthUserResponseDto } from './dto/auth-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { TokenRequestDto } from './dto/tokenRequest.dto';
 import { userInfoDto } from './dto/userInfo.dto';
 import { GetProfileQuery } from './queries/impl/get-profile.query';
 import { GetProfileQueryByToken } from './queries/impl/getProfileByToken.query';
@@ -42,7 +52,9 @@ export class AuthController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly authService: AuthService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService
   ) {}
 
   @Public()
@@ -91,19 +103,28 @@ export class AuthController {
   ): Promise<AuthUserResponseDto> {
     const data = await this.commandBus.execute(new RegisterUserCommand(dto));
 
-    const token = await this.authService.generateTokenFromUser(data.data);
+    const payload: Payload = {
+      sub: data.data.id,
+      email: data.data.email,
+      role: data.data.role,
+    };
 
-    res.cookie('access_token', token, {
+    const new_access_token =
+      await this.authService.generateTokenFromUser(payload);
+
+    res.cookie('access_token', new_access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: this.config.get<number>('JWT_EXPIRES_IN', 1000 * 60 * 60 * 24), // 24 hours
+      sameSite: 'lax',
+      maxAge:
+        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
+      path: '/',
     });
 
     return {
       ...data,
       token: {
-        access_token: token,
-        // refresh_token: refreshToken,
+        access_token: new_access_token,
       },
     };
   }
@@ -147,19 +168,66 @@ export class AuthController {
       new LoginCommand(dto)
     );
 
-    const token = await this.authService.generateTokenFromUser(data.data);
+    const payload: Payload = {
+      sub: data.data.id,
+      email: data.data.email,
+      role: data.data.role,
+    };
+
+    const token = await this.authService.generateTokenFromUser(payload);
 
     res.cookie('access_token', token, {
       httpOnly: true,
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: this.config.get<number>('JWT_EXPIRES_IN', 1000 * 60 * 60 * 24), // 24 hours
+      maxAge:
+        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
+      path: '/',
     });
+
+    const refresh_token = this.jwt.sign(payload, {
+      secret: this.config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
+      expiresIn: this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN'),
+    });
+
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge:
+        this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN') * 1000,
+      path: '/',
+    });
+
+    const old_session = await this.prisma.session.findFirst({
+      where: { userId: payload.sub },
+    });
+
+    if (!old_session)
+      await this.prisma.session.create({
+        data: {
+          userId: payload.sub,
+          token: await hash(crypto.randomUUID()),
+          expiresAt: new Date(
+            Date.now() +
+              this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN')
+          ),
+          refreshToken: await hash(refresh_token),
+        },
+      });
+    else
+      this.prisma.session.updateMany({
+        where: { userId: payload.sub },
+        data: {
+          refreshToken: await hash(refresh_token),
+        },
+      });
 
     return {
       ...data,
       token: {
         access_token: token,
-        // refresh_token: refreshToken,
+        // refresh_token: refresh_token,
       },
     };
   }
@@ -174,10 +242,13 @@ export class AuthController {
     description: 'Profile retrieved successfully',
     type: userInfoDto,
   })
-  getMyProfile(@Req() req: TokenRequestDto): Promise<userInfoDto> {
-    return this.queryBus.execute(new GetProfileQueryByToken(req.userToken));
+  async getMyProfile(
+    @Cookies('access_token') token: string
+  ): Promise<userInfoDto> {
+    return this.queryBus.execute(new GetProfileQueryByToken(token));
   }
 
+  @Public()
   @Get('profile/:id')
   @ApiOperation({
     summary: 'Get user profile',
@@ -212,19 +283,36 @@ export class AuthController {
     status: 200,
     description: 'Logout successful',
   })
-  logout(@Res({ passthrough: true }) res: Response): { message: string } {
+  async logout(
+    @Cookies('access_token') token: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ message: string }> {
+    const user = await this.jwt.verify(token, {
+      secret: this.config.getOrThrow<string>('JWT_SECRET_KEY'),
+    });
+
+    if (user) {
+      await this.prisma.session.deleteMany({
+        where: { userId: user.sub },
+      });
+    }
+
     res.clearCookie('access_token', {
+      httpOnly: true,
+    });
+    res.clearCookie('refresh_token', {
       httpOnly: true,
     });
     return { message: 'Logout successful' };
   }
 
-  @Get('/verify')
+  @Public()
+  @Post('/verify')
   @ApiOperation({
     summary: 'Verify user email',
     description: 'Verify user email using the verification token',
   })
-  @ApiParam({
+  @ApiQuery({
     name: 'token',
     description: 'Verification token sent to user email',
     example: '123456',
@@ -237,12 +325,104 @@ export class AuthController {
     status: 400,
     description: 'Invalid verification token',
   })
-  async verifyEmail(
-    @Query('token') token: string
-  ): Promise<AuthUserResponseDto> {
-    console.log(token);
+  async verifyEmail(@Query('token') token: string) {
     return this.commandBus.execute(
-      new verifyUserCommand({ verficationCode: token })
+      new verifyUserCommand({ verificationCode: token })
     );
+  }
+
+  @Post('/refresh')
+  @Public()
+  async refreshToken(
+    @Cookies('refresh_token') token: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const payload = await this.jwt.verify(token, {
+      secret: this.config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
+    });
+    const user = {
+      sub: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    };
+
+    const old_session = await this.prisma.session.findFirst({
+      where: { userId: user.sub },
+    });
+
+    if (!old_session) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    // Checks with the one in DB
+    if (
+      !old_session.refreshToken ||
+      !verify(old_session.refreshToken as string, token)
+    ) {
+      throw new BadRequestException('Invalid Refresh Token');
+    }
+
+    const new_access_token = await this.authService.generateTokenFromUser(user);
+    const new_refresh_token = this.jwt.sign(user, {
+      secret: this.config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
+      expiresIn: this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN'),
+    });
+
+    res.cookie('access_token', new_access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge:
+        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
+      path: '/',
+    });
+
+    res.cookie('refresh_token', new_refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge:
+        this.config.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') * 1000,
+      path: '/',
+    });
+
+    if (!old_session)
+      await this.prisma.session.create({
+        data: {
+          userId: user.sub,
+          token: await hash(crypto.randomUUID()),
+          expiresAt: new Date(
+            Date.now() +
+              1000 *
+                this.config.getOrThrow<number>('JWT_REFRESH_TOKEN_EXPIRES_IN')
+          ),
+          refreshToken: await hash(new_refresh_token),
+        },
+      });
+
+    this.prisma.session.updateMany({
+      where: { userId: user.sub },
+      data: {
+        refreshToken: await hash(new_refresh_token),
+      },
+    });
+
+    return {
+      access_token: new_access_token,
+    };
+  }
+
+  @Public()
+  @Get('/google')
+  @UseGuards(AuthGuard('google-auth'))
+  async googleAuth() {
+    console.log('Google');
+  }
+
+  @Public()
+  @Get('/google/callback')
+  @UseGuards(AuthGuard('google-auth'))
+  async googleAuthRedirect(@Req() req: any) {
+    console.log(req.user);
   }
 }

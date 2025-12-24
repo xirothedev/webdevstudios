@@ -25,7 +25,9 @@ export class verifyUserHandler implements ICommandHandler<
   ) {}
 
   async execute(command: verifyUserCommand): Promise<AuthUserResponseDto> {
-    const token = command.dto.verficationCode;
+    const token = command.dto.verificationCode;
+
+    console.log(1);
 
     const { id, tries }: VerificationDto = await this.redis.hGetAll(
       `user-verify:${token}`

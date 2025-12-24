@@ -19,14 +19,14 @@ export class userInfoDto {
     example: 'John Doe',
     nullable: true,
   })
-  fullName!: string | null;
+  fullName?: string | null;
 
   @ApiProperty({
     description: 'Avatar image URL',
     example: 'https://example.com/avatar.jpg',
     nullable: true,
   })
-  avatar!: string | null;
+  avatar?: string | null;
 
   @ApiProperty({
     description: 'User role',
@@ -40,5 +40,5 @@ export class userInfoDto {
     example: '2024-01-01T00:00:00.000Z',
     type: Date,
   })
-  createdAt!: Date;
+  createdAt?: Date;
 }

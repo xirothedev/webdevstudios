@@ -1,13 +1,14 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
   // Set global prefix for all routes
@@ -15,7 +16,7 @@ async function bootstrap() {
 
   // Enable cookie parser for JWT tokens
   app.use(cookieParser());
-
+  app.set('trust proxy', true);
   // Enable CORS
   app.enableCors({
     origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
@@ -37,11 +38,16 @@ async function bootstrap() {
     .setVersion('1.0.0')
     .addBearerAuth()
     .addCookieAuth('access_token')
+    .addCookieAuth('refresh_token')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   // Swagger UI available under the API global prefix: /v1/docs
-  SwaggerModule.setup('v1/docs', app, document);
+  SwaggerModule.setup('v1/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   const port = configService.get<number>('PORT', 4000);
   await app.listen(port);

@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer/dist/mailer.module';
-import type { StringValue } from 'ms';
 
 import { RedisModule } from '@/redis/redis.module';
 
@@ -15,6 +14,7 @@ import { RegisterUserHandler } from './commands/handlers/register-user.handler';
 import { verifyUserHandler } from './commands/handlers/verifyUser.handler';
 import { GetProfileHandler } from './queries/handlers/get-profile.handler';
 import { GetProfileByTokenHandler } from './queries/handlers/getProfileByToken.handler';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 const commandHandlers = [RegisterUserHandler, LoginHandler, verifyUserHandler];
@@ -26,16 +26,7 @@ const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
     PrismaModule,
     ConfigModule,
     RedisModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SECRET_KEY'),
-        signOptions: {
-          expiresIn: configService.get<StringValue>('JWT_EXPIRES_IN', '10m'),
-        },
-      }),
-    }),
+    JwtModule,
 
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -57,6 +48,12 @@ const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
     }),
   ],
   controllers: [AuthController],
-  providers: [...commandHandlers, ...queryHandlers, JwtStrategy, AuthService],
+  providers: [
+    ...commandHandlers,
+    ...queryHandlers,
+    JwtStrategy,
+    AuthService,
+    GoogleStrategy,
+  ],
 })
 export class AuthModule {}
