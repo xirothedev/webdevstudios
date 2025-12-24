@@ -46,19 +46,9 @@ export class GetProfileByTokenHandler implements IQueryHandler<
           },
         })
       );
-    } catch (err) {
-      console.log(err);
+    } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
-
-    console.log({
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      avatar: user.avatar,
-      role: user.role,
-      createdAt: user.createdAt,
-    });
 
     return {
       id: user.id,

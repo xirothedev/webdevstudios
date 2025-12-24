@@ -1,10 +1,9 @@
-import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
+  Logger,
   Param,
   Post,
   Query,
@@ -13,10 +12,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { JwtService } from '@nestjs/jwt';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -27,7 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { verify } from 'argon2';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { Cookies } from '@/common/decorators/cookies.decorators';
 import { Public } from '@/common/decorators/public.decorator';
@@ -35,6 +31,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 
 import { Payload } from './auth.interface';
 import { AuthService, cookieOptions, TokenType } from './auth.service';
+import { GoogleLoginCommand } from './commands/impl/google-login.command';
 import { LoginCommand } from './commands/impl/login.command';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
 import { verifyUserCommand } from './commands/impl/verifyUser.command';
@@ -42,6 +39,7 @@ import { AuthUserResponseDto } from './dto/auth-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { userInfoDto } from './dto/userInfo.dto';
+import { GoogleAuthGuard } from './guards/google.guard';
 import { GetProfileQuery } from './queries/impl/get-profile.query';
 import { GetProfileQueryByToken } from './queries/impl/getProfileByToken.query';
 
@@ -49,14 +47,12 @@ import { GetProfileQueryByToken } from './queries/impl/getProfileByToken.query';
 @ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly authService: AuthService,
-    private readonly config: ConfigService,
-    private readonly prisma: PrismaService,
-    private readonly jwt: JwtService,
-    private readonly httpService: HttpService
+    private readonly prisma: PrismaService
   ) {}
 
   @Public()
@@ -301,7 +297,7 @@ export class AuthController {
   async refreshToken(
     @Cookies('refresh_token') token: string,
     @Res({ passthrough: true }) res: Response
-  ) {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const payload = await this.authService.extractUserFromToken(
       token,
       TokenType.REFRESH
@@ -344,60 +340,43 @@ export class AuthController {
 
     return {
       access_token: new_access_token,
+      refresh_token: new_refresh_token,
     };
   }
 
   @Public()
   @Get('/google')
-  @UseGuards(AuthGuard('google-auth'))
+  @UseGuards(GoogleAuthGuard)
   async googleAuth() {
-    console.log('Google');
+    this.logger.log('Google Auth');
   }
 
   @Public()
   @Get('/google/callback')
-  @UseGuards(AuthGuard('google-auth'))
-  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
-    const externalAccount = await this.authService.createExternalAccount(req);
-
-    console.log(2);
-    let user = await this.authService.findUserById(
-      externalAccount.userId,
-      externalAccount.providerEmail as string
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthRedirect(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const data: AuthUserResponseDto = await this.commandBus.execute(
+      new GoogleLoginCommand(req.user!)
     );
 
-    try {
-      if (!user) {
-        user = await this.authService.createUser(
-          externalAccount.providerEmail as string
-        );
-      }
-    } catch {
-      throw new InternalServerErrorException('Internal Server Error');
-    }
-
-    console.log(3);
-
-    const jwtPayload: Payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    const { id, email, role } = data.data;
 
     const new_access_token = await this.authService.generateTokenFromUser(
-      jwtPayload,
+      { sub: id, email, role },
       TokenType.ACCESS
     );
 
     const new_refresh_token = await this.authService.generateTokenFromUser(
-      jwtPayload,
+      { sub: id, email, role },
       TokenType.REFRESH
     );
 
     res.cookie('access_token', new_access_token, cookieOptions);
     res.cookie('refresh_token', new_refresh_token, cookieOptions);
 
-    console.log(4);
-    return res.json({ access_token: new_access_token });
+    return res.redirect('https://google.com');
   }
 }

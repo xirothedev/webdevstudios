@@ -1,11 +1,12 @@
+import { User } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google-auth') {
-  constructor(private readonly config: ConfigService) {
+  constructor(readonly config: ConfigService) {
     const options = {
       clientID: config.getOrThrow<string>('GOOGLE_CLIENT_ID'),
       clientSecret: config.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
@@ -25,17 +26,22 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google-auth') {
   }
 
   async validate(
-    access_token: string,
-    refresh_token: string,
-    profile: any,
+    _access_token: string,
+    _refresh_token: string,
+    profile: Profile,
     cb: VerifyCallback
   ) {
-    const data = {
-      ...profile,
-      access_token,
-      refresh_token,
+    const user = {
+      id: profile.id, // Google user ID - needed for providerId
+      email: profile.emails![0].value,
+      fullName:
+        `${profile.name?.givenName || ''} ${profile.name?.middleName || ''} ${profile.name?.familyName || ''}`.trim() ||
+        undefined,
+      avatar: profile.photos![0].value,
+      role: 'CUSTOMER' as const,
+      emailVerified: true,
     };
 
-    cb(null, data);
+    cb(null, user as unknown as User);
   }
 }

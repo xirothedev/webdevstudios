@@ -5,11 +5,13 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer/dist/mailer.module';
 
+import { SessionSerializer } from '@/common/utils/session.serializer';
 import { RedisModule } from '@/redis/redis.module';
 
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleLoginHandler } from './commands/handlers/google-login.handler';
 import { LoginHandler } from './commands/handlers/login.handler';
 import { RegisterUserHandler } from './commands/handlers/register-user.handler';
 import { verifyUserHandler } from './commands/handlers/verifyUser.handler';
@@ -18,7 +20,12 @@ import { GetProfileByTokenHandler } from './queries/handlers/getProfileByToken.h
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
-const commandHandlers = [RegisterUserHandler, LoginHandler, verifyUserHandler];
+const commandHandlers = [
+  RegisterUserHandler,
+  LoginHandler,
+  verifyUserHandler,
+  GoogleLoginHandler,
+];
 const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
 
 @Module({
@@ -55,6 +62,7 @@ const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
     JwtStrategy,
     AuthService,
     GoogleStrategy,
+    SessionSerializer,
   ],
 })
 export class AuthModule {}

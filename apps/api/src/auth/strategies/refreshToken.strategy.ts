@@ -5,6 +5,8 @@ import { Strategy } from 'passport-jwt';
 
 import { PrismaService } from '@/prisma/prisma.service';
 
+import { Payload } from '../auth.interface';
+
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
   Strategy,
@@ -23,8 +25,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: any) {
-    console.log(payload);
+  async validate(payload: Payload) {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       select: {

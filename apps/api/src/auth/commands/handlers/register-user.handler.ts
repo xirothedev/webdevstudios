@@ -40,8 +40,6 @@ export class RegisterUserHandler implements ICommandHandler<
       },
     });
 
-    console.log(existingUser);
-
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
@@ -56,7 +54,6 @@ export class RegisterUserHandler implements ICommandHandler<
     });
 
     const hashedToken = await hash(crypto.randomBytes(32).toString('hex'));
-    console.log('token', hashedToken);
 
     await this.redis.hSet(`user-verify:${hashedToken}`, {
       id: user.id,

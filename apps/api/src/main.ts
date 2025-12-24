@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 import { AppModule } from './app.module';
 
@@ -17,6 +18,14 @@ async function bootstrap() {
   // Enable cookie parser for JWT tokens
   app.use(cookieParser());
   app.set('trust proxy', true);
+  app.use(
+    session({
+      secret: configService.getOrThrow<string>('SESSION_SECRET'),
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: true },
+    })
+  );
   // Enable CORS
   app.enableCors({
     origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
