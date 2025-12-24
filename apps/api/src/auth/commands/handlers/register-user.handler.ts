@@ -1,8 +1,16 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { hash } from 'argon2';
+import { randomBytes } from 'crypto';
 
+import { MailService } from '@/mail/mail.service';
 import { PrismaService } from '@/prisma/prisma.service';
+import { RedisService } from '@/redis/redis.service';
 
 import { AuthUserResponseDto } from '../../dto/auth-user.dto';
 import { RegisterUserCommand } from '../impl/register-user.command';
@@ -13,10 +21,15 @@ export class RegisterUserHandler implements ICommandHandler<
   RegisterUserCommand,
   AuthUserResponseDto
 > {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(RegisterUserHandler.name);
+  constructor(
+    private readonly mailService: MailService,
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService
+  ) {}
 
   async execute(command: RegisterUserCommand): Promise<AuthUserResponseDto> {
-    const { email, password, fullName, phone } = command.dto;
+    const { email, password } = command.dto;
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -27,6 +40,7 @@ export class RegisterUserHandler implements ICommandHandler<
         avatar: true,
         role: true,
         createdAt: true,
+        emailVerified: true,
       },
     });
 
@@ -40,10 +54,24 @@ export class RegisterUserHandler implements ICommandHandler<
       data: {
         email,
         password: hashedPassword,
-        fullName,
-        phone,
       },
     });
+
+    const hashedToken = await hash(randomBytes(32).toString('hex'));
+
+    await this.redis.hSet(`user-verify:${hashedToken}`, {
+      id: user.id,
+      tries: 0,
+    });
+
+    try {
+      await this.mailService.sendVerificationEmail(user.email, hashedToken);
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(
+        'Failed to send verification email'
+      );
+    }
 
     return {
       message: 'User registered successfully',

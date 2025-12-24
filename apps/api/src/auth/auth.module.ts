@@ -1,19 +1,31 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
-import type { StringValue } from 'ms';
+
+import { SessionSerializer } from '@/common/utils/session.serializer';
+import { MailModule } from '@/mail/mail.module';
+import { RedisModule } from '@/redis/redis.module';
 
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleLoginHandler } from './commands/handlers/google-login.handler';
 import { LoginHandler } from './commands/handlers/login.handler';
 import { RegisterUserHandler } from './commands/handlers/register-user.handler';
+import { verifyUserHandler } from './commands/handlers/verify-user.handler';
 import { GetProfileHandler } from './queries/handlers/get-profile.handler';
 import { GetProfileByTokenHandler } from './queries/handlers/getProfileByToken.handler';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
-const commandHandlers = [RegisterUserHandler, LoginHandler];
+const commandHandlers = [
+  RegisterUserHandler,
+  LoginHandler,
+  verifyUserHandler,
+  GoogleLoginHandler,
+];
 const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
 
 @Module({
@@ -21,18 +33,19 @@ const queryHandlers = [GetProfileHandler, GetProfileByTokenHandler];
     CqrsModule,
     PrismaModule,
     ConfigModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SECRET_KEY'),
-        signOptions: {
-          expiresIn: configService.get<StringValue>('JWT_EXPIRES_IN', '10m'),
-        },
-      }),
-    }),
+    RedisModule,
+    JwtModule,
+    HttpModule,
+    MailModule,
   ],
   controllers: [AuthController],
-  providers: [...commandHandlers, ...queryHandlers, JwtStrategy, AuthService],
+  providers: [
+    ...commandHandlers,
+    ...queryHandlers,
+    JwtStrategy,
+    AuthService,
+    GoogleStrategy,
+    SessionSerializer,
+  ],
 })
 export class AuthModule {}
