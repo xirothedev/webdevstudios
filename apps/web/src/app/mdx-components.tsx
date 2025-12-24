@@ -1,10 +1,7 @@
-import { MDXComponents } from '@/components/mdx/MDXComponents';
+import type { MDXComponents } from 'mdx/types';
 
-export function useMDXComponents(
-  components: Record<string, React.ComponentType>
-) {
+export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    ...MDXComponents,
     ...components,
   };
 }
