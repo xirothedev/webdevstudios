@@ -1,32 +1,31 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 
 import { PrismaService } from '@/prisma/prisma.service';
 
 import { Payload } from '../auth.interface';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class RefreshTokenStrategy extends PassportStrategy(
+  Strategy,
+  'refresh-token'
+) {
   constructor(
-    private readonly prisma: PrismaService,
-    configService: ConfigService
+    private readonly config: ConfigService,
+    private readonly prisma: PrismaService
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          return request?.cookies?.access_token;
-        },
-      ]),
-      ignoreExpiration: true,
-      secretOrKey: configService.getOrThrow<string>('JWT_SECRET_KEY'),
+      jwtFromRequest: (req) => {
+        return req.cookies.refresh_token;
+      },
+      ignoreExpiration: false,
+      secretOrKey: config.getOrThrow<string>('JWT_REFRESH_TOKEN_SECRET_KEY'),
     });
   }
 
   async validate(payload: Payload) {
-    console.debug('NGU');
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       select: {
@@ -36,10 +35,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         avatar: true,
         fullName: true,
         createdAt: true,
+        emailVerified: true,
       },
     });
 
-    if (!user) {
+    if (!user || (user && !user.emailVerified)) {
       throw new UnauthorizedException('User not found');
     }
 
