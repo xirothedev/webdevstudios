@@ -11,7 +11,7 @@ import {
   Users,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
@@ -381,6 +381,27 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
 }
 
 export default function GenerationPage() {
+  const [starPositions, setStarPositions] = useState<
+    Array<{
+      left: number;
+      top: number;
+      delay: number;
+      duration: number;
+    }>
+  >([]);
+
+  useEffect(() => {
+    // Generate random positions only on client side
+    setStarPositions(
+      Array.from({ length: 6 }, () => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        delay: Math.random() * 3,
+        duration: 4 + Math.random() * 4,
+      }))
+    );
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar variant="light" />
@@ -392,15 +413,15 @@ export default function GenerationPage() {
 
         {/* Floating stars animation */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {[...Array(6)].map((_, i) => (
+          {starPositions.map((star, i) => (
             <div
               key={i}
               className="animate-float absolute"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${4 + Math.random() * 4}s`,
+                left: `${star.left}%`,
+                top: `${star.top}%`,
+                animationDelay: `${star.delay}s`,
+                animationDuration: `${star.duration}s`,
               }}
             >
               <Star

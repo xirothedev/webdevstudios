@@ -15,6 +15,9 @@ export const SEO_IMAGES: Record<string, string> = {
   '/shop/pad-chuot': '/seo/shop/pad-chuot.png',
   '/generation': '/seo/generation.png',
   '/faq': '/seo/faq.png',
+  '/terms': '/seo/legal/terms.png',
+  '/privacy': '/seo/legal/privacy.png',
+  '/refund': '/seo/legal/refund.png',
 };
 const siteDescription =
   'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.';

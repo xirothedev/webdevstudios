@@ -7,7 +7,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     'Chính sách quyền riêng tư của WebDev Studios - Cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn.',
   path: '/privacy',
-  image: SEO_IMAGES['/'],
+  image: SEO_IMAGES['/privacy'],
   keywords: [
     'Chính sách quyền riêng tư',
     'Privacy Policy',

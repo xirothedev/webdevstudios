@@ -7,7 +7,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     'Chính sách đổi trả và hoàn tiền của WebDev Studios - Quy định và quy trình đổi trả sản phẩm.',
   path: '/refund',
-  image: SEO_IMAGES['/'],
+  image: SEO_IMAGES['/refund'],
   keywords: [
     'Chính sách đổi trả',
     'Refund Policy',
