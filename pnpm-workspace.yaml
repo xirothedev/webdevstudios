@@ -9,6 +9,7 @@ onlyBuiltDependencies:
   - '@nestjs/core'
   - '@prisma/engines'
   - '@scarf/scarf'
+  - esbuild
   - prisma
   - sharp
   - unrs-resolver

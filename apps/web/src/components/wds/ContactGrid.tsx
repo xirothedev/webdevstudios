@@ -53,14 +53,14 @@ function OnlineBeamBackground() {
           ref={mailRef}
           style={{ position: 'absolute', top: '18%', left: '26%' }}
         >
-          <Image src="/icons/gmail.png" alt="Email" width={20} height={20} />
+          <Image src="/icons/gmail.webp" alt="Email" width={20} height={20} />
         </Circle>
         <Circle
           ref={fbRef}
           style={{ position: 'absolute', top: '18%', right: '22%' }}
         >
           <Image
-            src="/icons/facebook.png"
+            src="/icons/facebook.webp"
             alt="Facebook"
             width={20}
             height={20}
@@ -71,7 +71,7 @@ function OnlineBeamBackground() {
           style={{ position: 'absolute', top: '72%', left: '24%' }}
         >
           <Image
-            src="/icons/telephone.png"
+            src="/icons/telephone.webp"
             alt="Phone"
             width={20}
             height={20}
@@ -82,7 +82,7 @@ function OnlineBeamBackground() {
           style={{ position: 'absolute', top: '72%', right: '18%' }}
         >
           <Image
-            src="/icons/messenger.png"
+            src="/icons/messenger.webp"
             alt="Messenger"
             width={20}
             height={20}
@@ -190,7 +190,7 @@ export function WDSContactGrid() {
       className: 'col-span-3 lg:col-span-1',
       background: (
         <div className="absolute inset-0">
-          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/ceremony-20-12-2025.png')] bg-cover bg-center opacity-50" />
+          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/ceremony-20-12-2025.webp')] bg-cover bg-center opacity-50" />
           <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/60 to-white/30" />
         </div>
       ),

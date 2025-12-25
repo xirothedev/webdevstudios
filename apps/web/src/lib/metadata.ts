@@ -6,18 +6,18 @@ const siteName = 'WebDev Studios';
 
 // SEO Images mapping: route path → SEO image path
 export const SEO_IMAGES: Record<string, string> = {
-  '/': '/seo/landing.png',
-  '/about': '/seo/about.png',
-  '/shop': '/seo/shop.png',
-  '/shop/ao-thun': '/seo/shop/ao-thun.png',
-  '/shop/moc-khoa': '/seo/shop/moc-khoa.png',
-  '/shop/day-deo': '/seo/shop/day-deo.png',
-  '/shop/pad-chuot': '/seo/shop/pad-chuot.png',
-  '/generation': '/seo/generation.png',
-  '/faq': '/seo/faq.png',
-  '/terms': '/seo/legal/terms.png',
-  '/privacy': '/seo/legal/privacy.png',
-  '/refund': '/seo/legal/refund.png',
+  '/': '/seo/landing.webp',
+  '/about': '/seo/about.webp',
+  '/shop': '/seo/shop.webp',
+  '/shop/ao-thun': '/seo/shop/ao-thun.webp',
+  '/shop/moc-khoa': '/seo/shop/moc-khoa.webp',
+  '/shop/day-deo': '/seo/shop/day-deo.webp',
+  '/shop/pad-chuot': '/seo/shop/pad-chuot.webp',
+  '/generation': '/seo/generation.webp',
+  '/faq': '/seo/faq.webp',
+  '/terms': '/seo/legal/terms.webp',
+  '/privacy': '/seo/legal/privacy.webp',
+  '/refund': '/seo/legal/refund.webp',
 };
 const siteDescription =
   'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.';

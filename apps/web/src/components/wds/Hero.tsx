@@ -85,7 +85,7 @@ export function WDSHero() {
           >
             <div className="relative h-full w-full overflow-hidden rounded-2xl">
               <Image
-                src="/image/HeroImage.webp"
+                src="/image/hero-image.webp"
                 alt="WebDev Studios - Câu lạc bộ lập trình web của sinh viên UIT"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"

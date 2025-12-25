@@ -31,7 +31,7 @@ export function WDSMissionSection() {
           >
             <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-lg">
               <Image
-                src="/image/TonChiImage.webp"
+                src="/image/ton-chi.webp"
                 alt="Tôn chỉ của WebDev Studios - Tuân thủ quy định, học hỏi và phát triển"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"

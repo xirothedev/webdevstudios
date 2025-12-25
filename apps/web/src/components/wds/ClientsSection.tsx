@@ -73,7 +73,7 @@ export function WDSClientsSection() {
           >
             <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-lg">
               <Image
-                src="/image/KhachHangImage.webp"
+                src="/image/khach-hang.webp"
                 alt="Đối tác và khách hàng của WebDev Studios"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
