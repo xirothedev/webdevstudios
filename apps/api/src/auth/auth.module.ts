@@ -6,7 +6,6 @@ import { PassportModule } from '@nestjs/passport';
 import { StringValue } from 'ms';
 
 import { MailModule } from '@/mail/mail.module';
-import { PrismaModule } from '@/prisma/prisma.module';
 
 // Controller
 import { AuthController } from './auth.controller';
@@ -71,7 +70,6 @@ const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
         },
       }),
     }),
-    PrismaModule,
     MailModule,
   ],
   controllers: [AuthController],

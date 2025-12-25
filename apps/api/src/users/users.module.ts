@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuthModule } from '@/auth/auth.module';
-import { PrismaModule } from '@/prisma/prisma.module';
+import { StorageModule } from '@/storage/storage.module';
 
 // Guards
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -32,7 +32,7 @@ const QueryHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, PrismaModule, AuthModule],
+  imports: [CqrsModule, AuthModule, StorageModule],
   controllers: [UsersController],
   providers: [...CommandHandlers, ...QueryHandlers, RolesGuard],
 })

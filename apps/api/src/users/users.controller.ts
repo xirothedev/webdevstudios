@@ -7,12 +7,16 @@ import {
   Param,
   Patch,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -22,6 +26,7 @@ import {
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
+import { FileValidationPipe } from '@/storage/pipes/file-validation.pipe';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -35,7 +40,6 @@ import {
   SearchUsersResponseDto,
   UserListResponseDto,
 } from './dtos/responses.dto';
-import { UpdateAvatarDto } from './dtos/update-avatar.dto';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { GetUserByIdQuery } from './queries/get-user-by-id/get-user-by-id.query';
@@ -76,26 +80,29 @@ export class UsersController {
 
   @Patch('avatar')
   @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Update own avatar',
     description:
-      'Update the authenticated user avatar. Currently accepts avatar URL string. TODO: Implement S3/R2 Cloudflare upload.',
+      'Update the authenticated user avatar. Upload image file (jpg, png, webp, max 5MB). Image will be resized to 400x400px and converted to WebP format.',
   })
-  @ApiBody({ type: UpdateAvatarDto })
   @ApiResponse({
     status: 200,
     description: 'Avatar updated successfully',
     type: PrivateUserDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request - Invalid file type or size',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateAvatar(
     @CurrentUser() user: { id: string },
-    @Body() dto: UpdateAvatarDto
+    @UploadedFile(new FileValidationPipe())
+    file: Express.Multer.File
   ): Promise<PrivateUserDto> {
-    return this.commandBus.execute(
-      new UpdateAvatarCommand(user.id, dto.avatar)
-    );
+    return this.commandBus.execute(new UpdateAvatarCommand(user.id, file));
   }
 
   @Get('me')
