@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["eslint.config.mjs", ".next", "node_modules", "next-env.d.ts"],
+    ignores: ['eslint.config.mjs', '.next', 'node_modules', 'next-env.d.ts'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -18,33 +18,41 @@ export default tseslint.config(
         projectService: false,
         tsconfigRootDir: import.meta.dirname,
         ecmaVersion: 2022,
-        sourceType: "module",
+        sourceType: 'module',
       },
     },
   },
   {
     plugins: {
-      "simple-import-sort": simpleImportSort,
+      'simple-import-sort': simpleImportSort,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_" },
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
-      "simple-import-sort/imports": [
-        "error",
+      'simple-import-sort/imports': [
+        'error',
         {
           groups: [
-            ["^\\u0000"], // Side effects
-            ["^node:"], // Node built-ins
-            ["^@?\\w"], // External libs (React, Nest...)
-            ["^@orderly/"], // Workspace packages
-            ["^@/"], // Path aliases
-            ["^\\."], // Relative imports
+            ['^\\u0000'], // Side effects
+            ['^node:'], // Node built-ins
+            ['^@?\\w'], // External libs (React, Nest...)
+            ['^@orderly/'], // Workspace packages
+            ['^@/'], // Path aliases
+            ['^\\.'], // Relative imports
           ],
         },
       ],
-      "simple-import-sort/exports": "error",
+      'simple-import-sort/exports': 'error',
     },
-  },
+  }
 );

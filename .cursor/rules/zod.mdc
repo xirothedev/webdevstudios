@@ -1,0 +1,119 @@
+---
+globs: **/*.{ts,tsx,js,jsx}
+alwaysApply: false
+---
+# Zod v4 Coding Guidelines
+
+Áp dụng các quy tắc này khi làm việc với thư viện Zod để đảm bảo validation logic chặt chẽ, type-safe và dễ bảo trì.
+
+## 1. Quy tắc đặt tên (Naming Conventions)
+
+- **Schema Variables**: Luôn sử dụng hậu tố `Schema`. Sử dụng `camelCase`.
+  - ✅ `const userSchema = ...`
+  - ❌ `const User = ...`
+- **Inferred Types**: Luôn sử dụng `PascalCase` và trùng tên với thực thể (hoặc thêm hậu tố `Dto` nếu cần).
+  - ✅ `type User = z.infer<typeof userSchema>;`
+  - ✅ `type CreateUserDto = z.infer<typeof createUserSchema>;`
+
+## 2. Validation Logic (Viết Rule)
+
+### Basic Rules
+Sử dụng các built-in methods của Zod tối đa trước khi dùng custom logic.
+- Dùng `z.string().min(1)` thay vì `.refine(s => s.length > 0)`.
+- Dùng `z.coerce` khi xử lý dữ liệu từ form-data hoặc query params (ví dụ: `z.coerce.number()`).
+
+### Shorthand & Top-level Utils (Zod v4 Specific)
+Ưu tiên sử dụng các top-level validators mới (standalone validators) để code gọn gàng hơn và cải thiện khả năng tree-shaking.
+
+- **Email**:
+  - ✅ `z.email()`
+  - ❌ `z.string().email()`
+- **UUID**:
+  - ✅ `z.uuid()`
+  - ❌ `z.string().uuid()`
+
+### Custom Rules với `.refine()`
+Sử dụng `.refine()` cho các logic xác thực đơn giản (trả về boolean).
+
+```typescript
+// ✅ Good
+const passwordSchema = z.string().refine((val) => !val.includes("123456"), {
+  message: "Mật khẩu không được chứa chuỗi dễ đoán",
+});
+```
+
+### Complex Rules với `.superRefine()`
+
+Sử dụng `.superRefine()` khi:
+
+1. Cần trả về nhiều lỗi cho cùng một field.
+2. Cần truy cập `ctx` để add issue thủ công.
+3. Validation phụ thuộc vào nhiều field (cross-field validation).
+
+```typescript
+// ✅ Good: Cross-field validation
+const confirmPasswordSchema = z.object({
+  password: z.string(),
+  confirm: z.string(),
+}).superRefine((data, ctx) => {
+  if (data.password !== data.confirm) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Mật khẩu xác nhận không khớp",
+      path: ["confirm"], // Chỉ định lỗi nằm ở field confirm
+    });
+  }
+});
+
+```
+
+## 3. Error Handling (Xử lý lỗi)
+
+### Sử dụng tham số `error` map
+
+Tận dụng khả năng tùy chỉnh error message trực tiếp trong definition.
+
+```typescript
+// ✅ Good
+const emailSchema = z.email({
+  error: (issue) => {
+      if (issue.code === z.ZodIssueCode.invalid_string) return "Email sai định dạng";
+      return "Email là bắt buộc";
+  }
+});
+
+```
+
+### Parse an toàn
+
+Luôn ưu tiên sử dụng `.safeParse()` thay vì `.parse()` để tránh crash ứng dụng khi validation thất bại.
+
+```typescript
+const result = userSchema.safeParse(input);
+if (!result.success) {
+  console.error(result.error.flatten());
+  return;
+}
+const data = result.data;
+
+```
+
+## 4. Reusability (Tái sử dụng)
+
+Tách các rule phức tạp hoặc regex ra thành biến riêng hoặc hàm helper để tái sử dụng.
+
+```typescript
+const vietnamPhoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+const vnPhoneSchema = z.string().regex(vietnamPhoneRegex, "Số điện thoại không hợp lệ");
+
+export const registerSchema = z.object({
+  phone: vnPhoneSchema,
+  // ...
+});
+
+```
+
+## 5. Performance Optimization
+
+* Hạn chế dùng `.transform()` quá nhiều nếu không cần thiết.
+* Với các schema lớn, sử dụng `z.lazy()` cẩn thận để tránh đệ quy vô hạn.

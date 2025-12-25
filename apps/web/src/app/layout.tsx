@@ -1,5 +1,6 @@
 import './globals.css';
 
+import { QueryClientProvider } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
@@ -11,6 +12,7 @@ import {
   defaultMetadata,
   SEO_IMAGES,
 } from '@/lib/metadata';
+import { queryClient } from '@/lib/query-client';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -68,11 +70,13 @@ export default function RootLayout({
   return (
     <html lang="vi" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
-        <AuthProvider>
-          <StructuredData />
-          <main className="min-h-screen">{children}</main>
-          <Toaster position="top-center" theme="dark" richColors />
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <StructuredData />
+            <main className="min-h-screen">{children}</main>
+            <Toaster position="top-center" theme="dark" richColors />
+          </AuthProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

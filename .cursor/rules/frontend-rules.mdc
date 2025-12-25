@@ -133,13 +133,18 @@ src/
 
 ### Client State
 - **Simple State**: `useState` cho local component state
-- **Form State**: Có thể dùng React Hook Form (nếu cần)
+- **Form State**: **BẮT BUỘC** sử dụng React Hook Form 7.x.x cho tất cả forms
 - **Global State**: Cân nhắc Zustand hoặc Context API (nếu thực sự cần)
 
-### API State Management (TanStack Query)
-- **Library**: `@tanstack/react-query` cho client-side data fetching
+### API State Management (TanStack Query) - BẮT BUỘC
+- **Library**: `@tanstack/react-query` - **BẮT BUỘC** sử dụng cho tất cả API calls
 - **Purpose**: Quản lý server state, caching, synchronization
 - **Setup**: Wrap app với `QueryClientProvider`
+- **Requirement**: 
+  - **KHÔNG BAO GIỜ** gọi API trực tiếp từ component
+  - **PHẢI** sử dụng TanStack Query hooks (`useQuery`, `useMutation`)
+  - **PHẢI** handler `onSuccess` và `onError` trong TanStack Query mutations
+  - **PHẢI** sử dụng Axios (không dùng fetch trực tiếp)
 - **Example**:
   ```tsx
   // Setup QueryClient
@@ -178,50 +183,118 @@ src/
   }
   ```
 
+## 📦 Required Dependencies
+
+### BẮT BUỘC phải có trong package.json:
+```json
+{
+  "dependencies": {
+    "@tanstack/react-query": "^5.x.x",
+    "react-hook-form": "^7.x.x",
+    "@hookform/resolvers": "^3.x.x",
+    "zod": "^3.x.x",
+    "axios": "^1.x.x"
+  }
+}
+```
+
+**Lưu ý**: 
+- TanStack Query: Bắt buộc cho tất cả API calls
+- React Hook Form: Bắt buộc cho tất cả forms
+- Zod: Bắt buộc cho form validation (dùng với @hookform/resolvers)
+- Axios: Bắt buộc cho HTTP client (không dùng fetch)
+
 ## 📡 API Integration
 
-### API Client Setup
-- **HTTP Client**: Axios cho HTTP requests
-- **State Management**: TanStack Query (React Query) cho data fetching và caching
+### API Client Setup - BẮT BUỘC
+- **HTTP Client**: **BẮT BUỘC** sử dụng Axios cho HTTP requests
+- **State Management**: **BẮT BUỘC** sử dụng TanStack Query (React Query) cho data fetching và caching
 - **Location**: 
-  - API client: `src/lib/api/client.ts` (axios instance)
-  - API services: `src/lib/api/services/` (API functions)
+  - API client: `src/lib/api-client.ts` (axios instance với withCredentials)
+  - API services: `src/lib/api/` (API functions)
   - Query hooks: `src/lib/api/hooks/` (TanStack Query hooks)
 
-### Axios Client Configuration
-```tsx
-// src/lib/api/client.ts
-import axios from 'axios'
+### Axios Client Configuration - BẮT BUỘC
+**QUAN TRỌNG**: Axios client PHẢI có `withCredentials: true` để gửi cookies (httpOnly cookies).
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+```tsx
+// src/lib/api-client.ts
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+
+// BẮT BUỘC: Tạo axios instance với withCredentials
+export const apiClient: AxiosInstance = axios.create({
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // BẮT BUỘC: Để gửi httpOnly cookies
 })
 
-// Request interceptor (e.g., add auth token)
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-// Response interceptor (e.g., handle errors)
-apiClient.interceptors.response.use(
-  (response) => response,
+// Request interceptor - Cookies tự động gửi với withCredentials
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Cookies tự động gửi bởi browser
+    return config
+  },
   (error) => {
-    // Handle common errors (401, 403, 500, etc.)
-    if (error.response?.status === 401) {
-      // Redirect to login
-    }
     return Promise.reject(error)
   }
 )
 
-export default apiClient
+// Response interceptor - Handle errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<{ message?: string; error?: string }>) => {
+    // Handle network errors
+    if (!error.response) {
+      return Promise.reject({
+        message: 'Không thể kết nối đến server. Vui lòng thử lại sau.',
+        status: 0,
+      })
+    }
+
+    const status = error.response.status
+    const data = error.response.data
+
+    // Extract error message
+    let message = data?.message || data?.error || 'Đã xảy ra lỗi'
+
+    // Map status codes to Vietnamese messages
+    switch (status) {
+      case 400:
+        message = data?.message || 'Dữ liệu không hợp lệ'
+        break
+      case 401:
+        message = data?.message || 'Xác thực thất bại. Vui lòng đăng nhập lại.'
+        break
+      case 403:
+        message = 'Bạn không có quyền thực hiện hành động này'
+        break
+      case 404:
+        message = data?.message || 'Không tìm thấy tài nguyên'
+        break
+      case 409:
+        message = data?.message || 'Dữ liệu đã tồn tại'
+        break
+      case 422:
+        message = data?.message || 'Dữ liệu không hợp lệ'
+        break
+      case 500:
+        message = 'Lỗi server. Vui lòng thử lại sau.'
+        break
+      default:
+        message = data?.message || `Lỗi ${status}: ${error.message}`
+    }
+
+    return Promise.reject({
+      message,
+      status,
+      data: error.response.data,
+    })
+  }
+)
 ```
 
 ### API Services with Axios
@@ -264,10 +337,13 @@ export const cartService = {
 }
 ```
 
-### TanStack Query Hooks
+### TanStack Query Hooks - BẮT BUỘC
+**QUAN TRỌNG**: Tất cả API calls PHẢI sử dụng TanStack Query hooks. KHÔNG BAO GIỜ gọi API trực tiếp.
+
 ```tsx
 // src/lib/api/hooks/use-cart.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { cartService, AddToCartRequest } from '../services/cart.service'
 
 // Query: Get cart items
@@ -279,24 +355,30 @@ export function useCart() {
   })
 }
 
-// Mutation: Add to cart
+// Mutation: Add to cart - BẮT BUỘC có onSuccess và onError
 export function useAddToCart() {
   const queryClient = useQueryClient()
   
   return useMutation({
     mutationFn: (data: AddToCartRequest) => cartService.addToCart(data),
     onSuccess: () => {
-      // Invalidate cart query to refetch
+      // BẮT BUỘC: Invalidate queries để sync data
       queryClient.invalidateQueries({ queryKey: ['cart'] })
+      // BẮT BUỘC: Show success notification
+      toast.success('Đã thêm vào giỏ hàng')
     },
-    onError: (error) => {
-      // Handle error (show toast, etc.)
+    onError: (error: unknown) => {
+      // BẮT BUỘC: Handle error và show notification
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Không thể thêm vào giỏ hàng'
+      toast.error(errorMessage)
       console.error('Failed to add to cart:', error)
     },
   })
 }
 
-// Mutation: Update cart item
+// Mutation: Update cart item - BẮT BUỘC có onSuccess và onError
 export function useUpdateCartItem() {
   const queryClient = useQueryClient()
   
@@ -305,11 +387,18 @@ export function useUpdateCartItem() {
       cartService.updateCartItem(itemId, quantity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
+      toast.success('Đã cập nhật giỏ hàng')
+    },
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Không thể cập nhật giỏ hàng'
+      toast.error(errorMessage)
     },
   })
 }
 
-// Mutation: Remove cart item
+// Mutation: Remove cart item - BẮT BUỘC có onSuccess và onError
 export function useRemoveCartItem() {
   const queryClient = useQueryClient()
   
@@ -317,12 +406,30 @@ export function useRemoveCartItem() {
     mutationFn: (itemId: string) => cartService.removeCartItem(itemId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
+      toast.success('Đã xóa khỏi giỏ hàng')
+    },
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Không thể xóa khỏi giỏ hàng'
+      toast.error(errorMessage)
     },
   })
 }
 ```
 
+**Rules cho TanStack Query**:
+- ✅ **BẮT BUỘC**: Tất cả mutations PHẢI có `onSuccess` và `onError` handlers
+- ✅ **BẮT BUỘC**: `onSuccess` PHẢI invalidate related queries
+- ✅ **BẮT BUỘC**: `onError` PHẢI show error notification (toast)
+- ✅ **BẮT BUỘC**: `onSuccess` có thể show success notification nếu cần
+- ✅ **BẮT BUỘC**: Sử dụng Axios (không dùng fetch)
+- ❌ **KHÔNG BAO GIỜ**: Gọi API service trực tiếp từ component
+- ❌ **KHÔNG BAO GIỜ**: Sử dụng `useEffect` để fetch data (dùng `useQuery` thay thế)
+
 ### Using Hooks in Components
+**Lưu ý**: `onSuccess` và `onError` đã được handle trong hook definition, không cần handle lại trong component (trừ khi cần custom logic).
+
 ```tsx
 'use client'
 import { useCart, useAddToCart } from '@/lib/api/hooks/use-cart'
@@ -332,19 +439,9 @@ export function CartButton({ productId, size }: { productId: string; size?: stri
   const addToCart = useAddToCart()
   
   const handleAddToCart = () => {
-    addToCart.mutate(
-      { productId, quantity: 1, size },
-      {
-        onSuccess: () => {
-          // Show success toast
-          toast.success('Đã thêm vào giỏ hàng')
-        },
-        onError: (error) => {
-          // Show error toast
-          toast.error('Không thể thêm vào giỏ hàng')
-        },
-      }
-    )
+    // onSuccess và onError đã được handle trong useAddToCart hook
+    // Chỉ cần gọi mutate với data
+    addToCart.mutate({ productId, quantity: 1, size })
   }
   
   return (
@@ -358,13 +455,138 @@ export function CartButton({ productId, size }: { productId: string; size?: stri
 }
 ```
 
+**Nếu cần custom logic trong component**:
+```tsx
+const handleAddToCart = () => {
+  addToCart.mutate(
+    { productId, quantity: 1, size },
+    {
+      onSuccess: () => {
+        // Custom logic (nếu cần)
+        // Note: onSuccess trong hook vẫn chạy trước
+        router.push('/cart')
+      },
+      onError: (error) => {
+        // Custom error handling (nếu cần)
+        // Note: onError trong hook vẫn chạy trước
+        console.log('Custom error handling:', error)
+      },
+    }
+  )
+}
+```
+
+### Form Handling với React Hook Form 7.x.x - BẮT BUỘC
+**QUAN TRỌNG**: Tất cả forms PHẢI sử dụng React Hook Form 7.x.x. KHÔNG BAO GIỜ dùng controlled inputs với useState.
+
+```tsx
+'use client'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { authApi } from '@/lib/api/auth.api'
+
+// Define validation schema với Zod
+const loginSchema = z.object({
+  email: z.string().email('Email không hợp lệ'),
+  password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+  rememberMe: z.boolean().optional(),
+})
+
+type LoginFormData = z.infer<typeof loginSchema>
+
+export function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false,
+    },
+  })
+
+  // BẮT BUỘC: Sử dụng TanStack Query mutation
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginFormData) => authApi.login(data),
+    onSuccess: () => {
+      toast.success('Đăng nhập thành công!')
+      router.push('/')
+    },
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Đăng nhập thất bại'
+      toast.error(errorMessage)
+    },
+  })
+
+  const onSubmit = (data: LoginFormData) => {
+    // BẮT BUỘC: Gọi mutation thay vì API trực tiếp
+    loginMutation.mutate(data)
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <input
+          {...register('email')}
+          type="email"
+          placeholder="Email"
+        />
+        {errors.email && <span>{errors.email.message}</span>}
+      </div>
+
+      <div>
+        <input
+          {...register('password')}
+          type="password"
+          placeholder="Password"
+        />
+        {errors.password && <span>{errors.password.message}</span>}
+      </div>
+
+      <div>
+        <input
+          {...register('rememberMe')}
+          type="checkbox"
+        />
+        <label>Remember me</label>
+      </div>
+
+      <button 
+        type="submit" 
+        disabled={isSubmitting || loginMutation.isPending}
+      >
+        {isSubmitting || loginMutation.isPending ? 'Đang xử lý...' : 'Đăng nhập'}
+      </button>
+    </form>
+  )
+}
+```
+
+**Rules cho React Hook Form**:
+- ✅ **BẮT BUỘC**: Sử dụng `useForm` hook cho tất cả forms
+- ✅ **BẮT BUỘC**: Sử dụng `register` để register inputs
+- ✅ **BẮT BUỘC**: Sử dụng `handleSubmit` cho form submission
+- ✅ **BẮT BUỘC**: Sử dụng Zod resolver cho validation
+- ✅ **BẮT BUỘC**: Kết hợp với TanStack Query mutations
+- ✅ **BẮT BUỘC**: Handle errors từ `formState.errors`
+- ❌ **KHÔNG BAO GIỜ**: Dùng controlled inputs với `useState` cho form fields
+- ❌ **KHÔNG BAO GIỜ**: Validate form thủ công (dùng Zod schema)
+
 ### Best Practices
-- **Error Handling**: Luôn handle errors trong `onError` callback của mutations
+- **Error Handling**: **BẮT BUỘC** handle errors trong `onError` callback của mutations
 - **Loading States**: Sử dụng `isPending`, `isLoading` từ hooks
+- **Form Validation**: **BẮT BUỘC** sử dụng React Hook Form với Zod resolver
 - **Optimistic Updates**: Có thể dùng `onMutate` cho optimistic updates
-- **Cache Invalidation**: Invalidate queries sau mutations để sync data
+- **Cache Invalidation**: **BẮT BUỘC** invalidate queries sau mutations để sync data
 - **Query Keys**: Sử dụng consistent query keys (arrays với proper structure)
 - **Type Safety**: Type tất cả API responses và requests
+- **API Calls**: **BẮT BUỘC** sử dụng TanStack Query, không gọi API trực tiếp
 
 ## ♿ Accessibility
 
@@ -496,6 +718,9 @@ npx shadcn@latest add dropdown-menu
 ### ❌ Don't Do This
 - ❌ Dùng `'use client'` không cần thiết
 - ❌ Fetch data trong `useEffect` khi có thể dùng Server Components
+- ❌ **Gọi API trực tiếp từ component** (phải dùng TanStack Query)
+- ❌ **Dùng useState cho form fields** (phải dùng React Hook Form)
+- ❌ **Mutation không có onSuccess và onError handlers**
 - ❌ Hardcode data thay vì fetch từ API
 - ❌ Ignore TypeScript errors
 - ❌ Skip alt text cho images
@@ -504,8 +729,11 @@ npx shadcn@latest add dropdown-menu
 
 ### ✅ Do This Instead
 - ✅ Ưu tiên Server Components
-- ✅ Fetch data trong Server Components
-- ✅ Integrate với API endpoints
+- ✅ Fetch data trong Server Components hoặc dùng `useQuery`
+- ✅ **Luôn sử dụng TanStack Query hooks cho API calls**
+- ✅ **Luôn sử dụng React Hook Form cho forms**
+- ✅ **Luôn có onSuccess và onError trong mutations**
+- ✅ Integrate với API endpoints qua TanStack Query
 - ✅ Fix TypeScript errors
 - ✅ Always provide alt text
 - ✅ Use Tailwind utility classes
