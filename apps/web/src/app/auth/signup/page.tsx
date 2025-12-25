@@ -131,7 +131,7 @@ export default function SignupPage() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-12 w-full rounded-lg bg-white text-black hover:bg-white/90 disabled:cursor-not-allowed"
+          className="mt-2 h-12 w-full rounded-lg bg-white text-black hover:bg-white/90 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Đang xử lý...' : 'Đăng ký'}
         </Button>
