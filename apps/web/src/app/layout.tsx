@@ -2,8 +2,10 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import { StructuredData } from '@/components/StructuredData';
+import { AuthProvider } from '@/contexts/auth.context';
 import {
   createPageMetadata,
   defaultMetadata,
@@ -66,8 +68,11 @@ export default function RootLayout({
   return (
     <html lang="vi" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
-        <StructuredData />
-        <main className="min-h-screen">{children}</main>
+        <AuthProvider>
+          <StructuredData />
+          <main className="min-h-screen">{children}</main>
+          <Toaster position="top-center" theme="dark" richColors />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -18,7 +19,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 
 import { Public } from '@/common/decorators/public.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
@@ -112,11 +113,15 @@ export class AuthController {
     status: 400,
     description: 'Email not verified',
   })
-  async login(@Body() dto: LoginDto, @Req() req: Request) {
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
 
-    return this.commandBus.execute(
+    const result = await this.commandBus.execute(
       new LoginCommand(
         dto.email,
         dto.password,
@@ -125,6 +130,34 @@ export class AuthController {
         userAgent
       )
     );
+
+    // Set cookies if login successful (not 2FA required)
+    if (!result.requires2FA && result.accessToken && result.refreshToken) {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const maxAge = dto.rememberMe
+        ? 30 * 24 * 60 * 60 * 1000
+        : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
+
+      // Set access token cookie
+      res.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      // Set refresh token cookie
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge,
+        path: '/',
+      });
+    }
+
+    return result;
   }
 
   @Public()
@@ -184,8 +217,43 @@ export class AuthController {
     status: 401,
     description: 'Invalid or expired refresh token',
   })
-  async refresh(@Body('refreshToken') refreshToken: string) {
-    return this.commandBus.execute(new RefreshTokenCommand(refreshToken));
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body('refreshToken') refreshToken?: string
+  ) {
+    // Get refresh token from cookie if not provided in body
+    const token = refreshToken || req.cookies?.refresh_token;
+    if (!token) {
+      throw new Error('Refresh token is required');
+    }
+
+    const result = await this.commandBus.execute(
+      new RefreshTokenCommand(token)
+    );
+
+    // Set new cookies
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Set access token cookie
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/',
+    });
+
+    // Set refresh token cookie
+    res.cookie('refresh_token', result.refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/',
+    });
+
+    return result;
   }
 
   @Post('logout')
@@ -221,9 +289,19 @@ export class AuthController {
   })
   async logout(
     @CurrentUser() user: { id: string },
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
     @Body('sessionId') sessionId?: string
   ) {
-    return this.commandBus.execute(new LogoutCommand(user.id, sessionId));
+    const result = await this.commandBus.execute(
+      new LogoutCommand(user.id, sessionId)
+    );
+
+    // Clear cookies
+    res.clearCookie('access_token', { path: '/' });
+    res.clearCookie('refresh_token', { path: '/' });
+
+    return result;
   }
 
   @Get('me')
@@ -312,12 +390,13 @@ export class AuthController {
   async verify2FA(
     @Body() dto: Verify2FADto,
     @CurrentUser() user: { id: string },
-    @Req() req: Request
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
   ) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
 
-    return this.commandBus.execute(
+    const result = await this.commandBus.execute(
       new Verify2FACommand(
         user.id,
         dto.code,
@@ -326,6 +405,29 @@ export class AuthController {
         userAgent
       )
     );
+
+    // Set cookies if login flow (tokens returned)
+    if (result.accessToken && result.refreshToken) {
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      res.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+    }
+
+    return result;
   }
 
   @Public()
@@ -359,7 +461,10 @@ export class AuthController {
     status: 401,
     description: 'OAuth authentication failed',
   })
-  async googleCallback(@Req() req: Request) {
+  async googleCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
     const oauthUser = req.user as {
@@ -370,11 +475,34 @@ export class AuthController {
       picture?: string;
     };
 
-    return this.oauthService.handleOAuthCallback(
+    const result = await this.oauthService.handleOAuthCallback(
       oauthUser as any,
       ipAddress,
       userAgent
     );
+
+    // Set cookies
+    if (result.accessToken && result.refreshToken) {
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      res.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+    }
+
+    return result;
   }
 
   @Public()
@@ -408,7 +536,10 @@ export class AuthController {
     status: 401,
     description: 'OAuth authentication failed',
   })
-  async githubCallback(@Req() req: Request) {
+  async githubCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
     const oauthUser = req.user as {
@@ -419,11 +550,34 @@ export class AuthController {
       picture?: string;
     };
 
-    return this.oauthService.handleOAuthCallback(
+    const result = await this.oauthService.handleOAuthCallback(
       oauthUser as any,
       ipAddress,
       userAgent
     );
+
+    // Set cookies
+    if (result.accessToken && result.refreshToken) {
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      res.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+    }
+
+    return result;
   }
 
   @Public()
