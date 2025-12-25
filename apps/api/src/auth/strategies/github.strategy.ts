@@ -1,7 +1,9 @@
+import { OAuthProvider } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-github2';
+import axios from 'axios';
+import { Profile, Strategy } from 'passport-github2';
 
 @Injectable()
 export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
@@ -17,14 +19,34 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: any,
-    done: any
+    profile: Profile,
+    done: (error: any, user: any) => void
   ): Promise<any> {
-    const { id, emails, displayName, username, photos } = profile;
+    const { id, displayName, username, photos } = profile;
+
+    // Get user email (might need separate call)
+    let email = profile.emails?.[0]?.value;
+    if (!email) {
+      try {
+        const emailsResponse = await axios.get(
+          'https://api.github.com/user/emails',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const primaryEmail = emailsResponse.data.find((e: any) => e.primary);
+        email = primaryEmail?.email || emailsResponse.data[0]?.email;
+      } catch {
+        email = `${username}@users.noreply.github.com`;
+      }
+    }
+
     const user = {
-      provider: 'GITHUB',
+      provider: OAuthProvider.GITHUB,
       providerId: id.toString(),
-      email: emails?.[0]?.value || `${username}@users.noreply.github.com`,
+      email: email || `${username}@users.noreply.github.com`,
       name: displayName || username,
       picture: photos?.[0]?.value,
       accessToken,

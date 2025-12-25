@@ -17,7 +17,6 @@ import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { Enable2FACommand } from './commands/enable-2fa/enable-2fa.command';
 import { LoginCommand } from './commands/login/login.command';
 import { LogoutCommand } from './commands/logout/logout.command';
-import { OAuthCallbackCommand } from './commands/oauth-callback/oauth-callback.command';
 import { RefreshTokenCommand } from './commands/refresh-token/refresh-token.command';
 import { RegisterCommand } from './commands/register/register.command';
 import { RequestPasswordResetCommand } from './commands/request-password-reset/request-password-reset.command';
@@ -27,20 +26,23 @@ import { VerifyEmailCommand } from './commands/verify-email/verify-email.command
 import { CurrentUser } from './decorators/current-user.decorator';
 // DTOs
 import { LoginDto } from './dtos/login.dto';
-import { OAuthCallbackDto } from './dtos/oauth-callback.dto';
 import { RegisterDto } from './dtos/register.dto';
 import { RequestPasswordResetDto } from './dtos/request-password-reset.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { Verify2FADto } from './dtos/verify-2fa.dto';
+import { GitHubOAuthGuard } from './guards/github-oauth.guard';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 // Queries
 import { GetCurrentUserQuery } from './queries/get-current-user/get-current-user.query';
 import { GetSessionsQuery } from './queries/get-sessions/get-sessions.query';
+import { OAuthService } from './services/oauth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
+    private readonly oauthService: OAuthService
   ) {}
 
   @Public()
@@ -130,34 +132,57 @@ export class AuthController {
 
   @Public()
   @Get('oauth/google')
+  @UseGuards(GoogleOAuthGuard)
   async initiateGoogleOAuth() {
-    // This will be handled by Passport strategy
-    // Return OAuth URL or redirect
-    return { message: 'Redirect to Google OAuth' };
+    // Passport will redirect to Google OAuth
+  }
+
+  @Public()
+  @Get('oauth/google/callback')
+  @UseGuards(GoogleOAuthGuard)
+  async googleCallback(@Req() req: Request) {
+    const ipAddress = req.ip || req.socket.remoteAddress;
+    const userAgent = req.get('user-agent');
+    const oauthUser = req.user as {
+      provider: string;
+      providerId: string;
+      email: string;
+      name?: string;
+      picture?: string;
+    };
+
+    return this.oauthService.handleOAuthCallback(
+      oauthUser as any,
+      ipAddress,
+      userAgent
+    );
   }
 
   @Public()
   @Get('oauth/github')
+  @UseGuards(GitHubOAuthGuard)
   async initiateGitHubOAuth() {
-    // This will be handled by Passport strategy
-    // Return OAuth URL or redirect
-    return { message: 'Redirect to GitHub OAuth' };
+    // Passport will redirect to GitHub OAuth
   }
 
   @Public()
-  @Post('oauth/callback')
-  async oauthCallback(@Body() dto: OAuthCallbackDto, @Req() req: Request) {
+  @Get('oauth/github/callback')
+  @UseGuards(GitHubOAuthGuard)
+  async githubCallback(@Req() req: Request) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
+    const oauthUser = req.user as {
+      provider: string;
+      providerId: string;
+      email: string;
+      name?: string;
+      picture?: string;
+    };
 
-    return this.commandBus.execute(
-      new OAuthCallbackCommand(
-        dto.provider,
-        dto.code,
-        dto.state,
-        ipAddress,
-        userAgent
-      )
+    return this.oauthService.handleOAuthCallback(
+      oauthUser as any,
+      ipAddress,
+      userAgent
     );
   }
 

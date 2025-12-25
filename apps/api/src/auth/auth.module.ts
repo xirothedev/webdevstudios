@@ -14,7 +14,6 @@ import { AuthController } from './auth.controller';
 import { Enable2FAHandler } from './commands/enable-2fa/enable-2fa.handler';
 import { LoginHandler } from './commands/login/login.handler';
 import { LogoutHandler } from './commands/logout/logout.handler';
-import { OAuthCallbackHandler } from './commands/oauth-callback/oauth-callback.handler';
 import { RefreshTokenHandler } from './commands/refresh-token/refresh-token.handler';
 import { RegisterHandler } from './commands/register/register.handler';
 import { RequestPasswordResetHandler } from './commands/request-password-reset/request-password-reset.handler';
@@ -22,6 +21,8 @@ import { ResetPasswordHandler } from './commands/reset-password/reset-password.h
 import { Verify2FAHandler } from './commands/verify-2fa/verify-2fa.handler';
 import { VerifyEmailHandler } from './commands/verify-email/verify-email.handler';
 // Guards
+import { GitHubOAuthGuard } from './guards/github-oauth.guard';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { MfaGuard } from './guards/mfa.guard';
 import { SessionRepository } from './infrastructure/session.repository';
 import { TokenService } from './infrastructure/token.service';
@@ -32,9 +33,11 @@ import { UserRepository } from './infrastructure/user.repository';
 // Queries
 import { GetCurrentUserHandler } from './queries/get-current-user/get-current-user.handler';
 import { GetSessionsHandler } from './queries/get-sessions/get-sessions.handler';
+// Services
+import { OAuthService } from './services/oauth.service';
+// Strategies
 import { GitHubStrategy } from './strategies/github.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
-// Strategies
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 const CommandHandlers = [
@@ -43,7 +46,6 @@ const CommandHandlers = [
   VerifyEmailHandler,
   Enable2FAHandler,
   Verify2FAHandler,
-  OAuthCallbackHandler,
   RequestPasswordResetHandler,
   ResetPasswordHandler,
   RefreshTokenHandler,
@@ -85,7 +87,11 @@ const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
     GoogleStrategy,
     GitHubStrategy,
     // Guards
+    GoogleOAuthGuard,
+    GitHubOAuthGuard,
     MfaGuard,
+    // Services
+    OAuthService,
     // Command Handlers
     ...CommandHandlers,
     // Query Handlers
