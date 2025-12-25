@@ -1,0 +1,167 @@
+---
+globs: apps/api/**/*.ts
+alwaysApply: false
+---
+# NestJS CQRS Architecture Rules
+
+You are an expert in **NestJS** development specializing in the **CQRS (Command Query Responsibility Segregation)** pattern using the `@nestjs/cqrs` package.
+
+When generating or refactoring code, you **MUST** strictly follow these rules.
+
+## 1. Core Technology Stack
+- **Library**: You MUST use `@nestjs/cqrs`.
+- **Validation**: Use `class-validator` and `class-transformer` for Command/Query properties.
+- **Language**: TypeScript (Strict mode).
+
+## 2. Directory Structure (Module-Based)
+Organize code within each Feature Module (`src/modules/<feature-name>/`) as follows:
+
+```text
+src/modules/<feature>/
+├── commands/               # Write operations
+│   ├── create-<feature>/
+│   │   ├── create-<feature>.command.ts
+│   │   └── create-<feature>.handler.ts
+├── queries/                # Read operations
+│   ├── get-<feature>/
+│   │   ├── get-<feature>.query.ts
+│   │   ├── get-<feature>.handler.ts
+│   └── dtos/               # Read models/DTOs returned by queries
+├── domain/                 # Domain Entities & Value Objects
+├── infrastructure/         # Repositories & Entity configurations
+└── <feature>.controller.ts # Entry point
+
+```
+
+## 3. Implementation Rules
+
+### A. Controllers
+
+* **Responsibility**: Validate HTTP input, then dispatch to `CommandBus` or `QueryBus`.
+* **Dependency Injection**: Inject **ONLY** `CommandBus` and `QueryBus`. Do NOT inject Services or Repositories directly into Controllers.
+
+### B. Commands (Write Side)
+
+* **File**: `*.command.ts`
+* **Structure**: Plain TypeScript class implementing `ICommand` (optional, usually just a class).
+* **Handler**:
+* File: `*.handler.ts`
+* Decorator: `@CommandHandler(CommandClass)`
+* Interface: Implements `ICommandHandler<CommandClass>`
+* **Logic**:
+1. Perform Domain Logic (via Domain Entities).
+2. Persist data using a Repository.
+3. Return minimal data (ID or void).
+
+### C. Queries (Read Side)
+
+* **File**: `*.query.ts`
+* **Structure**: Plain TypeScript class implementing `IQuery` (optional).
+* **Handler**:
+* File: `*.handler.ts`
+* Decorator: `@QueryHandler(QueryClass)`
+* Interface: Implements `IQueryHandler<QueryClass>`
+* **Logic**:
+1. Fetch data directly (Raw SQL, Query Builder, or lean Repository find).
+2. **Mapping**: Return a specific DTO/ViewModel, NOT a Domain Entity.
+3. **Constraint**: absolutely NO database write operations.
+
+## 4. Naming Conventions
+
+| Component | Pattern | Example |
+| --- | --- | --- |
+| **Command** | `Verb + Noun + Command` | `CreateUserCommand` |
+| **Query** | `Get/Find + Noun + Query` | `GetUserByIdQuery` |
+| **Handler** | `...Handler` | `CreateUserHandler` |
+| **Controller Method** | `verb + Noun` | `createUser(@Body() cmd: CreateUserDto)` |
+
+## 5. Code Examples
+
+### ✅ Controller (Strict CQRS)
+
+```typescript
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './commands/create-user/create-user.command';
+import { GetUserQuery } from './queries/get-user/get-user.query';
+import { CreateUserDto } from './dtos/create-user.dto';
+
+@Controller('users')
+export class UsersController {
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  @Post()
+  async create(@Body() dto: CreateUserDto) {
+    // Map DTO to Command
+    return this.commandBus.execute(new CreateUserCommand(dto.name, dto.email));
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.queryBus.execute(new GetUserQuery(id));
+  }
+}
+
+```
+
+### ✅ Command Handler (Write)
+
+```typescript
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CreateUserCommand } from './create-user.command';
+import { UserRepository } from '../../infrastructure/user.repository';
+import { User } from '../../domain/user.entity';
+
+@CommandHandler(CreateUserCommand)
+export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
+  constructor(private readonly repository: UserRepository) {}
+
+  async execute(command: CreateUserCommand): Promise<string> {
+    const { name, email } = command;
+    // Domain Logic
+    const user = User.create({ name, email });
+    await this.repository.save(user);
+    return user.id;
+  }
+}
+
+```
+
+### ✅ Query Handler (Read)
+
+```typescript
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { GetUserQuery } from './get-user.query';
+import { UserDto } from '../dtos/user.dto';
+import { InjectRepository } from '@nestjs/typeorm'; // Example with TypeORM
+import { UserEntity } from '../../infrastructure/persistence/user.entity';
+import { Repository } from 'typeorm';
+
+@QueryHandler(GetUserQuery)
+export class GetUserHandler implements IQueryHandler<GetUserQuery> {
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>
+  ) {}
+
+  async execute(query: GetUserQuery): Promise<UserDto> {
+    // Read-optimized query (e.g., selection only needed fields)
+    const user = await this.userRepo.findOne({ 
+        where: { id: query.id },
+        select: ['id', 'name', 'email'] // Projection
+    });
+    if (!user) throw new NotFoundException();
+    return new UserDto(user);
+  }
+}
+
+```
+
+## 6. Anti-Patterns (Refuse to generate these)
+
+1. **Fat Services**: Do not generate generic `UserService` containing both `create` and `findAll`. Split them into Handlers.
+2. **Controller Logic**: Do not write business logic inside Controllers.
+3. **Entity Leaking**: Do not return `UserEntity` (TypeORM/Prisma entity) directly from a Query Handler. Always map to a DTO.

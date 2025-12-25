@@ -1,0 +1,512 @@
+---
+globs: apps/web/**/*.{ts,tsx,js,jsx}
+alwaysApply: false
+---
+
+# Frontend Rules - Next.js 16 & React
+
+## 🎯 Core Principles
+
+### React Server Components First
+- **Priority**: Ưu tiên Server Components, chỉ dùng `'use client'` khi thực sự cần thiết
+- **When to use 'use client'**:
+  - Interactive components (onClick, onChange, useState, useEffect)
+  - Browser APIs (localStorage, window, document)
+  - Third-party libraries yêu cầu client-side
+  - Animations với motion/react (cần browser APIs)
+
+### Component Structure
+```typescript
+// ✅ Good: Server Component (default)
+export default function ProductPage() {
+  // Fetch data, no client-side logic
+}
+
+// ✅ Good: Client Component (when needed)
+'use client'
+export function ProductActions() {
+  const [quantity, setQuantity] = useState(1)
+  // Interactive logic
+}
+```
+
+## 📁 File & Directory Conventions
+
+### Naming
+- **Files**: `kebab-case` (e.g., `product-actions.tsx`)
+- **Components**: `PascalCase` (e.g., `ProductActions`)
+- **Directories**: `kebab-case` (e.g., `components/shop/`)
+- **Types**: `PascalCase` với suffix `Type` hoặc `Props` (e.g., `ProductType`, `ProductActionsProps`)
+
+### Directory Structure
+```
+src/
+├── app/              # Next.js App Router pages
+│   ├── layout.tsx    # Root layout
+│   ├── page.tsx      # Home page
+│   └── shop/         # Shop routes
+├── components/       # Reusable components
+│   ├── ui/          # shadcn/ui components
+│   ├── wds/         # WebDev Studios components
+│   └── shop/        # E-commerce components
+├── lib/             # Utilities & helpers
+├── types/           # TypeScript types
+└── data/            # Static data (temporary, sẽ migrate sang API)
+```
+
+## 🎨 Styling Rules
+
+### Tailwind CSS v4
+- **Approach**: Utility-first, mobile-first
+- **Custom Utilities**: Sử dụng `@layer utilities` trong `globals.css`
+- **Theme Colors**: Sử dụng CSS variables cho WDS colors
+  ```css
+  --wds-black: #000000;
+  --wds-white: #ffffff;
+  --wds-orange: #f7931e;
+  --wds-cream: #fff8e1;
+  ```
+
+### Responsive Design
+- **Breakpoints**: `sm:`, `md:`, `lg:`, `xl:`, `2xl:`
+- **Mobile First**: Viết styles cho mobile trước, sau đó override cho desktop
+- **Example**:
+  ```tsx
+  <div className="text-sm md:text-base lg:text-lg">
+    Responsive text
+  </div>
+  ```
+
+### Image Optimization
+- **Format**: WebP (ưu tiên), fallback PNG/JPG
+- **Component**: Luôn dùng Next.js `Image` component
+- **Required Props**: `src`, `alt`, `width`, `height` hoặc `fill`
+- **Priority**: Set `priority={true}` cho images above the fold
+- **Sizes**: Luôn specify `sizes` prop cho responsive images
+- **Example**:
+  ```tsx
+  <Image
+    src="/image/hero.webp"
+    alt="Hero image"
+    width={1200}
+    height={600}
+    priority
+    sizes="(max-width: 768px) 100vw, 1200px"
+  />
+  ```
+
+## 🎭 Animation Rules
+
+### motion/react Library
+- **Import**: `import { motion } from 'motion/react'`
+- **Performance**: Sử dụng `whileInView` cho scroll animations thay vì `useEffect`
+- **Variants**: Định nghĩa animation variants để tái sử dụng
+- **Example**:
+  ```tsx
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
+  
+  <motion.div
+    initial="hidden"
+    whileInView="visible"
+    variants={fadeInUp}
+    transition={{ duration: 0.5 }}
+  >
+    Content
+  </motion.div>
+  ```
+
+## 🔄 State Management
+
+### Server State
+- **Data Fetching**: Sử dụng async Server Components
+- **Caching**: Next.js built-in caching (fetch cache, route cache)
+- **Example**:
+  ```tsx
+  export default async function ProductPage({ params }) {
+    const product = await fetchProduct(params.slug)
+    return <ProductDetails product={product} />
+  }
+  ```
+
+### Client State
+- **Simple State**: `useState` cho local component state
+- **Form State**: Có thể dùng React Hook Form (nếu cần)
+- **Global State**: Cân nhắc Zustand hoặc Context API (nếu thực sự cần)
+
+### API State Management (TanStack Query)
+- **Library**: `@tanstack/react-query` cho client-side data fetching
+- **Purpose**: Quản lý server state, caching, synchronization
+- **Setup**: Wrap app với `QueryClientProvider`
+- **Example**:
+  ```tsx
+  // Setup QueryClient
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, // 1 minute
+        refetchOnWindowFocus: false,
+      },
+    },
+  })
+  
+  // In app
+  <QueryClientProvider client={queryClient}>
+    <App />
+  </QueryClientProvider>
+  ```
+
+## 🛡️ Type Safety
+
+### TypeScript Rules
+- **Strict Mode**: Luôn bật TypeScript strict mode
+- **Avoid `any`**: Không dùng `any`, dùng `unknown` nếu cần
+- **Type Definitions**: Định nghĩa types trong `src/types/`
+- **Props Types**: Luôn type props của components
+- **Example**:
+  ```tsx
+  interface ProductActionsProps {
+    productId: string
+    stock: number
+    onAddToCart: (quantity: number) => void
+  }
+  
+  export function ProductActions({ productId, stock, onAddToCart }: ProductActionsProps) {
+    // ...
+  }
+  ```
+
+## 📡 API Integration
+
+### API Client Setup
+- **HTTP Client**: Axios cho HTTP requests
+- **State Management**: TanStack Query (React Query) cho data fetching và caching
+- **Location**: 
+  - API client: `src/lib/api/client.ts` (axios instance)
+  - API services: `src/lib/api/services/` (API functions)
+  - Query hooks: `src/lib/api/hooks/` (TanStack Query hooks)
+
+### Axios Client Configuration
+```tsx
+// src/lib/api/client.ts
+import axios from 'axios'
+
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Request interceptor (e.g., add auth token)
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// Response interceptor (e.g., handle errors)
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle common errors (401, 403, 500, etc.)
+    if (error.response?.status === 401) {
+      // Redirect to login
+    }
+    return Promise.reject(error)
+  }
+)
+
+export default apiClient
+```
+
+### API Services with Axios
+```tsx
+// src/lib/api/services/cart.service.ts
+import apiClient from '../client'
+
+export interface AddToCartRequest {
+  productId: string
+  quantity: number
+  size?: string
+}
+
+export interface CartItem {
+  id: string
+  productId: string
+  quantity: number
+  size?: string
+}
+
+export const cartService = {
+  addToCart: async (data: AddToCartRequest): Promise<CartItem> => {
+    const response = await apiClient.post<CartItem>('/cart/add', data)
+    return response.data
+  },
+  
+  getCart: async (): Promise<CartItem[]> => {
+    const response = await apiClient.get<CartItem[]>('/cart')
+    return response.data
+  },
+  
+  updateCartItem: async (itemId: string, quantity: number): Promise<CartItem> => {
+    const response = await apiClient.put<CartItem>(`/cart/items/${itemId}`, { quantity })
+    return response.data
+  },
+  
+  removeCartItem: async (itemId: string): Promise<void> => {
+    await apiClient.delete(`/cart/items/${itemId}`)
+  },
+}
+```
+
+### TanStack Query Hooks
+```tsx
+// src/lib/api/hooks/use-cart.ts
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { cartService, AddToCartRequest } from '../services/cart.service'
+
+// Query: Get cart items
+export function useCart() {
+  return useQuery({
+    queryKey: ['cart'],
+    queryFn: () => cartService.getCart(),
+    staleTime: 30 * 1000, // 30 seconds
+  })
+}
+
+// Mutation: Add to cart
+export function useAddToCart() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: (data: AddToCartRequest) => cartService.addToCart(data),
+    onSuccess: () => {
+      // Invalidate cart query to refetch
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+    },
+    onError: (error) => {
+      // Handle error (show toast, etc.)
+      console.error('Failed to add to cart:', error)
+    },
+  })
+}
+
+// Mutation: Update cart item
+export function useUpdateCartItem() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
+      cartService.updateCartItem(itemId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+    },
+  })
+}
+
+// Mutation: Remove cart item
+export function useRemoveCartItem() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: (itemId: string) => cartService.removeCartItem(itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+    },
+  })
+}
+```
+
+### Using Hooks in Components
+```tsx
+'use client'
+import { useCart, useAddToCart } from '@/lib/api/hooks/use-cart'
+
+export function CartButton({ productId, size }: { productId: string; size?: string }) {
+  const { data: cart, isLoading } = useCart()
+  const addToCart = useAddToCart()
+  
+  const handleAddToCart = () => {
+    addToCart.mutate(
+      { productId, quantity: 1, size },
+      {
+        onSuccess: () => {
+          // Show success toast
+          toast.success('Đã thêm vào giỏ hàng')
+        },
+        onError: (error) => {
+          // Show error toast
+          toast.error('Không thể thêm vào giỏ hàng')
+        },
+      }
+    )
+  }
+  
+  return (
+    <button
+      onClick={handleAddToCart}
+      disabled={addToCart.isPending || isLoading}
+    >
+      {addToCart.isPending ? 'Đang thêm...' : 'Thêm vào giỏ'}
+    </button>
+  )
+}
+```
+
+### Best Practices
+- **Error Handling**: Luôn handle errors trong `onError` callback của mutations
+- **Loading States**: Sử dụng `isPending`, `isLoading` từ hooks
+- **Optimistic Updates**: Có thể dùng `onMutate` cho optimistic updates
+- **Cache Invalidation**: Invalidate queries sau mutations để sync data
+- **Query Keys**: Sử dụng consistent query keys (arrays với proper structure)
+- **Type Safety**: Type tất cả API responses và requests
+
+## ♿ Accessibility
+
+### Required Practices
+- **Alt Text**: Luôn có `alt` cho images
+- **ARIA Labels**: Sử dụng khi cần thiết
+- **Keyboard Navigation**: Đảm bảo tất cả interactive elements có thể navigate bằng keyboard
+- **Focus Indicators**: Visible focus states
+- **Semantic HTML**: Sử dụng đúng HTML elements (`<button>`, `<nav>`, `<main>`, etc.)
+
+### Component Reusability Priority
+
+**QUAN TRỌNG**: Luôn ưu tiên sử dụng components có sẵn trước khi tạo component mới.
+
+#### Priority Order:
+1. **shadcn/ui Components** (`src/components/ui/`)
+   - Kiểm tra xem component đã có trong `src/components/ui/` chưa
+   - Nếu chưa có, cài đặt từ shadcn/ui registry: `npx shadcn@latest add [component-name]`
+   - shadcn/ui components đã có sẵn accessibility, keyboard navigation, ARIA labels
+   - **Available Components**: button, input, navigation-menu, và nhiều components khác từ shadcn/ui
+
+2. **Custom Components trong Project** (`src/components/`)
+   - Kiểm tra xem đã có custom component tương tự chưa
+   - Xem trong `src/components/wds/`, `src/components/shop/` hoặc các folder khác
+   - Có thể extend/modify component có sẵn thay vì tạo mới
+
+3. **Tạo Component Mới** (chỉ khi không có sẵn)
+   - Chỉ tạo component mới khi:
+     - Không có trong shadcn/ui registry
+     - Không có custom component tương tự trong project
+     - Component cần thiết cho business logic đặc thù
+
+#### Examples:
+
+```tsx
+// ✅ Good: Sử dụng Button từ shadcn/ui
+import { Button } from '@/components/ui/button'
+
+export function ProductActions() {
+  return (
+    <Button onClick={handleAddToCart}>
+      Thêm vào giỏ
+    </Button>
+  )
+}
+
+// ❌ Bad: Tạo button mới thay vì dùng component có sẵn
+export function ProductActions() {
+  return (
+    <button className="px-4 py-2 bg-blue-500" onClick={handleAddToCart}>
+      Thêm vào giỏ
+    </button>
+  )
+}
+```
+
+```tsx
+// ✅ Good: Sử dụng Input từ shadcn/ui
+import { Input } from '@/components/ui/input'
+
+export function SearchForm() {
+  return <Input type="search" placeholder="Tìm kiếm..." />
+}
+
+// ❌ Bad: Tạo input mới
+export function SearchForm() {
+  return (
+    <input 
+      type="search" 
+      className="px-4 py-2 border rounded"
+      placeholder="Tìm kiếm..."
+    />
+  )
+}
+```
+
+#### shadcn/ui Component Installation:
+```bash
+# Cài đặt component từ shadcn/ui
+npx shadcn@latest add button
+npx shadcn@latest add input
+npx shadcn@latest add dialog
+npx shadcn@latest add dropdown-menu
+# ... và nhiều components khác
+```
+
+#### Available shadcn/ui Components:
+- **Form Components**: button, input, textarea, select, checkbox, radio-group, switch, label
+- **Layout Components**: card, separator, sheet, dialog, drawer, popover, tooltip
+- **Navigation**: navigation-menu, breadcrumb, tabs, pagination
+- **Data Display**: table, badge, avatar, progress, skeleton
+- **Feedback**: alert, toast, alert-dialog
+- **Overlay**: dropdown-menu, context-menu, hover-card
+- **Và nhiều components khác**: Xem tại https://ui.shadcn.com/docs/components
+
+#### Customization:
+- shadcn/ui components có thể customize dễ dàng với Tailwind CSS
+- Có thể extend props, thêm variants với `class-variance-authority`
+- Giữ nguyên accessibility features khi customize
+
+## 🧪 Testing (Future)
+
+### Testing Strategy
+- **Unit Tests**: Jest + React Testing Library
+- **E2E Tests**: Playwright (nếu cần)
+- **Component Tests**: Test UI components với user interactions
+
+## 📝 Code Quality
+
+### Linting & Formatting
+- **ESLint**: Next.js ESLint config với custom rules
+- **Prettier**: Auto-format với Tailwind plugin
+- **Pre-commit**: Husky + lint-staged
+
+### Best Practices
+1. **Component Size**: Giữ components nhỏ, single responsibility
+2. **Reusability**: Extract reusable logic vào custom hooks
+3. **Performance**: 
+   - Lazy load components với `dynamic()` khi cần
+   - Optimize images
+   - Minimize client-side JavaScript
+4. **SEO**: 
+   - Metadata cho mỗi page
+   - Structured data (JSON-LD)
+   - Semantic HTML
+
+## 🚫 Anti-Patterns
+
+### ❌ Don't Do This
+- ❌ Dùng `'use client'` không cần thiết
+- ❌ Fetch data trong `useEffect` khi có thể dùng Server Components
+- ❌ Hardcode data thay vì fetch từ API
+- ❌ Ignore TypeScript errors
+- ❌ Skip alt text cho images
+- ❌ Use inline styles thay vì Tailwind classes
+- ❌ Create large components (>200 lines)
+
+### ✅ Do This Instead
+- ✅ Ưu tiên Server Components
+- ✅ Fetch data trong Server Components
+- ✅ Integrate với API endpoints
+- ✅ Fix TypeScript errors
+- ✅ Always provide alt text
+- ✅ Use Tailwind utility classes
+- ✅ Split large components into smaller ones

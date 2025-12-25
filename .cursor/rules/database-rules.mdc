@@ -1,0 +1,243 @@
+---
+globs: apps/api/prisma/**/*.prisma
+alwaysApply: false
+---
+
+# Database Rules - Prisma Schema
+
+## 🎯 Schema Strategy
+
+### Simplified Schema for 4 Fixed Products
+- **Products**: Chỉ có 4 sản phẩm cố định (Áo thun, Pad chuột, Dây đeo, Móc khóa)
+- **No Categories**: Không có Category model (không cần vì chỉ 4 sản phẩm)
+- **No Variants**: Không có ProductVariant phức tạp, chỉ có ProductSizeStock cho áo thun
+- **Type Safety**: Sử dụng enums (ProductSlug, ProductSize) thay vì strings
+
+## 📁 Schema File Organization
+
+### File Structure
+```
+prisma/schema/
+├── base.prisma        # Base configuration, datasource, generator
+├── enums.prisma       # Tất cả enums
+├── user.prisma        # User, Session, Device models
+├── auth.prisma        # Authentication related (OAuth, MFA)
+├── product.prisma     # Product, ProductImage, ProductSizeStock
+├── order.prisma       # Order, OrderItem, Cart, CartItem
+└── marketing.prisma   # Review, Discount, Promotion
+```
+
+### Schema Composition
+- **Base**: Datasource, generator config
+- **Enums**: Tất cả enums tập trung một file
+- **Domain Models**: Tách theo domain (user, product, order, marketing)
+
+## 🔢 Enum Definitions
+
+### Product Enums
+```prisma
+enum ProductSlug {
+  AO_THUN    // Áo thun WebDev Studios
+  PAD_CHUOT  // Pad chuột WebDev Studios
+  DAY_DEO    // Dây đeo WebDev Studios
+  MOC_KHOA   // Móc khóa WebDev Studios
+}
+
+enum ProductSize {
+  S
+  M
+  L
+  XL
+}
+```
+
+### Rules for Enums
+- **Location**: Tất cả enums trong `enums.prisma`
+- **Naming**: `PascalCase` với `SCREAMING_SNAKE_CASE` values
+- **Comments**: Luôn có comment giải thích cho mỗi enum value
+- **Type Safety**: Sử dụng enums thay vì strings trong code
+
+## 📊 Model Definitions
+
+### Product Model
+```prisma
+model Product {
+  id          String      @id @default(cuid())
+  slug        ProductSlug @unique // Enum đảm bảo chỉ có 4 sản phẩm
+  name        String      @db.VarChar(255)
+  description String      @db.Text
+  
+  // Pricing
+  priceCurrent  Decimal @db.Money
+  priceOriginal Decimal? @db.Money
+  priceDiscount Decimal? @db.Money
+  
+  // Stock & Sizes
+  stock       Int     @default(0)
+  hasSizes    Boolean @default(false) // Chỉ áo thun = true
+  badge       String? @db.VarChar(50)
+  
+  // Ratings
+  ratingValue Decimal @default(0) @db.Decimal(3, 2)
+  ratingCount Int     @default(0)
+  
+  // Relations
+  images     ProductImage[]
+  sizeStocks ProductSizeStock[] // Chỉ cho áo thun
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+}
+```
+
+### Key Rules
+1. **ProductSlug**: Bắt buộc unique, enum type
+2. **Stock Management**: 
+   - `Product.stock` cho sản phẩm không có size
+   - `ProductSizeStock` cho áo thun (theo size)
+3. **Pricing**: Sử dụng `@db.Money` type cho tiền tệ
+4. **Ratings**: Decimal(3,2) cho rating (0-5.00)
+
+### ProductSizeStock Model
+```prisma
+model ProductSizeStock {
+  id     String      @id @default(cuid())
+  size   ProductSize
+  stock  Int         @default(0)
+  
+  productId String
+  product   Product @relation(...)
+  
+  @@unique([productId, size]) // Mỗi size của 1 sản phẩm chỉ có 1 record
+}
+```
+
+**Purpose**: Quản lý stock theo size cho áo thun. Các sản phẩm khác không có size, dùng `Product.stock` trực tiếp.
+
+## 🔗 Relations
+
+### Best Practices
+- **Cascade Delete**: Sử dụng `onDelete: Cascade` cho child records (e.g., ProductImage)
+- **Optional Relations**: Dùng `?` khi relation có thể null
+- **Indexes**: Thêm indexes cho foreign keys và frequently queried fields
+- **Example**:
+  ```prisma
+  model ProductImage {
+    productId String
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+    
+    @@index([productId, order]) // Composite index
+  }
+  ```
+
+## 📝 Naming Conventions
+
+### Models
+- **Singular**: `Product`, `Order`, `Cart` (không phải `Products`, `Orders`)
+- **PascalCase**: Tất cả model names
+- **Descriptive**: Tên model phải mô tả rõ ràng
+
+### Fields
+- **camelCase**: `productId`, `createdAt`, `ratingValue`
+- **Boolean Prefix**: `is`, `has`, `can` (e.g., `isPublished`, `hasSizes`)
+- **Timestamps**: `createdAt`, `updatedAt` (standard)
+
+### Relations
+- **Singular**: `product`, `user` (không phải `products`, `users`)
+- **Plural Arrays**: `images`, `reviews`, `orderItems`
+
+## 🗄️ Database Types
+
+### Prisma Types Mapping
+- **String**: `@db.VarChar(255)` cho short strings, `@db.Text` cho long text
+- **Decimal**: `@db.Decimal(precision, scale)` cho money/ratings
+- **Money**: `@db.Money` cho tiền tệ (PostgreSQL money type)
+- **DateTime**: Standard `DateTime` type
+- **Boolean**: Standard `Boolean` type
+- **Int**: Standard `Int` type
+
+### Examples
+```prisma
+priceCurrent  Decimal @db.Money           // Money type
+ratingValue   Decimal @db.Decimal(3, 2)   // 0.00 to 5.00
+name          String  @db.VarChar(255)    // Short string
+description   String  @db.Text            // Long text
+stock         Int     @default(0)          // Integer with default
+```
+
+## 🔄 Migrations
+
+### Migration Workflow
+1. **Edit Schema**: Sửa các file `.prisma` trong `prisma/schema/`
+2. **Generate**: `pnpm prisma:generate` để generate Prisma Client
+3. **Create Migration**: `pnpm prisma:migrate` để tạo migration
+4. **Review**: Kiểm tra migration SQL trước khi apply
+5. **Apply**: Migration sẽ tự động apply trong dev mode
+
+### Migration Rules
+- **Never Edit Migrations**: Không sửa migration files đã tạo
+- **Descriptive Names**: Tên migration phải mô tả rõ thay đổi
+- **Backup**: Backup database trước khi chạy migration production
+- **Test**: Test migrations trên staging trước
+
+## 🚫 Anti-Patterns
+
+### ❌ Don't Do This
+- ❌ Tạo Category model (không cần cho 4 sản phẩm)
+- ❌ Tạo ProductVariant phức tạp (dùng ProductSizeStock đơn giản hơn)
+- ❌ Dùng String cho ProductSlug (dùng enum ProductSlug)
+- ❌ Quên indexes cho foreign keys
+- ❌ Quên `onDelete` strategy cho relations
+- ❌ Hardcode magic numbers (dùng constants/enums)
+
+### ✅ Do This Instead
+- ✅ Sử dụng ProductSlug enum cho type safety
+- ✅ Dùng ProductSizeStock cho size management
+- ✅ Thêm indexes cho performance
+- ✅ Specify `onDelete` strategy
+- ✅ Sử dụng enums thay vì strings
+- ✅ Comment rõ ràng cho complex models
+
+## 📋 Schema Checklist
+
+Khi tạo/sửa model, đảm bảo:
+- [ ] Model name là Singular, PascalCase
+- [ ] Fields có proper types và constraints
+- [ ] Relations có proper `onDelete` strategy
+- [ ] Indexes được thêm cho frequently queried fields
+- [ ] Comments giải thích cho complex fields
+- [ ] Default values cho optional fields
+- [ ] Unique constraints nếu cần
+- [ ] Enum types thay vì strings khi có thể
+
+## 🔍 Query Optimization
+
+### Best Practices
+- **Select Only Needed Fields**: Không select `*`, chỉ select fields cần thiết
+- **Use Indexes**: Đảm bảo queries sử dụng indexes
+- **Avoid N+1**: Sử dụng `include` hoặc `select` để eager load relations
+- **Pagination**: Luôn paginate cho list queries
+
+### Example
+```typescript
+// ✅ Good: Select specific fields, use include
+const products = await prisma.product.findMany({
+  select: {
+    id: true,
+    slug: true,
+    name: true,
+    priceCurrent: true,
+    images: {
+      select: { url: true, altText: true },
+      take: 1
+    }
+  },
+  where: { isPublished: true }
+})
+
+// ❌ Bad: Select all, N+1 problem
+const products = await prisma.product.findMany()
+products.forEach(p => {
+  const images = await prisma.productImage.findMany({ where: { productId: p.id } })
+})
+```

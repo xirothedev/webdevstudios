@@ -1,105 +1,74 @@
 // =========================================
-// PRODUCT MANAGEMENT (Complex Logic)
+// PRODUCT MANAGEMENT (Simplified for 4 fixed products)
 // =========================================
 
-model Category {
-  id          String  @id @default(cuid())
-  name        String  @unique @db.VarChar(100)
-  slug        String  @unique @db.VarChar(100) // URL thân thiện SEO
-  description String? @db.Text
-  image       String? @db.Text
-
-  // Self-relation để làm danh mục đa cấp (Ví dụ: Thời trang nam -> Áo -> Áo thun)
-  parentId String?
-  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children Category[] @relation("CategoryHierarchy")
-
-  products Product[]
-
-  @@map("categories")
-}
 
 model Product {
-  id          String  @id @default(cuid())
-  name        String  @db.VarChar(255)
-  slug        String  @unique @db.VarChar(255)
-  description String? @db.Text // Hỗ trợ HTML/Markdown
+  id          String      @id @default(cuid())
+  slug        ProductSlug @unique // Enum đảm bảo chỉ có 4 sản phẩm
+  name        String      @db.VarChar(255)
+  description String      @db.Text
 
-  // Giá cơ bản (để hiển thị "Từ 100k"). Giá thật nằm ở Variant.
-  basePrice Decimal @db.Decimal(12, 2)
+  // Giá sản phẩm
+  priceCurrent  Decimal @db.Money // Giá hiện tại
+  priceOriginal Decimal? @db.Money // Giá gốc (nếu có giảm giá)
+  priceDiscount Decimal? @db.Money // Số tiền giảm
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  // Thông tin sản phẩm
+  stock       Int     @default(0) // Tổng số lượng tồn kho
+  hasSizes    Boolean @default(false) // Có hỗ trợ chọn size không (chỉ áo thun)
+  badge       String? @db.VarChar(50) // Badge hiển thị (Limited Edition, Official Merch)
 
+  // Đánh giá sản phẩm
+  ratingValue Decimal @default(0) @db.Decimal(3, 2) // Điểm đánh giá (0-5)
+  ratingCount  Int     @default(0) // Số lượng đánh giá
+
+  // Metadata
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  images   ProductImage[]
-  variants ProductVariant[] // Các biến thể (SKU)
-  options  ProductOption[] // Định nghĩa options (Màu, Size)
-  reviews  Review[]
+  images     ProductImage[]
+  sizeStocks ProductSizeStock[] // Quản lý stock theo size (chỉ áo thun)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
 
-  @@index([categoryId])
   @@index([slug])
   @@map("products")
 }
 
+/**
+ * Ảnh sản phẩm
+ */
 model ProductImage {
   id      String  @id @default(cuid())
   url     String  @db.Text
   altText String? @db.VarChar(255)
-  isMain  Boolean @default(false) // Ảnh đại diện
+  order   Int     @default(0) // Thứ tự hiển thị
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, order])
   @@map("product_images")
 }
 
-// Định nghĩa Option: Ví dụ sản phẩm có Option là "Màu sắc" và "Kích thước"
-model ProductOption {
-  id   String @id @default(cuid())
-  name String @db.VarChar(50) // VD: "Color", "Size"
+/**
+ * Quản lý tồn kho theo size (chỉ cho áo thun)
+ * Nếu sản phẩm không có size, stock được lưu trực tiếp ở Product.stock
+ */
+model ProductSizeStock {
+  id     String      @id @default(cuid())
+  size   ProductSize // S, M, L, XL
+  stock  Int         @default(0)
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  values ProductOptionValue[]
-
-  @@map("product_options")
+  @@unique([productId, size]) // Mỗi size của 1 sản phẩm chỉ có 1 record
+  @@index([productId])
+  @@map("product_size_stocks")
 }
 
-// Định nghĩa giá trị Option: "Đỏ", "Xanh", "S", "M"
-model ProductOptionValue {
-  id    String @id @default(cuid())
-  value String @db.VarChar(50) // VD: "Red", "XL"
-
-  optionId String
-  option   ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
-
-  // Many-to-many: Một giá trị option có thể thuộc về nhiều Variant
-  variants ProductVariant[]
-
-  @@map("product_option_values")
-}
-
-// SKU thực tế (Sự kết hợp của các Option Values)
-model ProductVariant {
-  id    String  @id @default(cuid())
-  sku   String  @unique @db.VarChar(50) // Mã kho: PROD-RED-XL
-  price Decimal @db.Decimal(12, 2) // Giá riêng cho biến thể này
-  stock Int     @default(0) // Quản lý tồn kho
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  // Liên kết với các giá trị option (Red, XL)
-  options ProductOptionValue[]
-
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-
-  @@map("product_variants")
-}

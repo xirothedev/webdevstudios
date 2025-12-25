@@ -1,0 +1,269 @@
+---
+alwaysApply: true
+---
+
+# Monorepo Structure & Turborepo
+
+## 🏗️ Monorepo Overview
+
+### Structure
+```
+webdevstudios/
+├── apps/
+│   ├── web/              # Next.js frontend application
+│   └── api/              # NestJS backend application
+├── docs/                 # Project documentation
+├── .cursor/
+│   └── rules/            # Cursor IDE rules
+├── package.json          # Root workspace config
+├── pnpm-workspace.yaml   # pnpm workspace config
+├── turbo.json            # Turborepo config
+└── MEMORIZE.md           # Session memory
+```
+
+### Package Manager
+- **pnpm**: Version 10.26.1
+- **Workspace**: pnpm workspaces với `pnpm-workspace.yaml`
+- **Install**: `pnpm install` ở root để install tất cả dependencies
+
+## 🚀 Turborepo Configuration
+
+### turbo.json
+```json
+{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
+```
+
+### Task Dependencies
+- **build**: Depends on dependencies' build (`^build`)
+- **lint**: Depends on dependencies' lint (`^lint`)
+- **dev**: No cache, persistent (dev server)
+
+## 📦 Apps Structure
+
+### Frontend App (`apps/web`)
+```
+apps/web/
+├── src/
+│   ├── app/              # Next.js App Router
+│   ├── components/       # React components
+│   ├── lib/              # Utilities
+│   ├── types/            # TypeScript types
+│   └── data/             # Static data (temporary)
+├── public/               # Static assets
+├── package.json
+├── tsconfig.json
+└── next.config.ts
+```
+
+**Key Points**:
+- Next.js 16 với App Router
+- TypeScript strict mode
+- Tailwind CSS v4
+- Path alias: `@/*` → `src/*`
+
+### Backend App (`apps/api`)
+```
+apps/api/
+├── src/
+│   ├── modules/          # Feature modules (CQRS)
+│   ├── common/          # Shared utilities
+│   ├── prisma/          # Prisma client & module
+│   ├── mail/            # Email service
+│   ├── redis/           # Redis service
+│   └── main.ts          # Entry point
+├── prisma/
+│   └── schema/          # Prisma schema files
+├── package.json
+└── tsconfig.json
+```
+
+**Key Points**:
+- NestJS 11 với CQRS pattern
+- Prisma ORM với PostgreSQL
+- Modular architecture
+- TypeScript strict mode
+
+## 🔧 Workspace Configuration
+
+### pnpm-workspace.yaml
+```yaml
+packages:
+  - 'apps/*'
+```
+
+### Root package.json Scripts
+```json
+{
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "prettier --write ...",
+    "clean": "turbo run clean"
+  }
+}
+```
+
+## 📋 Shared Dependencies
+
+### Development Dependencies (Root)
+- **turbo**: Monorepo build system
+- **prettier**: Code formatting
+- **husky**: Git hooks
+- **lint-staged**: Pre-commit linting
+- **typescript**: TypeScript compiler
+
+### App-Specific Dependencies
+- **apps/web**: Next.js, React, Tailwind, motion/react
+- **apps/api**: NestJS, Prisma, Passport, JWT
+
+## 🔄 Development Workflow
+
+### Starting Development
+```bash
+# Install all dependencies
+pnpm install
+
+# Start all apps in parallel
+pnpm dev
+```
+
+### Building
+```bash
+# Build all apps
+pnpm build
+
+# Build specific app
+cd apps/web && pnpm build
+```
+
+### Linting & Formatting
+```bash
+# Lint all apps
+pnpm lint
+
+# Format all code
+pnpm format
+```
+
+## 📁 File Organization Rules
+
+### Shared Code
+- **No Shared Packages**: Hiện tại không có shared packages
+- **Future**: Có thể tạo `packages/` folder cho shared code
+
+### Documentation
+- **Root Docs**: `docs/` folder ở root
+- **App Docs**: Có thể có `README.md` trong mỗi app
+- **Rules**: `.cursor/rules/` cho Cursor IDE rules
+
+## 🔍 Turborepo Features
+
+### Caching
+- **Build Cache**: Turborepo caches build outputs
+- **Task Cache**: Caches task results (lint, test, etc.)
+- **Cache Key**: Based on inputs (files, dependencies)
+
+### Parallel Execution
+- **Parallel Tasks**: Tasks có thể chạy parallel nếu không có dependencies
+- **Dependency Graph**: Turborepo tự động resolve dependencies
+
+### Remote Caching (Future)
+- **Vercel Remote Cache**: Có thể setup remote cache với Vercel
+- **Custom Remote Cache**: Có thể setup custom remote cache
+
+## 🚫 Common Mistakes
+
+### ❌ Don't Do This
+- ❌ Install dependencies ở root thay vì app folder
+- ❌ Hardcode paths giữa apps
+- ❌ Duplicate dependencies không cần thiết
+- ❌ Ignore Turborepo cache
+
+### ✅ Do This Instead
+- ✅ Install dependencies ở đúng location
+- ✅ Use proper imports (relative hoặc path aliases)
+- ✅ Share common dependencies ở root nếu có thể
+- ✅ Leverage Turborepo caching
+
+## 📊 Dependency Management
+
+### Version Management
+- **Lock File**: `pnpm-lock.yaml` ở root
+- **Version Sync**: Cùng version cho shared dependencies
+- **Updates**: Update dependencies với `pnpm update`
+
+### Peer Dependencies
+- **React**: Shared peer dependency giữa apps
+- **TypeScript**: Shared dev dependency
+
+## 🔐 Environment Variables
+
+### Frontend (`apps/web`)
+- **File**: `.env.local`
+- **Prefix**: `NEXT_PUBLIC_*` cho public variables
+- **Example**: `NEXT_PUBLIC_SITE_URL`
+
+### Backend (`apps/api`)
+- **File**: `.env`
+- **No Prefix**: Backend variables không cần prefix
+- **Example**: `JWT_SECRET_KEY`, `DATABASE_URL`
+
+### Root
+- **No Env File**: Root không có env file
+- **Shared Config**: Có thể có shared config nếu cần
+
+## 🧪 Testing in Monorepo
+
+### Test Structure
+- **Unit Tests**: Trong mỗi app
+- **E2E Tests**: Có thể ở root hoặc trong app
+- **Shared Test Utils**: Có thể tạo shared test utilities
+
+### Running Tests
+```bash
+# Run all tests
+pnpm test
+
+# Run tests for specific app
+cd apps/web && pnpm test
+```
+
+## 📝 Best Practices
+
+### Code Organization
+1. **Separation**: Mỗi app độc lập, không hardcode dependencies
+2. **Shared Code**: Extract shared code vào packages nếu cần
+3. **Documentation**: Document dependencies giữa apps
+
+### Build Optimization
+1. **Cache**: Leverage Turborepo caching
+2. **Parallel**: Run independent tasks in parallel
+3. **Incremental**: Use incremental builds
+
+### Development Experience
+1. **Hot Reload**: Both apps support hot reload
+2. **Type Safety**: Shared types nếu cần (có thể tạo shared package)
+3. **Linting**: Consistent linting rules across apps
+
+## 🎯 Future Improvements
+
+### Potential Additions
+- **Shared Packages**: `packages/ui`, `packages/types`, `packages/utils`
+- **Shared Config**: ESLint, Prettier configs
+- **CI/CD**: GitHub Actions với Turborepo
+- **Remote Cache**: Vercel Remote Cache hoặc custom solution

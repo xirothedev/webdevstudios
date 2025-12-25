@@ -6,10 +6,10 @@ model Voucher {
   id    String       @id @default(cuid())
   code  String       @unique @db.VarChar(20)
   type  DiscountType
-  value Decimal      @db.Decimal(12, 2) // Giá trị giảm (số tiền hoặc %)
+  value Decimal      @db.Money // Giá trị giảm (số tiền hoặc %)
 
-  minSpend    Decimal? @db.Decimal(12, 2) // Đơn tối thiểu
-  maxDiscount Decimal? @db.Decimal(12, 2) // Giảm tối đa (cho loại %)
+  minSpend    Decimal? @db.Money // Đơn tối thiểu
+  maxDiscount Decimal? @db.Money // Giảm tối đa (cho loại %)
 
   usageLimit Int @default(100) // Tổng số lần dùng
   usedCount  Int @default(0) // Đã dùng
@@ -27,12 +27,15 @@ model Review {
   comment String? @db.Text
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  @@index([productId])
+  @@index([userId])
   @@map("reviews")
 }

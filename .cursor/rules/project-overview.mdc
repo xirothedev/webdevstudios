@@ -1,0 +1,157 @@
+---
+alwaysApply: true
+---
+
+# Project Overview - WebDev Studios E-commerce
+
+## 🎯 Project Summary
+
+**WebDev Studios E-commerce** là một monorepo fullstack sử dụng Turborepo, bao gồm:
+- **Frontend**: Next.js 16 (App Router) với Tailwind CSS v4
+- **Backend**: NestJS 11 với CQRS pattern
+- **Database**: PostgreSQL với Prisma ORM
+- **Architecture**: Clean Architecture, CQRS, Monorepo
+
+## 📦 Tech Stack
+
+### Frontend (`apps/web`)
+- **Framework**: Next.js 16.1.1 (App Router)
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS v4
+- **Animations**: motion/react v12.23.26
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Icons**: Lucide React
+- **State Management**: React Server Components (RSC-first approach)
+- **API Client**: Axios cho HTTP requests
+- **Data Fetching**: TanStack Query (React Query) cho client-side state management
+- **Image Optimization**: Next.js Image component với WebP format
+
+### Backend (`apps/api`)
+- **Framework**: NestJS 11.x
+- **Language**: TypeScript 5.7.3
+- **Architecture**: CQRS pattern với `@nestjs/cqrs`
+- **Database**: PostgreSQL với Prisma 7.2.0
+- **Authentication**: JWT với Passport.js
+- **Validation**: class-validator, class-transformer
+- **Caching**: Redis (ioredis)
+- **Email**: Nodemailer với @nestjs-modules/mailer
+- **API Documentation**: Swagger/OpenAPI
+
+### Database
+- **ORM**: Prisma 7.x.x
+- **Database**: PostgreSQL
+- **Schema Strategy**: Schema-first, tối ưu cho 4 sản phẩm cố định
+- **Migrations**: Prisma Migrate
+
+### DevOps & Tools
+- **Monorepo**: Turborepo 2.x.x
+- **Package Manager**: pnpm 10.x.x
+- **Linting**: ESLint 9.x
+- **Formatting**: Prettier 3.x.x
+- **Git Hooks**: Husky + lint-staged
+
+## 🏗️ Architecture Overview
+
+### Monorepo Structure
+```
+webdevstudios/
+├── apps/
+│   ├── web/          # Next.js frontend
+│   └── api/          # NestJS backend
+├── docs/             # Documentation
+├── .cursor/rules/    # Cursor IDE rules
+└── package.json      # Root workspace config
+```
+
+### Frontend Architecture
+- **App Router**: Next.js 16 App Router với Server Components
+- **Component Structure**: 
+  - `src/components/` - Reusable components
+  - `src/components/ui/` - shadcn/ui components
+  - `src/components/wds/` - WebDev Studios specific components
+  - `src/components/shop/` - E-commerce components
+- **Routing**: File-based routing với App Router
+- **Styling**: Tailwind CSS v4 với custom utilities
+- **Themes**: Support cả dark theme (shop) và white theme (WDS)
+
+### Backend Architecture
+- **CQRS Pattern**: Tách biệt Command (write) và Query (read)
+- **Module Structure**:
+  ```
+  src/modules/<feature>/
+  ├── commands/        # Write operations
+  ├── queries/         # Read operations
+  ├── domain/          # Domain entities
+  ├── infrastructure/  # Repositories
+  └── <feature>.controller.ts
+  ```
+- **Dependency Injection**: NestJS DI container
+- **Guards**: JWT authentication guard (global)
+- **Interceptors**: Request/Response transformation
+- **Filters**: Global exception filters
+
+### Database Schema
+- **4 Fixed Products**: Áo thun, Pad chuột, Dây đeo, Móc khóa
+- **ProductSlug Enum**: Type-safe product identification
+- **Simplified Schema**: Tối ưu cho 4 sản phẩm, không có Category/Variant phức tạp
+- **Size Management**: ProductSizeStock cho áo thun (S, M, L, XL)
+
+## 🎨 Design System
+
+### Color Palette (WebDev Studios)
+- **Black**: `#000000` - Background dark theme
+- **White**: `#FFFFFF` - Background light theme
+- **Orange Accent**: `#F7931E` - Primary accent
+- **Cream Secondary**: `#FFF8E1` - Secondary color
+
+### Typography
+- **Font**: Inter (Google Fonts)
+- **Responsive**: Mobile-first approach
+
+### Components
+- **shadcn/ui**: Base UI components
+- **Custom Components**: WDS-specific components với animations
+- **Motion**: motion/react cho animations
+
+## 📋 Key Features
+
+### E-commerce Features
+- Product catalog (4 fixed products)
+- Shopping cart
+- Order management
+- User authentication (JWT + OAuth)
+- Product reviews/ratings
+- Stock management (với size cho áo thun)
+
+### WebDev Studios Features
+- Landing page với hero section
+- About page với mission/vision
+- Contact information
+- Client/Partner showcase
+- SEO optimization (metadata, structured data, sitemap)
+
+## 🔧 Development Environment
+
+### Prerequisites
+- Node.js >= 18.0.0
+- pnpm >= 8.0.0
+- PostgreSQL database
+- Redis (optional, for caching)
+
+### Environment Variables
+- **Frontend**: `NEXT_PUBLIC_SITE_URL`
+- **Backend**: `JWT_SECRET_KEY`, `JWT_ACCESS_TOKEN_EXPIRES_IN`, database URL, etc.
+
+### Scripts
+- `pnpm dev` - Start all apps in development mode
+- `pnpm build` - Build all apps
+- `pnpm lint` - Lint all apps
+- `pnpm format` - Format code with Prettier
+
+## 📝 Important Notes
+
+1. **Product Schema**: Được tối ưu cho 4 sản phẩm cố định. Nếu cần mở rộng, cân nhắc rebuild schema.
+2. **CQRS Pattern**: Backend PHẢI tuân thủ CQRS - Controllers chỉ dispatch Commands/Queries, không có business logic.
+3. **Server Components First**: Frontend ưu tiên Server Components, chỉ dùng `'use client'` khi cần thiết.
+4. **Type Safety**: Sử dụng TypeScript strict mode, tránh `any`, sử dụng enums cho constants.
+5. **Code Quality**: Luôn chạy `pnpm lint` và `pnpm format` sau khi code.

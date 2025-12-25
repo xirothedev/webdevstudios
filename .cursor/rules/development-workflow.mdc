@@ -1,0 +1,278 @@
+---
+alwaysApply: true
+---
+
+# Development Workflow & Best Practices
+
+## 🔄 Development Process
+
+### Step 1: Context Retrieval
+- **Before Starting**: Đọc `MEMORIZE.md` và `FEATURES.log` để hiểu context
+- **Check Documentation**: Xem các docs trong `docs/` folder
+- **Review Rules**: Xem lại các rules trong `.cursor/rules/`
+
+### Step 2: Planning & Brainstorming
+- **Analyze Requirements**: Phân tích yêu cầu kỹ lưỡng
+- **Propose Options**: Đưa ra 2-3 phương án với Pros/Cons
+- **Wait for Approval**: Chờ người dùng chọn phương án trước khi code
+
+### Step 3: Implementation
+- **Follow Architecture**: Tuân thủ kiến trúc đã định (CQRS, Clean Architecture)
+- **Code Standards**: Tuân thủ coding standards (TypeScript, ESLint, Prettier)
+- **Incremental**: Commit thường xuyên với messages rõ ràng
+
+### Step 4: Quality Assurance (MANDATORY)
+- **Lint**: Chạy `pnpm lint` và fix tất cả errors
+- **Format**: Chạy `pnpm format` để format code
+- **Type Check**: Đảm bảo TypeScript không có errors
+- **Test**: Test functionality manually hoặc với tests
+
+## 📝 Code Quality Standards
+
+### TypeScript
+- **Strict Mode**: Luôn bật strict mode
+- **No `any`**: Không dùng `any`, dùng `unknown` nếu cần
+- **Type Everything**: Type tất cả functions, variables, props
+- **Enums**: Sử dụng enums cho constants thay vì strings
+
+### Code Style
+- **Formatting**: Prettier với Tailwind plugin
+- **Linting**: ESLint với Next.js và NestJS configs
+- **Imports**: Sorted imports (simple-import-sort)
+- **Comments**: Comment cho complex logic, JSDoc cho public APIs
+
+### File Organization
+- **One Export Per File**: Mỗi file chỉ export một main thing (component, function, class)
+- **Co-location**: Đặt related files gần nhau
+- **Barrel Exports**: Có thể dùng `index.ts` để re-export
+
+## 🔍 Code Review Checklist
+
+### Before Committing
+- [ ] Code đã được lint và format
+- [ ] TypeScript không có errors
+- [ ] Không có console.log hoặc debug code
+- [ ] Comments rõ ràng cho complex logic
+- [ ] Error handling đầy đủ
+- [ ] Tests pass (nếu có)
+
+### For Frontend
+- [ ] Responsive design (mobile, tablet, desktop)
+- [ ] Accessibility (alt text, ARIA labels, keyboard nav)
+- [ ] Image optimization (WebP, proper sizes)
+- [ ] Loading states cho async operations
+- [ ] Error states cho failed operations
+
+### For Backend
+- [ ] CQRS pattern tuân thủ (Commands/Queries tách biệt)
+- [ ] Validation với class-validator
+- [ ] Error handling với proper HTTP status codes
+- [ ] Authentication/Authorization checks
+- [ ] Database queries optimized (no N+1)
+
+## 🚀 Git Workflow
+
+### Commit Messages
+- **Format**: `[TYPE] - Description`
+- **Types**: `feat`, `fix`, `chore`, `refactor`, `docs`, `style`
+- **Examples**:
+  - `feat: Add product detail page`
+  - `fix: Fix cart quantity validation`
+  - `refactor: Extract product API client`
+
+### Branch Strategy
+- **Main Branch**: `main` hoặc `master`
+- **Feature Branches**: `feature/description`
+- **Fix Branches**: `fix/description`
+- **Hotfix Branches**: `hotfix/description`
+
+### Pre-commit Hooks
+- **Husky**: Git hooks với lint-staged
+- **Auto-format**: Prettier format trước khi commit
+- **Lint Check**: ESLint check trước khi commit
+
+## 📋 Feature Development Workflow
+
+### 1. Planning Phase
+1. Phân tích yêu cầu
+2. Đề xuất 2-3 phương án
+3. Chờ approval từ user
+4. Tạo TODO list nếu task phức tạp
+
+### 2. Implementation Phase
+1. Setup (nếu cần): Tạo files, folders
+2. Implement core logic
+3. Add error handling
+4. Add loading states (frontend)
+5. Add validation (backend)
+
+### 3. Integration Phase
+1. Integrate với API (nếu frontend)
+2. Test integration
+3. Handle edge cases
+4. Add proper error messages
+
+### 4. Polish Phase
+1. Format code
+2. Add comments
+3. Update documentation
+4. Update FEATURES.log
+
+## 🐛 Bug Fixing Workflow
+
+### 1. Reproduce
+- Reproduce bug với steps rõ ràng
+- Identify root cause
+- Check related code
+
+### 2. Fix
+- Implement fix
+- Test fix thoroughly
+- Check for regressions
+
+### 3. Document
+- Update FEATURES.log với `[FIX]` type
+- Add comments nếu cần
+- Update documentation nếu behavior thay đổi
+
+## 📚 Documentation
+
+### Code Documentation
+- **JSDoc**: Cho public functions/classes
+- **Comments**: Cho complex logic
+- **README**: Cho mỗi module/feature lớn
+
+### Project Documentation
+- **MEMORIZE.md**: Session context, current state
+- **FEATURES.log**: Feature history
+- **docs/**: Detailed documentation
+
+### API Documentation
+- **Swagger**: Auto-generated từ NestJS decorators
+- **Comments**: Mô tả endpoints, parameters, responses
+
+## 🔧 Environment Setup
+
+### Required Tools
+- **Node.js**: >= 18.0.0
+- **pnpm**: >= 8.0.0
+- **PostgreSQL**: Database
+- **Redis**: Optional, for caching
+
+### Environment Variables
+- **Frontend**: `.env.local` với `NEXT_PUBLIC_*` variables
+- **Backend**: `.env` với database, JWT, etc.
+- **Never Commit**: Không commit `.env` files
+
+### Development Commands
+```bash
+# Start all apps
+pnpm dev
+
+# Build all apps
+pnpm build
+
+# Lint all apps
+pnpm lint
+
+# Format code
+pnpm format
+
+# Database migrations
+cd apps/api && pnpm prisma:migrate
+
+# Generate Prisma Client
+cd apps/api && pnpm prisma:generate
+```
+
+## 🧪 Testing Strategy
+
+### Unit Tests
+- **Location**: `*.spec.ts` files
+- **Framework**: Jest
+- **Coverage**: Aim for >80% coverage
+
+### Integration Tests
+- **E2E Tests**: Playwright (nếu cần)
+- **API Tests**: Supertest cho NestJS
+
+### Manual Testing
+- **Checklist**: Test trên multiple browsers, devices
+- **Accessibility**: Test với screen readers
+- **Performance**: Check Lighthouse scores
+
+## 🚫 Common Mistakes to Avoid
+
+### ❌ Don't Do This
+- ❌ Commit code chưa lint/format
+- ❌ Push code với TypeScript errors
+- ❌ Skip error handling
+- ❌ Hardcode values thay vì constants
+- ❌ Ignore accessibility
+- ❌ Skip responsive design
+- ❌ Commit `.env` files
+- ❌ Break CQRS pattern (backend)
+- ❌ Use `'use client'` không cần thiết (frontend)
+
+### ✅ Do This Instead
+- ✅ Lint và format trước khi commit
+- ✅ Fix tất cả TypeScript errors
+- ✅ Handle errors properly
+- ✅ Use constants/enums
+- ✅ Test accessibility
+- ✅ Test responsive design
+- ✅ Use `.env.example` template
+- ✅ Follow CQRS pattern
+- ✅ Prefer Server Components
+
+## 📊 Performance Best Practices
+
+### Frontend
+- **Image Optimization**: WebP format, proper sizes
+- **Code Splitting**: Dynamic imports cho large components
+- **Lazy Loading**: Lazy load below-the-fold content
+- **Caching**: Use Next.js caching strategies
+
+### Backend
+- **Database Queries**: Optimize queries, use indexes
+- **Caching**: Redis caching cho frequently accessed data
+- **Pagination**: Always paginate list queries
+- **Connection Pooling**: Proper database connection pooling
+
+## 🔐 Security Best Practices
+
+### Frontend
+- **Input Validation**: Validate user input
+- **XSS Prevention**: Sanitize user-generated content
+- **CSRF Protection**: Use Next.js CSRF protection
+- **Secure Headers**: Set proper security headers
+
+### Backend
+- **Authentication**: JWT với proper expiration
+- **Authorization**: Check permissions
+- **Input Validation**: class-validator
+- **SQL Injection**: Prisma protects against SQL injection
+- **Rate Limiting**: Implement rate limiting
+
+## 📝 Logging & Monitoring
+
+### Frontend
+- **Error Logging**: Log errors to monitoring service
+- **User Actions**: Track important user actions (analytics)
+
+### Backend
+- **Request Logging**: Log API requests
+- **Error Logging**: Log errors với stack traces
+- **Performance**: Monitor slow queries
+
+## 🎯 Success Criteria
+
+Một feature được coi là hoàn thành khi:
+- [ ] Code đã lint và format
+- [ ] TypeScript không có errors
+- [ ] Functionality hoạt động đúng
+- [ ] Error handling đầy đủ
+- [ ] Responsive design (frontend)
+- [ ] Accessibility checked (frontend)
+- [ ] Documentation updated
+- [ ] FEATURES.log updated

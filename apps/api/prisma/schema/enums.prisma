@@ -55,3 +55,24 @@ enum SessionStatus {
   EXPIRED
   REVOKED
 }
+
+// =========================================
+// PRODUCT ENUMS
+// =========================================
+
+enum ProductSlug {
+  AO_THUN    // Áo thun WebDev Studios
+  PAD_CHUOT  // Pad chuột WebDev Studios
+  DAY_DEO    // Dây đeo WebDev Studios
+  MOC_KHOA   // Móc khóa WebDev Studios
+}
+
+/**
+ * Size sản phẩm (chỉ áo thun có size)
+ */
+enum ProductSize {
+  S
+  M
+  L
+  XL
+}
