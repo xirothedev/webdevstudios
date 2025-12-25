@@ -55,87 +55,119 @@ export default function SignupPage() {
 
   return (
     <AuthLayout variant="signup">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <label className="space-y-2 text-sm text-white/80">
-          <span>Họ và tên</span>
-          <Input
-            type="text"
-            placeholder="Nhập họ và tên của bạn"
-            {...register('fullName')}
-            disabled={isLoading}
-            className="h-12"
-          />
-          {errors.fullName && (
-            <p className="text-sm text-red-400">{errors.fullName.message}</p>
-          )}
-        </label>
+      <div className="glass-card">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div className="space-y-2">
+            <label
+              htmlFor="fullName"
+              className="block text-sm font-medium text-white/90"
+            >
+              Họ và tên
+            </label>
+            <Input
+              id="fullName"
+              type="text"
+              placeholder="Nhập họ và tên của bạn"
+              {...register('fullName')}
+              disabled={isLoading}
+              className="glass-input"
+            />
+            {errors.fullName && (
+              <p className="text-sm text-red-400">{errors.fullName.message}</p>
+            )}
+          </div>
 
-        <label className="space-y-2 text-sm text-white/80">
-          <span>Email</span>
-          <Input
-            type="email"
-            placeholder="Nhập địa chỉ email của bạn"
-            {...register('email')}
-            disabled={isLoading}
-            className="h-12"
-          />
-          {errors.email && (
-            <p className="text-sm text-red-400">{errors.email.message}</p>
-          )}
-        </label>
+          <div className="space-y-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-white/90"
+            >
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Nhập địa chỉ email của bạn"
+              {...register('email')}
+              disabled={isLoading}
+              className="glass-input"
+            />
+            {errors.email && (
+              <p className="text-sm text-red-400">{errors.email.message}</p>
+            )}
+          </div>
 
-        <label className="space-y-2 text-sm text-white/80">
-          <span>Mật khẩu</span>
-          <Input
-            type="password"
-            placeholder="Tối thiểu 8 ký tự"
-            {...register('password')}
-            disabled={isLoading}
-            className="h-12"
-          />
-          {errors.password && (
-            <p className="text-sm text-red-400">{errors.password.message}</p>
-          )}
-        </label>
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-white/90"
+            >
+              Mật khẩu
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Tối thiểu 8 ký tự"
+              {...register('password')}
+              disabled={isLoading}
+              className="glass-input"
+            />
+            {errors.password && (
+              <p className="text-sm text-red-400">{errors.password.message}</p>
+            )}
+          </div>
 
-        <label className="space-y-2 text-sm text-white/80">
-          <span>Xác nhận mật khẩu</span>
-          <Input
-            type="password"
-            placeholder="Nhập lại mật khẩu"
-            {...register('confirmPassword')}
-            disabled={isLoading}
-            className="h-12"
-          />
-          {errors.confirmPassword && (
-            <p className="text-sm text-red-400">
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </label>
+          <div className="space-y-2">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-white/90"
+            >
+              Xác nhận mật khẩu
+            </label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Nhập lại mật khẩu"
+              {...register('confirmPassword')}
+              disabled={isLoading}
+              className="glass-input"
+            />
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-400">
+                {errors.confirmPassword.message}
+              </p>
+            )}
+          </div>
 
-        <label className="space-y-2 text-sm text-white/80">
-          <span>Số điện thoại (tùy chọn)</span>
-          <Input
-            type="tel"
-            placeholder="Nhập số điện thoại"
-            {...register('phone')}
-            disabled={isLoading}
-            className="h-12"
-          />
-          {errors.phone && (
-            <p className="text-sm text-red-400">{errors.phone.message}</p>
-          )}
-        </label>
+          <div className="space-y-2">
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-white/90"
+            >
+              Số điện thoại <span className="text-white/50">(tùy chọn)</span>
+            </label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="Nhập số điện thoại"
+              {...register('phone')}
+              disabled={isLoading}
+              className="glass-input"
+            />
+            {errors.phone && (
+              <p className="text-sm text-red-400">{errors.phone.message}</p>
+            )}
+          </div>
 
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="mt-2 h-12 w-full rounded-lg bg-white text-black hover:bg-white/90 disabled:cursor-not-allowed"
-        >
-          {isLoading ? 'Đang xử lý...' : 'Đăng ký'}
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="glass-button h-12 w-full text-base font-semibold"
+          >
+            {isLoading ? 'Đang xử lý...' : 'Đăng ký'}
+          </Button>
+        </form>
+      </div>
     </AuthLayout>
   );
 }
