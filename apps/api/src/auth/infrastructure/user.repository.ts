@@ -1,4 +1,4 @@
-import { User } from '@generated/prisma';
+import { User, UserRole } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma/prisma.service';
@@ -48,6 +48,7 @@ export class UserRepository {
       mfaEnabled: boolean;
       mfaSecret: string;
       avatar: string;
+      role: UserRole;
     }>
   ): Promise<User> {
     return this.prisma.user.update({

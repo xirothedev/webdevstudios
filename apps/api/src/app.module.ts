@@ -11,12 +11,14 @@ import { JwtAuthGuard } from './common/guards/jwt.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { MailModule } from './mail/mail.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
