@@ -19,20 +19,33 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     try {
       this.client = new Redis({
-        host: this.config.getOrThrow<string>('REDIS_HOST', 'localhost'),
-        port: this.config.getOrThrow<number>('REDIS_PORT', 6379),
+        host: this.config.get<string>('REDIS_HOST', '127.0.0.1'),
+        port: this.config.get<number>('REDIS_PORT', 6379),
       });
 
-      this.client.on('error', (err: unknown) =>
-        console.error('Redis Client Error', err)
-      );
+      // Handle errors to prevent unhandled error events
+      this.client.on('error', (err: unknown) => {
+        console.error('[Redis] Connection error:', err);
+      });
 
       // ioredis connects automatically, but we can wait for ready event
       await new Promise<void>((resolve, reject) => {
-        this.client.once('ready', () => resolve());
-        this.client.once('error', (err) => reject(err));
+        const timeout = setTimeout(() => {
+          reject(new Error('Redis connection timeout'));
+        }, 5000);
+
+        this.client.once('ready', () => {
+          clearTimeout(timeout);
+          resolve();
+        });
+
+        this.client.once('error', (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        });
       });
-    } catch {
+    } catch (error) {
+      console.error('[Redis] Failed to connect:', error);
       throw new InternalServerErrorException('Failed connecting to Redis');
     }
   }

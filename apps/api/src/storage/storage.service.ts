@@ -7,6 +7,8 @@ import { Injectable } from '@nestjs/common';
 
 import { StorageException } from './exceptions/storage.exception';
 import {
+  CacheOptions,
+  CacheStrategy,
   UploadFileOptions,
   UploadImageOptions,
   UploadResult,
@@ -30,6 +32,46 @@ export class StorageService {
   }
 
   /**
+   * Get cache control header based on strategy
+   */
+  private getCacheControl(cache?: CacheOptions): string {
+    if (!cache || cache.strategy === 'no-cache') {
+      return 'no-cache, no-store, must-revalidate';
+    }
+
+    const maxAge = cache.maxAge ?? this.getDefaultMaxAge(cache.strategy);
+    const strategy = cache.strategy || 'long-lived';
+
+    if (strategy === 'immutable') {
+      return `public, max-age=${maxAge}, immutable`;
+    }
+
+    return `public, max-age=${maxAge}`;
+  }
+
+  /**
+   * Get default max-age for cache strategy
+   */
+  private getDefaultMaxAge(strategy: CacheStrategy | undefined): number {
+    if (!strategy) {
+      return 2592000; // 30 days default
+    }
+
+    switch (strategy) {
+      case 'immutable':
+        return 31536000; // 1 year
+      case 'long-lived':
+        return 2592000; // 30 days
+      case 'short-lived':
+        return 86400; // 1 day
+      case 'no-cache':
+        return 0;
+      default:
+        return 2592000; // 30 days default
+    }
+  }
+
+  /**
    * Upload file to R2
    */
   async uploadFile(options: UploadFileOptions): Promise<UploadResult> {
@@ -39,6 +81,7 @@ export class StorageService {
         Key: options.key,
         Body: options.file,
         ContentType: options.contentType,
+        CacheControl: this.getCacheControl(options.cache),
         Metadata: options.metadata,
       });
 
@@ -73,11 +116,12 @@ export class StorageService {
         fit: 'cover',
       });
 
-      // Upload processed image
+      // Upload processed image with immutable cache (avatar files have unique timestamp + UUID)
       return await this.uploadFile({
         key: options.key,
         file: processedImage,
         contentType: 'image/webp',
+        cache: { strategy: 'immutable' },
       });
     } catch (error) {
       if (error instanceof StorageException) {
