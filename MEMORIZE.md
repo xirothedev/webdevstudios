@@ -1,6 +1,6 @@
 ## Trạng thái hiện tại của dự án
 
-- Monorepo `savi-ecommerce-fullstack-turborepo` với app web sử dụng Next.js (App Router), Tailwind CSS, motion/react và Next Image cho phần landing page / shop.
+- Monorepo `webdevtudios-fullstack-turborepo` với app web sử dụng Next.js (App Router), Tailwind CSS, motion/react và Next Image cho phần landing page / shop.
 - `FeaturesGrid` trên trang web hiển thị 4 sản phẩm merch WebDev Studios: áo thun, huy hiệu, dây đeo (lanyard) và pad chuột limited, với hiệu ứng glassmorphism và animation 3D nhẹ.
 
 ## Những gì đã đạt được trong session này
