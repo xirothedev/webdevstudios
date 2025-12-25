@@ -58,6 +58,7 @@ import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { GetCurrentUserQuery } from './queries/get-current-user/get-current-user.query';
 import { GetSessionsQuery } from './queries/get-sessions/get-sessions.query';
 import { OAuthService } from './services/oauth.service';
+import { OAuthRedirectService } from './services/oauth-redirect.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -65,7 +66,8 @@ export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-    private readonly oauthService: OAuthService
+    private readonly oauthService: OAuthService,
+    private readonly oauthRedirectService: OAuthRedirectService
   ) {}
 
   @Public()
@@ -437,11 +439,30 @@ export class AuthController {
     summary: 'Initiate Google OAuth',
     description: 'Redirects to Google OAuth consent screen',
   })
+  @ApiQuery({
+    name: 'redirect_url',
+    required: false,
+    description: 'Frontend URL to redirect after OAuth success',
+  })
   @ApiResponse({
     status: 302,
     description: 'Redirect to Google OAuth',
   })
-  async initiateGoogleOAuth() {
+  async initiateGoogleOAuth(
+    @Query('redirect_url') redirectUrl?: string,
+    @Req() req?: Request
+  ) {
+    // Store redirect_url in session to retrieve in callback
+    if (redirectUrl && req?.session) {
+      req.session.oauthRedirectUrl = redirectUrl;
+      // Save session before redirect
+      await new Promise<void>((resolve, reject) => {
+        req.session?.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+    }
     // Passport will redirect to Google OAuth
   }
 
@@ -461,10 +482,9 @@ export class AuthController {
     status: 401,
     description: 'OAuth authentication failed',
   })
-  async googleCallback(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
-  ) {
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    // Get redirect_url from session (stored during initiation)
+    const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
     const oauthUser = req.user as {
@@ -475,34 +495,19 @@ export class AuthController {
       picture?: string;
     };
 
-    const result = await this.oauthService.handleOAuthCallback(
-      oauthUser as any,
-      ipAddress,
-      userAgent
-    );
+    try {
+      const result = await this.oauthService.handleOAuthCallback(
+        oauthUser as any,
+        ipAddress,
+        userAgent
+      );
 
-    // Set cookies
-    if (result.accessToken && result.refreshToken) {
-      const isProduction = process.env.NODE_ENV === 'production';
-
-      res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
-        maxAge: 15 * 60 * 1000, // 15 minutes
-        path: '/',
-      });
-
-      res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/',
-      });
+      // Use service to handle success redirect
+      this.oauthRedirectService.handleSuccess(res, result, redirectUrl);
+    } catch (error) {
+      // Use service to handle error redirect
+      this.oauthRedirectService.handleError(res, error, redirectUrl);
     }
-
-    return result;
   }
 
   @Public()
@@ -512,11 +517,30 @@ export class AuthController {
     summary: 'Initiate GitHub OAuth',
     description: 'Redirects to GitHub OAuth consent screen',
   })
+  @ApiQuery({
+    name: 'redirect_url',
+    required: false,
+    description: 'Frontend URL to redirect after OAuth success',
+  })
   @ApiResponse({
     status: 302,
     description: 'Redirect to GitHub OAuth',
   })
-  async initiateGitHubOAuth() {
+  async initiateGitHubOAuth(
+    @Query('redirect_url') redirectUrl?: string,
+    @Req() req?: Request
+  ) {
+    // Store redirect_url in session to retrieve in callback
+    if (redirectUrl && req?.session) {
+      req.session.oauthRedirectUrl = redirectUrl;
+      // Save session before redirect
+      await new Promise<void>((resolve, reject) => {
+        req.session?.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+    }
     // Passport will redirect to GitHub OAuth
   }
 
@@ -536,10 +560,9 @@ export class AuthController {
     status: 401,
     description: 'OAuth authentication failed',
   })
-  async githubCallback(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
-  ) {
+  async githubCallback(@Req() req: Request, @Res() res: Response) {
+    // Get redirect_url from session (stored during initiation)
+    const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
     const oauthUser = req.user as {
@@ -550,34 +573,19 @@ export class AuthController {
       picture?: string;
     };
 
-    const result = await this.oauthService.handleOAuthCallback(
-      oauthUser as any,
-      ipAddress,
-      userAgent
-    );
+    try {
+      const result = await this.oauthService.handleOAuthCallback(
+        oauthUser as any,
+        ipAddress,
+        userAgent
+      );
 
-    // Set cookies
-    if (result.accessToken && result.refreshToken) {
-      const isProduction = process.env.NODE_ENV === 'production';
-
-      res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
-        maxAge: 15 * 60 * 1000, // 15 minutes
-        path: '/',
-      });
-
-      res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/',
-      });
+      // Use service to handle success redirect
+      this.oauthRedirectService.handleSuccess(res, result, redirectUrl);
+    } catch (error) {
+      // Use service to handle error redirect
+      this.oauthRedirectService.handleError(res, error, redirectUrl);
     }
-
-    return result;
   }
 
   @Public()

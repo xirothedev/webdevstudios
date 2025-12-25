@@ -2,6 +2,7 @@ import { apiClient } from '@/lib/api-client';
 import type {
   LoginRequest,
   LoginResponse,
+  RefreshTokenResponse,
   RegisterRequest,
   RegisterResponse,
   User,
@@ -52,6 +53,17 @@ export const authApi = {
       {
         params: { token },
       }
+    );
+    return response.data;
+  },
+
+  /**
+   * Refresh access token
+   */
+  async refreshToken(refreshToken?: string): Promise<RefreshTokenResponse> {
+    const response = await apiClient.post<RefreshTokenResponse>(
+      '/auth/refresh',
+      refreshToken ? { refreshToken } : {}
     );
     return response.data;
   },

@@ -5,9 +5,10 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useRegister } from '@/lib/api/hooks/use-auth';
+import { useRedirect, useRegister } from '@/lib/api/hooks/use-auth';
 
 // Validation schema với Zod
 const signupSchema = z
@@ -40,7 +41,8 @@ export default function SignupPage() {
     },
   });
 
-  const registerMutation = useRegister();
+  const { redirectUrl } = useRedirect();
+  const registerMutation = useRegister(redirectUrl);
 
   const onSubmit = (data: SignupFormData) => {
     // Remove confirmPassword before sending to API
@@ -55,6 +57,7 @@ export default function SignupPage() {
 
   return (
     <AuthLayout variant="signup">
+      <OAuthRedirectHandler />
       <div className="glass-card">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">

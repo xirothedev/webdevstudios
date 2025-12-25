@@ -3,6 +3,7 @@ import './globals.css';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 
 import { StructuredData } from '@/components/StructuredData';
@@ -71,11 +72,13 @@ export default function RootLayout({
     <html lang="vi" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <StructuredData />
-            <main className="min-h-screen">{children}</main>
-            <Toaster position="top-center" theme="dark" richColors />
-          </AuthProvider>
+          <Suspense fallback={null}>
+            <AuthProvider>
+              <StructuredData />
+              <main className="min-h-screen">{children}</main>
+              <Toaster position="top-center" theme="dark" richColors />
+            </AuthProvider>
+          </Suspense>
         </QueryClientProvider>
       </body>
     </html>

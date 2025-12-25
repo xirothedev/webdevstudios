@@ -6,6 +6,7 @@ interface SocialButtonProps {
   platform: SocialPlatform;
   label: string;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 const platformIcons: Record<SocialPlatform, React.ReactElement> = {
@@ -40,13 +41,19 @@ const platformIcons: Record<SocialPlatform, React.ReactElement> = {
   ),
 };
 
-export function SocialButton({ platform, label, onClick }: SocialButtonProps) {
+export function SocialButton({
+  platform,
+  label,
+  onClick,
+  disabled,
+}: SocialButtonProps) {
   return (
     <Button
       type="button"
       variant="outline"
       onClick={onClick}
-      className="group relative h-12 w-full justify-start overflow-hidden rounded-lg border border-white/10 bg-white/5 text-white transition-all hover:border-white/20 hover:bg-white/10"
+      disabled={disabled}
+      className="group relative h-12 w-full justify-start overflow-hidden rounded-lg border border-white/10 bg-white/5 text-white transition-all hover:border-white/20 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {/* Icon */}
       <div className="relative z-10 flex items-center gap-3">

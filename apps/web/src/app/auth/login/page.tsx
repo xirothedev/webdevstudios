@@ -5,9 +5,10 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useLogin } from '@/lib/api/hooks/use-auth';
+import { useLogin, useRedirect } from '@/lib/api/hooks/use-auth';
 
 // Validation schema với Zod
 const loginSchema = z.object({
@@ -36,7 +37,8 @@ export default function LoginPage() {
     },
   });
 
-  const loginMutation = useLogin();
+  const { redirectUrl } = useRedirect();
+  const loginMutation = useLogin(redirectUrl);
   const rememberMe = watch('rememberMe');
 
   const onSubmit = (data: LoginFormData) => {
@@ -47,6 +49,7 @@ export default function LoginPage() {
 
   return (
     <AuthLayout variant="login">
+      <OAuthRedirectHandler />
       <div className="glass-card">
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold text-white drop-shadow-lg">

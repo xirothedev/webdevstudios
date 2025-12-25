@@ -89,8 +89,8 @@ model Device {
 // Quản lý session đăng nhập
 model Session {
   id           String  @id @default(cuid())
-  token        String  @unique @db.VarChar(255) // Session token (JWT hoặc random string)
-  refreshToken String? @unique @db.VarChar(255) // Refresh token
+  token        String  @unique @db.Text // Session token (JWT hoặc random string)
+  refreshToken String? @unique @db.Text // Refresh token
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

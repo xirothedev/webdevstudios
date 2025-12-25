@@ -45,3 +45,14 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type OAuthProvider = 'google' | 'github';
+
+export interface RefreshTokenRequest {
+  refreshToken?: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}

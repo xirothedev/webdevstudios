@@ -32,8 +32,9 @@ import { UserRepository } from './infrastructure/user.repository';
 // Queries
 import { GetCurrentUserHandler } from './queries/get-current-user/get-current-user.handler';
 import { GetSessionsHandler } from './queries/get-sessions/get-sessions.handler';
-// Services
 import { OAuthService } from './services/oauth.service';
+// Services
+import { OAuthRedirectService } from './services/oauth-redirect.service';
 // Strategies
 import { GitHubStrategy } from './strategies/github.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
@@ -90,6 +91,7 @@ const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
     MfaGuard,
     // Services
     OAuthService,
+    OAuthRedirectService,
     // Command Handlers
     ...CommandHandlers,
     // Query Handlers
