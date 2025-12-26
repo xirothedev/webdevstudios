@@ -43,7 +43,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Copy necessary files
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/node_modules/.prisma ./apps/api/node_modules/.prisma
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/generated ./apps/api/generated
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
