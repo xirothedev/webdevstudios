@@ -6,11 +6,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CartModule } from './cart/cart.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { MailModule } from './mail/mail.module';
+import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProductsModule } from './products/products.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import { StorageModule } from './storage/storage.module';
 import { UsersModule } from './users/users.module';
 
@@ -20,6 +24,10 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UsersModule,
+    ProductsModule,
+    CartModule,
+    OrdersModule,
+    ReviewsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
