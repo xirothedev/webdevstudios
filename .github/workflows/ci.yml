@@ -78,7 +78,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm prisma:generate --filter=api
+        run: cd apps/api && pnpm prisma:generate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/webdevstudios_test
 
