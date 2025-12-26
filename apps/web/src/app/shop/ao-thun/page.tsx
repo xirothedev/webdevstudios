@@ -10,6 +10,7 @@ import { ProductFeatures } from '@/components/shop/ProductFeatures';
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery';
 import { ProductInfo } from '@/components/shop/ProductInfo';
 import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
+import { ProductSizeGuide } from '@/components/shop/ProductSizeGuide';
 import { ProductSizeSelector } from '@/components/shop/ProductSizeSelector';
 import { useProduct } from '@/lib/api/hooks/use-products';
 import { getBackendSlug } from '@/lib/product-slug-mapping';
@@ -173,6 +174,9 @@ export default function AoThunPage() {
 
           {/* Additional Info Section */}
           <ProductAdditionalInfo info={staticContent.additionalInfo} />
+
+          {/* Size Guide Section */}
+          <ProductSizeGuide />
         </div>
       </main>
 
