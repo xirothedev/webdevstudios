@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -33,6 +34,7 @@ function ProductContentInner({
   const [selectedSize, setSelectedSize] = useState<ProductSize>('M');
   const [quantity, setQuantity] = useState(1);
 
+  const router = useRouter();
   const BACKEND_SLUG = getBackendSlug(productSlug);
   const { user, isAuthenticated } = useAuth();
 
@@ -93,13 +95,32 @@ function ProductContentInner({
     }
   };
 
-  const handleBuyNow = () => {
-    // TODO: Buy now logic
-    if (product?.hasSizes) {
-      console.log('Buy now:', { size: selectedSize, quantity });
-    } else {
-      console.log('Buy now:', { quantity });
+  const handleBuyNow = async () => {
+    if (!product || !isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để mua hàng');
+      router.push('/auth/login');
+      return;
     }
+
+    // Check stock
+    const availableStock = product.hasSizes
+      ? product.sizeStocks?.find((ss) => ss.size === selectedSize)?.stock || 0
+      : product.stock || 0;
+
+    if (quantity > availableStock) {
+      toast.error(
+        `Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock}`
+      );
+      return;
+    }
+
+    // For Buy Now, we need shipping address
+    // For now, redirect to a checkout page with pre-filled product
+    // Or we can show a modal to collect shipping address
+    // For simplicity, redirect to checkout with product info in query params
+    router.push(
+      `/checkout?buyNow=true&productId=${product.id}&productSlug=${BACKEND_SLUG}&size=${selectedSize}&quantity=${quantity}`
+    );
   };
 
   // Calculate stock for selected size (before early returns to maintain hook order)
