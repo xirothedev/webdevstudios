@@ -10,8 +10,11 @@ import { ProductFeatures } from '@/components/shop/ProductFeatures';
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery';
 import { ProductInfo } from '@/components/shop/ProductInfo';
 import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
+import { ProductReviews } from '@/components/shop/ProductReviews';
 import { ProductSizeGuide } from '@/components/shop/ProductSizeGuide';
 import { ProductSizeSelector } from '@/components/shop/ProductSizeSelector';
+import { ReviewForm } from '@/components/shop/ReviewForm';
+import { useAuth } from '@/hooks/use-auth';
 import { useAddToCart } from '@/lib/api/hooks/use-cart';
 import { useSuspenseProduct } from '@/lib/api/hooks/use-products';
 import { getBackendSlug } from '@/lib/product-slug-mapping';
@@ -31,6 +34,7 @@ function ProductContentInner({
   const [quantity, setQuantity] = useState(1);
 
   const BACKEND_SLUG = getBackendSlug(productSlug);
+  const { user, isAuthenticated } = useAuth();
 
   // Fetch product data using Suspense Query
   const { data: product } = useSuspenseProduct(BACKEND_SLUG);
@@ -208,6 +212,33 @@ function ProductContentInner({
 
       {/* Size Guide Section - Only for products with sizes */}
       {product.hasSizes && <ProductSizeGuide />}
+
+      {/* Reviews Section */}
+      <section className="mt-16">
+        <h2 className="mb-8 text-3xl font-bold text-white">
+          Đánh giá sản phẩm
+        </h2>
+
+        {/* Review Form - Only for authenticated users */}
+        {isAuthenticated ? (
+          <div className="mb-8">
+            <ReviewForm productSlug={BACKEND_SLUG} currentUserId={user?.id} />
+          </div>
+        ) : (
+          <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-6">
+            <p className="text-white/60">
+              Đăng nhập để viết đánh giá về sản phẩm này.
+            </p>
+          </div>
+        )}
+
+        {/* Reviews List */}
+        <ProductReviews
+          productSlug={BACKEND_SLUG}
+          currentUserId={user?.id}
+          currentUserRole={user?.role}
+        />
+      </section>
     </>
   );
 }

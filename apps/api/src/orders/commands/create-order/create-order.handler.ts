@@ -11,8 +11,9 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CartRepository } from '../../../cart/infrastructure/cart.repository';
-import { ProductRepository } from '../../../products/infrastructure/product.repository';
+import { CartRepository } from '@/cart/infrastructure/cart.repository';
+import { ProductRepository } from '@/products/infrastructure/product.repository';
+
 import { OrderDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';
 import { OrderWithItems } from '../../types/order.types';
@@ -71,7 +72,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
 
       if (cartItem.quantity > availableStock) {
         throw new ConflictException(
-          `Insufficient stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`
+          `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`
         );
       }
 

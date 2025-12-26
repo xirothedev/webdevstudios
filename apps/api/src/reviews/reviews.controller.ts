@@ -1,4 +1,4 @@
-import { ProductSlug } from '@generated/prisma';
+import { ProductSlug, UserRole } from '@generated/prisma';
 import {
   Body,
   Controller,
@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
@@ -22,6 +23,8 @@ import {
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { CreateReviewCommand } from './commands/create-review/create-review.command';
 import { DeleteReviewCommand } from './commands/delete-review/delete-review.command';
 import { UpdateReviewCommand } from './commands/update-review/update-review.command';
@@ -147,10 +150,12 @@ export class ReviewsController {
   }
 
   @Delete('reviews/:id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete review',
-    description: 'Delete own review',
+    description: 'Delete review (Admin only)',
   })
   @ApiParam({
     name: 'id',
@@ -168,12 +173,9 @@ export class ReviewsController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Review not found' })
-  async deleteReview(
-    @Param('id') id: string,
-    @CurrentUser() user: { id: string }
-  ): Promise<{ success: boolean }> {
-    return this.commandBus.execute(new DeleteReviewCommand(id, user.id));
+  async deleteReview(@Param('id') id: string): Promise<{ success: boolean }> {
+    return this.commandBus.execute(new DeleteReviewCommand(id));
   }
 }

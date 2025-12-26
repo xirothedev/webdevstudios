@@ -1,4 +1,4 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { ProductRepository } from '../../../products/infrastructure/product.repository';
@@ -13,17 +13,12 @@ export class DeleteReviewHandler implements ICommandHandler<DeleteReviewCommand>
   ) {}
 
   async execute(command: DeleteReviewCommand): Promise<{ success: boolean }> {
-    const { reviewId, userId } = command;
+    const { reviewId } = command;
 
     // Get review
     const review = await this.reviewRepository.findById(reviewId);
     if (!review) {
       throw new NotFoundException(`Review with id ${reviewId} not found`);
-    }
-
-    // Verify ownership
-    if (review.userId !== userId) {
-      throw new ForbiddenException('Review does not belong to user');
     }
 
     const productId = review.productId;
