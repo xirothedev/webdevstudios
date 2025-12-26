@@ -1,0 +1,35 @@
+// =========================================
+// EVENTS (Lịch sự kiện câu lạc bộ)
+// =========================================
+
+enum EventType {
+  MEETING // Cuộc họp
+  WORKSHOP // Workshop
+  SOCIAL // Sự kiện xã hội
+  COMPETITION // Cuộc thi
+  SURVEY // Khảo sát
+  OTHER // Khác
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  startDate   DateTime  @db.Timestamptz(6)
+  endDate     DateTime  @db.Timestamptz(6)
+  location    String?   @db.VarChar(255)
+  type        EventType
+  organizer   String?   @db.VarChar(100)
+  attendees   Int? // Số người tham gia (optional)
+  surveyLink  String?   @db.Text // Link Google Form cho SURVEY events
+
+  // Audit fields
+  createdBy String? // User ID của admin tạo event
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startDate])
+  @@index([endDate])
+  @@index([type])
+  @@map("events")
+}

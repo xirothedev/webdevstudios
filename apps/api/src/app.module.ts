@@ -10,6 +10,7 @@ import { CartModule } from './cart/cart.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { EventsModule } from './events/events.module';
 import { MailModule } from './mail/mail.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -31,6 +32,7 @@ import { UsersModule } from './users/users.module';
     CartModule,
     OrdersModule,
     ReviewsModule,
+    EventsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
