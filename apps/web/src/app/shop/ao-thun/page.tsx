@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
@@ -42,8 +42,25 @@ export default function AoThunPage() {
     console.log('Buy now:', { size: selectedSize, quantity });
   };
 
+  // Calculate stock for selected size (before early returns to maintain hook order)
+  const stockBySize = product?.sizeStocks?.reduce(
+    (acc, ss) => {
+      acc[ss.size] = ss.stock;
+      return acc;
+    },
+    {} as Record<ProductSize, number>
+  );
+  const selectedSizeStock = stockBySize?.[selectedSize] ?? product?.stock ?? 0;
+
+  // Reset quantity when size changes if current quantity exceeds new stock
+  useEffect(() => {
+    if (product && quantity > selectedSizeStock) {
+      setQuantity(selectedSizeStock > 0 ? selectedSizeStock : 1);
+    }
+  }, [selectedSize, selectedSizeStock, quantity, product]);
+
   const increaseQuantity = () => {
-    setQuantity((prev) => Math.min(prev + 1, 10));
+    setQuantity((prev) => Math.min(prev + 1, selectedSizeStock ?? 10));
   };
 
   const decreaseQuantity = () => {
@@ -83,13 +100,6 @@ export default function AoThunPage() {
   };
 
   const sizes = product.sizeStocks?.map((ss) => ss.size) || [];
-  const stockBySize = product.sizeStocks?.reduce(
-    (acc, ss) => {
-      acc[ss.size] = ss.stock;
-      return acc;
-    },
-    {} as Record<ProductSize, number>
-  );
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">
@@ -145,7 +155,8 @@ export default function AoThunPage() {
                 quantity={quantity}
                 onIncrease={increaseQuantity}
                 onDecrease={decreaseQuantity}
-                stock={product.stock}
+                stock={selectedSizeStock}
+                max={selectedSizeStock ?? 0}
               />
 
               {/* Add to Cart Button */}

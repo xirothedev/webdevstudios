@@ -2,6 +2,8 @@
 
 import { Minus, Plus } from 'lucide-react';
 
+import { NumberTicker } from '@/components/ui/number-ticker';
+
 interface ProductQuantitySelectorProps {
   quantity: number;
   onIncrease: () => void;
@@ -44,7 +46,14 @@ export function ProductQuantitySelector({
         </div>
         {stock !== undefined && (
           <span className="text-sm text-white/60">
-            Còn lại: <span className="font-semibold text-white">{stock}</span>{' '}
+            Còn lại:{' '}
+            <span className="font-semibold text-white">
+              <NumberTicker
+                value={stock}
+                startValue={stock}
+                className="text-white"
+              />
+            </span>{' '}
             sản phẩm
           </span>
         )}

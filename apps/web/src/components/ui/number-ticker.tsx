@@ -29,15 +29,33 @@ export function NumberTicker({
     stiffness: 100,
   });
   const isInView = useInView(ref, { once: true, margin: '0px' });
+  const previousValue = useRef(value);
+  const hasAnimated = useRef(false);
 
+  // Initial animation when in view (only once)
   useEffect(() => {
-    if (isInView) {
+    if (isInView && !hasAnimated.current) {
       const timer = setTimeout(() => {
         motionValue.set(direction === 'down' ? startValue : value);
+        previousValue.current = value;
+        hasAnimated.current = true;
       }, delay * 1000);
       return () => clearTimeout(timer);
     }
-  }, [motionValue, isInView, delay, value, direction, startValue]);
+  }, [motionValue, isInView, delay, direction, startValue, value]);
+
+  // Animate when value changes (for dynamic updates)
+  useEffect(() => {
+    if (isInView && previousValue.current !== value) {
+      // Set current value as starting point, then animate to new value
+      motionValue.set(previousValue.current);
+      // Use requestAnimationFrame to ensure smooth transition
+      requestAnimationFrame(() => {
+        motionValue.set(value);
+      });
+      previousValue.current = value;
+    }
+  }, [motionValue, isInView, value]);
 
   useEffect(
     () =>

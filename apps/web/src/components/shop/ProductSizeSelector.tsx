@@ -37,7 +37,7 @@ export function ProductSizeSelector({
               onClick={() => !isOutOfStock && onSizeChange(size)}
               disabled={isOutOfStock}
               className={cn(
-                'relative h-12 w-16 cursor-pointer rounded-xl border-2 transition-all duration-200',
+                'relative flex h-12 w-16 cursor-pointer flex-col items-center justify-center rounded-xl border-2 transition-all duration-200',
                 isOutOfStock && 'cursor-not-allowed opacity-50',
                 isSelected
                   ? 'border-wds-accent bg-wds-accent/10 shadow-wds-accent/20 shadow-lg'
@@ -63,7 +63,7 @@ export function ProductSizeSelector({
                 </motion.div>
               )}
               {stock !== undefined && stock > 0 && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] text-white/60">
+                <span className="mt-0.5 text-[10px] text-white/60">
                   {stock}
                 </span>
               )}
