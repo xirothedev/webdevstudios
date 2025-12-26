@@ -8,7 +8,7 @@ RUN npm install -g pnpm
 
 # Dependencies stage
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
 RUN pnpm install --frozen-lockfile
@@ -18,10 +18,14 @@ FROM base AS builder
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
 
-# Build the web app
-RUN pnpm build --filter=web
+# Build the web app using npx to ensure next is found
+WORKDIR /app/apps/web
+RUN npx next build
+WORKDIR /app
 
 # Production runner stage
 FROM base AS runner

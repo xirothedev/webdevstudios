@@ -7,7 +7,7 @@ RUN npm install -g pnpm
 
 # Dependencies stage
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
 RUN pnpm install --frozen-lockfile
@@ -16,13 +16,17 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
 
-# Build the API
-RUN pnpm build --filter=api
+# Build the API using npx to ensure nest is found
+WORKDIR /app/apps/api
+RUN npx nest build
 
 # Generate Prisma client
-RUN pnpm prisma:generate --filter=api
+RUN npx prisma generate
+WORKDIR /app
 
 # Production runner stage
 FROM base AS runner

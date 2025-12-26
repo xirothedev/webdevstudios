@@ -192,7 +192,7 @@ src/
     "@tanstack/react-query": "^5.x.x",
     "react-hook-form": "^7.x.x",
     "@hookform/resolvers": "^3.x.x",
-    "zod": "^3.x.x",
+    "zod": "^4.x.x",
     "axios": "^1.x.x"
   }
 }
