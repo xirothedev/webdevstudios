@@ -4,6 +4,7 @@ import { ShoppingCart, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { QuantitySelector } from '@/components/shop/QuantitySelector';
 import { Button } from '@/components/ui/button';
 import {
   useRemoveFromCart,
@@ -94,36 +95,20 @@ function CartContentInner() {
                 </p>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 rounded-lg border border-white/10 px-1">
-                    <Button
-                      onClick={() =>
-                        handleUpdateQuantity(item.id, item.quantity - 1)
-                      }
-                      disabled={item.quantity <= 1 || isItemUpdating(item.id)}
-                      variant="ghost"
-                      size="sm"
-                      className="hover:text-wds-accent h-auto px-3 py-1 text-white/70 hover:bg-transparent disabled:opacity-30"
-                    >
-                      -
-                    </Button>
-                    <span className="px-4 py-1 text-white">
-                      {item.quantity}
-                    </span>
-                    <Button
-                      onClick={() =>
-                        handleUpdateQuantity(item.id, item.quantity + 1)
-                      }
-                      disabled={
-                        item.quantity >= item.stockAvailable ||
-                        isItemUpdating(item.id)
-                      }
-                      variant="ghost"
-                      size="sm"
-                      className="hover:text-wds-accent h-auto px-3 py-1 text-white/70 hover:bg-transparent disabled:opacity-30"
-                    >
-                      +
-                    </Button>
-                  </div>
+                  <QuantitySelector
+                    quantity={item.quantity}
+                    onIncrease={() =>
+                      handleUpdateQuantity(item.id, item.quantity + 1)
+                    }
+                    onDecrease={() =>
+                      handleUpdateQuantity(item.id, item.quantity - 1)
+                    }
+                    max={item.stockAvailable}
+                    disabled={isItemUpdating(item.id)}
+                    variant="compact"
+                    showIcons={false}
+                    size="sm"
+                  />
 
                   <Button
                     onClick={() => handleRemoveItem(item.id)}
