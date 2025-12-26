@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "postinstall": "pnpm exec prisma generate --schema=prisma/schema/base.prisma",
+    "postinstall": "pnpm exec prisma generate --schema=apps/api/prisma/schema/base.prisma",
     "prisma:generate": "pnpm exec prisma generate",
     "prisma:migrate": "pnpm exec prisma migrate dev",
     "prisma:studio": "pnpm exec prisma studio",
