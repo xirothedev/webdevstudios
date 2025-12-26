@@ -1,5 +1,5 @@
 # Base stage with Node.js and pnpm
-FROM node:lts-alpine AS base
+FROM node:25-alpine3.22 AS base
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 

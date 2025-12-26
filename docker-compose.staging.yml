@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     container_name: webdevstudios-postgres-staging
     restart: always
     environment:
@@ -18,7 +18,7 @@ services:
       - staging-network
 
   redis:
-    image: redis:alpine
+    image: redis:8.4.0-alpine
     container_name: webdevstudios-redis-staging
     restart: always
     command: redis-server --requirepass ${REDIS_PASSWORD}
@@ -69,7 +69,7 @@ services:
       - staging-network
 
   nginx:
-    image: nginx:alpine
+    image: nginx:1.29.4
     container_name: webdevstudios-nginx-staging
     restart: always
     ports:
