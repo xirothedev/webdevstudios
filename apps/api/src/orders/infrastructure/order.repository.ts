@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
 import {
   OrderStatus,
   PaymentStatus,
   ProductSize,
   ProductSlug,
-} from 'generated/prisma/client';
+} from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { ShippingAddressDto } from '../dtos/order.dto';

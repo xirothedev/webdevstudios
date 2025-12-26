@@ -1,3 +1,4 @@
+import { UserRole } from '@generated/prisma';
 import {
   Body,
   Controller,
@@ -17,7 +18,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRole } from 'generated/prisma/client';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';

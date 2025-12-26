@@ -23,7 +23,7 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['../../.env.local', '../../.env', '.env.local', '.env'],
+      envFilePath: ['.env'],
     }),
     AuthModule,
     UsersModule,

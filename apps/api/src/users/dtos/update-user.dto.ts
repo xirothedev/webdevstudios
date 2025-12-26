@@ -1,3 +1,4 @@
+import { UserRole } from '@generated/prisma';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEnum,
@@ -6,7 +7,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { UserRole } from 'generated/prisma/client';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({

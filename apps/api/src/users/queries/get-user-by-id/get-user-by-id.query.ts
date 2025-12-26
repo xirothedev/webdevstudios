@@ -1,4 +1,4 @@
-import { UserRole } from 'generated/prisma/client';
+import { UserRole } from '@generated/prisma';
 
 export class GetUserByIdQuery {
   constructor(

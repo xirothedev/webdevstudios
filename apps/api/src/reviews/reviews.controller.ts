@@ -1,3 +1,4 @@
+import { ProductSlug } from '@generated/prisma';
 import {
   Body,
   Controller,
@@ -18,7 +19,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ProductSlug } from 'generated/prisma/client';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';

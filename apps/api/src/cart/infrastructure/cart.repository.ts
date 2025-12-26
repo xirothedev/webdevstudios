@@ -1,5 +1,5 @@
+import { ProductSize } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
-import { ProductSize } from 'generated/prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { CartWithItems } from '../types/cart.types';

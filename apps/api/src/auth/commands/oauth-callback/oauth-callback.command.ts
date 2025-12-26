@@ -1,5 +1,5 @@
+import { OAuthProvider } from '@generated/prisma';
 import { ICommand } from '@nestjs/cqrs';
-import { OAuthProvider } from 'generated/prisma/client';
 
 export class OAuthCallbackCommand implements ICommand {
   constructor(

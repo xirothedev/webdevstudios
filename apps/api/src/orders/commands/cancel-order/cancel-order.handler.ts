@@ -1,10 +1,10 @@
+import { OrderStatus } from '@generated/prisma';
 import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { OrderStatus } from 'generated/prisma/client';
 
 import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { OrderDto } from '../../dtos/order.dto';

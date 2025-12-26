@@ -1,9 +1,4 @@
-import {
-  Cart,
-  CartItem,
-  Product,
-  ProductSizeStock,
-} from 'generated/prisma/client';
+import { Cart, CartItem, Product, ProductSizeStock } from '@generated/prisma';
 
 export type ProductWithStock = Product & {
   sizeStocks: ProductSizeStock[];

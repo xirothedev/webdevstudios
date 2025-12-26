@@ -1,9 +1,4 @@
-import {
-  Order,
-  OrderItem,
-  Product,
-  ShippingAddress,
-} from 'generated/prisma/client';
+import { Order, OrderItem, Product, ShippingAddress } from '@generated/prisma';
 
 export type OrderItemWithProduct = OrderItem & {
   product: Product | null;

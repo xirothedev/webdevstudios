@@ -1,4 +1,4 @@
-import { ProductSlug } from 'generated/prisma/client';
+import { ProductSlug } from '@generated/prisma';
 
 /**
  * Map product slug to image URL (hardcoded in frontend)

@@ -1,5 +1,5 @@
+import { DeviceType, OAuthProvider } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
-import { DeviceType, OAuthProvider } from 'generated/prisma/client';
 import * as UAParser from 'ua-parser-js';
 
 import { PrismaService } from '../../prisma/prisma.service';

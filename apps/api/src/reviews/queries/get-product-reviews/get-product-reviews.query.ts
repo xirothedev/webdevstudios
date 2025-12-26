@@ -1,4 +1,4 @@
-import { ProductSlug } from 'generated/prisma/client';
+import { ProductSlug } from '@generated/prisma';
 
 export class GetProductReviewsQuery {
   constructor(

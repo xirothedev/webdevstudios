@@ -1,5 +1,5 @@
+import { UserRole } from '@generated/prisma';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { UserRole } from 'generated/prisma/client';
 
 import { PrismaService } from '../../../prisma/prisma.service';
 import { SearchUsersResponseDto } from '../../dtos/responses.dto';

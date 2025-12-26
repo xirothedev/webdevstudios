@@ -1,3 +1,4 @@
+import { MFAMethod } from '@generated/prisma';
 import {
   BadRequestException,
   Injectable,
@@ -5,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
-import { MFAMethod } from 'generated/prisma/client';
 
 import { PrismaService } from '../../../prisma/prisma.service';
 import { TotpService } from '../../infrastructure/totp.service';

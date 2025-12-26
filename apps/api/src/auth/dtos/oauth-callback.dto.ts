@@ -1,6 +1,6 @@
+import { OAuthProvider } from '@generated/prisma';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { OAuthProvider } from 'generated/prisma/client';
 
 export class OAuthCallbackDto {
   @ApiProperty({

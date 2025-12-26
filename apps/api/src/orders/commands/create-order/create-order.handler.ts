@@ -1,15 +1,15 @@
 import {
+  OrderStatus,
+  PaymentStatus,
+  ProductSize,
+  ProductSlug,
+} from '@generated/prisma';
+import {
   BadRequestException,
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  OrderStatus,
-  PaymentStatus,
-  ProductSize,
-  ProductSlug,
-} from 'generated/prisma/client';
 
 import { CartRepository } from '../../../cart/infrastructure/cart.repository';
 import { ProductRepository } from '../../../products/infrastructure/product.repository';
