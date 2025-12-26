@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -93,9 +94,12 @@ export default function PadChuotPage() {
         <div className="mx-auto max-w-7xl px-6">
           {/* Breadcrumb */}
           <nav className="mb-8 flex items-center gap-2 text-sm text-white/60">
-            <a href="/shop" className="hover:text-wds-accent transition-colors">
+            <Link
+              href="/shop"
+              className="hover:text-wds-accent transition-colors"
+            >
               Shop
-            </a>
+            </Link>
             <span>/</span>
             <span className="text-white/90">Pad chuột</span>
           </nav>

@@ -123,6 +123,7 @@ apiClient.interceptors.response.use(
             '/about', // About page
             '/faq', // FAQ page
             '/generation', // Generation page
+            '/calendar', // Calendar page
           ];
 
           // Check if current path is a public route or auth route
