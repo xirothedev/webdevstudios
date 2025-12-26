@@ -10,11 +10,21 @@ import { ProductFeatures } from '@/components/shop/ProductFeatures';
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery';
 import { ProductInfo } from '@/components/shop/ProductInfo';
 import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
-import { mocKhoaProduct } from '@/data/products/moc-khoa';
+import { useProduct } from '@/lib/api/hooks/use-products';
+import { getBackendSlug } from '@/lib/product-slug-mapping';
+import { getProductStaticContent } from '@/lib/product-static-content';
+
+const BACKEND_SLUG = getBackendSlug('moc-khoa');
 
 export default function MocKhoaPage() {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  // Fetch product data from API
+  const { data: product, isLoading, error } = useProduct(BACKEND_SLUG);
+
+  // Get static content (images, features, additionalInfo)
+  const staticContent = getProductStaticContent(BACKEND_SLUG);
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
@@ -35,6 +45,38 @@ export default function MocKhoaPage() {
 
   const decreaseQuantity = () => {
     setQuantity((prev) => Math.max(prev - 1, 1));
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
+        <div className="text-white">Đang tải...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !product) {
+    return (
+      <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
+        <div className="text-white">
+          {error instanceof Error ? error.message : 'Không tìm thấy sản phẩm'}
+        </div>
+      </div>
+    );
+  }
+
+  // Map backend ProductDto to component props
+  const price = {
+    current: product.priceCurrent,
+    original: product.priceOriginal ?? undefined,
+    discount: product.priceDiscount ?? undefined,
+  };
+
+  const rating = {
+    value: product.ratingValue,
+    count: product.ratingCount,
   };
 
   return (
@@ -62,17 +104,17 @@ export default function MocKhoaPage() {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
             {/* Left: Product Image */}
             <ProductImageGallery
-              images={mocKhoaProduct.images}
-              badge={mocKhoaProduct.badge}
+              images={staticContent.images}
+              badge={product.badge || undefined}
             />
 
             {/* Right: Product Info */}
             <div className="flex flex-col justify-center">
               <ProductInfo
-                name={mocKhoaProduct.name}
-                rating={mocKhoaProduct.rating}
-                price={mocKhoaProduct.price}
-                description={mocKhoaProduct.description}
+                name={product.name}
+                rating={rating}
+                price={price}
+                description={product.description}
                 priceNote="Giá đã bao gồm VAT. Miễn phí vận chuyển cho đơn hàng trên 500.000₫"
               />
 
@@ -81,7 +123,7 @@ export default function MocKhoaPage() {
                 quantity={quantity}
                 onIncrease={increaseQuantity}
                 onDecrease={decreaseQuantity}
-                stock={mocKhoaProduct.stock}
+                stock={product.stock}
               />
 
               {/* Add to Cart Button */}
@@ -92,12 +134,12 @@ export default function MocKhoaPage() {
               />
 
               {/* Product Features */}
-              <ProductFeatures features={mocKhoaProduct.features} />
+              <ProductFeatures features={staticContent.features} />
             </div>
           </div>
 
           {/* Additional Info Section */}
-          <ProductAdditionalInfo info={mocKhoaProduct.additionalInfo} />
+          <ProductAdditionalInfo info={staticContent.additionalInfo} />
         </div>
       </main>
 

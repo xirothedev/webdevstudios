@@ -52,16 +52,20 @@ export const productsApi = {
    * Get all products
    */
   async listProducts(): Promise<ProductListResponse> {
-    const response = await apiClient.get<ProductListResponse>('/products');
-    return response.data;
+    const response = await apiClient.get<{ data: ProductListResponse }>(
+      '/products'
+    );
+    return response.data.data;
   },
 
   /**
    * Get product by slug
    */
   async getProductBySlug(slug: ProductSlug): Promise<Product> {
-    const response = await apiClient.get<Product>(`/products/${slug}`);
-    return response.data;
+    const response = await apiClient.get<{ data: Product }>(
+      `/products/${slug}`
+    );
+    return response.data.data;
   },
 
   /**
@@ -72,9 +76,12 @@ export const productsApi = {
     size?: ProductSize
   ): Promise<StockInfo> {
     const params = size ? { size } : {};
-    const response = await apiClient.get<StockInfo>(`/products/${slug}/stock`, {
-      params,
-    });
-    return response.data;
+    const response = await apiClient.get<{ data: StockInfo }>(
+      `/products/${slug}/stock`,
+      {
+        params,
+      }
+    );
+    return response.data.data;
   },
 };
