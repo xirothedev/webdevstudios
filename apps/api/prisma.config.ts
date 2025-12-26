@@ -2,13 +2,16 @@
 // pnpm install --save-dev prisma dotenv
 import 'dotenv/config';
 
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { defineConfig } from 'prisma/config';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  schema: join('prisma', 'schema'),
+  schema: join(__dirname, 'prisma', 'schema'),
   migrations: {
-    path: 'prisma/migrations',
+    path: join(__dirname, 'prisma', 'migrations'),
   },
   datasource: {
     url: process.env['DATABASE_URL'],
