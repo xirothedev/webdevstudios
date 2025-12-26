@@ -29,7 +29,6 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  images     ProductImage[]
   sizeStocks ProductSizeStock[] // Quản lý stock theo size (chỉ áo thun)
   cartItems  CartItem[]
   orderItems OrderItem[]
@@ -37,22 +36,6 @@ model Product {
 
   @@index([slug])
   @@map("products")
-}
-
-/**
- * Ảnh sản phẩm
- */
-model ProductImage {
-  id      String  @id @default(cuid())
-  url     String  @db.Text
-  altText String? @db.VarChar(255)
-  order   Int     @default(0) // Thứ tự hiển thị
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([productId, order])
-  @@map("product_images")
 }
 
 /**
