@@ -10,19 +10,19 @@ export function AuthFooter({ variant = 'login' }: AuthFooterProps) {
       <div className="text-center text-sm text-white/60">
         {variant === 'login' ? (
           <>
-            Don&apos;t have an account?{' '}
+            Chưa có tài khoản?{' '}
             <Link
               href="/auth/signup"
               className="text-white hover:text-white/80"
             >
-              Sign up
+              Đăng kí
             </Link>
           </>
         ) : (
           <>
-            Already have an account?{' '}
+            Đã có tài khoản?{' '}
             <Link href="/auth/login" className="text-white hover:text-white/80">
-              Sign in
+              Đăng nhập
             </Link>
           </>
         )}
@@ -31,23 +31,23 @@ export function AuthFooter({ variant = 'login' }: AuthFooterProps) {
       <div className="text-center text-xs text-white/40">
         {variant === 'signup' ? (
           <>
-            By creating an account, you agree to the{' '}
-            <Link href="/terms" className="hover:text-white/70">
-              Terms of Service
+            Bằng cách tạo tài khoản, bạn đồng ý với{' '}
+            <Link href="/terms" className="hover:text-wds-accent text-white">
+              Điều khoản dịch vụ
             </Link>{' '}
-            and{' '}
-            <Link href="/privacy" className="hover:text-white/70">
-              Privacy Policy
+            và{' '}
+            <Link href="/privacy" className="hover:text-wds-accent text-white">
+              Chính sách bảo mật
             </Link>
           </>
         ) : (
           <>
-            <Link href="/terms" className="hover:text-white/70">
-              Terms of Service
+            <Link href="/terms" className="hover:text-wds-accent text-white">
+              Điều khoản dịch vụ
             </Link>{' '}
-            and{' '}
-            <Link href="/privacy" className="hover:text-white/70">
-              Privacy Policy
+            và{' '}
+            <Link href="/privacy" className="hover:text-wds-accent text-white">
+              Chính sách bảo mật
             </Link>
           </>
         )}

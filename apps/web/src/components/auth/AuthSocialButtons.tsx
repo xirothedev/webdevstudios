@@ -16,13 +16,13 @@ export function AuthSocialButtons() {
     <div className="space-y-3">
       <SocialButton
         platform="google"
-        label="Continue with Google"
+        label="Tiếp tục với Google"
         onClick={() => handleOAuth('google')}
         disabled={isLoading}
       />
       <SocialButton
         platform="github"
-        label="Continue with GitHub"
+        label="Tiếp tục với GitHub"
         onClick={() => handleOAuth('github')}
         disabled={isLoading}
       />
