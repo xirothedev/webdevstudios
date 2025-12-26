@@ -48,8 +48,15 @@ export interface Order {
   updatedAt: string;
 }
 
+export type OrderType = 'FROM_CART' | 'DIRECT_PURCHASE';
+
 export interface CreateOrderRequest {
   shippingAddress: ShippingAddress;
+  orderType?: OrderType;
+  productId?: string;
+  productSlug?: string;
+  size?: ProductSize;
+  quantity?: number;
 }
 
 export interface OrderListResponse {

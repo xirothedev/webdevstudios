@@ -1,9 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Footer } from '@/components/Footer';
@@ -11,9 +12,11 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/api/hooks/use-cart';
-import { useCreateOrder } from '@/lib/api/hooks/use-orders';
-import { ShippingAddress } from '@/lib/api/orders';
+import { useCreateOrder, useOrders } from '@/lib/api/hooks/use-orders';
+import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments';
+import { CreateOrderRequest, ShippingAddress } from '@/lib/api/orders';
 import { formatPrice } from '@/lib/utils';
+import { ProductSize } from '@/types/product';
 
 // Validation schema với Zod
 const shippingAddressSchema = z.object({
@@ -37,12 +40,30 @@ type ShippingAddressFormData = z.infer<typeof shippingAddressSchema>;
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isBuyNow = searchParams.get('buyNow') === 'true';
+  const buyNowProductId = searchParams.get('productId');
+  const buyNowProductSlug = searchParams.get('productSlug');
+  const buyNowSize = searchParams.get('size') as ProductSize | undefined;
+  const buyNowQuantity = searchParams.get('quantity');
 
-  // Fetch cart using TanStack Query
-  const { data: cart, isLoading: isLoadingCart, error: cartError } = useCart();
+  // Fetch cart using TanStack Query (only if not Buy Now)
+  const cartQuery = useCart();
+  const {
+    data: cart,
+    isLoading: isLoadingCart,
+    error: cartError,
+  } = isBuyNow ? { data: null, isLoading: false, error: null } : cartQuery;
+
+  // Check for pending orders
+  const { data: ordersData } = useOrders(1, 1);
+  const pendingOrder = ordersData?.orders.find(
+    (order) => order.status === 'PENDING' && order.paymentStatus === 'PENDING'
+  );
 
   // Create order mutation
   const createOrderMutation = useCreateOrder();
+  const createPaymentLinkMutation = useCreatePaymentLink();
 
   // Form setup với react-hook-form
   const {
@@ -63,17 +84,36 @@ export default function CheckoutPage() {
     },
   });
 
-  // Redirect to cart if cart is empty or error
+  // Redirect to cart if cart is empty or error (only for FROM_CART mode)
   useEffect(() => {
-    if (cartError || (cart && cart.items.length === 0)) {
+    if (!isBuyNow && (cartError || (cart && cart.items.length === 0))) {
       router.push('/cart');
     }
-  }, [cart, cartError, router]);
+  }, [cart, cartError, router, isBuyNow]);
+
+  // Redirect to payment page if there's a pending order
+  useEffect(() => {
+    if (pendingOrder) {
+      // Save orderId to localStorage for recovery
+      localStorage.setItem('pendingOrderId', pendingOrder.id);
+      router.push(`/payments/${pendingOrder.id}`);
+    }
+  }, [pendingOrder, router]);
 
   const isFormSubmitting = isSubmitting || createOrderMutation.isPending;
 
   const onSubmit = (data: ShippingAddressFormData) => {
-    if (!cart || cart.items.length === 0) return;
+    // For FROM_CART mode, check if cart exists and has items
+    if (!isBuyNow && (!cart || cart.items.length === 0)) return;
+
+    // For DIRECT_PURCHASE mode, check if required fields are present
+    if (
+      isBuyNow &&
+      (!buyNowProductId || !buyNowProductSlug || !buyNowQuantity)
+    ) {
+      toast.error('Thông tin sản phẩm không hợp lệ');
+      return;
+    }
 
     const shippingAddress: ShippingAddress = {
       fullName: data.fullName,
@@ -86,17 +126,45 @@ export default function CheckoutPage() {
       postalCode: data.postalCode,
     };
 
-    createOrderMutation.mutate(
-      { shippingAddress },
-      {
-        onSuccess: (order) => {
-          router.push(`/orders/${order.id}`);
-        },
+    // Prepare order data
+    const orderData: CreateOrderRequest = {
+      shippingAddress,
+      orderType: isBuyNow ? 'DIRECT_PURCHASE' : 'FROM_CART',
+    };
+
+    // Add Buy Now fields if applicable
+    if (isBuyNow && buyNowProductId && buyNowProductSlug && buyNowQuantity) {
+      orderData.productId = buyNowProductId;
+      orderData.productSlug = buyNowProductSlug;
+      orderData.quantity = parseInt(buyNowQuantity, 10);
+      if (buyNowSize) {
+        orderData.size = buyNowSize;
       }
-    );
+    }
+
+    createOrderMutation.mutate(orderData, {
+      onSuccess: async (order) => {
+        // Save orderId to localStorage for recovery
+        localStorage.setItem('pendingOrderId', order.id);
+
+        // Create payment link
+        try {
+          await createPaymentLinkMutation.mutateAsync({
+            orderId: order.id,
+          });
+
+          // Redirect to payment page
+          router.push(`/payments/${order.id}`);
+        } catch (error) {
+          // If payment link creation fails, still redirect to order page
+          console.error('Failed to create payment link:', error);
+          router.push(`/orders/${order.id}`);
+        }
+      },
+    });
   };
 
-  if (isLoadingCart) {
+  if (isLoadingCart && !isBuyNow) {
     return (
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">Đang tải...</div>
@@ -104,12 +172,22 @@ export default function CheckoutPage() {
     );
   }
 
-  if (cartError || !cart || cart.items.length === 0) {
+  if (!isBuyNow && (cartError || !cart || cart.items.length === 0)) {
     return null; // useEffect will redirect
   }
 
-  const shippingFee = cart.totalAmount >= 500000 ? 0 : 30000;
-  const total = cart.totalAmount + shippingFee;
+  // Calculate totals
+  let subtotal = 0;
+  if (isBuyNow && buyNowQuantity) {
+    // For Buy Now, we need to fetch product price
+    // For now, show a placeholder - in production, fetch product details
+    subtotal = 0; // Will be calculated on backend
+  } else if (cart) {
+    subtotal = cart.totalAmount;
+  }
+
+  const shippingFee = subtotal >= 500000 ? 0 : 30000;
+  const total = subtotal + shippingFee;
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -287,21 +365,37 @@ export default function CheckoutPage() {
                   Tóm tắt đơn hàng
                 </h2>
                 <div className="mb-6 space-y-3">
-                  {cart.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex justify-between text-sm text-white/80"
-                    >
+                  {isBuyNow ? (
+                    <div className="flex justify-between text-sm text-white/80">
                       <span>
-                        {item.productName}
-                        {item.size && ` (${item.size})`} x {item.quantity}
+                        Mua trực tiếp
+                        {buyNowSize && ` (${buyNowSize})`} x{' '}
+                        {buyNowQuantity || 1}
                       </span>
-                      <span>{formatPrice(item.subtotal)}₫</span>
+                      <span>Đang tính...</span>
                     </div>
-                  ))}
+                  ) : (
+                    cart?.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex justify-between text-sm text-white/80"
+                      >
+                        <span>
+                          {item.productName}
+                          {item.size && ` (${item.size})`} x {item.quantity}
+                        </span>
+                        <span>{formatPrice(item.subtotal)}₫</span>
+                      </div>
+                    ))
+                  )}
                   <div className="flex justify-between border-t border-white/10 pt-3 text-white/80">
                     <span>Tạm tính:</span>
-                    <span>{formatPrice(cart.totalAmount)}₫</span>
+                    <span>
+                      {isBuyNow
+                        ? 'Đang tính...'
+                        : formatPrice(cart?.totalAmount || 0)}
+                      ₫
+                    </span>
                   </div>
                   <div className="flex justify-between text-white/80">
                     <span>Phí vận chuyển:</span>

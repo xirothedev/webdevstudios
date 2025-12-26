@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
@@ -10,6 +10,7 @@ import { formatPrice } from '@/lib/utils';
 
 export default function OrderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const orderId = params.id as string;
 
   // Fetch order data
@@ -68,12 +69,32 @@ export default function OrderDetailPage() {
             <h1 className="mb-2 text-3xl font-bold text-white">
               Đơn hàng {order.code}
             </h1>
-            <p className="text-white/60">
-              Trạng thái:{' '}
-              <span className="font-semibold text-white">
-                {getStatusText(order.status)}
-              </span>
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-white/60">
+                Trạng thái:{' '}
+                <span className="font-semibold text-white">
+                  {getStatusText(order.status)}
+                </span>
+              </p>
+              <p className="text-white/60">
+                Thanh toán:{' '}
+                <span
+                  className={`font-semibold ${
+                    order.paymentStatus === 'PAID'
+                      ? 'text-green-400'
+                      : order.paymentStatus === 'FAILED'
+                        ? 'text-red-400'
+                        : 'text-yellow-400'
+                  }`}
+                >
+                  {order.paymentStatus === 'PAID'
+                    ? 'Đã thanh toán'
+                    : order.paymentStatus === 'FAILED'
+                      ? 'Thanh toán thất bại'
+                      : 'Chờ thanh toán'}
+                </span>
+              </p>
+            </div>
           </div>
 
           {/* Order Items */}
@@ -161,16 +182,27 @@ export default function OrderDetailPage() {
           </div>
 
           {/* Actions */}
-          {canCancel && (
-            <Button
-              onClick={handleCancel}
-              disabled={cancelOrderMutation.isPending}
-              variant="outline"
-              className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-            >
-              {cancelOrderMutation.isPending ? 'Đang hủy...' : 'Hủy đơn hàng'}
-            </Button>
-          )}
+          <div className="flex gap-4">
+            {order.paymentStatus === 'PENDING' &&
+              order.status === 'PENDING' && (
+                <Button
+                  onClick={() => router.push(`/payments/${orderId}`)}
+                  className="bg-wds-accent hover:bg-wds-accent/90 font-semibold text-black"
+                >
+                  Thanh toán ngay
+                </Button>
+              )}
+            {canCancel && order.paymentStatus !== 'PAID' && (
+              <Button
+                onClick={handleCancel}
+                disabled={cancelOrderMutation.isPending}
+                variant="outline"
+                className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+              >
+                {cancelOrderMutation.isPending ? 'Đang hủy...' : 'Hủy đơn hàng'}
+              </Button>
+            )}
+          </div>
         </div>
       </main>
       <Footer />
