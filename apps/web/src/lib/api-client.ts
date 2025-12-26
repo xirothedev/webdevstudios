@@ -112,10 +112,27 @@ apiClient.interceptors.response.use(
         // Refresh failed - clear queue
         processQueue(refreshError, null);
 
-        // Only redirect if we're in the browser and not already on login page
+        // Only redirect if we're in the browser and not on public pages
         if (typeof window !== 'undefined') {
           const currentPath = window.location.pathname;
-          if (!currentPath.startsWith('/auth/login')) {
+
+          // List of public routes that don't require authentication
+          const publicRoutes = [
+            '/', // Home page
+            '/shop', // Shop listing
+            '/about', // About page
+            '/faq', // FAQ page
+            '/generation', // Generation page
+          ];
+
+          // Check if current path is a public route or auth route
+          const isPublicRoute =
+            publicRoutes.includes(currentPath) ||
+            currentPath.startsWith('/shop/') || // Shop product pages
+            currentPath.startsWith('/auth/') || // Auth pages
+            currentPath.startsWith('/legal/'); // Legal pages
+
+          if (!isPublicRoute) {
             // Clear any auth-related state
             window.location.href = '/auth/login';
           }

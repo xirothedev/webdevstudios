@@ -12,6 +12,7 @@ export default defineConfig({
   schema: join(__dirname, 'prisma', 'schema'),
   migrations: {
     path: join(__dirname, 'prisma', 'migrations'),
+    seed: 'bun prisma/seed.ts',
   },
   datasource: {
     url: process.env['DATABASE_URL'],

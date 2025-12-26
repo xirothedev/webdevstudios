@@ -54,7 +54,7 @@ export default function CartPage() {
     );
   }
 
-  if (cartError || !cart || cart.items.length === 0) {
+  if (cartError || !cart || !cart.items || cart.items.length === 0) {
     return (
       <div className="bg-wds-background text-wds-text min-h-screen">
         <Navbar />
