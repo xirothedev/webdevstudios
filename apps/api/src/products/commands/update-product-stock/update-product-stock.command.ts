@@ -1,4 +1,4 @@
-import { ProductSize } from '@generated/prisma';
+import { ProductSize } from 'generated/prisma/client';
 
 export class UpdateProductStockCommand {
   constructor(

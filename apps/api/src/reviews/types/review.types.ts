@@ -1,4 +1,4 @@
-import { Product, Review, User } from '@generated/prisma';
+import { Product, Review, User } from 'generated/prisma/client';
 
 export type UserPublic = Pick<User, 'id' | 'fullName' | 'avatar'>;
 

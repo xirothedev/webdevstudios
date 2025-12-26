@@ -1,4 +1,4 @@
-import { ProductSize, ProductSlug } from '@generated/prisma';
+import { ProductSize, ProductSlug } from 'generated/prisma/client';
 
 export class GetProductStockQuery {
   constructor(

@@ -1,4 +1,4 @@
-import { OrderStatus } from '@generated/prisma';
+import { OrderStatus } from 'generated/prisma/client';
 
 export class UpdateOrderStatusCommand {
   constructor(

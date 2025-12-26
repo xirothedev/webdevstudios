@@ -1,6 +1,6 @@
-import { UserRole } from '@generated/prisma';
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { UserRole } from 'generated/prisma/client';
 
 import { UserRepository } from '../../../auth/infrastructure/user.repository';
 import { PrivateUserDto, PublicUserDto } from '../../dtos/user.dto';

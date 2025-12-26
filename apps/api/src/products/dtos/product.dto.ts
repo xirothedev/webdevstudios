@@ -1,5 +1,5 @@
-import { ProductSize, ProductSlug } from '@generated/prisma';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ProductSize, ProductSlug } from 'generated/prisma/client';
 
 export class ProductSizeStockDto {
   @ApiProperty({

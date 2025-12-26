@@ -1,5 +1,5 @@
-import { ProductSize } from '@generated/prisma';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ProductSize } from 'generated/prisma/client';
 
 export class CartItemDto {
   @ApiProperty({

@@ -1,4 +1,4 @@
-import { ProductSlug } from '@generated/prisma';
+import { ProductSlug } from 'generated/prisma/client';
 
 export class CreateReviewCommand {
   constructor(

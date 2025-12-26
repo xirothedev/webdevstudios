@@ -1,4 +1,3 @@
-import { DeviceType, MFAMethod } from '@generated/prisma';
 import {
   BadRequestException,
   Injectable,
@@ -7,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
+import { DeviceType, MFAMethod } from 'generated/prisma/client';
 import * as UAParser from 'ua-parser-js';
 
 import { PrismaService } from '../../../prisma/prisma.service';

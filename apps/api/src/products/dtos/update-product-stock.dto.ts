@@ -1,6 +1,6 @@
-import { ProductSize } from '@generated/prisma';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsPositive } from 'class-validator';
+import { ProductSize } from 'generated/prisma/client';
 
 export class UpdateProductStockDto {
   @ApiProperty({

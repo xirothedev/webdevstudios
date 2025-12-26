@@ -1,4 +1,4 @@
-import { UserRole } from '@generated/prisma';
+import { UserRole } from 'generated/prisma/client';
 
 export class UpdateUserCommand {
   constructor(

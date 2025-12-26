@@ -1,6 +1,6 @@
-import { SessionStatus } from '@generated/prisma';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SessionStatus } from 'generated/prisma/client';
 
 import { SessionRepository } from '../../infrastructure/session.repository';
 import { TokenService } from '../../infrastructure/token.service';

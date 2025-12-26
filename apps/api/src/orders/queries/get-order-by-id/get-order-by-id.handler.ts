@@ -1,6 +1,6 @@
-import { UserRole } from '@generated/prisma';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { UserRole } from 'generated/prisma/client';
 
 import { OrderDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';

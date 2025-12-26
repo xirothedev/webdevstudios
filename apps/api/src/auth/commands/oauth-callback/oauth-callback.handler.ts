@@ -1,8 +1,8 @@
-import { DeviceType, OAuthProvider } from '@generated/prisma';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
+import { DeviceType, OAuthProvider } from 'generated/prisma/client';
 import * as UAParser from 'ua-parser-js';
 
 import { PrismaService } from '../../../prisma/prisma.service';

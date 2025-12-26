@@ -1,10 +1,28 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [".env", ".env.*local"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.local"],
+      "env": [
+        "NEXT_PUBLIC_*",
+        "DATABASE_URL",
+        "CORS_ORIGIN",
+        "SESSION_SECRET",
+        "MAIL_*",
+        "JWT_*",
+        "GOOGLE_*",
+        "GITHUB_*",
+        "*_TOKEN_EXPIRES_IN",
+        "FRONTEND_URL",
+        "*_VERIFICATION_URL",
+        "*_RESET_URL",
+        "R2_*",
+        "REDIS_*",
+        "PORT"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -15,7 +33,25 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.local"],
+      "env": [
+        "NEXT_PUBLIC_*",
+        "DATABASE_URL",
+        "CORS_ORIGIN",
+        "SESSION_SECRET",
+        "MAIL_*",
+        "JWT_*",
+        "GOOGLE_*",
+        "GITHUB_*",
+        "*_TOKEN_EXPIRES_IN",
+        "FRONTEND_URL",
+        "*_VERIFICATION_URL",
+        "*_RESET_URL",
+        "R2_*",
+        "REDIS_*",
+        "PORT"
+      ]
     },
     "clean": {
       "cache": false

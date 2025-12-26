@@ -1,5 +1,5 @@
-import { Device, Session, SessionStatus, User } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
+import { Device, Session, SessionStatus, User } from 'generated/prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
 

@@ -21,7 +21,10 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     PrismaModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env.local', '../../.env', '.env.local', '.env'],
+    }),
     AuthModule,
     UsersModule,
     ProductsModule,

@@ -1,8 +1,8 @@
-import { OAuthProvider } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import axios from 'axios';
+import { OAuthProvider } from 'generated/prisma/client';
 import { Profile, Strategy } from 'passport-github2';
 
 @Injectable()
