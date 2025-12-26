@@ -31,8 +31,21 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
     let verifiedData;
     try {
       verifiedData = await this.payOSService.verifyWebhook(webhookData);
-    } catch {
-      this.logger.warn('Invalid webhook signature');
+    } catch (error) {
+      // For test webhooks during URL verification, PayOS might send invalid signatures
+      // Check if this looks like a test webhook
+      const paymentLinkId = webhookData.data?.paymentLinkId;
+      if (
+        !paymentLinkId ||
+        paymentLinkId === 'test' ||
+        paymentLinkId.includes('test')
+      ) {
+        this.logger.log('Test webhook received - URL verification successful');
+        return; // Return success for test webhooks
+      }
+      this.logger.warn(
+        `Invalid webhook signature: ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Invalid webhook signature');
     }
 
@@ -57,9 +70,17 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
       );
 
     if (!paymentTransaction) {
+      // This might be a test webhook from PayOS for URL verification
+      // Log but don't throw error - let controller handle gracefully
       this.logger.warn(
-        `Payment transaction not found: ${paymentData.paymentLinkId}`
+        `Payment transaction not found: ${paymentData.paymentLinkId}. This might be a test webhook.`
       );
+      // For test webhooks, we should still return success to verify URL
+      // Check if this looks like a test webhook (no real orderCode match)
+      if (!paymentData.paymentLinkId || paymentData.paymentLinkId === 'test') {
+        this.logger.log('Test webhook received - URL verification successful');
+        return;
+      }
       throw new NotFoundException('Payment transaction not found');
     }
 

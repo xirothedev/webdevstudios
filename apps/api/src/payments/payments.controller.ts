@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
   ApiBody,
@@ -7,6 +7,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { Public } from '@/common/decorators/public.decorator';
 
 import { CreatePaymentLinkCommand } from './commands/create-payment-link/create-payment-link.command';
 import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook/process-payment-webhook.command';
@@ -19,6 +21,8 @@ import {
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
+  private readonly logger = new Logger(PaymentsController.name);
+
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post('create-link')
@@ -49,6 +53,7 @@ export class PaymentsController {
   }
 
   @Post('webhook')
+  @Public()
   @ApiOperation({
     summary: 'PayOS webhook endpoint',
     description:
@@ -84,12 +89,30 @@ export class PaymentsController {
       signature: string;
     }
   ): Promise<{ success: boolean }> {
-    // PayOS webhook includes signature in the body
-    await this.commandBus.execute(
-      new ProcessPaymentWebhookCommand(webhookData)
-    );
+    try {
+      // PayOS webhook includes signature in the body
+      await this.commandBus.execute(
+        new ProcessPaymentWebhookCommand(webhookData)
+      );
 
-    return { success: true };
+      this.logger.log(
+        `Webhook processed successfully for paymentLinkId: ${webhookData.data?.paymentLinkId || 'unknown'}`
+      );
+
+      return { success: true };
+    } catch (error) {
+      // Log error but return 200 to PayOS to prevent retries for invalid webhooks
+      // This is important for webhook URL verification
+      this.logger.error(
+        `Webhook processing failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined
+      );
+
+      // For webhook URL verification, PayOS expects 200 response
+      // Even if we can't process the webhook, we should return 200
+      // to confirm the endpoint is reachable
+      return { success: false };
+    }
   }
 
   @Get('verify/:transactionCode')
