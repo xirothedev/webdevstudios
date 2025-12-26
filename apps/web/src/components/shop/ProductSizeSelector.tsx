@@ -3,14 +3,15 @@
 import { Check } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { ProductSize } from '@/lib/api/products';
 import { cn } from '@/lib/utils';
-import { ProductSize } from '@/types/product';
 
 interface ProductSizeSelectorProps {
   sizes: ProductSize[];
   selectedSize: ProductSize;
   onSizeChange: (size: ProductSize) => void;
   showSizeGuide?: boolean;
+  stockBySize?: Record<ProductSize, number>;
 }
 
 export function ProductSizeSelector({
@@ -18,6 +19,7 @@ export function ProductSizeSelector({
   selectedSize,
   onSizeChange,
   showSizeGuide = true,
+  stockBySize,
 }: ProductSizeSelectorProps) {
   return (
     <div className="mb-8">
@@ -27,12 +29,16 @@ export function ProductSizeSelector({
       <div className="flex flex-wrap gap-3">
         {sizes.map((size) => {
           const isSelected = selectedSize === size;
+          const stock = stockBySize?.[size] ?? undefined;
+          const isOutOfStock = stock !== undefined && stock === 0;
           return (
             <button
               key={size}
-              onClick={() => onSizeChange(size)}
+              onClick={() => !isOutOfStock && onSizeChange(size)}
+              disabled={isOutOfStock}
               className={cn(
                 'relative h-12 w-16 cursor-pointer rounded-xl border-2 transition-all duration-200',
+                isOutOfStock && 'cursor-not-allowed opacity-50',
                 isSelected
                   ? 'border-wds-accent bg-wds-accent/10 shadow-wds-accent/20 shadow-lg'
                   : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
@@ -41,7 +47,8 @@ export function ProductSizeSelector({
               <span
                 className={cn(
                   'text-sm font-semibold',
-                  isSelected ? 'text-wds-accent' : 'text-white/70'
+                  isSelected ? 'text-wds-accent' : 'text-white/70',
+                  isOutOfStock && 'line-through'
                 )}
               >
                 {size}
@@ -54,6 +61,11 @@ export function ProductSizeSelector({
                 >
                   <Check className="h-3 w-3 text-black" />
                 </motion.div>
+              )}
+              {stock !== undefined && stock > 0 && (
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] text-white/60">
+                  {stock}
+                </span>
               )}
             </button>
           );
