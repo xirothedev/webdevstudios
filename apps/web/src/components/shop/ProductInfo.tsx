@@ -3,6 +3,8 @@
 import { Star } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { formatPrice } from '@/lib/utils';
+
 interface ProductInfoProps {
   name: string;
   rating: {
@@ -25,10 +27,6 @@ export function ProductInfo({
   description,
   priceNote,
 }: ProductInfoProps) {
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN').format(amount);
-  };
-
   const discountPercentage = price.discount
     ? Math.round((price.discount / (price.original || price.current)) * 100)
     : null;
