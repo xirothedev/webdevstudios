@@ -1,56 +1,46 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-const FRONTEND_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+import { SITE_URL } from '@/lib/constants';
 
 export default function OAuthCallbackPage() {
-  useEffect(() => {
-    // This page is loaded in a popup window after OAuth callback
-    // Send message to parent window and close popup
+  const searchParams = useSearchParams();
 
-    const sendMessage = (
-      type: 'oauth-success' | 'oauth-error',
-      data?: unknown
-    ) => {
-      if (window.opener) {
-        // Verify origin for security
-        const allowedOrigin = new URL(FRONTEND_URL).origin;
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    const redirectUrl = searchParams.get('redirect_url');
+
+    if (window.opener) {
+      const allowedOrigin = new URL(SITE_URL).origin;
+
+      if (error) {
         window.opener.postMessage(
           {
-            type,
-            data,
+            type: 'oauth-error',
+            data: {
+              error,
+              errorDescription:
+                errorDescription || 'OAuth authentication failed',
+            },
+          },
+          allowedOrigin
+        );
+      } else {
+        window.opener.postMessage(
+          {
+            type: 'oauth-success',
+            data: { redirectUrl: redirectUrl || '/' },
           },
           allowedOrigin
         );
       }
-      // Close popup after sending message
-      setTimeout(() => {
-        window.close();
-      }, 100);
-    };
-
-    // Check if there's an error in URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    const errorDescription = urlParams.get('error_description');
-    const redirectUrl = urlParams.get('redirect_url');
-
-    if (error) {
-      sendMessage('oauth-error', {
-        error,
-        errorDescription: errorDescription || 'OAuth authentication failed',
-      });
-      return;
     }
 
-    // If no error, assume success (backend has set cookies)
-    // Include redirect_url in the message so parent can redirect after reload
-    sendMessage('oauth-success', {
-      redirectUrl: redirectUrl || '/',
-    });
-  }, []);
+    setTimeout(() => window.close(), 100);
+  }, [searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-black text-white">

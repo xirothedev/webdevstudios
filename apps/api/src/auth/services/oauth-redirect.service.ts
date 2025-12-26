@@ -63,8 +63,6 @@ export class OAuthRedirectService {
 
     if (redirectUrl) {
       callbackUrl.searchParams.set('redirect_url', redirectUrl);
-    } else {
-      callbackUrl.searchParams.set('redirect_url', '/');
     }
 
     return callbackUrl.toString();

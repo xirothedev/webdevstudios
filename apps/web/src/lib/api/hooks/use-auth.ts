@@ -6,16 +6,13 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { authApi } from '@/lib/api/auth.api';
+import { API_URL, SITE_URL } from '@/lib/constants';
 import type {
   LoginRequest,
   LoginResponse,
   OAuthProvider,
   RegisterRequest,
 } from '@/types/auth.types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const FRONTEND_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 // Query Keys
 export const authKeys = {
@@ -163,8 +160,8 @@ export function useRedirect() {
 
     // Validate redirect URL - only allow internal URLs
     try {
-      const url = new URL(redirectUrl, FRONTEND_URL);
-      const frontendOrigin = new URL(FRONTEND_URL).origin;
+      const url = new URL(redirectUrl, SITE_URL);
+      const frontendOrigin = new URL(SITE_URL).origin;
 
       // Only allow same origin redirects
       if (url.origin !== frontendOrigin) {
@@ -205,14 +202,9 @@ export function useOAuth() {
 
     setIsLoading(true);
 
-    // Build OAuth URL with redirect_url in state if provided
-    let oauthUrl = `${API_URL}/auth/oauth/${provider}`;
-    if (redirectUrl) {
-      const params = new URLSearchParams({
-        redirect_url: redirectUrl,
-      });
-      oauthUrl += `?${params.toString()}`;
-    }
+    const oauthUrl = redirectUrl
+      ? `${API_URL}/auth/oauth/${provider}?${new URLSearchParams({ redirect_url: redirectUrl }).toString()}`
+      : `${API_URL}/auth/oauth/${provider}`;
 
     // Calculate popup position (center of screen)
     const width = 500;
@@ -240,33 +232,23 @@ export function useOAuth() {
     // Listen for messages from popup
     const messageHandler = (event: MessageEvent) => {
       // Verify origin for security
-      const allowedOrigin = new URL(FRONTEND_URL).origin;
+      const allowedOrigin = new URL(SITE_URL).origin;
       if (event.origin !== allowedOrigin) {
         return;
       }
 
       if (event.data?.type === 'oauth-success') {
-        // OAuth successful
         popupRef.current?.close();
         popupRef.current = null;
 
-        const finalRedirectUrl = event.data.data?.redirectUrl || '/';
+        const redirectUrl = event.data.data?.redirectUrl || '/';
 
-        // Invalidate queries to refetch user data
         queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
-
         toast.success('Đăng nhập thành công!');
 
-        // Reload page to ensure cookies are available, then redirect
-        // Store redirect URL in sessionStorage to use after reload
-        if (finalRedirectUrl && finalRedirectUrl !== '/') {
-          sessionStorage.setItem('oauth_redirect_url', finalRedirectUrl);
-        }
-
-        // Reload page
+        sessionStorage.setItem('oauth_redirect_url', redirectUrl);
         window.location.reload();
       } else if (event.data?.type === 'oauth-error') {
-        // OAuth failed
         popupRef.current?.close();
         popupRef.current = null;
 
@@ -289,8 +271,8 @@ export function useOAuth() {
         setIsLoading(false);
         if (messageHandlerRef.current) {
           window.removeEventListener('message', messageHandlerRef.current);
-          messageHandlerRef.current = null;
         }
+        messageHandlerRef.current = null;
         popupRef.current = null;
       }
     }, 500);
