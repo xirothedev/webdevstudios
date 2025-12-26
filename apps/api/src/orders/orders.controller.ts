@@ -62,7 +62,15 @@ export class OrdersController {
     @Body() dto: CreateOrderDto
   ): Promise<OrderDto> {
     return this.commandBus.execute(
-      new CreateOrderCommand(user.id, dto.shippingAddress)
+      new CreateOrderCommand(
+        user.id,
+        dto.shippingAddress,
+        dto.orderType,
+        dto.productId,
+        dto.productSlug,
+        dto.size,
+        dto.quantity
+      )
     );
   }
 
