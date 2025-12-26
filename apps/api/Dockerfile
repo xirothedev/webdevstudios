@@ -14,10 +14,7 @@ COPY apps/api/package.json ./apps/api/
 COPY apps/api/prisma.config.ts ./apps/api/
 COPY apps/api/prisma ./apps/api/prisma
 COPY apps/api/tsconfig.json ./apps/api/
-RUN pnpm install --frozen-lockfile --ignore-scripts
-
-# Run postinstall script
-RUN pnpm -C apps/api exec prisma generate --schema=prisma/schema/base.prisma
+RUN pnpm install --frozen-lockfile
 
 # Builder stage
 FROM base AS builder
