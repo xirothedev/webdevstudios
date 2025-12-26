@@ -1,7 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../../prisma/prisma.service';
 import { UserListResponseDto } from '../../dtos/responses.dto';
 import { PrivateUserDto } from '../../dtos/user.dto';
 import { ListUsersQuery } from './list-users.query';

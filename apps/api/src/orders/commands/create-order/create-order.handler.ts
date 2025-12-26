@@ -11,9 +11,8 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CartRepository } from '@/cart/infrastructure/cart.repository';
-import { ProductRepository } from '@/products/infrastructure/product.repository';
-
+import { CartRepository } from '../../../cart/infrastructure/cart.repository';
+import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { OrderDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';
 import { OrderWithItems } from '../../types/order.types';

@@ -24,12 +24,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser } from '@/auth/decorators/current-user.decorator';
-import { Public } from '@/common/decorators/public.decorator';
-import { FileValidationPipe } from '@/storage/pipes/file-validation.pipe';
-
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { FileValidationPipe } from '../storage/pipes/file-validation.pipe';
 import { DeleteUserCommand } from './commands/delete-user/delete-user.command';
 import { UpdateAvatarCommand } from './commands/update-avatar/update-avatar.command';
 import { UpdateProfileCommand } from './commands/update-profile/update-profile.command';

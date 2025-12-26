@@ -1,8 +1,7 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductRepository } from '@/products/infrastructure/product.repository';
-
+import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { ReviewRepository } from '../../infrastructure/review.repository';
 import { DeleteReviewCommand } from './delete-review.command';
 

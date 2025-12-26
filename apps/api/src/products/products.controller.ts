@@ -18,8 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Public } from '@/common/decorators/public.decorator';
-
+import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { UpdateProductStockCommand } from './commands/update-product-stock/update-product-stock.command';

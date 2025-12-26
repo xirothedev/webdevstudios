@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { CartModule } from '@/cart/cart.module';
-import { PrismaModule } from '@/prisma/prisma.module';
-import { ProductsModule } from '@/products/products.module';
-
+import { CartModule } from '../cart/cart.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { ProductsModule } from '../products/products.module';
 // Commands
 import { CancelOrderHandler } from './commands/cancel-order/cancel-order.handler';
 import { CreateOrderHandler } from './commands/create-order/create-order.handler';

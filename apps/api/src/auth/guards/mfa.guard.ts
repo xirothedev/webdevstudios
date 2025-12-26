@@ -5,8 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../prisma/prisma.service';
 import { SessionRepository } from '../infrastructure/session.repository';
 import { TokenStorageService } from '../infrastructure/token-storage.service';
 

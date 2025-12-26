@@ -2,8 +2,7 @@ import { UserRole } from '@generated/prisma';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '@/auth/infrastructure/user.repository';
-
+import { UserRepository } from '../../../auth/infrastructure/user.repository';
 import { PrivateUserDto } from '../../dtos/responses.dto';
 import { UpdateUserCommand } from './update-user.command';
 

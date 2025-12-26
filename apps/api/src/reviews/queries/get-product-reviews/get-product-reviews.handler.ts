@@ -1,8 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { ProductRepository } from '@/products/infrastructure/product.repository';
-
+import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { ReviewDto, ReviewListResponseDto } from '../../dtos/review.dto';
 import { ReviewRepository } from '../../infrastructure/review.repository';
 import { ReviewWithRelations } from '../../types/review.types';

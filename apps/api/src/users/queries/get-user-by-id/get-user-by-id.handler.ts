@@ -2,8 +2,7 @@ import { UserRole } from '@generated/prisma';
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '@/auth/infrastructure/user.repository';
-
+import { UserRepository } from '../../../auth/infrastructure/user.repository';
 import { PrivateUserDto, PublicUserDto } from '../../dtos/user.dto';
 import { GetUserByIdQuery } from './get-user-by-id.query';
 

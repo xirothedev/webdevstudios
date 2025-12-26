@@ -9,8 +9,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
 import * as UAParser from 'ua-parser-js';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../../prisma/prisma.service';
 import { SessionRepository } from '../../infrastructure/session.repository';
 import { TokenService } from '../../infrastructure/token.service';
 import { TokenStorageService } from '../../infrastructure/token-storage.service';

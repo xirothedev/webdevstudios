@@ -5,8 +5,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import axios from 'axios';
 import * as UAParser from 'ua-parser-js';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../../prisma/prisma.service';
 import { SessionRepository } from '../../infrastructure/session.repository';
 import { TokenService } from '../../infrastructure/token.service';
 import { UserRepository } from '../../infrastructure/user.repository';

@@ -5,8 +5,7 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductRepository } from '@/products/infrastructure/product.repository';
-
+import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { ReviewDto } from '../../dtos/review.dto';
 import { ReviewRepository } from '../../infrastructure/review.repository';
 import { ReviewWithRelations } from '../../types/review.types';

@@ -16,8 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser } from '@/auth/decorators/current-user.decorator';
-
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AddToCartCommand } from './commands/add-to-cart/add-to-cart.command';
 import { ClearCartCommand } from './commands/clear-cart/clear-cart.command';
 import { RemoveFromCartCommand } from './commands/remove-from-cart/remove-from-cart.command';

@@ -2,8 +2,7 @@ import { DeviceType, OAuthProvider } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import * as UAParser from 'ua-parser-js';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../prisma/prisma.service';
 import { SessionRepository } from '../infrastructure/session.repository';
 import { TokenService } from '../infrastructure/token.service';
 import { TokenStorageService } from '../infrastructure/token-storage.service';

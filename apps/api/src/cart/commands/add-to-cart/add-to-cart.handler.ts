@@ -5,8 +5,7 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductRepository } from '@/products/infrastructure/product.repository';
-
+import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { CartDto, CartItemDto } from '../../dtos/cart.dto';
 import { CartRepository } from '../../infrastructure/cart.repository';
 import { CartWithItems } from '../../types/cart.types';

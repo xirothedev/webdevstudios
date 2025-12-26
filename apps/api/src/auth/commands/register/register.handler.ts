@@ -2,8 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
 
-import { MailService } from '@/mail/mail.service';
-
+import { MailService } from '../../../mail/mail.service';
 import { TokenService } from '../../infrastructure/token.service';
 import { TokenStorageService } from '../../infrastructure/token-storage.service';
 import { UserRepository } from '../../infrastructure/user.repository';

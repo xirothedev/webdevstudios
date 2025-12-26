@@ -19,8 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser } from '@/auth/decorators/current-user.decorator';
-
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CancelOrderCommand } from './commands/cancel-order/cancel-order.command';

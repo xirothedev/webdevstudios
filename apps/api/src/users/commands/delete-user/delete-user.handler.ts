@@ -1,8 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../../prisma/prisma.service';
 import { DeleteUserCommand } from './delete-user.command';
 
 @CommandHandler(DeleteUserCommand)

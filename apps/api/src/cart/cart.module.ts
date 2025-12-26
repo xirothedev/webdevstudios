@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { PrismaModule } from '@/prisma/prisma.module';
-import { ProductsModule } from '@/products/products.module';
-
+import { PrismaModule } from '../prisma/prisma.module';
+import { ProductsModule } from '../products/products.module';
 // Controller
 import { CartController } from './cart.controller';
 // Commands

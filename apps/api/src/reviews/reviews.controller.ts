@@ -20,9 +20,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser } from '@/auth/decorators/current-user.decorator';
-import { Public } from '@/common/decorators/public.decorator';
-
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { CreateReviewCommand } from './commands/create-review/create-review.command';
 import { DeleteReviewCommand } from './commands/delete-review/delete-review.command';
 import { UpdateReviewCommand } from './commands/update-review/update-review.command';

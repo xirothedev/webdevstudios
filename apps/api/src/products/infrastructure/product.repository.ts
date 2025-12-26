@@ -1,8 +1,7 @@
 import { Product, ProductSize, ProductSlug } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../prisma/prisma.service';
 import { ProductWithRelations } from '../types/product.types';
 
 @Injectable()

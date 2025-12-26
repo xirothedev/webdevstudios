@@ -2,9 +2,8 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 
-import { UserRepository } from '@/auth/infrastructure/user.repository';
-import { StorageService } from '@/storage/storage.service';
-
+import { UserRepository } from '../../../auth/infrastructure/user.repository';
+import { StorageService } from '../../../storage/storage.service';
 import { PrivateUserDto } from '../../dtos/responses.dto';
 import { UpdateAvatarCommand } from './update-avatar.command';
 

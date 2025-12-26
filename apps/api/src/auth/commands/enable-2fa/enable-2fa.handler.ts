@@ -7,8 +7,7 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
 
-import { PrismaService } from '@/prisma/prisma.service';
-
+import { PrismaService } from '../../../prisma/prisma.service';
 import { TotpService } from '../../infrastructure/totp.service';
 import { UserRepository } from '../../infrastructure/user.repository';
 import { Enable2FACommand } from './enable-2fa.command';

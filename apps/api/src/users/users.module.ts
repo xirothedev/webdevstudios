@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { AuthModule } from '@/auth/auth.module';
-import { StorageModule } from '@/storage/storage.module';
-
+import { AuthModule } from '../auth/auth.module';
 // Guards
 import { RolesGuard } from '../common/guards/roles.guard';
+import { StorageModule } from '../storage/storage.module';
 // Commands
 import { DeleteUserHandler } from './commands/delete-user/delete-user.handler';
 import { UpdateAvatarHandler } from './commands/update-avatar/update-avatar.handler';

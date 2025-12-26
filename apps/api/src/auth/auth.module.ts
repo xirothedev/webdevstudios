@@ -5,8 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { StringValue } from 'ms';
 
-import { MailModule } from '@/mail/mail.module';
-
+import { MailModule } from '../mail/mail.module';
 // Controller
 import { AuthController } from './auth.controller';
 // Commands

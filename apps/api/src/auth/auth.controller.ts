@@ -22,9 +22,8 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 
-import { Public } from '@/common/decorators/public.decorator';
-import { JwtAuthGuard } from '@/common/guards/jwt.guard';
-
+import { Public } from '../common/decorators/public.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt.guard';
 // Commands
 import { Enable2FACommand } from './commands/enable-2fa/enable-2fa.command';
 import { LoginCommand } from './commands/login/login.command';
