@@ -37,16 +37,16 @@ export const cartApi = {
    * Get user's cart
    */
   async getCart(): Promise<Cart> {
-    const response = await apiClient.get<Cart>('/cart');
-    return response.data;
+    const response = await apiClient.get<{ data: Cart }>('/cart');
+    return response.data.data;
   },
 
   /**
    * Add item to cart
    */
   async addToCart(data: AddToCartRequest): Promise<Cart> {
-    const response = await apiClient.post<Cart>('/cart/items', data);
-    return response.data;
+    const response = await apiClient.post<{ data: Cart }>('/cart/items', data);
+    return response.data.data;
   },
 
   /**
@@ -56,26 +56,28 @@ export const cartApi = {
     cartItemId: string,
     data: UpdateCartItemRequest
   ): Promise<Cart> {
-    const response = await apiClient.patch<Cart>(
+    const response = await apiClient.patch<{ data: Cart }>(
       `/cart/items/${cartItemId}`,
       data
     );
-    return response.data;
+    return response.data.data;
   },
 
   /**
    * Remove item from cart
    */
   async removeFromCart(cartItemId: string): Promise<Cart> {
-    const response = await apiClient.delete<Cart>(`/cart/items/${cartItemId}`);
-    return response.data;
+    const response = await apiClient.delete<{ data: Cart }>(
+      `/cart/items/${cartItemId}`
+    );
+    return response.data.data;
   },
 
   /**
    * Clear cart
    */
   async clearCart(): Promise<Cart> {
-    const response = await apiClient.delete<Cart>('/cart');
-    return response.data;
+    const response = await apiClient.delete<{ data: Cart }>('/cart');
+    return response.data.data;
   },
 };

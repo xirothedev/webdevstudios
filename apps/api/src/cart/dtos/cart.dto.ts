@@ -1,5 +1,15 @@
 import { ProductSize } from '@generated/prisma';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CartItemDto {
   @ApiProperty({
@@ -105,6 +115,8 @@ export class AddToCartDto {
     description: 'Product ID',
     example: 'clx1234567890',
   })
+  @IsString()
+  @IsNotEmpty()
   productId: string;
 
   @ApiPropertyOptional({
@@ -112,6 +124,8 @@ export class AddToCartDto {
     enum: ProductSize,
     example: ProductSize.M,
   })
+  @IsEnum(ProductSize)
+  @IsOptional()
   size?: ProductSize;
 
   @ApiProperty({
@@ -119,6 +133,10 @@ export class AddToCartDto {
     example: 1,
     minimum: 1,
   })
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @Min(1)
   quantity: number;
 }
 
@@ -128,5 +146,9 @@ export class UpdateCartItemDto {
     example: 2,
     minimum: 1,
   })
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @Min(1)
   quantity: number;
 }

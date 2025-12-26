@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 
+import { QueryDevtools } from '@/components/ReactQueryDevtools';
 import { StructuredData } from '@/components/StructuredData';
 import { AuthProvider } from '@/contexts/auth.context';
 import {
@@ -79,6 +80,7 @@ export default function RootLayout({
               <Toaster position="top-center" theme="dark" richColors />
             </AuthProvider>
           </Suspense>
+          <QueryDevtools />
         </QueryClientProvider>
       </body>
     </html>

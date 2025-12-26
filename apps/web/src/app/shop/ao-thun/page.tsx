@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
@@ -13,6 +14,7 @@ import { ProductInfo } from '@/components/shop/ProductInfo';
 import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
 import { ProductSizeGuide } from '@/components/shop/ProductSizeGuide';
 import { ProductSizeSelector } from '@/components/shop/ProductSizeSelector';
+import { useAddToCart } from '@/lib/api/hooks/use-cart';
 import { useProduct } from '@/lib/api/hooks/use-products';
 import { getBackendSlug } from '@/lib/product-slug-mapping';
 import { getProductStaticContent } from '@/lib/product-static-content';
@@ -23,7 +25,6 @@ const BACKEND_SLUG = getBackendSlug('ao-thun');
 export default function AoThunPage() {
   const [selectedSize, setSelectedSize] = useState<ProductSize>('M');
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Fetch product data from API
   const { data: product, isLoading, error } = useProduct(BACKEND_SLUG);
@@ -31,12 +32,39 @@ export default function AoThunPage() {
   // Get static content (images, features, additionalInfo)
   const staticContent = getProductStaticContent(BACKEND_SLUG);
 
+  // Add to cart mutation
+  const addToCartMutation = useAddToCart();
+
   const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsAddingToCart(false);
-    // TODO: Add to cart logic
+    if (!product) return;
+
+    // Validation: ensure size is selected
+    if (!selectedSize) {
+      toast.error('Vui lòng chọn size');
+      return;
+    }
+
+    // Calculate stock for selected size
+    const stockBySize = product.sizeStocks?.reduce(
+      (acc, ss) => {
+        acc[ss.size] = ss.stock;
+        return acc;
+      },
+      {} as Record<ProductSize, number>
+    );
+    const selectedSizeStock = stockBySize?.[selectedSize] ?? product.stock ?? 0;
+
+    // Validation: quantity must be valid
+    if (quantity <= 0 || quantity > selectedSizeStock) {
+      toast.error('Số lượng không hợp lệ');
+      return;
+    }
+
+    addToCartMutation.mutate({
+      productId: product.id,
+      size: selectedSize,
+      quantity,
+    });
   };
 
   const handleBuyNow = () => {
@@ -168,7 +196,7 @@ export default function AoThunPage() {
               <ProductActions
                 onAddToCart={handleAddToCart}
                 onBuyNow={handleBuyNow}
-                isAddingToCart={isAddingToCart}
+                isAddingToCart={addToCartMutation.isPending}
               />
 
               {/* Product Features */}

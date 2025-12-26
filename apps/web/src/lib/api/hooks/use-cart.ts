@@ -1,6 +1,11 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import {
@@ -18,6 +23,16 @@ export const cartKeys = {
 // Query: Get user's cart
 export function useCart() {
   return useQuery({
+    queryKey: cartKeys.current(),
+    queryFn: () => cartApi.getCart(),
+    staleTime: 30 * 1000, // 30 seconds
+    retry: false,
+  });
+}
+
+// Suspense Query: Get user's cart (for Suspense boundary)
+export function useSuspenseCart() {
+  return useSuspenseQuery({
     queryKey: cartKeys.current(),
     queryFn: () => cartApi.getCart(),
     staleTime: 30 * 1000, // 30 seconds

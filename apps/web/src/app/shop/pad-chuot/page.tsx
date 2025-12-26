@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
@@ -11,6 +12,7 @@ import { ProductFeatures } from '@/components/shop/ProductFeatures';
 import { ProductImageGallery } from '@/components/shop/ProductImageGallery';
 import { ProductInfo } from '@/components/shop/ProductInfo';
 import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
+import { useAddToCart } from '@/lib/api/hooks/use-cart';
 import { useProduct } from '@/lib/api/hooks/use-products';
 import { getBackendSlug } from '@/lib/product-slug-mapping';
 import { getProductStaticContent } from '@/lib/product-static-content';
@@ -19,7 +21,6 @@ const BACKEND_SLUG = getBackendSlug('pad-chuot');
 
 export default function PadChuotPage() {
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Fetch product data from API
   const { data: product, isLoading, error } = useProduct(BACKEND_SLUG);
@@ -27,12 +28,22 @@ export default function PadChuotPage() {
   // Get static content (images, features, additionalInfo)
   const staticContent = getProductStaticContent(BACKEND_SLUG);
 
+  // Add to cart mutation
+  const addToCartMutation = useAddToCart();
+
   const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsAddingToCart(false);
-    // TODO: Add to cart logic
+    if (!product) return;
+
+    // Validation: quantity must be valid
+    if (quantity <= 0 || quantity > product.stock) {
+      toast.error('Số lượng không hợp lệ');
+      return;
+    }
+
+    addToCartMutation.mutate({
+      productId: product.id,
+      quantity,
+    });
   };
 
   const handleBuyNow = () => {
@@ -134,7 +145,7 @@ export default function PadChuotPage() {
               <ProductActions
                 onAddToCart={handleAddToCart}
                 onBuyNow={handleBuyNow}
-                isAddingToCart={isAddingToCart}
+                isAddingToCart={addToCartMutation.isPending}
               />
 
               {/* Product Features */}

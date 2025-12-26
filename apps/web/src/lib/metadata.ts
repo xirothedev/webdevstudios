@@ -14,6 +14,7 @@ export const SEO_IMAGES: Record<string, string> = {
   '/shop/moc-khoa': '/seo/shop/moc-khoa.webp',
   '/shop/day-deo': '/seo/shop/day-deo.webp',
   '/shop/pad-chuot': '/seo/shop/pad-chuot.webp',
+  '/cart': '/seo/shop.webp',
   '/generation': '/seo/generation.webp',
   '/faq': '/seo/faq.webp',
   '/terms': '/seo/legal/terms.webp',
