@@ -44,7 +44,8 @@ model Order {
   discountValue Decimal @default(0) @db.Money
 
   // Snapshot địa chỉ giao hàng (Lưu cứng dữ liệu text để không bị đổi khi user sửa profile)
-  shippingAddressJson Json @db.JsonB
+  shippingAddressId String           @unique
+  shippingAddress   ShippingAddress  @relation(fields: [shippingAddressId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -52,6 +53,28 @@ model Order {
   items OrderItem[]
 
   @@map("orders")
+}
+
+/**
+ * Địa chỉ giao hàng (Snapshot tại thời điểm đặt hàng)
+ */
+model ShippingAddress {
+  id          String @id @default(cuid())
+  fullName    String @db.VarChar(255)
+  phone       String @db.VarChar(20)
+  addressLine1 String @db.VarChar(255)
+  addressLine2 String? @db.VarChar(255)
+  city        String @db.VarChar(100)
+  district    String @db.VarChar(100)
+  ward        String @db.VarChar(100)
+  postalCode  String @db.VarChar(20)
+
+  order Order?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shipping_addresses")
 }
 
 // Lưu lại trạng thái sản phẩm TẠI THỜI ĐIỂM MUA (Snapshot)
