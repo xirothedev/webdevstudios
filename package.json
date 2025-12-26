@@ -6,6 +6,7 @@
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "format": "prettier --write \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && pnpm format",
     "format:check": "prettier --check \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && pnpm format:check",
     "clean": "turbo run clean",
