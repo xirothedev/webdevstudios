@@ -5,7 +5,10 @@ import type {
   RefreshTokenResponse,
   RegisterRequest,
   RegisterResponse,
+  RequestPasswordResetResponse,
+  ResetPasswordResponse,
   User,
+  Verify2FAResponse,
   VerifyEmailResponse,
 } from '@/types/auth.types';
 
@@ -64,6 +67,47 @@ export const authApi = {
     const response = await apiClient.post<RefreshTokenResponse>(
       '/auth/refresh',
       refreshToken ? { refreshToken } : {}
+    );
+    return response.data;
+  },
+
+  /**
+   * Request password reset
+   */
+  async requestPasswordReset(
+    email: string
+  ): Promise<RequestPasswordResetResponse> {
+    const response = await apiClient.post<RequestPasswordResetResponse>(
+      '/auth/password/reset-request',
+      { email }
+    );
+    return response.data;
+  },
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(
+    token: string,
+    newPassword: string
+  ): Promise<ResetPasswordResponse> {
+    const response = await apiClient.post<ResetPasswordResponse>(
+      '/auth/password/reset',
+      { token, newPassword }
+    );
+    return response.data;
+  },
+
+  /**
+   * Verify 2FA code
+   */
+  async verify2FA(
+    code: string,
+    sessionId?: string
+  ): Promise<Verify2FAResponse> {
+    const response = await apiClient.post<Verify2FAResponse>(
+      '/auth/2fa/verify',
+      { code, sessionId }
     );
     return response.data;
   },

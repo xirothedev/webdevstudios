@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -225,9 +226,10 @@ export class AuthController {
     @Body('refreshToken') refreshToken?: string
   ) {
     // Get refresh token from cookie if not provided in body
+    console.log(req.cookies);
     const token = refreshToken || req.cookies?.refresh_token;
     if (!token) {
-      throw new Error('Refresh token is required');
+      throw new BadRequestException('Refresh token is required');
     }
 
     const result = await this.commandBus.execute(

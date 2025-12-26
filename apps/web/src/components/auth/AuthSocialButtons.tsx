@@ -1,16 +1,15 @@
 'use client';
 
-import { useOAuth, useRedirect } from '@/lib/api/hooks/use-auth';
+import { useOAuth } from '@/lib/api/hooks/use-auth';
 import type { OAuthProvider } from '@/types/auth.types';
 
 import { SocialButton } from './SocialButton';
 
 export function AuthSocialButtons() {
-  const { redirectUrl } = useRedirect();
   const { initiateOAuth, isLoading } = useOAuth();
 
   const handleOAuth = (provider: OAuthProvider) => {
-    initiateOAuth(provider, redirectUrl);
+    initiateOAuth(provider);
   };
 
   return (

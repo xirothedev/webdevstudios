@@ -1,269 +1,236 @@
-<!-- c8bcadfb-35b8-4fd4-ab55-faf05d646cd7 49069ee0-0d08-4ad9-b358-abf96af21533 -->
+<!-- c8bcadfb-35b8-4fd4-ab55-faf05d646cd7 f4b21232-1fbd-4615-8ad8-e7a89bc898a8 -->
 
-# Kế hoạch tích hợp API Authentication với OAuth Popup Flow
+# Kế hoạch implement các tính năng Auth còn lại
 
 ## Tổng quan
 
-Backend đã có đầy đủ endpoints cho authentication:
+Backend đã có đầy đủ endpoints:
 
-- Login/Register (đã có hooks)
-- OAuth (Google & GitHub) - backend xử lý toàn bộ flow
-- Refresh token - cần implement
-- Logout/Current user (đã có hooks)
+- ✅ Login/Register - Đã implement
+- ✅ OAuth - Đã implement
+- ✅ Verify Email - Đã implement
+- ❌ Forgot Password (Request Reset) - Cần implement
+- ❌ Reset Password - Cần implement
+- ❌ 2FA Verification (Login flow) - Cần implement
+- ❌ 2FA Enable (Settings) - Có thể làm sau
+- ❌ Sessions Management - Có thể làm sau
 
-Frontend cần:
+## Các tính năng cần implement
 
-- Login/Signup pages với forms (đã có)
-- OAuth popup flow (mới)
-- Redirect URL handling từ query params (mới)
-- Hook tái sử dụng cho OAuth và redirect logic (mới)
+### 1. Forgot Password Flow
 
-## OAuth Popup Flow
+- User nhập email → Gửi request reset password
+- Backend gửi email với reset token
+- User click link trong email → Redirect về reset password page
 
-1. User click OAuth button → Mở popup window với `${API_URL}/auth/oauth/{provider}`
-2. Popup redirect đến OAuth provider (Google/GitHub)
-3. OAuth provider callback về `${API_URL}/auth/oauth/{provider}/callback`
-4. Backend xử lý, set cookies, và redirect về frontend callback page
-5. Callback page (trong popup) gửi message về parent window và tự đóng
-6. Parent window nhận message → Reload page → Redirect về `redirect_url` (nếu có)
+### 2. Reset Password Flow
+
+- User nhập token (từ URL) và password mới
+- Submit → Backend verify token và update password
+- Redirect về login page
+
+### 3. 2FA Verification Flow
+
+- User login với 2FA enabled → Redirect đến 2FA page
+- User nhập 6-digit code từ authenticator app
+- Verify → Complete login
 
 ## Các bước thực hiện
 
-### 1. Tạo OAuth Callback Page (`apps/web/src/app/auth/oauth/callback/page.tsx`)
+### Phase 0: Fix Login Redirect Bug
 
-Tạo page để handle OAuth callback trong popup:
+#### 0.1. Fix useRedirect Hook (`apps/web/src/lib/api/hooks/use-auth.ts`)
 
-- Page này sẽ được load trong popup window
-- Backend redirect về đây sau khi OAuth thành công
-- Page gửi `postMessage` về parent window với success status
-- Tự động đóng popup sau khi gửi message
-- Handle error cases (gửi error message về parent)
+- Vấn đề: `useRedirect()` đang return `'/'` làm default ngay cả khi không có `redirect_url` trong query params
+- Giải pháp: Chỉ return `'/'` khi thực sự cần redirect, không nên default về `/` khi user đang ở auth pages
+- Thay đổi: `getRedirectUrl()` chỉ return `redirectUrl` nếu có, không default về `/`
+- Cập nhật `useLogin` và `useRegister` để chỉ redirect khi có `redirectUrl` thực sự
 
-**Lưu ý**: Backend cần redirect về `${FRONTEND_URL}/auth/oauth/callback` thay vì home page
+#### 0.2. Fix Login Success Redirect (`apps/web/src/lib/api/hooks/use-auth.ts`)
 
-### 2. Tạo useOAuth Hook (`apps/web/src/lib/api/hooks/use-auth.ts`)
+- **Vấn đề**: Login thành công luôn redirect về `redirectUrl || '/'` ngay cả khi không có redirectUrl, dẫn đến tự động redirect về home page mà chưa hề đăng nhập
+- **Giải pháp**:
+- Chỉ redirect khi có `redirectUrl` rõ ràng từ query params
+- Nếu không có `redirectUrl`, chỉ invalidate queries và show success message, không redirect
+- User có thể tự quyết định đi đâu sau khi login thành công (có thể thêm button "Đi đến trang chủ" nếu muốn)
 
-Tạo hook để handle OAuth popup flow:
+#### 0.3. Fix Register Success Redirect (`apps/web/src/lib/api/hooks/use-auth.ts`)
 
-- `useOAuth()` hook:
-  - Mở popup window với OAuth URL
-  - Listen `message` event từ popup
-  - Handle success: Invalidate queries, show toast, redirect
-  - Handle error: Show error toast
-  - Cleanup: Remove event listeners khi unmount
+- **Vấn đề**: Tương tự như login, register cũng có thể có vấn đề redirect
+- **Giải pháp**: Áp dụng logic tương tự như login - chỉ redirect khi có `redirectUrl`, nếu không thì redirect về login page (vì register xong cần verify email)
 
-### 3. Tạo useRedirect Hook (`apps/web/src/lib/api/hooks/use-auth.ts` hoặc file riêng)
+### Phase 1: Forgot Password & Reset Password
 
-Tạo hook để handle redirect URL:
+#### 1.1. Cập nhật Types (`apps/web/src/types/auth.types.ts`)
 
-- `useRedirect()` hook:
-  - Read `redirect_url` từ query params (useSearchParams)
-  - Return redirect function
-  - Default redirect về home (`/`) nếu không có `redirect_url`
-  - Validate redirect URL (chỉ cho phép internal URLs, tránh open redirect)
+- Thêm `RequestPasswordResetRequest` interface
+- Thêm `ResetPasswordRequest` interface
+- Thêm `RequestPasswordResetResponse` interface
+- Thêm `ResetPasswordResponse` interface
 
-### 4. Cập nhật SocialButton Component (`apps/web/src/components/auth/SocialButton.tsx`)
+#### 1.2. Mở rộng Auth API Client (`apps/web/src/lib/api/auth.api.ts`)
 
-Cập nhật để sử dụng OAuth popup:
+- Thêm `requestPasswordReset(email: string)` function
+- Thêm `resetPassword(token: string, newPassword: string)` function
 
-- Thêm `onClick` handler gọi `useOAuth` hook
-- Pass `redirect_url` từ current page query params
-- Handle loading state (disable button khi popup đang mở)
+#### 1.3. Tạo Auth Hooks (`apps/web/src/lib/api/hooks/use-auth.ts`)
 
-### 5. Tích hợp vào Login Page (`apps/web/src/app/auth/login/page.tsx`)
+- Thêm `useRequestPasswordReset()` hook
+- Thêm `useResetPassword()` hook
 
-- Sử dụng `useRedirect` hook để get redirect URL
-- Pass redirect URL vào `useOAuth` hook
-- Sau khi login thành công, redirect về `redirect_url` hoặc home
+#### 1.4. Tạo Forgot Password Page (`apps/web/src/app/auth/forgot-password/page.tsx`)
 
-### 6. Tích hợp vào Register Page (`apps/web/src/app/auth/signup/page.tsx`)
+- Form với email input
+- Validation với Zod
+- Sử dụng `useRequestPasswordReset` hook
+- Show success message sau khi submit
+- Link quay lại login page
 
-- Sử dụng `useRedirect` hook để get redirect URL
-- Pass redirect URL vào `useOAuth` hook
-- Sau khi register thành công, redirect về `redirect_url` hoặc login page
+#### 1.5. Tạo Reset Password Page (`apps/web/src/app/auth/reset-password/page.tsx`)
 
-### 7. Cập nhật Login/Register Hooks (`apps/web/src/lib/api/hooks/use-auth.ts`)
+- Read token từ query params
+- Form với password và confirm password inputs
+- Validation với Zod (password match, min length)
+- Sử dụng `useResetPassword` hook
+- Show success message và redirect về login
+- Handle error cases (invalid/expired token)
 
-Cập nhật `useLogin` và `useRegister`:
+### Phase 2: 2FA Verification
 
-- Accept `redirectUrl` parameter
-- Redirect về `redirectUrl` sau khi success (thay vì hardcode)
+#### 2.1. Cập nhật Types (`apps/web/src/types/auth.types.ts`)
 
-### 8. Cập nhật Types (`apps/web/src/types/auth.types.ts`)
+- Thêm `Verify2FARequest` interface
+- Thêm `Verify2FAResponse` interface
+- Thêm `Enable2FAResponse` interface (cho tương lai)
 
-Thêm types:
+#### 2.2. Mở rộng Auth API Client (`apps/web/src/lib/api/auth.api.ts`)
 
-- `RefreshTokenRequest` và `RefreshTokenResponse`
-- OAuth provider type: `'google' | 'github'`
+- Thêm `verify2FA(code: string, sessionId?: string)` function
 
-### 9. Mở rộng Auth API Client (`apps/web/src/lib/api/auth.api.ts`)
+#### 2.3. Tạo Auth Hooks (`apps/web/src/lib/api/hooks/use-auth.ts`)
 
-Thêm function:
+- Thêm `useVerify2FA()` hook
+- Cập nhật `useLogin` để handle 2FA redirect (đã có sẵn)
 
-- `refreshToken(refreshToken?: string)` - Refresh access token
+#### 2.4. Tạo 2FA Verification Page (`apps/web/src/app/auth/2fa/page.tsx`)
 
-### 10. Cập nhật API Client Interceptor (`apps/web/src/lib/api-client.ts`)
+- Form với 6-digit code input
+- Auto-focus và auto-submit khi đủ 6 digits
+- Sử dụng `useVerify2FA` hook
+- Read `sessionId` từ query params hoặc store trong sessionStorage
+- Show loading state
+- Handle success: Invalidate queries, redirect về home
+- Handle error: Show error message, allow retry
 
-Thêm logic tự động refresh token:
+### Phase 3: Optional Features (Có thể làm sau)
 
-- Intercept 401 responses
-- Tự động gọi refresh token API
-- Retry original request với token mới
-- Handle refresh token expiration (redirect to login)
+#### 3.1. Sessions Management
 
-## Auth Flows
+- GET /auth/sessions endpoint
+- Display active sessions
+- Allow revoke sessions
 
-**Login Flow:**
+#### 3.2. 2FA Enable (Settings)
 
-- Form submit → `useLogin(redirectUrl)` → API call → Handle response → Redirect về `redirectUrl` hoặc home
-- OAuth: Click button → Popup → OAuth flow → Popup đóng → Reload → Redirect về `redirect_url`
-
-**Register Flow:**
-
-- Form submit → `useRegister(redirectUrl)` → API call → Show success → Redirect về `redirectUrl` hoặc login
-- OAuth: Click button → Popup → OAuth flow → Popup đóng → Reload → Redirect về `redirect_url`
-
-**OAuth Popup Flow:**
-
-1. Click button → `useOAuth(provider, redirectUrl)` → Mở popup
-2. Popup: Backend OAuth flow → Redirect về `/auth/oauth/callback`
-3. Callback page: Gửi `postMessage` → Đóng popup
-4. Parent: Nhận message → Invalidate queries → Reload → Redirect về `redirectUrl`
+- POST /auth/2fa/enable endpoint
+- Display QR code
+- Show backup codes
+- Verify setup
 
 ## Files cần tạo/sửa
 
 ### Files mới:
 
-- `apps/web/src/app/auth/oauth/callback/page.tsx` - OAuth callback handler trong popup
+- `apps/web/src/app/auth/forgot-password/page.tsx` - Forgot password form
+- `apps/web/src/app/auth/reset-password/page.tsx` - Reset password form với token
+- `apps/web/src/app/auth/2fa/page.tsx` - 2FA verification form
 
 ### Files cần sửa:
 
-- `apps/web/src/types/auth.types.ts` - Thêm refresh token và OAuth types
-- `apps/web/src/lib/api/auth.api.ts` - Thêm refresh token function
-- `apps/web/src/lib/api-client.ts` - Thêm refresh token interceptor
-- `apps/web/src/lib/api/hooks/use-auth.ts` - Thêm `useOAuth` và `useRedirect` hooks, cập nhật `useLogin` và `useRegister`
-- `apps/web/src/components/auth/SocialButton.tsx` - Thêm onClick handler với popup flow
-- `apps/web/src/app/auth/login/page.tsx` - Tích hợp redirect URL logic
-- `apps/web/src/app/auth/signup/page.tsx` - Tích hợp redirect URL logic
+- `apps/web/src/types/auth.types.ts` - Thêm password reset và 2FA types
+- `apps/web/src/lib/api/auth.api.ts` - Thêm password reset và 2FA API functions
+- `apps/web/src/lib/api/hooks/use-auth.ts` - Thêm password reset và 2FA hooks
+- `apps/web/src/app/auth/login/page.tsx` - Thêm link "Quên mật khẩu?"
 
-## Kiến trúc Flow
+## Auth Flows
 
-```
-┌─────────────┐
-│   Frontend  │
-│   Button    │
-└──────┬──────┘
-       │ Click → useOAuth()
-       ▼
-┌──────────────┐
-│ Open Popup   │
-│ window.open()│
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐      ┌─────────────┐
-│ Popup:       │ ───▶ │   Google/   │
-│ Backend      │      │   GitHub    │
-│ /auth/oauth/ │      │   OAuth     │
-│ {provider}   │      └──────┬──────┘
-└──────────────┘             │
-                             ▼
-                    ┌──────────────┐
-                    │   Provider   │
-                    │   Callback   │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Backend      │
-                    │ /auth/oauth/ │
-                    │ {provider}/  │
-                    │  callback    │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Set Cookies  │
-                    │ + Redirect   │
-                    │ to Frontend  │
-                    │ /auth/oauth/ │
-                    │ callback     │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Callback Page│
-                    │ (in Popup)    │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ postMessage  │
-                    │ to Parent    │
-                    │ + Close Popup│
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Parent Window│
-                    │ Receive Msg  │
-                    └──────┬──────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Invalidate   │
-                    │ Queries      │
-                    │ + Reload     │
-                    │ + Redirect   │
-                    │ to redirect_ │
-                    │ url          │
-                    └──────────────┘
-```
+**Forgot Password Flow:**
 
-## Lưu ý quan trọng
+1. User click "Quên mật khẩu?" trên login page
+2. Redirect đến `/auth/forgot-password`
+3. User nhập email → Submit
+4. Show success message: "Vui lòng kiểm tra email để reset mật khẩu"
+5. Backend gửi email với reset link: `${SITE_URL}/auth/reset-password?token=...`
+6. User click link → Redirect về reset password page
 
-1. **Popup Window**:
-   - Size: ~500x600px, centered
-   - Features: `width=500,height=600,left=...,top=...,resizable=yes,scrollbars=yes`
-   - Check popup blocked: Handle nếu browser block popup
+**Reset Password Flow:**
 
-2. **PostMessage Security**:
-   - Verify `event.origin` trước khi xử lý message
-   - Chỉ accept messages từ frontend origin
-   - Message format: `{ type: 'oauth-success' | 'oauth-error', data?: any }`
+1. User vào `/auth/reset-password?token=...`
+2. Read token từ query params
+3. User nhập password mới và confirm
+4. Submit → Backend verify token và update password
+5. Show success message → Redirect về login page
 
-3. **Redirect URL Validation**:
-   - Chỉ cho phép internal URLs (same origin)
-   - Tránh open redirect vulnerability
-   - Default về `/` nếu invalid
+**2FA Verification Flow:**
 
-4. **Backend Redirect URL**:
-   - Backend cần redirect về `${FRONTEND_URL}/auth/oauth/callback` thay vì home
-   - Có thể pass `redirect_url` trong state parameter của OAuth flow
+1. User login với 2FA enabled
+2. `useLogin` detect `requires2FA: true`
+3. Redirect đến `/auth/2fa?sessionId=...` (nếu có)
+4. User nhập 6-digit code
+5. Submit → Backend verify code
+6. Success → Set cookies, invalidate queries, redirect về home
 
-5. **Cookies**: Backend đã set httpOnly cookies, sẽ tự động có sau khi reload
+## UI/UX Considerations
 
-6. **Error Handling**:
-   - Popup errors → Gửi error message về parent
-   - Network errors → Show toast
-   - User cancels OAuth → Popup đóng, không làm gì
+### Forgot Password Page:
+
+- Simple form với email input
+- Success state: Show message với icon
+- Link quay lại login
+- Consistent với login/signup design (glass-card style)
+
+### Reset Password Page:
+
+- Form với password và confirm password
+- Show token validation error nếu invalid
+- Success state: Show message và auto-redirect
+- Consistent với login/signup design
+
+### 2FA Page:
+
+- 6-digit code input (có thể dùng 6 separate inputs hoặc 1 input với pattern)
+- Auto-focus và auto-submit khi đủ 6 digits
+- Loading state khi verifying
+- Error state với retry option
+- Link "Quay lại đăng nhập" nếu user muốn cancel
+
+## Security Considerations
+
+1. **Token Validation**: Reset password token chỉ valid một lần và có expiration
+2. **Rate Limiting**: Backend đã handle rate limiting cho password reset requests
+3. **2FA Code**: 6-digit code có expiration time (thường 30 giây)
+4. **Session ID**: 2FA verification cần sessionId để link với login attempt
 
 ## Dependencies
 
 Không cần thêm dependencies mới, sử dụng:
 
 - `@tanstack/react-query` (đã có)
-- `axios` (đã có)
-- `next/navigation` (đã có)
+- `react-hook-form` với `zodResolver` (đã có)
+- `zod` (đã có)
 - `sonner` cho toast (đã có)
-- Browser APIs: `window.open`, `window.postMessage`, `window.addEventListener`
+- `next/navigation` (đã có)
 
 ### To-dos
 
-- [ ] Cập nhật auth.types.ts với OAuth và refresh token types
-- [ ] Thêm OAuth và refresh token functions vào auth.api.ts
-- [ ] Thêm automatic refresh token logic vào api-client.ts interceptor
-- [ ] Tạo useOAuth và useRefreshToken hooks trong use-auth.ts
-- [ ] Kết nối OAuth buttons với useOAuth hook trong SocialButton.tsx
-- [ ] Tạo OAuth callback page để handle OAuth redirect từ backend
-- [ ] Test tất cả auth flows: login, register, OAuth, refresh token
+- [ ] Cập nhật auth.types.ts với password reset types
+- [ ] Thêm requestPasswordReset và resetPassword functions vào auth.api.ts
+- [ ] Tạo useRequestPasswordReset và useResetPassword hooks
+- [ ] Tạo forgot password page với form và validation
+- [ ] Tạo reset password page với token validation
+- [ ] Thêm link Quên mật khẩu? vào login page
+- [ ] Cập nhật auth.types.ts với 2FA types
+- [ ] Thêm verify2FA function vào auth.api.ts
+- [ ] Tạo useVerify2FA hook
+- [ ] Tạo 2FA verification page với 6-digit code input
+- [ ] Test tất cả auth flows: forgot password, reset password, 2FA

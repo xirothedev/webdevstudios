@@ -8,7 +8,7 @@ import { AuthLayout } from '@/components/auth/AuthLayout';
 import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useRedirect, useRegister } from '@/lib/api/hooks/use-auth';
+import { useRegister } from '@/lib/api/hooks/use-auth';
 
 // Validation schema với Zod
 const signupSchema = z
@@ -41,8 +41,7 @@ export default function SignupPage() {
     },
   });
 
-  const { redirectUrl } = useRedirect();
-  const registerMutation = useRegister(redirectUrl);
+  const registerMutation = useRegister();
 
   const onSubmit = (data: SignupFormData) => {
     // Remove confirmPassword before sending to API

@@ -56,3 +56,44 @@ export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface RequestPasswordResetRequest {
+  email: string;
+}
+
+export interface RequestPasswordResetResponse {
+  success: boolean;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+}
+
+export interface Verify2FARequest {
+  code: string;
+  sessionId?: string;
+}
+
+export interface Verify2FAResponse {
+  accessToken?: string;
+  refreshToken?: string;
+  user?: {
+    id: string;
+    email: string;
+    fullName: string | null;
+    emailVerified: boolean;
+    mfaEnabled: boolean;
+  };
+  verified?: boolean;
+}
+
+export interface Enable2FAResponse {
+  qrCode: string;
+  secret: string;
+  backupCodes: string[];
+}

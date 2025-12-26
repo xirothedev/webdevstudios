@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -43,8 +43,37 @@ export function useCurrentUser() {
   });
 }
 
+// Helper function to get redirect URL from query params
+function getRedirectUrlFromQuery(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectUrl = searchParams.get('redirect_url');
+  if (!redirectUrl) {
+    return null;
+  }
+
+  // Validate redirect URL - only allow internal URLs
+  try {
+    const url = new URL(redirectUrl, SITE_URL);
+    const frontendOrigin = new URL(SITE_URL).origin;
+
+    // Only allow same origin redirects
+    if (url.origin !== frontendOrigin) {
+      return null;
+    }
+
+    return url.pathname + url.search;
+  } catch {
+    // Invalid URL, return null
+    return null;
+  }
+}
+
 // Mutation: Login
-export function useLogin(redirectUrl?: string) {
+export function useLogin() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -62,9 +91,12 @@ export function useLogin(redirectUrl?: string) {
       await queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
       toast.success('Đăng nhập thành công!');
 
-      // Redirect to provided URL or home
-      const finalRedirectUrl = redirectUrl || '/';
-      router.push(finalRedirectUrl);
+      // Get redirect URL from query params only after successful login
+      const redirectUrl = getRedirectUrlFromQuery();
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      }
+      // If no redirectUrl, stay on login page - user can navigate manually
     },
     onError: (error: unknown) => {
       const errorMessage =
@@ -77,7 +109,7 @@ export function useLogin(redirectUrl?: string) {
 }
 
 // Mutation: Register
-export function useRegister(redirectUrl?: string) {
+export function useRegister() {
   const router = useRouter();
 
   return useMutation({
@@ -87,7 +119,9 @@ export function useRegister(redirectUrl?: string) {
         'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.'
       );
 
-      // Redirect to provided URL or login page
+      // Get redirect URL from query params only after successful register
+      const redirectUrl = getRedirectUrlFromQuery();
+      // Register always redirects to login for email verification, unless redirect_url is provided
       const finalRedirectUrl = redirectUrl || '/auth/login';
       router.push(finalRedirectUrl);
     },
@@ -147,43 +181,78 @@ export function useVerifyEmail() {
   });
 }
 
-// Hook: Get redirect URL from query params
-export function useRedirect() {
-  const searchParams = useSearchParams();
+// Mutation: Request Password Reset
+export function useRequestPasswordReset() {
+  return useMutation({
+    mutationFn: (email: string) => authApi.requestPasswordReset(email),
+    onSuccess: () => {
+      toast.success(
+        'Vui lòng kiểm tra email để nhận link reset mật khẩu. Nếu không thấy email, vui lòng kiểm tra thư mục spam.'
+      );
+    },
+    onError: (error: unknown) => {
+      // Backend always returns success for security, but handle errors just in case
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Không thể gửi email reset mật khẩu. Vui lòng thử lại sau.';
+      toast.error(errorMessage);
+    },
+  });
+}
+
+// Mutation: Reset Password
+export function useResetPassword() {
   const router = useRouter();
 
-  const getRedirectUrl = (): string => {
-    const redirectUrl = searchParams.get('redirect_url');
-    if (!redirectUrl) {
-      return '/';
-    }
+  return useMutation({
+    mutationFn: (data: { token: string; newPassword: string }) =>
+      authApi.resetPassword(data.token, data.newPassword),
+    onSuccess: () => {
+      toast.success('Đặt lại mật khẩu thành công!');
+      setTimeout(() => {
+        router.push('/auth/login');
+      }, 2000);
+    },
+    onError: (error: unknown) => {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Token không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.';
+      toast.error(errorMessage);
+    },
+  });
+}
 
-    // Validate redirect URL - only allow internal URLs
-    try {
-      const url = new URL(redirectUrl, SITE_URL);
-      const frontendOrigin = new URL(SITE_URL).origin;
+// Mutation: Verify 2FA
+export function useVerify2FA() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
-      // Only allow same origin redirects
-      if (url.origin !== frontendOrigin) {
-        return '/';
+  return useMutation({
+    mutationFn: (data: { code: string; sessionId?: string }) =>
+      authApi.verify2FA(data.code, data.sessionId),
+    onSuccess: async (response) => {
+      // If login flow (has tokens), invalidate queries and redirect
+      if (response.accessToken && response.refreshToken) {
+        await queryClient.invalidateQueries({
+          queryKey: authKeys.currentUser(),
+        });
+        toast.success('Xác thực 2FA thành công!');
+        router.push('/');
+      } else {
+        // Setup flow (just verified)
+        toast.success('2FA đã được kích hoạt thành công!');
       }
-
-      return url.pathname + url.search;
-    } catch {
-      // Invalid URL, default to home
-      return '/';
-    }
-  };
-
-  const redirect = (defaultPath: string = '/') => {
-    const redirectUrl = getRedirectUrl();
-    router.push(redirectUrl || defaultPath);
-  };
-
-  return {
-    redirectUrl: getRedirectUrl(),
-    redirect,
-  };
+    },
+    onError: (error: unknown) => {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Mã xác thực không hợp lệ. Vui lòng thử lại.';
+      toast.error(errorMessage);
+    },
+  });
 }
 
 // Hook: OAuth popup flow
@@ -195,13 +264,15 @@ export function useOAuth() {
     null
   );
 
-  const initiateOAuth = (provider: OAuthProvider, redirectUrl?: string) => {
+  const initiateOAuth = (provider: OAuthProvider) => {
     if (isLoading) {
       return;
     }
 
     setIsLoading(true);
 
+    // Get redirect URL from query params
+    const redirectUrl = getRedirectUrlFromQuery();
     const oauthUrl = redirectUrl
       ? `${API_URL}/auth/oauth/${provider}?${new URLSearchParams({ redirect_url: redirectUrl }).toString()}`
       : `${API_URL}/auth/oauth/${provider}`;

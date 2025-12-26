@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -8,7 +9,7 @@ import { AuthLayout } from '@/components/auth/AuthLayout';
 import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useLogin, useRedirect } from '@/lib/api/hooks/use-auth';
+import { useLogin } from '@/lib/api/hooks/use-auth';
 
 // Validation schema với Zod
 const loginSchema = z.object({
@@ -37,8 +38,7 @@ export default function LoginPage() {
     },
   });
 
-  const { redirectUrl } = useRedirect();
-  const loginMutation = useLogin(redirectUrl);
+  const loginMutation = useLogin();
   const rememberMe = watch('rememberMe');
 
   const onSubmit = (data: LoginFormData) => {
@@ -97,6 +97,14 @@ export default function LoginPage() {
             {errors.password && (
               <p className="text-sm text-red-400">{errors.password.message}</p>
             )}
+            <div className="flex justify-end">
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-white/70 transition-colors hover:text-white"
+              >
+                Quên mật khẩu?
+              </Link>
+            </div>
           </div>
 
           <div className="flex items-center">
