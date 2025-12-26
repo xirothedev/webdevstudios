@@ -51,6 +51,7 @@ model Order {
   updatedAt DateTime @updatedAt
 
   items OrderItem[]
+  paymentTransaction PaymentTransaction?
 
   @@map("orders")
 }

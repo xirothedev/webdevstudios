@@ -1,0 +1,26 @@
+// =========================================
+// PAYMENT SYSTEM
+// =========================================
+
+model PaymentTransaction {
+  id              String                   @id @default(cuid())
+  orderId         String                   @unique
+  order           Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  transactionCode String                   @unique // PayOS transaction code
+  amount          Decimal                  @db.Money
+  status          PaymentTransactionStatus @default(PENDING)
+  paymentUrl      String? // URL để redirect
+  payosData       Json? // Lưu raw data từ PayOS
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@map("payment_transactions")
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+  FAILED
+}
