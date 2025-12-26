@@ -10,11 +10,9 @@ FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
-# Copy Prisma schema and config for postinstall script
-COPY apps/api/prisma.config.ts ./apps/api/
-COPY apps/api/prisma ./apps/api/prisma
-COPY apps/api/tsconfig.json ./apps/api/
-RUN pnpm install --frozen-lockfile
+# Disable postinstall scripts to avoid Prisma generate during install
+# Prisma client will be generated in builder stage instead
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Builder stage
 FROM base AS builder
