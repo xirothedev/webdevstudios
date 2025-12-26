@@ -194,4 +194,47 @@ export class OrderRepository {
 
     return code;
   }
+
+  async findPendingOrdersByUserId(userId: string): Promise<OrderWithItems[]> {
+    return this.prisma.order.findMany({
+      where: {
+        userId,
+        status: OrderStatus.PENDING,
+        paymentStatus: PaymentStatus.PENDING,
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+          orderBy: { id: 'asc' },
+        },
+        shippingAddress: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findExpiredPendingOrders(): Promise<OrderWithItems[]> {
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+
+    return this.prisma.order.findMany({
+      where: {
+        status: OrderStatus.PENDING,
+        paymentStatus: PaymentStatus.PENDING,
+        createdAt: {
+          lt: fifteenMinutesAgo,
+        },
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+          orderBy: { id: 'asc' },
+        },
+        shippingAddress: true,
+      },
+    });
+  }
 }
