@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +14,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { EventsModule } from './events/events.module';
 import { MailModule } from './mail/mail.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { ReviewsModule } from './reviews/reviews.module';
@@ -26,11 +28,13 @@ import { UsersModule } from './users/users.module';
       isGlobal: true,
       envFilePath: ['.env'],
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
     ProductsModule,
     CartModule,
     OrdersModule,
+    PaymentsModule,
     ReviewsModule,
     EventsModule,
     JwtModule.registerAsync({
