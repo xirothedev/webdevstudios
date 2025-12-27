@@ -15,6 +15,28 @@ async function bootstrap() {
   // Set global prefix for all routes
   app.setGlobalPrefix('v1');
 
+  // Disable for error in OAuth callback
+  // app.use(
+  //   helmet({
+  //     contentSecurityPolicy: {
+  //       directives: {
+  //         defaultSrc: ["'self'"],
+  //         styleSrc: ["'self'", "'unsafe-inline'"],
+  //         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+  //         imgSrc: ["'self'", 'data:', 'https:'],
+  //         connectSrc: [
+  //           "'self'",
+  //           'https://oauth2.googleapis.com',
+  //           'https://www.googleapis.com',
+  //           'https://github.com',
+  //           'https://api.github.com',
+  //         ],
+  //       },
+  //     },
+  //     crossOriginEmbedderPolicy: false,
+  //   })
+  // );
+
   // Enable cookie parser for JWT tokens
   app.use(cookieParser());
   app.set('trust proxy', true);
