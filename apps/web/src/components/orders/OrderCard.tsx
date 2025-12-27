@@ -87,7 +87,7 @@ export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
   };
 
   return (
-    <div className="group hover:border-wds-accent/30 rounded-xl border border-white/10 bg-white/5 p-6 transition-all">
+    <div className="group hover:border-wds-accent/30 flex h-full flex-col rounded-xl border border-white/10 bg-white/5 p-6 transition-all">
       {/* Header */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex-1">
@@ -148,7 +148,7 @@ export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-white/10 pt-4">
         <Link
           href={`/orders/${order.id}`}
           className="text-wds-accent hover:text-wds-accent/80 inline-flex items-center gap-1 text-sm font-medium transition-colors"
