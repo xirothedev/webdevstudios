@@ -40,7 +40,7 @@ export class OAuthRedirectService {
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: 'lax', // Always lax for multiple ports/subdomains
       maxAge: 15 * 60 * 1000, // 15 minutes
       path: '/',
     });
@@ -48,7 +48,7 @@ export class OAuthRedirectService {
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: 'lax', // Always lax for multiple ports/subdomains
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });

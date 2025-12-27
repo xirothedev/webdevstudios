@@ -153,7 +153,7 @@ export class AuthController {
       res.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: 'lax', // Always lax for multiple ports/subdomains
         maxAge: 15 * 60 * 1000, // 15 minutes
         path: '/',
       });
@@ -162,7 +162,7 @@ export class AuthController {
       res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: 'lax', // Always lax for multiple ports/subdomains
         maxAge,
         path: '/',
       });
@@ -252,7 +252,7 @@ export class AuthController {
     res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: 'lax', // Always lax for multiple ports/subdomains
       maxAge: 15 * 60 * 1000, // 15 minutes
       path: '/',
     });
@@ -261,7 +261,7 @@ export class AuthController {
     res.cookie('refresh_token', result.refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: 'lax', // Always lax for multiple ports/subdomains
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/',
     });
@@ -428,7 +428,7 @@ export class AuthController {
       res.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: 'lax', // Always lax for multiple ports/subdomains
         maxAge: 15 * 60 * 1000, // 15 minutes
         path: '/',
       });
@@ -436,7 +436,7 @@ export class AuthController {
       res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: 'lax', // Always lax for multiple ports/subdomains
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
       });

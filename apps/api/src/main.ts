@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 
 import { AppModule } from './app.module';
+import { CsrfMiddleware } from './common/middleware/csrf.middleware';
+import { CsrfService } from './common/services/csrf.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -40,14 +42,24 @@ async function bootstrap() {
   // Enable cookie parser for JWT tokens
   app.use(cookieParser());
   app.set('trust proxy', true);
+
+  const isProduction = process.env.NODE_ENV === 'production';
   app.use(
     session({
       secret: configService.getOrThrow<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: true,
-      cookie: { secure: true },
+      cookie: {
+        secure: isProduction,
+        sameSite: 'lax', // Always lax for multiple ports/subdomains
+      },
     })
   );
+
+  // Setup CSRF protection
+  const csrfService = app.get(CsrfService);
+  const csrfMiddleware = new CsrfMiddleware(csrfService);
+  app.use(csrfMiddleware.use.bind(csrfMiddleware));
   // Enable CORS
   app.enableCors({
     origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
@@ -58,6 +70,7 @@ async function bootstrap() {
       'Authorization',
       'Accept',
       'X-Requested-With',
+      'X-CSRF-Token',
     ],
     exposedHeaders: ['Content-Type', 'Authorization'],
   });

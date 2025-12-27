@@ -12,6 +12,7 @@ import { CartModule } from './cart/cart.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { CsrfService } from './common/services/csrf.service';
 import { ThrottlerRedisStorage } from './common/storage/throttler-redis.storage';
 import { EventsModule } from './events/events.module';
 import { MailModule } from './mail/mail.module';
@@ -83,6 +84,7 @@ import { UsersModule } from './users/users.module';
   controllers: [AppController],
   providers: [
     AppService,
+    CsrfService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
