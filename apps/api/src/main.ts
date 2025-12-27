@@ -18,6 +18,23 @@ async function bootstrap() {
   // Set global prefix for all routes
   app.setGlobalPrefix('v1');
 
+  // Enable CORS first - Must be before any other middleware
+  app.enableCors({
+    origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+      'X-CSRF-Token',
+    ],
+    exposedHeaders: ['Content-Type', 'Authorization'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
+
   // Disable for error in OAuth callback
   // app.use(
   //   helmet({
@@ -61,20 +78,6 @@ async function bootstrap() {
   const csrfService = app.get(CsrfService);
   const csrfMiddleware = new CsrfMiddleware(csrfService);
   app.use(csrfMiddleware.use.bind(csrfMiddleware));
-  // Enable CORS
-  app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Accept',
-      'X-Requested-With',
-      'X-CSRF-Token',
-    ],
-    exposedHeaders: ['Content-Type', 'Authorization'],
-  });
 
   // Global validation pipe
   app.useGlobalPipes(
