@@ -38,8 +38,33 @@ alwaysApply: true
 ### Code Style
 - **Formatting**: Prettier với Tailwind plugin
 - **Linting**: ESLint với Next.js và NestJS configs
-- **Imports**: Sorted imports (simple-import-sort)
+- **Imports**: Sorted imports (simple-import-sort) - **MANDATORY**
 - **Comments**: Comment cho complex logic, JSDoc cho public APIs
+
+### Import Order (simple-import-sort)
+Imports **MUST** be sorted theo thứ tự sau (tự động bởi ESLint):
+
+1. **Side effects** (`import '...'`) - Imports không có binding
+2. **Node built-ins** (`import fs from 'node:fs'`) - Node.js built-in modules
+3. **External libraries** (`import { ... } from '@nestjs/common'`) - Third-party packages
+4. **Path aliases** (`import { ... } from '@/common'`) - Internal path aliases (nếu có)
+5. **Relative imports** (`import { ... } from './file'`) - Relative imports
+
+**Example**:
+```typescript
+// ✅ CORRECT - Đúng thứ tự
+import 'reflect-metadata'; // Side effects
+import { Injectable } from '@nestjs/common'; // External
+import { CommandBus } from '@nestjs/cqrs'; // External
+import { PrismaService } from '../prisma/prisma.service'; // Relative
+import { CreateUserCommand } from './create-user.command'; // Relative
+
+// ❌ WRONG - Sai thứ tự
+import { CreateUserCommand } from './create-user.command'; // Relative trước
+import { Injectable } from '@nestjs/common'; // External sau
+```
+
+**Auto-fix**: Chạy `pnpm lint --fix` để tự động sắp xếp imports
 
 ### File Organization
 - **One Export Per File**: Mỗi file chỉ export một main thing (component, function, class)
@@ -51,6 +76,7 @@ alwaysApply: true
 ### Before Committing
 - [ ] Code đã được lint và format
 - [ ] TypeScript không có errors
+- [ ] Imports đã được sắp xếp đúng thứ tự (simple-import-sort)
 - [ ] Không có console.log hoặc debug code
 - [ ] Comments rõ ràng cho complex logic
 - [ ] Error handling đầy đủ
@@ -213,6 +239,8 @@ cd apps/api && pnpm prisma:generate
 - ❌ Commit `.env` files
 - ❌ Break CQRS pattern (backend)
 - ❌ Use `'use client'` không cần thiết (frontend)
+- ❌ Import lại Global modules trong feature modules
+- ❌ Import statements không đúng thứ tự (phải theo simple-import-sort)
 
 ### ✅ Do This Instead
 - ✅ Lint và format trước khi commit
@@ -224,6 +252,9 @@ cd apps/api && pnpm prisma:generate
 - ✅ Use `.env.example` template
 - ✅ Follow CQRS pattern
 - ✅ Prefer Server Components
+- ✅ Inject Global module services trực tiếp (không cần import module)
+- ✅ Sắp xếp imports theo thứ tự: side effects → node built-ins → external → path aliases → relative
+- ✅ Chạy `pnpm lint --fix` để auto-fix import order
 
 ## 📊 Performance Best Practices
 
@@ -253,6 +284,41 @@ cd apps/api && pnpm prisma:generate
 - **Input Validation**: class-validator
 - **SQL Injection**: Prisma protects against SQL injection
 - **Rate Limiting**: Implement rate limiting
+
+## 🔌 NestJS Module Best Practices
+
+### Global Modules
+- **Definition**: Modules được đánh dấu `@Global()` có thể được inject vào bất kỳ module nào mà không cần import
+- **Current Global Modules**: 
+  - `PrismaModule` - Database access
+  - `RedisModule` - Redis operations
+  - `ConfigModule` - Environment configuration (với `isGlobal: true`)
+
+### Rules for Global Modules
+1. **DO NOT import Global modules** trong feature modules (AuthModule, ProductsModule, etc.)
+2. **DO import Global modules** chỉ ở `AppModule` để đảm bảo chúng được load
+3. **DO inject Global services directly** - Chỉ cần inject service, không cần import module
+4. **Example**:
+   ```typescript
+   // ❌ WRONG - Import lại Global module
+   @Module({
+     imports: [PrismaModule, RedisModule], // Không cần!
+   })
+   
+   // ✅ CORRECT - Inject service trực tiếp
+   @Module({})
+   export class SomeModule {
+     constructor(
+       private readonly prisma: PrismaService, // Tự động available
+       private readonly redis: RedisService    // Tự động available
+     ) {}
+   }
+   ```
+
+### Benefits
+- **Cleaner imports**: Giảm số lượng imports không cần thiết
+- **Better performance**: Tránh duplicate module loading
+- **Easier maintenance**: Centralized module management
 
 ## 📝 Logging & Monitoring
 
