@@ -22,7 +22,7 @@ export async function getCsrfToken(): Promise<string> {
 
   // Fetch new token
   tokenPromise = axios
-    .get<{ csrfToken: string }>(`${API_URL}/v1/csrf-token`, {
+    .get<{ csrfToken: string }>(`${API_URL}/csrf-token`, {
       withCredentials: true, // Include cookies for session
     })
     .then((response) => {
