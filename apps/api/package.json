@@ -12,6 +12,7 @@
     "prisma:migrate": "pnpm exec prisma migrate dev",
     "prisma:studio": "pnpm exec prisma studio",
     "prisma:seed": "pnpm exec prisma db seed",
+    "prisma:seed:user": "bun prisma/user.seed.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
