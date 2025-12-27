@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthLoading } from '@/components/auth/AuthLoading';
 import { Button } from '@/components/ui/button';
 import { useVerifyEmail } from '@/lib/api/hooks/use-auth';
 
@@ -110,9 +111,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <AuthLayout variant="login">
-          <div className="space-y-4 text-center">
-            <h2 className="text-2xl font-semibold text-white">Đang tải...</h2>
-          </div>
+          <AuthLoading />
         </AuthLayout>
       }
     >

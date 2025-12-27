@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { PageLoading } from '@/components/common/PageLoading';
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -59,9 +60,7 @@ export default function PaymentPage() {
 
   if (isLoadingOrder) {
     return (
-      <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
-        <div className="text-white">Đang tải...</div>
-      </div>
+      <PageLoading variant="dark" message="Đang tải thông tin thanh toán..." />
     );
   }
 

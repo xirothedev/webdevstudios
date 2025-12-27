@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthLoading } from '@/components/auth/AuthLoading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useVerify2FA } from '@/lib/api/hooks/use-auth';
@@ -141,13 +142,7 @@ export default function Verify2FAPage() {
     <Suspense
       fallback={
         <AuthLayout variant="login">
-          <div className="glass-card">
-            <div className="space-y-4 text-center">
-              <h2 className="text-2xl font-bold text-white drop-shadow-lg">
-                Đang tải...
-              </h2>
-            </div>
-          </div>
+          <AuthLoading />
         </AuthLayout>
       }
     >

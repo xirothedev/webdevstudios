@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { PageLoading } from '@/components/common/PageLoading';
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -165,11 +166,7 @@ export default function CheckoutPage() {
   };
 
   if (isLoadingCart && !isBuyNow) {
-    return (
-      <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
-        <div className="text-white">Đang tải...</div>
-      </div>
-    );
+    return <PageLoading variant="dark" message="Đang tải giỏ hàng..." />;
   }
 
   if (!isBuyNow && (cartError || !cart || cart.items.length === 0)) {
