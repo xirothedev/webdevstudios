@@ -6,6 +6,7 @@ import {
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { SecurityLoggerService } from '@/common/services/security-logger.service';
 import { OrderRepository } from '@/orders/infrastructure/order.repository';
 import { ProductRepository } from '@/products/infrastructure/product.repository';
 
@@ -21,7 +22,8 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
     private readonly paymentRepository: PaymentRepository,
     private readonly orderRepository: OrderRepository,
     private readonly productRepository: ProductRepository,
-    private readonly payOSService: PayOSService
+    private readonly payOSService: PayOSService,
+    private readonly securityLogger: SecurityLoggerService
   ) {}
 
   async execute(command: ProcessPaymentWebhookCommand): Promise<void> {
@@ -43,9 +45,16 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
         this.logger.log('Test webhook received - URL verification successful');
         return; // Return success for test webhooks
       }
-      this.logger.warn(
-        `Invalid webhook signature: ${error instanceof Error ? error.message : String(error)}`
+
+      // Log webhook signature failure for security monitoring (A08: Data Integrity)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Invalid webhook signature: ${errorMessage}`);
+      await this.securityLogger.logWebhookSignatureFailure(
+        '/v1/payments/webhook',
+        undefined // IP address not available in handler context
       );
+
       throw new BadRequestException('Invalid webhook signature');
     }
 
