@@ -23,6 +23,13 @@ import {
 import type { Request, Response } from 'express';
 
 import { Public } from '../common/decorators/public.decorator';
+import {
+  Throttle2FA,
+  ThrottleOAuth,
+  ThrottlePasswordReset,
+  ThrottleRefresh,
+  ThrottleStrict,
+} from '../common/decorators/throttle.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt.guard';
 // Commands
 import { Enable2FACommand } from './commands/enable-2fa/enable-2fa.command';
@@ -71,6 +78,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @ThrottleStrict()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -94,6 +102,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleStrict()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -191,6 +200,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleRefresh()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -347,6 +357,7 @@ export class AuthController {
     return this.queryBus.execute(new GetSessionsQuery(user.id));
   }
 
+  @Throttle2FA()
   @Post('2fa/enable')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -372,6 +383,7 @@ export class AuthController {
     return this.commandBus.execute(new Enable2FACommand(user.id));
   }
 
+  @Throttle2FA()
   @Post('2fa/verify')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -434,6 +446,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleOAuth()
   @Get('oauth/google')
   @UseGuards(GoogleOAuthGuard)
   @ApiOperation({
@@ -468,6 +481,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleOAuth()
   @Get('oauth/google/callback')
   @UseGuards(GoogleOAuthGuard)
   @ApiOperation({
@@ -512,6 +526,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleOAuth()
   @Get('oauth/github')
   @UseGuards(GitHubOAuthGuard)
   @ApiOperation({
@@ -546,6 +561,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottleOAuth()
   @Get('oauth/github/callback')
   @UseGuards(GitHubOAuthGuard)
   @ApiOperation({
@@ -590,6 +606,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottlePasswordReset()
   @Post('password/reset-request')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -608,6 +625,7 @@ export class AuthController {
   }
 
   @Public()
+  @ThrottlePasswordReset()
   @Post('password/reset')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

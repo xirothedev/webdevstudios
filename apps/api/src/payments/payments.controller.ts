@@ -9,6 +9,10 @@ import {
 } from '@nestjs/swagger';
 
 import { Public } from '@/common/decorators/public.decorator';
+import {
+  ThrottleAPI,
+  ThrottlePayment,
+} from '@/common/decorators/throttle.decorator';
 
 import { CreatePaymentLinkCommand } from './commands/create-payment-link/create-payment-link.command';
 import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook/process-payment-webhook.command';
@@ -25,6 +29,7 @@ export class PaymentsController {
 
   constructor(private readonly commandBus: CommandBus) {}
 
+  @ThrottlePayment()
   @Post('create-link')
   @ApiOperation({
     summary: 'Create payment link for order',
@@ -115,6 +120,7 @@ export class PaymentsController {
     }
   }
 
+  @ThrottleAPI()
   @Get('verify/:transactionCode')
   @ApiOperation({
     summary: 'Verify payment status',

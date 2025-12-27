@@ -3,7 +3,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { CartModule } from '../cart/cart.module';
-import { PrismaModule } from '../prisma/prisma.module';
 import { ProductsModule } from '../products/products.module';
 // Commands
 import { CancelOrderHandler } from './commands/cancel-order/cancel-order.handler';
@@ -31,13 +30,7 @@ const CommandHandlers = [
 const QueryHandlers = [GetOrderByIdHandler, ListOrdersHandler];
 
 @Module({
-  imports: [
-    CqrsModule,
-    ScheduleModule,
-    PrismaModule,
-    CartModule,
-    ProductsModule,
-  ],
+  imports: [CqrsModule, ScheduleModule, CartModule, ProductsModule],
   controllers: [OrdersController],
   providers: [
     ...CommandHandlers,

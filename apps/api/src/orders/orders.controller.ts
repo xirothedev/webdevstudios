@@ -21,6 +21,7 @@ import {
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { ThrottleAPI } from '../common/decorators/throttle.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CancelOrderCommand } from './commands/cancel-order/cancel-order.command';
 import { CreateOrderCommand } from './commands/create-order/create-order.command';
@@ -42,6 +43,7 @@ export class OrdersController {
     private readonly queryBus: QueryBus
   ) {}
 
+  @ThrottleAPI()
   @Post()
   @ApiBearerAuth()
   @ApiOperation({

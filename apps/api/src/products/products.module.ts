@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { PrismaModule } from '../prisma/prisma.module';
 // Commands
 import { UpdateProductStockHandler } from './commands/update-product-stock/update-product-stock.handler';
 // Repository
@@ -22,7 +21,7 @@ const QueryHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, PrismaModule],
+  imports: [CqrsModule],
   controllers: [ProductsController],
   providers: [...CommandHandlers, ...QueryHandlers, ProductRepository],
   exports: [ProductRepository],

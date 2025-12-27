@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { PrismaModule } from '../prisma/prisma.module';
 import { ProductsModule } from '../products/products.module';
 // Controller
 import { CartController } from './cart.controller';
@@ -25,7 +24,7 @@ const CommandHandlers = [
 const QueryHandlers = [GetCartHandler];
 
 @Module({
-  imports: [CqrsModule, PrismaModule, ProductsModule],
+  imports: [CqrsModule, ProductsModule],
   controllers: [CartController],
   providers: [...CommandHandlers, ...QueryHandlers, CartRepository],
   exports: [CartRepository],

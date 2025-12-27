@@ -92,4 +92,34 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async del(key: string): Promise<void> {
     await this.client.del(key);
   }
+
+  // Methods for Throttler support
+  async get(key: string): Promise<string | null> {
+    return this.client.get(key);
+  }
+
+  async set(
+    key: string,
+    value: string,
+    expiryMode: 'EX' | 'PX',
+    time: number
+  ): Promise<void> {
+    if (expiryMode === 'EX') {
+      await this.client.setex(key, time, value);
+    } else {
+      await this.client.psetex(key, time, value);
+    }
+  }
+
+  async exists(key: string): Promise<number> {
+    return this.client.exists(key);
+  }
+
+  async ttl(key: string): Promise<number> {
+    return this.client.ttl(key);
+  }
+
+  async incr(key: string): Promise<number> {
+    return this.client.incr(key);
+  }
 }

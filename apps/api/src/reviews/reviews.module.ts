@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { OrdersModule } from '../orders/orders.module';
-import { PrismaModule } from '../prisma/prisma.module';
 import { ProductsModule } from '../products/products.module';
 // Commands
 import { CreateReviewHandler } from './commands/create-review/create-review.handler';
@@ -24,7 +23,7 @@ const CommandHandlers = [
 const QueryHandlers = [GetProductReviewsHandler];
 
 @Module({
-  imports: [CqrsModule, PrismaModule, ProductsModule, OrdersModule],
+  imports: [CqrsModule, ProductsModule, OrdersModule],
   controllers: [ReviewsController],
   providers: [...CommandHandlers, ...QueryHandlers, ReviewRepository],
   exports: [ReviewRepository],
