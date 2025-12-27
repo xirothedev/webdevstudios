@@ -71,7 +71,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="dark scroll-smooth" suppressHydrationWarning>
+    <html
+      lang="vi"
+      className="dark scroll-smooth"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <body className={`${inter.variable} antialiased`}>
         <QueryClientProvider client={queryClient}>
           <Suspense fallback={null}>

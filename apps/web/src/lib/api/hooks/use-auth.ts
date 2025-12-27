@@ -149,7 +149,6 @@ export function useLogout() {
       clearCsrfToken();
       queryClient.clear();
       toast.success('Đã đăng xuất');
-      // Reload page instead of redirecting
       window.location.reload();
     },
     onError: (error: unknown) => {
