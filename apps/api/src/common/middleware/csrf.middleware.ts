@@ -34,6 +34,11 @@ export class CsrfMiddleware implements NestMiddleware {
       return next();
     }
 
+    // Skip CSRF for refresh token endpoint (protected by refresh token itself)
+    if (req.path === '/v1/auth/refresh') {
+      return next();
+    }
+
     // Skip CSRF for webhook routes (external services)
     if (req.path.startsWith('/v1/payments/webhook')) {
       return next();
