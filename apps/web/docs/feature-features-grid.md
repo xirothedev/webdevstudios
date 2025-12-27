@@ -20,7 +20,7 @@
 ### Thay đổi trong session này
 
 - Tăng kích thước block ảnh hero cho áo thun WDS:
-  - Thay `h-52 w-72` thành kích thước lớn hơn, responsive theo breakpoint (`h-60 w-80`, `md:h-72 md:w-[26rem]`, `lg:h-80 lg:w-[30rem]`).
+  - Thay `h-52 w-72` thành kích thước lớn hơn, responsive theo breakpoint (`h-60 w-80`, `md:h-72 md:w-104`, `lg:h-80 lg:w-120`).
   - Hover mạnh hơn: `scale: 1.12`, `y: -16`, `rotate: -2`, tăng `translateZ` để cảm giác nổi hơn.
   - Tăng cường glow/background gradient và drop-shadow để ảnh nổi bật so với nền.
 - Cập nhật alignment giữa ảnh và nội dung:

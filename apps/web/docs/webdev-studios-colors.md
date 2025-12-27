@@ -66,8 +66,8 @@ border-color: var(--wds-orange);
 ### Trong Tailwind Classes
 
 ```tsx
-<div className="bg-(--color-wds-background) text-(--color-wds-text)">
-  <button className="bg-(--color-wds-accent)</button>
+<div className="bg-wds-background text-wds-text">
+  <button className="bg-wds-accent</button>
 </div>
 ```
 

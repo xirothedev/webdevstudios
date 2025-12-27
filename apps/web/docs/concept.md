@@ -288,7 +288,7 @@ const buttonVariants = cva(
 'bg-linear-to-b from-white via-white to-wds-secondary/30';
 
 // Radial gradient mask
-'[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]';
+'mask-[radial-gradient(400px_circle_at_center,white,transparent)]';
 ```
 
 ## Layout System
