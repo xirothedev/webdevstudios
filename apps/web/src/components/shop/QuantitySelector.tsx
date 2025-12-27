@@ -73,8 +73,14 @@ export function QuantitySelector({
   size = 'md',
   className,
 }: QuantitySelectorProps) {
+  // Use stock if available, otherwise use max
+  const maxQuantity = stock !== undefined ? stock : max;
+
+  // Disable decrease if quantity is 1 or less, or if disabled
   const isDecreaseDisabled = disabled || quantity <= 1;
-  const isIncreaseDisabled = disabled || quantity >= max;
+
+  // Disable increase if quantity reaches max (stock or max), or if disabled
+  const isIncreaseDisabled = disabled || quantity >= maxQuantity;
 
   return (
     <div className={cn('flex items-center gap-4', className)}>
@@ -125,6 +131,9 @@ export function QuantitySelector({
             />
           </span>{' '}
           sản phẩm
+          {quantity >= stock && (
+            <span className="text-wds-accent ml-2">(Đã đạt tối đa)</span>
+          )}
         </span>
       )}
     </div>

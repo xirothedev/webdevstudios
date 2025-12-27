@@ -4,9 +4,10 @@ import { ShoppingCart, Trash2, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useCartDrawer } from '@/contexts/cart-drawer.context';
 import {
   useCart,
   useRemoveFromCart,
@@ -17,7 +18,7 @@ import { formatPrice } from '@/lib/utils';
 import { QuantitySelector } from './QuantitySelector';
 
 export function FloatingCartButton() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
   const { data: cart, isLoading } = useCart();
   const updateCartItemMutation = useUpdateCartItem();
   const removeFromCartMutation = useRemoveFromCart();
@@ -57,13 +58,13 @@ export function FloatingCartButton() {
         !target.closest('[data-cart-drawer]') &&
         !target.closest('[data-cart-button]')
       ) {
-        setIsOpen(false);
+        closeDrawer();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, closeDrawer]);
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
@@ -82,7 +83,7 @@ export function FloatingCartButton() {
       {/* Floating Button */}
       <motion.button
         data-cart-button
-        onClick={() => setIsOpen(true)}
+        onClick={openDrawer}
         className="bg-wds-accent fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full text-black shadow-lg transition-shadow hover:shadow-xl"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -109,7 +110,7 @@ export function FloatingCartButton() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
+              onClick={closeDrawer}
               className="fixed inset-0 z-50 bg-black/50"
             />
 
@@ -127,7 +128,7 @@ export function FloatingCartButton() {
                 <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
                   <h2 className="text-xl font-bold text-white">Giỏ hàng</h2>
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={closeDrawer}
                     className="text-white/70 transition-colors hover:text-white"
                     aria-label="Đóng giỏ hàng"
                   >
@@ -147,7 +148,7 @@ export function FloatingCartButton() {
                         Hãy thêm sản phẩm vào giỏ hàng để tiếp tục
                       </p>
                       <Button
-                        onClick={() => setIsOpen(false)}
+                        onClick={closeDrawer}
                         className="bg-wds-accent hover:bg-wds-accent/90 text-black"
                       >
                         Tiếp tục mua sắm
@@ -254,7 +255,7 @@ export function FloatingCartButton() {
                         </span>
                       </div>
                     </div>
-                    <Link href="/cart" onClick={() => setIsOpen(false)}>
+                    <Link href="/cart" onClick={closeDrawer}>
                       <Button className="bg-wds-accent hover:bg-wds-accent/90 h-12 w-full font-semibold text-black">
                         Xem giỏ hàng
                       </Button>

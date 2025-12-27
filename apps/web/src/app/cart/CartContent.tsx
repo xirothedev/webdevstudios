@@ -36,7 +36,7 @@ function CartContentInner() {
     removeFromCartMutation.mutate(itemId);
   };
 
-  // Check if specific item is being updated
+  // Check if specific item is being updated (only during actual API call, not during debounce)
   const isItemUpdating = (itemId: string) => {
     return (
       (updateCartItemMutation.isPending &&
@@ -103,6 +103,7 @@ function CartContentInner() {
                     onDecrease={() =>
                       handleUpdateQuantity(item.id, item.quantity - 1)
                     }
+                    stock={item.stockAvailable}
                     max={item.stockAvailable}
                     disabled={isItemUpdating(item.id)}
                     variant="compact"

@@ -10,6 +10,7 @@ import { CsrfInitializer } from '@/components/csrf-initializer';
 import { QueryDevtools } from '@/components/ReactQueryDevtools';
 import { StructuredData } from '@/components/StructuredData';
 import { AuthProvider } from '@/contexts/auth.context';
+import { CartDrawerProvider } from '@/contexts/cart-drawer.context';
 import {
   createPageMetadata,
   defaultMetadata,
@@ -81,10 +82,12 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <Suspense fallback={null}>
             <AuthProvider>
-              <CsrfInitializer />
-              <StructuredData />
-              <main className="min-h-screen">{children}</main>
-              <Toaster position="top-center" theme="dark" richColors />
+              <CartDrawerProvider>
+                <CsrfInitializer />
+                <StructuredData />
+                <main className="min-h-screen">{children}</main>
+                <Toaster position="top-center" theme="dark" richColors />
+              </CartDrawerProvider>
             </AuthProvider>
           </Suspense>
           <QueryDevtools />
