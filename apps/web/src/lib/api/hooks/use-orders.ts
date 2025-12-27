@@ -1,6 +1,11 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { CreateOrderRequest, ordersApi, OrderStatus } from '@/lib/api/orders';
@@ -18,6 +23,15 @@ export const orderKeys = {
 // Query: List user orders
 export function useOrders(page: number = 1, limit: number = 10) {
   return useQuery({
+    queryKey: orderKeys.list(page, limit),
+    queryFn: () => ordersApi.listOrders(page, limit),
+    staleTime: 30 * 1000, // 30 seconds
+  });
+}
+
+// Suspense Query: List user orders (for Suspense boundary)
+export function useSuspenseOrders(page: number = 1, limit: number = 10) {
+  return useSuspenseQuery({
     queryKey: orderKeys.list(page, limit),
     queryFn: () => ordersApi.listOrders(page, limit),
     staleTime: 30 * 1000, // 30 seconds
