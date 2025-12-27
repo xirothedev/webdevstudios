@@ -6,6 +6,7 @@ import axios, {
 
 import { API_URL } from '@/lib/constants';
 import { clearCsrfToken, getCsrfToken } from '@/lib/csrf';
+import { RefreshTokenResponse } from '@/types/auth.types';
 
 // Track if we're currently refreshing to avoid multiple refresh calls
 let isRefreshing = false;
@@ -90,16 +91,36 @@ apiClient.interceptors.response.use(
       });
     }
 
+    console.log('94 api-client', error.response);
+
     const status = error.response.status;
     const data = error.response.data;
 
     // Handle 401 Unauthorized - try to refresh token
-    // Skip refresh logic for refresh endpoint itself to avoid infinite loop
+    // Skip refresh logic for auth endpoints (login, register, etc.) and refresh endpoint
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/register') ||
+      originalRequest.url?.includes('/auth/signup') ||
+      originalRequest.url?.includes('/auth/verify-email') ||
+      originalRequest.url?.includes('/auth/password/reset-request') ||
+      originalRequest.url?.includes('/auth/password/reset') ||
+      originalRequest.url === '/auth/login' ||
+      originalRequest.url === '/auth/register' ||
+      originalRequest.url === '/auth/signup';
+
     const isRefreshEndpoint =
       originalRequest.url?.includes('/auth/refresh') ||
       originalRequest.url === '/auth/refresh';
 
-    if (status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
+    // Don't refresh token for auth endpoints or refresh endpoint
+    // Auth endpoints return 401 when credentials are wrong, not when token expired
+    if (
+      status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint &&
+      !isRefreshEndpoint
+    ) {
       if (isRefreshing) {
         // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
@@ -119,7 +140,9 @@ apiClient.interceptors.response.use(
       try {
         // Try to refresh token (backend will use cookie if available)
         // Use direct axios call to avoid interceptor loop
-        const refreshResponse = await axios.post(
+        const refreshResponse = await axios.post<{
+          data: RefreshTokenResponse;
+        }>(
           `${API_URL}/auth/refresh`,
           {},
           {
@@ -127,9 +150,7 @@ apiClient.interceptors.response.use(
           }
         );
 
-        console.log('130 api-client', refreshResponse);
-
-        const { accessToken } = refreshResponse.data;
+        const { accessToken } = refreshResponse.data.data;
 
         // Process queued requests
         processQueue(null, accessToken);

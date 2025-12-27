@@ -97,10 +97,8 @@ export function useLogin() {
 
       // Get redirect URL from query params only after successful login
       const redirectUrl = getRedirectUrlFromQuery();
-      if (redirectUrl) {
-        router.push(redirectUrl);
-      }
-      // If no redirectUrl, stay on login page - user can navigate manually
+      // Redirect to redirectUrl if provided, otherwise redirect to homepage
+      router.push(redirectUrl || '/');
     },
     onError: (error: unknown) => {
       const errorMessage =
