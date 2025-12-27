@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import {
   NavigationMenu,
@@ -11,10 +12,18 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { UserAvatar } from '@/components/wds/UserAvatar';
+import { useCurrentUser } from '@/lib/api/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 export function WDSHeader() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const { data: user } = useCurrentUser();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -66,12 +75,16 @@ export function WDSHeader() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <Link
-          href="/auth/login"
-          className="bg-wds-accent hover:bg-wds-accent/90 rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors"
-        >
-          Đăng nhập
-        </Link>
+        {mounted && user ? (
+          <UserAvatar variant="light" />
+        ) : (
+          <Link
+            href="/auth/login"
+            className="bg-wds-accent hover:bg-wds-accent/90 rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors"
+          >
+            Đăng nhập
+          </Link>
+        )}
       </div>
     </header>
   );

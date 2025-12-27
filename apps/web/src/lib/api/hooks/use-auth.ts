@@ -142,17 +142,15 @@ export function useRegister() {
 // Mutation: Logout
 export function useLogout() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: (sessionId?: string) => authApi.logout(sessionId),
     onSuccess: () => {
-      // Clear CSRF token on logout
       clearCsrfToken();
-      // Clear all queries
       queryClient.clear();
       toast.success('Đã đăng xuất');
-      router.push('/auth/login');
+      // Reload page instead of redirecting
+      window.location.reload();
     },
     onError: (error: unknown) => {
       // Still clear CSRF token and queries even on error
@@ -161,7 +159,7 @@ export function useLogout() {
       const errorMessage =
         error instanceof Error ? error.message : 'Đăng xuất thất bại';
       toast.error(errorMessage);
-      router.push('/auth/login');
+      window.location.reload();
     },
   });
 }

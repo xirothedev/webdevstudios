@@ -46,11 +46,11 @@ export const reviewsApi = {
     const params: Record<string, string> = {};
     if (page) params.page = page.toString();
     if (limit) params.limit = limit.toString();
-    const response = await apiClient.get<ReviewListResponse>(
+    const response = await apiClient.get<{ data: ReviewListResponse }>(
       `/products/${productSlug}/reviews`,
       { params }
     );
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -60,11 +60,11 @@ export const reviewsApi = {
     productSlug: ProductSlug,
     data: CreateReviewRequest
   ): Promise<Review> {
-    const response = await apiClient.post<Review>(
+    const response = await apiClient.post<{ data: Review }>(
       `/products/${productSlug}/reviews`,
       data
     );
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -74,20 +74,20 @@ export const reviewsApi = {
     reviewId: string,
     data: UpdateReviewRequest
   ): Promise<Review> {
-    const response = await apiClient.patch<Review>(
+    const response = await apiClient.patch<{ data: Review }>(
       `/products/reviews/${reviewId}`,
       data
     );
-    return response.data;
+    return response.data.data;
   },
 
   /**
    * Delete review
    */
   async deleteReview(reviewId: string): Promise<{ success: boolean }> {
-    const response = await apiClient.delete<{ success: boolean }>(
+    const response = await apiClient.delete<{ data: { success: boolean } }>(
       `/products/reviews/${reviewId}`
     );
-    return response.data;
+    return response.data.data;
   },
 };

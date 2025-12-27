@@ -73,16 +73,16 @@ export const ordersApi = {
    * Create order from cart
    */
   async createOrder(data: CreateOrderRequest): Promise<Order> {
-    const response = await apiClient.post<Order>('/orders', data);
-    return response.data;
+    const response = await apiClient.post<{ data: Order }>('/orders', data);
+    return response.data.data;
   },
 
   /**
    * Get order by ID
    */
   async getOrderById(orderId: string): Promise<Order> {
-    const response = await apiClient.get<Order>(`/orders/${orderId}`);
-    return response.data;
+    const response = await apiClient.get<{ data: Order }>(`/orders/${orderId}`);
+    return response.data.data;
   },
 
   /**
@@ -92,18 +92,23 @@ export const ordersApi = {
     const params: Record<string, string> = {};
     if (page) params.page = page.toString();
     if (limit) params.limit = limit.toString();
-    const response = await apiClient.get<OrderListResponse>('/orders', {
-      params,
-    });
-    return response.data;
+    const response = await apiClient.get<{ data: OrderListResponse }>(
+      '/orders',
+      {
+        params,
+      }
+    );
+    return response.data.data;
   },
 
   /**
    * Cancel order
    */
   async cancelOrder(orderId: string): Promise<Order> {
-    const response = await apiClient.patch<Order>(`/orders/${orderId}/cancel`);
-    return response.data;
+    const response = await apiClient.patch<{ data: Order }>(
+      `/orders/${orderId}/cancel`
+    );
+    return response.data.data;
   },
 
   /**
@@ -113,9 +118,12 @@ export const ordersApi = {
     orderId: string,
     status: OrderStatus
   ): Promise<Order> {
-    const response = await apiClient.patch<Order>(`/orders/${orderId}/status`, {
-      status,
-    });
-    return response.data;
+    const response = await apiClient.patch<{ data: Order }>(
+      `/orders/${orderId}/status`,
+      {
+        status,
+      }
+    );
+    return response.data.data;
   },
 };

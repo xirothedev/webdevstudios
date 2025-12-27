@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   NavigationMenu,
@@ -16,6 +16,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { UserAvatar } from '@/components/wds/UserAvatar';
+import { useCurrentUser } from '@/lib/api/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 interface NavbarProps {
@@ -26,6 +28,12 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
   const pathname = usePathname();
   const isDark = variant === 'dark';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { data: user } = useCurrentUser();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -158,36 +166,44 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
         </NavigationMenu>
 
         <div className="flex items-center gap-4">
-          {isDark ? (
-            <>
-              <Link
-                href="/auth/login"
-                className={cn(
-                  'hidden text-xs font-medium transition-colors sm:block',
-                  'hover:text-wds-accent',
-                  isDark ? 'text-white/70' : 'text-gray-600 hover:text-black'
-                )}
-              >
-                Đăng nhập
-              </Link>
-              <Link
-                href="/shop"
-                className="focus:ring-wds-accent relative hidden h-8 overflow-hidden rounded-full p-px focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:outline-none sm:inline-flex"
-              >
-                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ffffff_0%,#f7931e_50%,#ffffff_100%)]" />
-                <span className="bg-wds-accent hover:bg-wds-accent/90 inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full px-3 py-1 text-xs font-medium text-black backdrop-blur-3xl transition-colors">
-                  Xem sản phẩm
-                  <ChevronRight className="ml-1 h-3 w-3" />
-                </span>
-              </Link>
-            </>
+          {mounted && user ? (
+            <UserAvatar variant={isDark ? 'dark' : 'light'} />
           ) : (
-            <Link
-              href="/auth/login"
-              className="bg-wds-accent hover:bg-wds-accent/90 hidden rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors sm:inline-block"
-            >
-              Đăng nhập
-            </Link>
+            <>
+              {isDark ? (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className={cn(
+                      'hidden text-xs font-medium transition-colors sm:block',
+                      'hover:text-wds-accent',
+                      isDark
+                        ? 'text-white/70'
+                        : 'text-gray-600 hover:text-black'
+                    )}
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link
+                    href="/shop"
+                    className="focus:ring-wds-accent relative hidden h-8 overflow-hidden rounded-full p-px focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:outline-none sm:inline-flex"
+                  >
+                    <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ffffff_0%,#f7931e_50%,#ffffff_100%)]" />
+                    <span className="bg-wds-accent hover:bg-wds-accent/90 inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full px-3 py-1 text-xs font-medium text-black backdrop-blur-3xl transition-colors">
+                      Xem sản phẩm
+                      <ChevronRight className="ml-1 h-3 w-3" />
+                    </span>
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="bg-wds-accent hover:bg-wds-accent/90 hidden rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors sm:inline-block"
+                >
+                  Đăng nhập
+                </Link>
+              )}
+            </>
           )}
 
           {/* Mobile Menu Button */}
@@ -311,25 +327,40 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
 
                 {/* Mobile Actions */}
                 <div className="mt-8 flex flex-col gap-3">
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: navItems.length * 0.1,
-                      duration: 0.3,
-                    }}
-                  >
-                    <Link
-                      href="/auth/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={cn(
-                        'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
-                        'bg-wds-accent hover:bg-wds-accent/90 text-black'
-                      )}
+                  {mounted && user ? (
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        delay: navItems.length * 0.1,
+                        duration: 0.3,
+                      }}
                     >
-                      Đăng nhập
-                    </Link>
-                  </motion.div>
+                      <div className="flex justify-center">
+                        <UserAvatar variant={isDark ? 'dark' : 'light'} />
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        delay: navItems.length * 0.1,
+                        duration: 0.3,
+                      }}
+                    >
+                      <Link
+                        href="/auth/login"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={cn(
+                          'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
+                          'bg-wds-accent hover:bg-wds-accent/90 text-black'
+                        )}
+                      >
+                        Đăng nhập
+                      </Link>
+                    </motion.div>
+                  )}
 
                   {isDark && (
                     <motion.div
