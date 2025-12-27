@@ -97,3 +97,18 @@ export interface Enable2FAResponse {
   secret: string;
   backupCodes: string[];
 }
+
+export interface Session {
+  id: string;
+  device: {
+    id: string;
+    name: string | null;
+    type: string;
+    lastSeenAt: Date;
+  } | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  status: 'ACTIVE' | 'EXPIRED' | 'REVOKED';
+  createdAt: Date;
+  expiresAt: Date;
+}

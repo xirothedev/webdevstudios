@@ -7,6 +7,7 @@ import type {
   RegisterResponse,
   RequestPasswordResetResponse,
   ResetPasswordResponse,
+  Session,
   User,
   Verify2FAResponse,
   VerifyEmailResponse,
@@ -111,6 +112,14 @@ export const authApi = {
       '/auth/2fa/verify',
       { code, sessionId }
     );
+    return response.data.data;
+  },
+
+  /**
+   * Get user sessions
+   */
+  async getSessions(): Promise<Session[]> {
+    const response = await apiClient.get<{ data: Session[] }>('/auth/sessions');
     return response.data.data;
   },
 };
