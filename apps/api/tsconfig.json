@@ -1,6 +1,7 @@
 {
   "include": ["src"],
   "compilerOptions": {
+    "types": ["node", "jest", "multer"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,

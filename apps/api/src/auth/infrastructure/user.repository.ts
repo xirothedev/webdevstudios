@@ -10,6 +10,21 @@ export class UserRepository {
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        fullName: true,
+        phone: true,
+        avatar: true,
+        role: true,
+        mfaEnabled: true,
+        mfaSecret: true,
+        emailVerified: true,
+        phoneVerified: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
