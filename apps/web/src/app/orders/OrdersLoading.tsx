@@ -5,7 +5,7 @@ export function OrdersLoading() {
       <div className="h-9 w-48 animate-pulse rounded bg-white/10" />
 
       {/* Orders List Skeleton */}
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
