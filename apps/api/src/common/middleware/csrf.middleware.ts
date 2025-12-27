@@ -1,7 +1,10 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
+import type { AuthenticatedUser } from '@/types/express';
+
 import { CsrfService } from '../services/csrf.service';
+import { SecurityLoggerService } from '../services/security-logger.service';
 
 /**
  * CSRF Protection Middleware
@@ -13,7 +16,10 @@ export class CsrfMiddleware implements NestMiddleware {
     typeof CsrfService.prototype.getProtection
   >;
 
-  constructor(private readonly csrfService: CsrfService) {
+  constructor(
+    readonly csrfService: CsrfService,
+    private readonly securityLogger: SecurityLoggerService
+  ) {
     this.csrfProtection = csrfService.getProtection();
   }
 
@@ -44,6 +50,19 @@ export class CsrfMiddleware implements NestMiddleware {
     }
 
     // Validate CSRF token using csrf-csrf middleware
-    this.csrfProtection(req, res, next);
+    this.csrfProtection(req, res, (err) => {
+      if (err) {
+        // Log CSRF failure
+        const user = req.user as AuthenticatedUser | undefined;
+        this.securityLogger.logCsrfFailure(
+          req.path,
+          req.method,
+          req.ip,
+          user?.id
+        );
+        return next(err);
+      }
+      next();
+    });
   }
 }

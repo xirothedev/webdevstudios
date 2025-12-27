@@ -11,8 +11,10 @@ import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt.guard';
+import { SecurityLoggingInterceptor } from './common/interceptors/security-logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { CsrfService } from './common/services/csrf.service';
+import { SecurityLoggerService } from './common/services/security-logger.service';
 import { ThrottlerRedisStorage } from './common/storage/throttler-redis.storage';
 import { EventsModule } from './events/events.module';
 import { MailModule } from './mail/mail.module';
@@ -85,6 +87,7 @@ import { UsersModule } from './users/users.module';
   providers: [
     AppService,
     CsrfService,
+    SecurityLoggerService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -96,6 +99,10 @@ import { UsersModule } from './users/users.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SecurityLoggingInterceptor,
     },
     {
       provide: APP_FILTER,

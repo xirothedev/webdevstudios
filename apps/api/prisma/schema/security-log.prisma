@@ -1,0 +1,21 @@
+model SecurityLog {
+  id        String   @id @default(cuid())
+  type      String // SecurityEventType enum
+  severity  String // low, medium, high, critical
+  message   String   @db.Text
+  userId    String?
+  ipAddress String?
+  userAgent String?
+  path      String?
+  method    String?
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  // Indexes for efficient querying
+  @@index([type])
+  @@index([severity])
+  @@index([timestamp])
+  @@index([userId])
+  @@index([ipAddress])
+  @@map("security_logs")
+}

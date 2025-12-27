@@ -10,6 +10,7 @@ import session from 'express-session';
 import { AppModule } from './app.module';
 import { CsrfMiddleware } from './common/middleware/csrf.middleware';
 import { CsrfService } from './common/services/csrf.service';
+import { SecurityLoggerService } from './common/services/security-logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -76,7 +77,8 @@ async function bootstrap() {
 
   // Setup CSRF protection
   const csrfService = app.get(CsrfService);
-  const csrfMiddleware = new CsrfMiddleware(csrfService);
+  const securityLogger = app.get(SecurityLoggerService);
+  const csrfMiddleware = new CsrfMiddleware(csrfService, securityLogger);
   app.use(csrfMiddleware.use.bind(csrfMiddleware));
 
   // Global validation pipe

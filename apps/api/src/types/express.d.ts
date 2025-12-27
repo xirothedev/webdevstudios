@@ -6,9 +6,16 @@ declare module 'express-session' {
   }
 }
 
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role?: string;
+}
+
 declare module 'express-serve-static-core' {
   interface Request {
     sessionID: string;
     session: Session & Partial<SessionData>;
+    user?: AuthenticatedUser;
   }
 }
