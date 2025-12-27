@@ -447,9 +447,23 @@ export default function GenerationPage() {
             </div>
             <h1 className="text-3xl leading-tight font-black text-balance sm:text-4xl lg:text-5xl xl:text-6xl">
               Các thế hệ{' '}
-              <span className="text-wds-accent relative">
+              <span className="text-wds-accent relative inline-block">
                 Lãnh đạo
-                <span className="bg-wds-accent/50 absolute -bottom-2 left-0 h-1 w-full rounded-full" />
+                <svg
+                  className="absolute -bottom-2 left-0 w-full"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 228 62"
+                  fill="none"
+                  preserveAspectRatio="none"
+                  style={{ height: '16px' }}
+                >
+                  <path
+                    d="M2.16113 4.12184C32.9272 3.15566 210.477 0.901249 224.787 4.12184C242.674 8.14757 50.4565 15.877 40.7974 18.7755C33.0701 21.0943 191.766 26.3439 201.067 26.988C210.369 27.6321 90.5241 37.8414 91.9551 59.999"
+                    stroke="#F7931E"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </span>
             </h1>
             <p className="mx-auto max-w-2xl px-4 text-sm text-pretty text-gray-600 sm:text-base">
