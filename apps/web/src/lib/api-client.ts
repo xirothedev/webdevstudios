@@ -5,6 +5,7 @@ import axios, {
 } from 'axios';
 
 import { API_URL } from '@/lib/constants';
+import { clearCsrfToken, getCsrfToken } from '@/lib/csrf';
 
 // Track if we're currently refreshing to avoid multiple refresh calls
 let isRefreshing = false;
@@ -34,11 +35,36 @@ export const apiClient: AxiosInstance = axios.create({
   withCredentials: true, // Send cookies with requests
 });
 
-// Request interceptor - cookies are automatically sent with withCredentials: true
-// No need to manually inject tokens since they're in httpOnly cookies
+// Request interceptor - add CSRF token for state-changing requests
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Cookies are automatically sent by browser
+  async (config: InternalAxiosRequestConfig) => {
+    // Skip CSRF token for safe methods (GET, HEAD, OPTIONS)
+    const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
+    if (config.method && safeMethods.includes(config.method.toUpperCase())) {
+      return config;
+    }
+
+    // Skip CSRF token for OAuth and webhook endpoints
+    const skipCsrfPaths = ['/auth/oauth', '/payments/webhook', '/csrf-token'];
+    if (
+      config.url &&
+      skipCsrfPaths.some((path) => config.url?.includes(path))
+    ) {
+      return config;
+    }
+
+    // Fetch and add CSRF token for state-changing requests
+    try {
+      const token = await getCsrfToken();
+      if (token) {
+        config.headers['X-CSRF-Token'] = token;
+      }
+    } catch (error) {
+      // If CSRF token fetch fails, still proceed with request
+      // Backend will return 403 if CSRF validation fails
+      console.warn('Failed to fetch CSRF token:', error);
+    }
+
     return config;
   },
   (error) => {
@@ -156,6 +182,33 @@ apiClient.interceptors.response.use(
       });
     }
 
+    // Handle 403 Forbidden - might be CSRF token issue
+    if (status === 403 && !originalRequest._retry) {
+      const isCsrfEndpoint =
+        originalRequest.url?.includes('/csrf-token') ||
+        originalRequest.url === '/csrf-token';
+
+      // If not CSRF endpoint, try to refresh CSRF token and retry
+      if (!isCsrfEndpoint) {
+        originalRequest._retry = true;
+        clearCsrfToken(); // Clear invalid token
+
+        try {
+          // Fetch new CSRF token
+          const newToken = await getCsrfToken();
+          if (newToken && originalRequest.headers) {
+            originalRequest.headers['X-CSRF-Token'] = newToken;
+          }
+
+          // Retry original request with new token
+          return apiClient(originalRequest);
+        } catch (csrfError) {
+          // If CSRF token fetch fails, return original error
+          console.error('Failed to refresh CSRF token:', csrfError);
+        }
+      }
+    }
+
     // Extract error message
     let message = data?.message || data?.error || 'Đã xảy ra lỗi';
 
@@ -168,7 +221,15 @@ apiClient.interceptors.response.use(
         message = data?.message || 'Xác thực thất bại. Vui lòng đăng nhập lại.';
         break;
       case 403:
-        message = 'Bạn không có quyền thực hiện hành động này';
+        // Check if it's a CSRF error
+        if (
+          data?.message?.toLowerCase().includes('csrf') ||
+          data?.error?.toLowerCase().includes('csrf')
+        ) {
+          message = 'Phiên làm việc đã hết hạn. Vui lòng thử lại.';
+        } else {
+          message = 'Bạn không có quyền thực hiện hành động này';
+        }
         break;
       case 404:
         message = data?.message || 'Không tìm thấy tài nguyên';

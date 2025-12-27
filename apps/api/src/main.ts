@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import basicAuth from 'express-basic-auth';
 import session from 'express-session';
 
 import { AppModule } from './app.module';
@@ -85,10 +86,38 @@ async function bootstrap() {
   );
 
   // Swagger configuration
+  // Protect Swagger with Basic Auth in production
+  if (isProduction) {
+    const swaggerUsername =
+      configService.getOrThrow<string>('SWAGGER_USERNAME');
+    const swaggerPassword =
+      configService.getOrThrow<string>('SWAGGER_PASSWORD');
+
+    app.use(
+      '/v1/docs',
+      basicAuth({
+        users: { [swaggerUsername]: swaggerPassword },
+        challenge: true,
+        realm: 'Swagger API Docs',
+      })
+    );
+  }
+
   const config = new DocumentBuilder()
     .setTitle('WebDev Studios API')
     .setVersion('1.0.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'Bearer'
+    )
+    .addSecurityRequirements('Bearer')
     .addCookieAuth('access_token')
     .addCookieAuth('refresh_token')
     .build();
@@ -99,6 +128,7 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true,
     },
+    customSiteTitle: 'WebDev Studios API Documentation',
   });
 
   const port = configService.get<number>('PORT', 4000);

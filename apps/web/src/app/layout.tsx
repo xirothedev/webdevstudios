@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 
+import { CsrfInitializer } from '@/components/csrf-initializer';
 import { QueryDevtools } from '@/components/ReactQueryDevtools';
 import { StructuredData } from '@/components/StructuredData';
 import { AuthProvider } from '@/contexts/auth.context';
@@ -75,6 +76,7 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <Suspense fallback={null}>
             <AuthProvider>
+              <CsrfInitializer />
               <StructuredData />
               <main className="min-h-screen">{children}</main>
               <Toaster position="top-center" theme="dark" richColors />

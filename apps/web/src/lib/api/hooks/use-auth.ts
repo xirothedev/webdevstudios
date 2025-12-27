@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { authApi } from '@/lib/api/auth.api';
 import { API_URL, SITE_URL } from '@/lib/constants';
+import { clearCsrfToken } from '@/lib/csrf';
 import type {
   LoginRequest,
   LoginResponse,
@@ -80,6 +81,9 @@ export function useLogin() {
   return useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: async (response: LoginResponse) => {
+      // Clear old CSRF token and fetch new one for new session
+      clearCsrfToken();
+
       // Check if 2FA is required
       if (response.requires2FA) {
         toast.info('Vui lòng xác thực 2FA để tiếp tục');
@@ -143,13 +147,16 @@ export function useLogout() {
   return useMutation({
     mutationFn: (sessionId?: string) => authApi.logout(sessionId),
     onSuccess: () => {
+      // Clear CSRF token on logout
+      clearCsrfToken();
       // Clear all queries
       queryClient.clear();
       toast.success('Đã đăng xuất');
       router.push('/auth/login');
     },
     onError: (error: unknown) => {
-      // Still clear queries and redirect even on error
+      // Still clear CSRF token and queries even on error
+      clearCsrfToken();
       queryClient.clear();
       const errorMessage =
         error instanceof Error ? error.message : 'Đăng xuất thất bại';
