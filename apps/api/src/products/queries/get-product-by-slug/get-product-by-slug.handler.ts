@@ -46,6 +46,7 @@ export class GetProductBySlugHandler implements IQueryHandler<GetProductBySlugQu
         stock: ss.stock,
       })),
       stockStatus,
+      isPublished: product.isPublished,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };

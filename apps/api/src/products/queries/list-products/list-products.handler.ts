@@ -44,6 +44,7 @@ export class ListProductsHandler implements IQueryHandler<ListProductsQuery> {
         stock: ss.stock,
       })),
       stockStatus,
+      isPublished: product.isPublished,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };

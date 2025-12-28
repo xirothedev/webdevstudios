@@ -85,6 +85,7 @@ export class UpdateProductStockHandler implements ICommandHandler<UpdateProductS
         stock: ss.stock,
       })),
       stockStatus,
+      isPublished: product.isPublished,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     };

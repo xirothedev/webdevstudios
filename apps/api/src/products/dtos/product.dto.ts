@@ -112,6 +112,12 @@ export class ProductDto {
   stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock';
 
   @ApiProperty({
+    description: 'Whether product is published',
+    example: true,
+  })
+  isPublished: boolean;
+
+  @ApiProperty({
     description: 'Product creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
