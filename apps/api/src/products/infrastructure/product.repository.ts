@@ -88,6 +88,17 @@ export class ProductRepository {
     });
   }
 
+  async deleteSizeStock(productId: string, size: ProductSize): Promise<void> {
+    await this.prisma.productSizeStock.delete({
+      where: {
+        productId_size: {
+          productId,
+          size,
+        },
+      },
+    });
+  }
+
   async decrementStock(productId: string, quantity: number): Promise<Product> {
     return this.prisma.product.update({
       where: { id: productId },

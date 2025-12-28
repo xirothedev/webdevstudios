@@ -22,6 +22,7 @@ import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { UpdateProductCommand } from './commands/update-product/update-product.command';
+import { UpdateProductSizesCommand } from './commands/update-product-sizes/update-product-sizes.command';
 import { UpdateProductStockCommand } from './commands/update-product-stock/update-product-stock.command';
 import {
   ProductDto,
@@ -29,6 +30,7 @@ import {
   StockInfoDto,
 } from './dtos/product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { UpdateProductSizesDto } from './dtos/update-product-sizes.dto';
 import { UpdateProductStockDto } from './dtos/update-product-stock.dto';
 import { GetProductBySlugQuery } from './queries/get-product-by-slug/get-product-by-slug.query';
 import { GetProductStockQuery } from './queries/get-product-stock/get-product-stock.query';
@@ -186,6 +188,41 @@ export class ProductsController {
   ): Promise<ProductDto> {
     return this.commandBus.execute(
       new UpdateProductStockCommand(id, dto.stock, dto.size)
+    );
+  }
+
+  @Patch(':id/sizes')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update product size stocks (Admin only)',
+    description:
+      'Update multiple size stocks at once. Total stock will be automatically recalculated. Use stock = 0 to effectively remove a size.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Product ID',
+    example: 'clx1234567890',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Size stocks updated successfully',
+    type: ProductDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  async updateProductSizes(
+    @Param('id') id: string,
+    @Body() dto: UpdateProductSizesDto
+  ): Promise<ProductDto> {
+    return this.commandBus.execute(
+      new UpdateProductSizesCommand(
+        id,
+        dto.sizeStocks.map((ss) => ({ size: ss.size, stock: ss.stock }))
+      )
     );
   }
 }
