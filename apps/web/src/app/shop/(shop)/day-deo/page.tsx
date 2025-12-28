@@ -1,7 +1,5 @@
-'use client';
-
-import { ProductPageContent } from '../ProductPageContent';
+import { notFound } from 'next/navigation';
 
 export default function DayDeoPage() {
-  return <ProductPageContent productSlug="day-deo" productName="Dây đeo" />;
+  notFound();
 }

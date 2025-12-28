@@ -6,12 +6,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     '',
     '/about',
-    '/shop',
     '/faq',
-    // Add more routes as they are created
-    // '/generation',
-    // '/share',
-    // '/faq',
+    '/generation',
+    '/share',
+    '/faq',
+    '/blog',
   ];
 
   return routes.map((route) => ({

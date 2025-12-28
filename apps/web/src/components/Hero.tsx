@@ -2,22 +2,12 @@
 
 import { Package, Users } from 'lucide-react';
 import { motion } from 'motion/react';
-import Image from 'next/image';
 
 export function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden pt-32 pb-20">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image
-          src="/shop/ao-thun.webp"
-          alt="Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        {/* Dark Overlay for better text readability */}
         <div className="absolute inset-0 bg-black/60"></div>
       </div>
 

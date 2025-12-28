@@ -1,7 +1,5 @@
-'use client';
-
-import { ProductPageContent } from '../ProductPageContent';
+import { notFound } from 'next/navigation';
 
 export default function AoThunPage() {
-  return <ProductPageContent productSlug="ao-thun" productName="Áo thun" />;
+  notFound();
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,11 +9,9 @@ import { useEffect, useState } from 'react';
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { UserAvatar } from '@/components/wds/UserAvatar';
@@ -39,19 +37,10 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'Trang chủ', href: '/' },
     { label: 'Về chúng tôi', href: '/about' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Shop', href: '/shop' },
     { label: 'Lịch sự kiện', href: '/calendar' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'WDS chia sẻ', href: '/share' },
     { label: 'FAQ', href: '/faq' },
-  ];
-
-  const shopItems = [
-    { label: 'Tất cả sản phẩm', href: '/shop' },
-    { label: 'Áo thun', href: '/shop/ao-thun' },
-    { label: 'Móc khóa', href: '/shop/moc-khoa' },
-    { label: 'Dây đeo', href: '/shop/day-deo' },
-    { label: 'Pad chuột', href: '/shop/pad-chuot' },
   ];
 
   return (
@@ -108,34 +97,6 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
 
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList className="gap-2">
-            {/* Shop dropdown - only show on shop page or when variant is dark */}
-            {(isDark || pathname === '/shop') && (
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="h-8 bg-transparent text-xs font-medium text-white/70!">
-                  Sản phẩm
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-card/95 backdrop-blur-md">
-                  <ul className="grid w-[200px] gap-1 p-2">
-                    {shopItems.map((item) => (
-                      <li key={item.href}>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href={item.href}
-                            className={cn(
-                              'hover:text-wds-accent block rounded-sm px-3 py-2 text-xs transition-colors select-none hover:bg-white/5',
-                              isDark ? 'text-white/70' : 'text-gray-600'
-                            )}
-                          >
-                            {item.label}
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            )}
-
             {/* Main navigation items */}
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -184,16 +145,6 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                     )}
                   >
                     Đăng nhập
-                  </Link>
-                  <Link
-                    href="/shop"
-                    className="focus:ring-wds-accent relative hidden h-8 overflow-hidden rounded-full p-px focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:outline-none sm:inline-flex"
-                  >
-                    <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ffffff_0%,#f7931e_50%,#ffffff_100%)]" />
-                    <span className="bg-wds-accent hover:bg-wds-accent/90 inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full px-3 py-1 text-xs font-medium text-black backdrop-blur-3xl transition-colors">
-                      Xem sản phẩm
-                      <ChevronRight className="ml-1 h-3 w-3" />
-                    </span>
                   </Link>
                 </>
               ) : (
@@ -359,26 +310,6 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                         )}
                       >
                         Đăng nhập
-                      </Link>
-                    </motion.div>
-                  )}
-
-                  {isDark && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        delay: navItems.length * 0.1 + 0.1,
-                        duration: 0.3,
-                      }}
-                    >
-                      <Link
-                        href="/shop"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="border-wds-accent text-wds-accent hover:bg-wds-accent/10 flex w-full items-center justify-center gap-2 rounded-lg border-2 bg-transparent px-4 py-3 text-base font-medium transition-colors"
-                      >
-                        Xem sản phẩm
-                        <ChevronRight className="h-4 w-4" />
                       </Link>
                     </motion.div>
                   )}
