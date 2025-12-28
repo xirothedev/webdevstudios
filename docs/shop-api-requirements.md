@@ -1,92 +1,81 @@
-# Tổng hợp các tính năng cần call API ở route `/shop`
+# Summary of API Features Required for `/shop` Route
 
-## 📋 Tổng quan
+## 📋 Overview
 
-Tài liệu này liệt kê tất cả các tính năng trong frontend route `/shop` cần tích hợp với API backend.
+This document lists all features in the frontend `/shop` route that need to be integrated with the backend API.
 
 ---
 
-## 🏪 Route `/shop` (Trang chủ shop)
+## 🏪 Route `/shop` (Shop Homepage)
 
 **File:** `apps/web/src/app/shop/page.tsx`
 
-### Tính năng hiện tại:
+### Current Features:
 
-- Hiển thị Hero section
-- Hiển thị TrustSection
-- Hiển thị FeaturesGrid
+- Display Hero section
+- Display TrustSection
+- Display FeaturesGrid
 
-### Tính năng cần API (nếu có):
+### API Features Needed (if any):
 
-1. **Danh sách sản phẩm nổi bật** (nếu muốn dynamic)
+1. **Featured Products List** (if dynamic)
    - **Endpoint:** `GET /api/products/featured`
-   - **Mục đích:** Lấy danh sách sản phẩm nổi bật để hiển thị trong FeaturesGrid
-   - **Priority:** Thấp (hiện tại đang hardcode)
+   - **Purpose:** Get list of featured products to display in FeaturesGrid
+   - **Priority:** Low (currently hardcoded)
 
 ---
 
-## 📦 Route `/shop/[product-slug]` (Trang chi tiết sản phẩm)
+## 📦 Route `/shop/[product-slug]` (Product Detail Page)
 
 **Files:**
 
-- `apps/web/src/app/shop/ao-thun/page.tsx`
-- `apps/web/src/app/shop/pad-chuot/page.tsx`
-- `apps/web/src/app/shop/day-deo/page.tsx`
-- `apps/web/src/app/shop/moc-khoa/page.tsx`
+- `apps/web/src/app/shop/(shop)/ao-thun/page.tsx`
+- `apps/web/src/app/shop/(shop)/pad-chuot/page.tsx`
+- `apps/web/src/app/shop/(shop)/day-deo/page.tsx`
+- `apps/web/src/app/shop/(shop)/moc-khoa/page.tsx`
 
-### Tính năng cần API:
+**Note:** Product pages now use a shared `ProductPageContent` component located at `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
 
-#### 1. **Lấy thông tin sản phẩm** ⚠️ **PRIORITY: CAO**
+### API Features Needed:
 
-- **Endpoint:** `GET /api/products/:slug` hoặc `GET /api/products/:id`
-- **Mục đích:** Lấy thông tin chi tiết sản phẩm (name, price, images, description, stock, sizes, rating, etc.)
-- **Hiện tại:** Đang dùng static data từ `@/data/products/*`
-- **Vị trí code:**
-  ```22:27:apps/web/src/app/shop/ao-thun/page.tsx
-  const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsAddingToCart(false);
-    // TODO: Add to cart logic
-  };
-  ```
-- **Cần thay đổi:** Fetch product data từ API thay vì import static data
+#### 1. **Get Product Information** ⚠️ **PRIORITY: HIGH**
 
-#### 2. **Thêm vào giỏ hàng** ⚠️ **PRIORITY: CAO**
+- **Endpoint:** `GET /api/products/:slug` or `GET /api/products/:id`
+- **Purpose:** Get detailed product information (name, price, images, description, stock, sizes, rating, etc.)
+- **Current:** Using static data from `@/data/products/*`
+- **Code Location:**
+  - Product pages: `apps/web/src/app/shop/(shop)/[product-slug]/page.tsx`
+  - Shared component: `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
+  - Product data fetching logic should be implemented in `ProductPageContent.tsx`
+- **Changes Needed:** Fetch product data from API instead of importing static data
 
-- **Endpoint:** `POST /api/cart/add` hoặc `POST /api/cart/items`
-- **Mục đích:** Thêm sản phẩm vào giỏ hàng với size và quantity
+#### 2. **Add to Cart** ⚠️ **PRIORITY: HIGH**
+
+- **Endpoint:** `POST /api/cart/add` or `POST /api/cart/items`
+- **Purpose:** Add product to cart with size and quantity
 - **Request body:**
   ```json
   {
     "productId": "ao-thun-wds",
     "slug": "ao-thun",
-    "size": "M", // optional, chỉ có với sản phẩm có size
+    "size": "M", // optional, only for products with sizes
     "quantity": 1,
     "price": 299000
   }
   ```
-- **Hiện tại:** Chỉ simulate với `setTimeout`, có TODO comment
-- **Vị trí code:**
-  ```22:28:apps/web/src/app/shop/ao-thun/page.tsx
-  const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsAddingToCart(false);
-    // TODO: Add to cart logic
-  };
-  ```
-- **Cần xử lý:**
-  - Success: Hiển thị notification/toast thành công
-  - Error: Hiển thị lỗi (hết hàng, không hợp lệ, etc.)
-  - Update cart count trong Navbar (nếu có)
+- **Current:** Only simulated with `setTimeout`, has TODO comment
+- **Code Location:**
+  - Component: `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
+  - Add to cart logic should be implemented using the cart API hooks from `@/lib/api/hooks/use-cart`
+- **Handling Needed:**
+  - Success: Display success notification/toast
+  - Error: Display error (out of stock, invalid, etc.)
+  - Update cart count in Navbar (if available)
 
-#### 3. **Mua ngay (Buy Now)** ⚠️ **PRIORITY: CAO**
+#### 3. **Buy Now** ⚠️ **PRIORITY: HIGH**
 
-- **Endpoint:** `POST /api/orders/create` hoặc `POST /api/checkout`
-- **Mục đích:** Tạo đơn hàng ngay lập tức và chuyển đến trang checkout
+- **Endpoint:** `POST /api/orders/create` or `POST /api/checkout`
+- **Purpose:** Create order immediately and redirect to checkout page
 - **Request body:**
   ```json
   {
@@ -97,165 +86,141 @@ Tài liệu này liệt kê tất cả các tính năng trong frontend route `/s
     "price": 299000
   }
   ```
-- **Hiện tại:** Chỉ `console.log`, có TODO comment
-- **Vị trí code:**
-  ```30:33:apps/web/src/app/shop/ao-thun/page.tsx
-  const handleBuyNow = () => {
-    // TODO: Buy now logic
-    console.log('Buy now:', { size: selectedSize, quantity });
-  };
-  ```
-- **Cần xử lý:**
-  - Tạo order/checkout session
-  - Redirect đến trang checkout với order ID
+- **Current:** Only `console.log`, has TODO comment
+- **Code Location:**
+  - Component: `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
+  - Buy now logic should be implemented using the orders API hooks from `@/lib/api/hooks/use-orders`
+- **Handling Needed:**
+  - Create order/checkout session
+  - Redirect to checkout page with order ID
 
-#### 4. **Kiểm tra tồn kho (Stock Check)** ⚠️ **PRIORITY: TRUNG BÌNH**
+#### 4. **Stock Check** ⚠️ **PRIORITY: MEDIUM**
 
-- **Endpoint:** `GET /api/products/:id/stock` hoặc trong response của product detail
-- **Mục đích:** Kiểm tra số lượng tồn kho real-time
-- **Hiện tại:** Dùng static `stock` từ product data
-- **Vị trí code:**
-  ```92:97:apps/web/src/app/shop/ao-thun/page.tsx
-  <ProductQuantitySelector
-    quantity={quantity}
-    onIncrease={increaseQuantity}
-    onDecrease={decreaseQuantity}
-    stock={aoThunProduct.stock}
-  />
-  ```
-- **Cần xử lý:**
-  - Validate quantity không vượt quá stock
-  - Disable nút "Thêm vào giỏ" nếu hết hàng
-  - Hiển thị thông báo "Hết hàng" nếu stock = 0
+- **Endpoint:** `GET /api/products/:id/stock` or in product detail response
+- **Purpose:** Check real-time stock quantity
+- **Current:** Using static `stock` from product data
+- **Code Location:**
+  - Component: `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
+  - Stock data should be fetched from API using product hooks from `@/lib/api/hooks/use-products`
+- **Handling Needed:**
+  - Validate quantity does not exceed stock
+  - Disable "Add to Cart" button if out of stock
+  - Display "Out of Stock" message if stock = 0
 
-#### 5. **Lấy đánh giá sản phẩm (Reviews/Ratings)** ⚠️ **PRIORITY: TRUNG BÌNH**
+#### 5. **Get Product Reviews/Ratings** ⚠️ **PRIORITY: MEDIUM**
 
-- **Endpoint:** `GET /api/products/:id/reviews` hoặc trong response của product detail
-- **Mục đích:** Lấy danh sách đánh giá và rating của sản phẩm
-- **Hiện tại:** Dùng static `rating` từ product data
-- **Vị trí code:**
-  ```74:79:apps/web/src/app/shop/ao-thun/page.tsx
-  <ProductInfo
-    name={aoThunProduct.name}
-    rating={aoThunProduct.rating}
-    price={aoThunProduct.price}
-    description={aoThunProduct.description}
-    priceNote="Giá đã bao gồm VAT. Miễn phí vận chuyển cho đơn hàng trên 500.000₫"
-  />
-  ```
-- **Cần xử lý:**
-  - Hiển thị rating trung bình
-  - Hiển thị số lượng đánh giá
-  - Có thể mở rộng: Hiển thị danh sách reviews chi tiết
+- **Endpoint:** `GET /api/products/:id/reviews` or in product detail response
+- **Purpose:** Get list of reviews and product rating
+- **Current:** Using static `rating` from product data
+- **Code Location:**
+  - Component: `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
+  - Rating data should be fetched from API using reviews hooks from `@/lib/api/hooks/use-reviews`
+- **Handling Needed:**
+  - Display average rating
+  - Display number of reviews
+  - Can be extended: Display detailed reviews list
 
-#### 6. **Kiểm tra size có sẵn** ⚠️ **PRIORITY: THẤP**
+#### 6. **Check Available Sizes** ⚠️ **PRIORITY: LOW**
 
-- **Endpoint:** `GET /api/products/:id/sizes` hoặc trong response của product detail
-- **Mục đích:** Kiểm tra size nào còn hàng (nếu có logic stock theo size)
-- **Hiện tại:** Dùng static `sizes` array
-- **Vị trí code:**
-  ```83:89:apps/web/src/app/shop/ao-thun/page.tsx
-  {aoThunProduct.hasSizes && aoThunProduct.sizes && (
-    <ProductSizeSelector
-      sizes={aoThunProduct.sizes}
-      selectedSize={selectedSize}
-      onSizeChange={setSelectedSize}
-    />
-  )}
-  ```
-- **Cần xử lý:**
-  - Disable size không còn hàng
-  - Hiển thị badge "Hết hàng" cho size không có stock
+- **Endpoint:** `GET /api/products/:id/sizes` or in product detail response
+- **Purpose:** Check which sizes are in stock (if there is size-based stock logic)
+- **Current:** Using static `sizes` array
+- **Code Location:**
+  - Component: `apps/web/src/app/shop/(shop)/ProductPageContent.tsx`
+  - Size availability should be checked via product stock API from `@/lib/api/hooks/use-products`
+- **Handling Needed:**
+  - Disable sizes that are out of stock
+  - Display "Out of Stock" badge for sizes without stock
 
 ---
 
-## 🛒 Tính năng liên quan (có thể cần)
+## 🛒 Related Features (may be needed)
 
-### 1. **Giỏ hàng (Cart)**
+### 1. **Cart**
 
-- **Endpoint:** `GET /api/cart` - Lấy danh sách items trong giỏ
-- **Endpoint:** `PUT /api/cart/items/:id` - Cập nhật quantity
-- **Endpoint:** `DELETE /api/cart/items/:id` - Xóa item khỏi giỏ
-- **Endpoint:** `GET /api/cart/count` - Lấy số lượng items (cho badge trong Navbar)
+- **Endpoint:** `GET /api/cart` - Get list of items in cart
+- **Endpoint:** `PUT /api/cart/items/:id` - Update quantity
+- **Endpoint:** `DELETE /api/cart/items/:id` - Remove item from cart
+- **Endpoint:** `GET /api/cart/count` - Get number of items (for badge in Navbar)
 
-### 2. **Tìm kiếm sản phẩm**
+### 2. **Product Search**
 
-- **Endpoint:** `GET /api/products/search?q=...` - Tìm kiếm sản phẩm
-- **Priority:** Thấp (chưa có UI)
+- **Endpoint:** `GET /api/products/search?q=...` - Search products
+- **Priority:** Low (no UI yet)
 
-### 3. **Lọc sản phẩm**
+### 3. **Product Filtering**
 
-- **Endpoint:** `GET /api/products?category=...&priceMin=...&priceMax=...` - Lọc sản phẩm
-- **Priority:** Thấp (chưa có UI)
+- **Endpoint:** `GET /api/products?category=...&priceMin=...&priceMax=...` - Filter products
+- **Priority:** Low (no UI yet)
 
 ---
 
-## 📝 Ghi chú kỹ thuật
+## 📝 Technical Notes
 
-### Các file cần chỉnh sửa:
+### Files to Modify:
 
 1. **Product Pages:**
-   - `apps/web/src/app/shop/ao-thun/page.tsx`
-   - `apps/web/src/app/shop/pad-chuot/page.tsx`
-   - `apps/web/src/app/shop/day-deo/page.tsx`
-   - `apps/web/src/app/shop/moc-khoa/page.tsx`
+   - `apps/web/src/app/shop/(shop)/ao-thun/page.tsx`
+   - `apps/web/src/app/shop/(shop)/pad-chuot/page.tsx`
+   - `apps/web/src/app/shop/(shop)/day-deo/page.tsx`
+   - `apps/web/src/app/shop/(shop)/moc-khoa/page.tsx`
+   - `apps/web/src/app/shop/(shop)/ProductPageContent.tsx` (shared component)
 
 2. **Components:**
-   - `apps/web/src/components/shop/ProductActions.tsx` - Có thể cần thêm error handling
-   - `apps/web/src/components/shop/ProductQuantitySelector.tsx` - Cần validate với stock từ API
-   - `apps/web/src/components/shop/ProductSizeSelector.tsx` - Cần disable size hết hàng
+   - `apps/web/src/components/shop/ProductActions.tsx` - May need additional error handling
+   - `apps/web/src/components/shop/ProductQuantitySelector.tsx` - Need to validate with stock from API
+   - `apps/web/src/components/shop/ProductSizeSelector.tsx` - Need to disable out-of-stock sizes
 
 3. **API Client:**
-   - Cần tạo API client utilities (có thể trong `apps/web/src/lib/api/` hoặc `apps/web/src/services/`)
+   - API client utilities are already available in `apps/web/src/lib/api/`
+   - React Query hooks are already available in `apps/web/src/lib/api/hooks/`:
+     - `use-products.ts` - Product data fetching
+     - `use-cart.ts` - Cart operations
+     - `use-orders.ts` - Order operations
+     - `use-reviews.ts` - Review operations
 
-### Error Handling cần có:
+### Error Handling Needed:
 
-- **Network errors:** Hiển thị thông báo "Không thể kết nối đến server"
-- **Validation errors:** Hiển thị lỗi từ API (hết hàng, size không hợp lệ, etc.)
-- **Authentication errors:** Redirect đến trang login nếu cần đăng nhập
-- **Rate limiting:** Hiển thị thông báo "Quá nhiều request, vui lòng thử lại sau"
+- **Network errors:** Display message "Cannot connect to server"
+- **Validation errors:** Display error from API (out of stock, invalid size, etc.)
+- **Authentication errors:** Redirect to login page if authentication required
+- **Rate limiting:** Display message "Too many requests, please try again later"
 
 ### Loading States:
 
-- Đã có: `isAddingToCart` state trong ProductActions
-- Cần thêm: Loading state cho product data fetch
+- Already have: `isAddingToCart` state in ProductActions
+- Need to add: Loading state for product data fetch
 
 ---
 
-## 🎯 Tóm tắt Priority
+## 🎯 Priority Summary
 
-### **PRIORITY CAO** (Cần implement ngay):
+### **HIGH PRIORITY** (Need to implement immediately):
 
-1. ✅ Lấy thông tin sản phẩm từ API
-2. ✅ Thêm vào giỏ hàng
-3. ✅ Mua ngay (Buy Now)
+1. ✅ Get product information from API
+2. ✅ Add to cart
+3. ✅ Buy Now
 
-### **PRIORITY TRUNG BÌNH** (Nên có):
+### **MEDIUM PRIORITY** (Should have):
 
-4. ⚠️ Kiểm tra tồn kho real-time
-5. ⚠️ Lấy đánh giá sản phẩm từ API
+4. ⚠️ Real-time stock check
+5. ⚠️ Get product reviews from API
 
-### **PRIORITY THẤP** (Có thể làm sau):
+### **LOW PRIORITY** (Can do later):
 
-6. ℹ️ Kiểm tra size có sẵn
-7. ℹ️ Danh sách sản phẩm nổi bật (nếu muốn dynamic)
-8. ℹ️ Tìm kiếm và lọc sản phẩm
-
----
-
-## 📌 TODO Comments trong code
-
-Các TODO comments cần được xử lý:
-
-1. `apps/web/src/app/shop/ao-thun/page.tsx:27` - `// TODO: Add to cart logic`
-2. `apps/web/src/app/shop/ao-thun/page.tsx:31` - `// TODO: Buy now logic`
-3. `apps/web/src/app/shop/pad-chuot/page.tsx:24` - `// TODO: Add to cart logic`
-4. `apps/web/src/app/shop/pad-chuot/page.tsx:28` - `// TODO: Buy now logic`
-5. `apps/web/src/app/shop/day-deo/page.tsx:24` - `// TODO: Add to cart logic`
-6. `apps/web/src/app/shop/day-deo/page.tsx:28` - `// TODO: Buy now logic`
-7. `apps/web/src/app/shop/moc-khoa/page.tsx:24` - `// TODO: Add to cart logic`
-8. `apps/web/src/app/shop/moc-khoa/page.tsx:28` - `// TODO: Buy now logic`
+6. ℹ️ Check available sizes
+7. ℹ️ Featured products list (if dynamic)
+8. ℹ️ Product search and filtering
 
 ---
 
-_Tài liệu được tạo tự động từ phân tích source code frontend - Cập nhật: 2025_
+## 📌 TODO Comments in Code
+
+**Note:** Product pages have been refactored to use a shared `ProductPageContent` component. TODO comments should be addressed in:
+
+- `apps/web/src/app/shop/(shop)/ProductPageContent.tsx` - Main component handling all product page logic
+- Individual product pages are now simple wrappers that pass the product slug to `ProductPageContent`
+
+---
+
+_Document automatically generated from frontend source code analysis - Updated: 2025_

@@ -9,8 +9,8 @@ model PaymentTransaction {
   transactionCode String                   @unique // PayOS transaction code
   amount          Decimal                  @db.Money
   status          PaymentTransactionStatus @default(PENDING)
-  paymentUrl      String? // URL để redirect
-  payosData       Json? // Lưu raw data từ PayOS
+  paymentUrl      String? // URL for redirect
+  payosData       Json? // Store raw data from PayOS
   createdAt       DateTime                 @default(now())
   updatedAt       DateTime                 @updatedAt
 

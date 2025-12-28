@@ -1,37 +1,37 @@
 # WebDev Studios Color Palette
 
-Bảng màu được lấy từ trang web https://www.webdevstudios.org/
+Color palette extracted from https://www.webdevstudios.org/
 
-## Màu chính
+## Primary Colors
 
 ### Background
 
 - **Black**: `#000000` / `rgb(0, 0, 0)`
-  - Màu nền chính của trang web
-  - Sử dụng cho background chính
+  - Main background color of the website
+  - Used for main background
 
 ### Text
 
 - **White**: `#FFFFFF` / `rgb(255, 255, 255)`
-  - Màu chữ chính
-  - Sử dụng cho tất cả text trên nền đen
+  - Main text color
+  - Used for all text on black background
 
 ### Accent
 
 - **Vibrant Orange**: `#F7931E` / `rgb(247, 147, 30)`
-  - Màu nhấn chính
-  - Sử dụng cho logo, buttons, và các elements quan trọng
-  - Tạo điểm nhấn trên nền đen
+  - Main accent color
+  - Used for logo, buttons, and important elements
+  - Creates emphasis on black background
 
 ### Secondary Background
 
 - **Light Creamy Yellow**: `#FFF8E1` / `rgb(255, 248, 225)`
-  - Màu nền phụ cho illustrations
-  - Sử dụng cho các elements decorative
+  - Secondary background color for illustrations
+  - Used for decorative elements
 
 ## CSS Variables
 
-Đã được thêm vào `globals.css`:
+Added to `globals.css`:
 
 ```css
 :root {
@@ -44,7 +44,7 @@ Bảng màu được lấy từ trang web https://www.webdevstudios.org/
 
 ## Tailwind Theme Colors
 
-Đã được thêm vào `@theme inline`:
+Added to `@theme inline`:
 
 ```css
 --color-wds-background: #000000;
@@ -53,9 +53,9 @@ Bảng màu được lấy từ trang web https://www.webdevstudios.org/
 --color-wds-secondary: #fff8e1;
 ```
 
-## Cách sử dụng
+## Usage
 
-### Trong CSS
+### In CSS
 
 ```css
 background-color: var(--wds-black);
@@ -63,7 +63,7 @@ color: var(--wds-white);
 border-color: var(--wds-orange);
 ```
 
-### Trong Tailwind Classes
+### In Tailwind Classes
 
 ```tsx
 <div className="bg-wds-background text-wds-text">
@@ -71,7 +71,7 @@ border-color: var(--wds-orange);
 </div>
 ```
 
-### Hoặc sử dụng trực tiếp hex values
+### Or use hex values directly
 
 ```tsx
 <div className="bg-wds-backgroundround text-wds-text">
@@ -79,18 +79,18 @@ border-color: var(--wds-orange);
 </div>
 ```
 
-## Màu sắc theo vai trò
+## Colors by Role
 
-| Vai trò          | Màu    | Hex       | RGB                  |
-| ---------------- | ------ | --------- | -------------------- |
-| Background chính | Black  | `#000000` | `rgb(0, 0, 0)`       |
-| Text chính       | White  | `#FFFFFF` | `rgb(255, 255, 255)` |
-| Accent/CTA       | Orange | `#F7931E` | `rgb(247, 147, 30)`  |
-| Background phụ   | Cream  | `#FFF8E1` | `rgb(255, 248, 225)` |
+| Role                 | Color  | Hex       | RGB                  |
+| -------------------- | ------ | --------- | -------------------- |
+| Main Background      | Black  | `#000000` | `rgb(0, 0, 0)`       |
+| Main Text            | White  | `#FFFFFF` | `rgb(255, 255, 255)` |
+| Accent/CTA           | Orange | `#F7931E` | `rgb(247, 147, 30)`  |
+| Secondary Background | Cream  | `#FFF8E1` | `rgb(255, 248, 225)` |
 
-## Ghi chú
+## Notes
 
-- Bảng màu này phù hợp cho dark theme
-- Orange accent tạo contrast tốt trên nền đen
-- Cream color được sử dụng cho các illustrations và decorative elements
-- Đảm bảo contrast ratio đủ cho accessibility (WCAG AA)
+- This color palette is suitable for dark theme
+- Orange accent creates good contrast on black background
+- Cream color is used for illustrations and decorative elements
+- Ensures sufficient contrast ratio for accessibility (WCAG AA)

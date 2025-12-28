@@ -1,37 +1,37 @@
-## Feature: FeaturesGrid (Bộ sưu tập merch WebDev Studios)
+## Feature: FeaturesGrid (WebDev Studios Merch Collection)
 
-### Mô tả
+### Description
 
-`FeaturesGrid` là section giới thiệu các sản phẩm merch với phong cách glassmorphism + 3D parallax trên trang web:
+`FeaturesGrid` is a section introducing merch products with glassmorphism + 3D parallax style on the website:
 
-- Áo thun WebDev Studios (`ao-thun.webp`)
-- Huy hiệu WebDev Studios (`huy-hieu.webp`)
-- Dây đeo WebDev Studios (`day-deo.webp`)
-- Pad chuột WebDev Studios Limited Edition (`pad-chuot.webp`)
+- WebDev Studios T-shirt (`ao-thun.webp`)
+- WebDev Studios Badge (`huy-hieu.webp`)
+- WebDev Studios Lanyard (`day-deo.webp`)
+- WebDev Studios Limited Edition Mouse Pad (`pad-chuot.webp`)
 
-### Chi tiết UI/UX
+### UI/UX Details
 
-- Glass card với border mờ, backdrop-blur, gradient overlay và shimmer.
-- Sử dụng `motion/react` cho hiệu ứng:
-  - Tilt 3D nhẹ theo vị trí chuột (GlassCard wrapper).
-  - Hover scale / translate Y / rotate cho các block ảnh sản phẩm.
-- Ảnh sản phẩm sử dụng `next/image` với `fill` để tối ưu và giữ tỉ lệ đẹp.
+- Glass card with blurred border, backdrop-blur, gradient overlay and shimmer.
+- Uses `motion/react` for effects:
+  - Light 3D tilt based on mouse position (GlassCard wrapper).
+  - Hover scale / translate Y / rotate for product image blocks.
+- Product images use `next/image` with `fill` for optimization and maintaining aspect ratio.
 
-### Thay đổi trong session này
+### Changes in This Session
 
-- Tăng kích thước block ảnh hero cho áo thun WDS:
-  - Thay `h-52 w-72` thành kích thước lớn hơn, responsive theo breakpoint (`h-60 w-80`, `md:h-72 md:w-104`, `lg:h-80 lg:w-120`).
-  - Hover mạnh hơn: `scale: 1.12`, `y: -16`, `rotate: -2`, tăng `translateZ` để cảm giác nổi hơn.
-  - Tăng cường glow/background gradient và drop-shadow để ảnh nổi bật so với nền.
-- Cập nhật alignment giữa ảnh và nội dung:
-  - Card Huy hiệu WebDev Studios: tiêu đề & mô tả mô tả đúng huy hiệu (`huy-hieu.webp`).
-  - Card Dây đeo WebDev Studios: tiêu đề & mô tả mô tả đúng dây đeo/lanyard (`day-deo.webp`), ảnh full-width để preview rõ.
-  - Card Pad chuột WebDev Studios Limited Edition: tiêu đề mô tả đúng pad chuột limited (`pad-chuot.webp`).
+- Increased hero image block size for WDS t-shirt:
+  - Changed from `h-52 w-72` to larger size, responsive by breakpoint (`h-60 w-80`, `md:h-72 md:w-104`, `lg:h-80 lg:w-120`).
+  - Stronger hover: `scale: 1.12`, `y: -16`, `rotate: -2`, increased `translateZ` for more prominent effect.
+  - Enhanced glow/background gradient and drop-shadow to make image stand out from background.
+- Updated alignment between image and content:
+  - WebDev Studios Badge card: title & description correctly describe badge (`huy-hieu.webp`).
+  - WebDev Studios Lanyard card: title & description correctly describe lanyard (`day-deo.webp`), full-width image for clear preview.
+  - WebDev Studios Limited Edition Mouse Pad card: title correctly describes limited mouse pad (`pad-chuot.webp`).
 
-### File liên quan
+### Related Files
 
 - `apps/web/src/components/FeaturesGrid.tsx`
 
 ### Env vars
 
-- Feature này không yêu cầu env var riêng. Không có thay đổi mới cho `.env.example`.
+- This feature does not require separate env vars. No new changes for `.env.example`.

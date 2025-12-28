@@ -21,8 +21,8 @@ export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
     }
 
     // Privacy Logic:
-    // - Nếu requesterId === userId: Return PrivateUserDto (full data)
-    // - Nếu requesterRole === ADMIN: Return PrivateUserDto (full data)
+    // - If requesterId === userId: Return PrivateUserDto (full data)
+    // - If requesterRole === ADMIN: Return PrivateUserDto (full data)
     // - Otherwise: Return PublicUserDto (limited: id, fullName, avatar only)
     if (requesterId === userId || requesterRole === UserRole.ADMIN) {
       return {

@@ -1,8 +1,8 @@
-# Tóm tắt Rebuild Schema Prisma
+# Prisma Schema Rebuild Summary
 
-## 🎯 Mục tiêu
+## 🎯 Objective
 
-Rebuild lại schema Prisma để tối ưu và tối giản cho **4 sản phẩm cố định** của shop:
+Rebuild Prisma schema to optimize and simplify for **4 fixed products** in the shop:
 
 1. Áo thun (AO_THUN)
 2. Pad chuột (PAD_CHUOT)
@@ -11,16 +11,16 @@ Rebuild lại schema Prisma để tối ưu và tối giản cho **4 sản phẩ
 
 ---
 
-## ✅ Các thay đổi đã thực hiện
+## ✅ Changes Made
 
-### 1. **Thêm Enum ProductSlug** (`enums.prisma`)
+### 1. **Add ProductSlug Enum** (`enums.prisma`)
 
 ```prisma
 enum ProductSlug {
-  AO_THUN    // Áo thun WebDev Studios
-  PAD_CHUOT  // Pad chuột WebDev Studios
-  DAY_DEO    // Dây đeo WebDev Studios
-  MOC_KHOA   // Móc khóa WebDev Studios
+  AO_THUN    // T-shirt WebDev Studios
+  PAD_CHUOT  // Mouse pad WebDev Studios
+  DAY_DEO    // Lanyard WebDev Studios
+  MOC_KHOA   // Keychain WebDev Studios
 }
 
 enum ProductSize {
@@ -31,64 +31,64 @@ enum ProductSize {
 }
 ```
 
-**Lợi ích:**
+**Benefits:**
 
-- Type safety: Đảm bảo chỉ có 4 sản phẩm hợp lệ
-- Dễ maintain: Thêm/sửa sản phẩm chỉ cần update enum
-- Performance: Database có thể optimize index cho enum
+- Type safety: Ensures only 4 valid products
+- Easy to maintain: Adding/editing products only requires updating enum
+- Performance: Database can optimize index for enum
 
 ---
 
-### 2. **Đơn giản hóa Product Model** (`product.prisma`)
+### 2. **Simplify Product Model** (`product.prisma`)
 
-#### ❌ **Đã loại bỏ:**
+#### ❌ **Removed:**
 
-- `Category` model (không cần vì chỉ có 4 sản phẩm)
-- `ProductOption` model (không cần vì không có nhiều options)
+- `Category` model (not needed since there are only 4 products)
+- `ProductOption` model (not needed since there are not many options)
 - `ProductOptionValue` model
-- `ProductVariant` model phức tạp (thay bằng `ProductSizeStock` đơn giản)
+- Complex `ProductVariant` model (replaced with simple `ProductSizeStock`)
 
-#### ✅ **Schema mới:**
+#### ✅ **New Schema:**
 
 ```prisma
 model Product {
   id          String      @id @default(cuid())
-  slug        ProductSlug @unique // Enum đảm bảo chỉ có 4 sản phẩm
+  slug        ProductSlug @unique // Enum ensures only 4 products
   name        String      @db.VarChar(255)
   description String      @db.Text
 
-  // Giá sản phẩm (đơn giản hóa)
+  // Product pricing (simplified)
   priceCurrent  Decimal @db.Decimal(12, 2)
   priceOriginal Decimal? @db.Decimal(12, 2)
   priceDiscount Decimal? @db.Decimal(12, 2)
 
-  // Thông tin sản phẩm
+  // Product information
   stock       Int     @default(0)
-  hasSizes    Boolean @default(false) // Chỉ áo thun = true
+  hasSizes    Boolean @default(false) // Only t-shirt = true
   badge       String? @db.VarChar(50)
 
-  // Đánh giá
+  // Ratings
   ratingValue Decimal @default(0) @db.Decimal(3, 2)
   ratingCount Int     @default(0)
 
   // Relations
   images     ProductImage[]
-  sizeStocks ProductSizeStock[] // Chỉ cho áo thun
+  sizeStocks ProductSizeStock[] // Only for t-shirt
   cartItems  CartItem[]
   orderItems OrderItem[]
   reviews    Review[]
 }
 ```
 
-**Lợi ích:**
+**Benefits:**
 
-- Đơn giản hơn: Từ ~100 dòng code xuống còn ~50 dòng
-- Dễ query: Không cần join nhiều bảng
-- Performance tốt hơn: Ít bảng, ít relation
+- Simpler: From ~100 lines of code down to ~50 lines
+- Easier to query: No need to join many tables
+- Better performance: Fewer tables, fewer relations
 
 ---
 
-### 3. **Thêm ProductSizeStock Model**
+### 3. **Add ProductSizeStock Model**
 
 ```prisma
 model ProductSizeStock {
@@ -103,16 +103,16 @@ model ProductSizeStock {
 }
 ```
 
-**Mục đích:**
+**Purpose:**
 
-- Quản lý stock theo size cho áo thun
-- Các sản phẩm khác không có size, dùng `Product.stock` trực tiếp
+- Manage stock by size for t-shirt
+- Other products don't have sizes, use `Product.stock` directly
 
 ---
 
-### 4. **Cập nhật CartItem** (`order.prisma`)
+### 4. **Update CartItem** (`order.prisma`)
 
-#### ❌ **Trước:**
+#### ❌ **Before:**
 
 ```prisma
 model CartItem {
@@ -122,40 +122,40 @@ model CartItem {
 }
 ```
 
-#### ✅ **Sau:**
+#### ✅ **After:**
 
 ```prisma
 model CartItem {
   productId String
   product   Product @relation(...)
-  size      ProductSize? // Chỉ áo thun có
+  size      ProductSize? // Only t-shirt has
   quantity  Int
   // ...
 }
 ```
 
-**Lợi ích:**
+**Benefits:**
 
-- Đơn giản hơn: Không cần ProductVariant
-- Linh hoạt: Size nullable, chỉ áo thun mới có
+- Simpler: No need for ProductVariant
+- Flexible: Size nullable, only t-shirt has it
 
 ---
 
-### 5. **Cập nhật OrderItem** (`order.prisma`)
+### 5. **Update OrderItem** (`order.prisma`)
 
-#### ❌ **Trước:**
+#### ❌ **Before:**
 
 ```prisma
 model OrderItem {
   variantId String?
   variant   ProductVariant? @relation(...)
   productName String
-  variantName String // VD: "Red - XL"
+  variantName String // E.g.: "Red - XL"
   // ...
 }
 ```
 
-#### ✅ **Sau:**
+#### ✅ **After:**
 
 ```prisma
 model OrderItem {
@@ -163,33 +163,33 @@ model OrderItem {
   product   Product? @relation(...)
 
   // Snapshot data
-  productSlug ProductSlug // Lưu slug để dễ tra cứu
+  productSlug ProductSlug // Store slug for easy lookup
   productName String
-  size        ProductSize? // Size nếu có
+  size        ProductSize? // Size if available
   price       Decimal
   quantity    Int
   // ...
 }
 ```
 
-**Lợi ích:**
+**Benefits:**
 
-- Rõ ràng hơn: `productSlug` dễ tra cứu hơn `variantName`
-- Đơn giản: Không cần `variantName` phức tạp
-
----
-
-### 6. **Cập nhật Review Model** (`marketing.prisma`)
-
-#### ✅ **Cải thiện:**
-
-- Thêm `updatedAt` field
-- `userId` nullable để hỗ trợ review ẩn danh
-- Thêm indexes cho performance
+- Clearer: `productSlug` is easier to lookup than `variantName`
+- Simpler: No need for complex `variantName`
 
 ---
 
-## 📊 So sánh Before/After
+### 6. **Update Review Model** (`marketing.prisma`)
+
+#### ✅ **Improvements:**
+
+- Added `updatedAt` field
+- `userId` nullable to support anonymous reviews
+- Added indexes for performance
+
+---
+
+## 📊 Before/After Comparison
 
 | Aspect               | Before                              | After                       | Improvement |
 | -------------------- | ----------------------------------- | --------------------------- | ----------- |
@@ -203,27 +203,27 @@ model OrderItem {
 
 ## 🚀 Next Steps
 
-### 1. **Tạo Migration**
+### 1. **Create Migration**
 
 ```bash
 cd apps/api
 npx prisma migrate dev --name rebuild_product_schema
 ```
 
-### 2. **Seed Data cho 4 sản phẩm**
+### 2. **Seed Data for 4 Products**
 
-Tạo seed script để insert 4 sản phẩm vào database với ProductSlug enum.
+Create seed script to insert 4 products into database with ProductSlug enum.
 
-### 3. **Cập nhật API Services**
+### 3. **Update API Services**
 
-- Cập nhật ProductService để sử dụng ProductSlug enum
-- Cập nhật CartService để xử lý size
-- Cập nhật OrderService để lưu snapshot đúng format
+- Update ProductService to use ProductSlug enum
+- Update CartService to handle size
+- Update OrderService to save snapshot in correct format
 
-### 4. **Cập nhật Frontend Types**
+### 4. **Update Frontend Types**
 
-- Tạo ProductSlug enum trong TypeScript
-- Cập nhật Product interface để match với schema mới
+- Create ProductSlug enum in TypeScript
+- Update Product interface to match new schema
 
 ---
 
@@ -231,24 +231,24 @@ Tạo seed script để insert 4 sản phẩm vào database với ProductSlug en
 
 ### Database Migration Required
 
-- Cần drop các bảng cũ: `categories`, `product_options`, `product_option_values`, `product_variants`
-- Cần migrate data từ `ProductVariant` sang `Product` và `ProductSizeStock`
-- Cần migrate `CartItem` và `OrderItem` để reference `Product` thay vì `ProductVariant`
+- Need to drop old tables: `categories`, `product_options`, `product_option_values`, `product_variants`
+- Need to migrate data from `ProductVariant` to `Product` and `ProductSizeStock`
+- Need to migrate `CartItem` and `OrderItem` to reference `Product` instead of `ProductVariant`
 
 ### API Changes
 
-- Endpoints liên quan đến Category sẽ bị xóa
-- Endpoints liên quan đến ProductVariant cần refactor
-- Cart/Order endpoints cần update để xử lý size
+- Endpoints related to Category will be removed
+- Endpoints related to ProductVariant need refactoring
+- Cart/Order endpoints need update to handle size
 
 ---
 
 ## 📝 Notes
 
-- Schema này được tối ưu cho **4 sản phẩm cố định**
-- Nếu sau này cần mở rộng (thêm sản phẩm, thêm options), cần cân nhắc rebuild lại
-- Hiện tại: **Đơn giản, nhanh, dễ maintain** ✅
+- This schema is optimized for **4 fixed products**
+- If expansion is needed later (add products, add options), consider rebuilding
+- Current state: **Simple, fast, easy to maintain** ✅
 
 ---
 
-_Cập nhật: 2025-01-XX_
+_Updated: 2025-01-XX_

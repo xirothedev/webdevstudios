@@ -1,109 +1,109 @@
 # SEO Configuration
 
-## Tổng quan
+## Overview
 
-Dự án đã được cấu hình đầy đủ SEO với các tính năng:
+The project has been fully configured with SEO features:
 
-- **Metadata đầy đủ**: Title, description, keywords cho từng trang
-- **Open Graph tags**: Cho Facebook và các mạng xã hội khác
-- **Twitter Cards**: Tối ưu hiển thị trên Twitter
-- **Structured Data (JSON-LD)**: Schema.org markup cho search engines
-- **Sitemap**: Tự động generate sitemap.xml
-- **Robots.txt**: Hướng dẫn crawlers
+- **Complete Metadata**: Title, description, keywords for each page
+- **Open Graph tags**: For Facebook and other social networks
+- **Twitter Cards**: Optimized display on Twitter
+- **Structured Data (JSON-LD)**: Schema.org markup for search engines
+- **Sitemap**: Auto-generated sitemap.xml
+- **Robots.txt**: Crawler instructions
 
-## Cấu trúc Files
+## File Structure
 
 ### Core SEO Files
 
-- `src/lib/metadata.ts` - Metadata configuration và helper functions
+- `src/lib/metadata.ts` - Metadata configuration and helper functions
 - `src/lib/structured-data.ts` - Structured data (JSON-LD) schemas
-- `src/components/StructuredData.tsx` - Component để inject structured data
+- `src/components/StructuredData.tsx` - Component to inject structured data
 - `src/app/sitemap.ts` - Dynamic sitemap generation
 - `src/app/robots.ts` - Dynamic robots.txt generation
 
 ### Page Metadata
 
-Mỗi trang có metadata riêng được định nghĩa trong file page:
+Each page has its own metadata defined in the page file:
 
 - `src/app/page.tsx` - Home page metadata
 - `src/app/about/page.tsx` - About page metadata
 - `src/app/shop/page.tsx` - Shop page metadata
 
-## Cấu hình
+## Configuration
 
 ### Environment Variables
 
-Thêm vào `.env.local`:
+Add to `.env.local`:
 
 ```env
 NEXT_PUBLIC_SITE_URL=https://webdevstudios.xirothedev.site/
 ```
 
-Nếu không có, sẽ sử dụng default: `https://webdevstudios.xirothedev.site/`
+If not provided, will use default: `https://webdevstudios.xirothedev.site/`
 
 ### Metadata Configuration
 
-File `src/lib/metadata.ts` chứa:
+File `src/lib/metadata.ts` contains:
 
-- **defaultMetadata**: Metadata mặc định cho toàn site
-- **createPageMetadata()**: Helper function để tạo metadata cho từng trang
+- **defaultMetadata**: Default metadata for entire site
+- **createPageMetadata()**: Helper function to create metadata for each page
 
 ### Structured Data
 
-File `src/lib/structured-data.ts` chứa các schemas:
+File `src/lib/structured-data.ts` contains schemas:
 
-- **Organization Schema**: Thông tin về tổ chức
-- **WebSite Schema**: Thông tin về website
+- **Organization Schema**: Organization information
+- **WebSite Schema**: Website information
 - **Breadcrumb Schema**: Breadcrumb navigation
-- **Page Schema**: Schema cho từng trang
+- **Page Schema**: Schema for each page
 
-## Sử dụng
+## Usage
 
-### Thêm Metadata cho trang mới
+### Add Metadata for New Page
 
 ```typescript
 import { createPageMetadata } from '@/lib/metadata';
 
 export const metadata = createPageMetadata({
-  title: 'Tên trang',
-  description: 'Mô tả trang',
+  title: 'Page Title',
+  description: 'Page description',
   path: '/path-to-page',
   image: '/path-to-image.png', // Optional
   keywords: ['keyword1', 'keyword2'], // Optional
 });
 ```
 
-### Thêm Structured Data cho trang
+### Add Structured Data for Page
 
 ```typescript
 import { getPageSchema } from '@/lib/structured-data';
 import { siteUrl } from '@/lib/metadata';
 
-// Trong component
+// In component
 const pageSchema = getPageSchema({
-  title: 'Tên trang',
-  description: 'Mô tả',
+  title: 'Page Title',
+  description: 'Description',
   url: `${siteUrl}/path`,
   image: '/image.png',
 });
 
-// Thêm vào component
+// Add to component
 <script
   type="application/ld+json"
   dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }}
 />
 ```
 
-### Cập nhật Sitemap
+### Update Sitemap
 
-Chỉnh sửa `src/app/sitemap.ts` để thêm routes mới:
+Edit `src/app/sitemap.ts` to add new routes:
 
 ```typescript
 const routes = [
   '',
   '/about',
   '/shop',
-  '/new-page', // Thêm route mới
+  '/new-page', // Add new route
 ];
 ```
 
@@ -140,8 +140,8 @@ const routes = [
 
 - ✅ Organization Schema
 - ✅ WebSite Schema
-- ✅ Breadcrumb Schema (có thể thêm cho từng trang)
-- ✅ Page Schema (có thể thêm cho từng trang)
+- ✅ Breadcrumb Schema (can be added for each page)
+- ✅ Page Schema (can be added for each page)
 
 ### 5. Technical SEO
 
@@ -155,7 +155,7 @@ const routes = [
 
 ### Google Search Console
 
-1. Thêm verification code vào `src/lib/metadata.ts`:
+1. Add verification code to `src/lib/metadata.ts`:
 
 ```typescript
 verification: {
@@ -165,7 +165,7 @@ verification: {
 
 ### Bing Webmaster Tools
 
-1. Thêm verification code vào `src/lib/metadata.ts`:
+1. Add verification code to `src/lib/metadata.ts`:
 
 ```typescript
 verification: {
@@ -176,16 +176,16 @@ verification: {
 
 ## Best Practices
 
-1. **Unique Titles**: Mỗi trang có title riêng, không trùng lặp
-2. **Descriptive Descriptions**: Mô tả rõ ràng, hấp dẫn, 150-160 ký tự
-3. **Keywords**: Sử dụng keywords tự nhiên, không spam
-4. **Images**: Sử dụng images có kích thước phù hợp (1200x630 cho OG)
-5. **Canonical URLs**: Đảm bảo mỗi trang có canonical URL
-6. **Structured Data**: Validate với [Google Rich Results Test](https://search.google.com/test/rich-results)
+1. **Unique Titles**: Each page has unique title, no duplicates
+2. **Descriptive Descriptions**: Clear, engaging descriptions, 150-160 characters
+3. **Keywords**: Use natural keywords, no spam
+4. **Images**: Use images with appropriate size (1200x630 for OG)
+5. **Canonical URLs**: Ensure each page has canonical URL
+6. **Structured Data**: Validate with [Google Rich Results Test](https://search.google.com/test/rich-results)
 
 ## Testing
 
-### Tools để test SEO
+### SEO Testing Tools
 
 1. **Google Rich Results Test**: https://search.google.com/test/rich-results
 2. **Facebook Sharing Debugger**: https://developers.facebook.com/tools/debug/
@@ -196,30 +196,30 @@ verification: {
 ### Local Testing
 
 ```bash
-# Build và start production server
+# Build and start production server
 pnpm build
 pnpm start
 
 # Test sitemap
 curl http://localhost:3000/sitemap.xml
 
-# Test robots.txt (auto-generated với domain động)
+# Test robots.txt (auto-generated with dynamic domain)
 curl http://localhost:3000/robots.txt
 ```
 
 ## Notes
 
-- Metadata được tự động merge với defaultMetadata
-- Sitemap tự động generate từ routes trong sitemap.ts
-- **Robots.txt tự động generate** từ `src/app/robots.ts` với domain động từ `NEXT_PUBLIC_SITE_URL`
-- Structured data được inject vào mọi trang qua StructuredData component
-- Robots.txt cho phép tất cả crawlers, chỉ disallow admin và API routes
+- Metadata is automatically merged with defaultMetadata
+- Sitemap automatically generated from routes in sitemap.ts
+- **Robots.txt automatically generated** from `src/app/robots.ts` with dynamic domain from `NEXT_PUBLIC_SITE_URL`
+- Structured data is injected into all pages via StructuredData component
+- Robots.txt allows all crawlers, only disallows admin and API routes
 
 ## Future Enhancements
 
-- [ ] Thêm Article schema cho blog posts
-- [ ] Thêm FAQ schema cho FAQ page
-- [ ] Thêm Event schema cho events
-- [ ] Thêm Person schema cho team members
-- [ ] Auto-generate sitemap từ routes
-- [ ] Add hreflang tags cho đa ngôn ngữ
+- [ ] Add Article schema for blog posts
+- [ ] Add FAQ schema for FAQ page
+- [ ] Add Event schema for events
+- [ ] Add Person schema for team members
+- [ ] Auto-generate sitemap from routes
+- [ ] Add hreflang tags for multi-language

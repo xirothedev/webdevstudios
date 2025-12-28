@@ -475,10 +475,31 @@ apps/web/
 - **Framework**: Next.js 16 with App Router
 - **UI Library**: shadcn/ui + custom components
 - **Styling**: Tailwind CSS v4
-- **Animations**: Framer Motion + tw-animate-css
+- **Animations**: motion/react (v12.23.26) + tw-animate-css
 - **Icons**: Lucide React
 - **Fonts**: Inter (Google Fonts)
 - **TypeScript**: Full type safety
+
+## Code Style
+
+### Export Patterns
+
+All components use **inline exports** (export at declaration):
+
+```typescript
+// ✅ Correct - Inline export
+export function Button({ ... }) {
+  // ...
+}
+
+export const Input = React.forwardRef(...);
+
+// ❌ Avoid - Bottom export
+function Button({ ... }) {
+  // ...
+}
+export { Button };
+```
 
 ## Design Principles
 

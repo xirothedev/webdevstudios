@@ -121,7 +121,7 @@ async function main() {
   // Create orders with different statuses
   const orders: Order[] = [];
 
-  // 1. PENDING order (chưa thanh toán)
+  // 1. PENDING order (not yet paid)
   if (aoThun) {
     const shippingAddress1 = await prisma.shippingAddress.create({
       data: {
@@ -164,7 +164,7 @@ async function main() {
     console.log(`Created order: ${order1.code} (PENDING)`);
   }
 
-  // 2. CONFIRMED order (đã xác nhận, đã thanh toán)
+  // 2. CONFIRMED order (confirmed, paid)
   if (padChuot) {
     const shippingAddress2 = await prisma.shippingAddress.create({
       data: {
@@ -208,7 +208,7 @@ async function main() {
     console.log(`Created order: ${order2.code} (CONFIRMED)`);
   }
 
-  // 3. PROCESSING order (đang đóng gói)
+  // 3. PROCESSING order (packaging)
   if (aoThun && dayDeo) {
     const shippingAddress3 = await prisma.shippingAddress.create({
       data: {
@@ -260,7 +260,7 @@ async function main() {
     console.log(`Created order: ${order3.code} (PROCESSING)`);
   }
 
-  // 4. SHIPPING order (đang giao)
+  // 4. SHIPPING order (shipping)
   if (mocKhoa) {
     const shippingAddress4 = await prisma.shippingAddress.create({
       data: {
@@ -304,7 +304,7 @@ async function main() {
     console.log(`Created order: ${order4.code} (SHIPPING)`);
   }
 
-  // 5. DELIVERED order (đã giao)
+  // 5. DELIVERED order (delivered)
   if (aoThun && padChuot && dayDeo) {
     const shippingAddress5 = await prisma.shippingAddress.create({
       data: {
@@ -364,7 +364,7 @@ async function main() {
     console.log(`Created order: ${order5.code} (DELIVERED)`);
   }
 
-  // 6. CANCELLED order (đã hủy)
+  // 6. CANCELLED order (cancelled)
   if (dayDeo) {
     const shippingAddress6 = await prisma.shippingAddress.create({
       data: {

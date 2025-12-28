@@ -4,10 +4,10 @@ import { motion } from 'motion/react';
 
 interface SizeMeasurement {
   size: string;
-  chest: string; // Chiều rộng ngực
-  length: string; // Chiều dài áo
-  shoulder: string; // Chiều rộng vai
-  sleeve: string; // Chiều dài tay áo
+  chest: string; // Chest width
+  length: string; // Shirt length
+  shoulder: string; // Shoulder width
+  sleeve: string; // Sleeve length
 }
 
 const sizeChart: SizeMeasurement[] = [

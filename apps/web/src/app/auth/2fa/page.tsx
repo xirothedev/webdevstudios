@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useVerify2FA } from '@/lib/api/hooks/use-auth';
 
-// Validation schema với Zod
+// Validation schema with Zod
 const verify2FASchema = z.object({
   code: z
     .string()

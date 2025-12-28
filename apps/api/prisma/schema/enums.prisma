@@ -1,20 +1,20 @@
 // =========================================
-// ENUMS (Định nghĩa các tập giá trị cố định)
+// ENUMS (Define fixed value sets)
 // =========================================
 
 enum UserRole {
-  ADMIN // Chủ shop
-  CUSTOMER // Khách mua hàng
+  ADMIN // Shop owner
+  CUSTOMER // Customer
 }
 
 enum OrderStatus {
-  PENDING // Chờ thanh toán
-  CONFIRMED // Đã xác nhận
-  PROCESSING // Đang đóng gói
-  SHIPPING // Đang giao
-  DELIVERED // Giao thành công
-  CANCELLED // Đã hủy
-  RETURNED // Trả hàng
+  PENDING // Awaiting payment
+  CONFIRMED // Confirmed
+  PROCESSING // Packaging
+  SHIPPING // Shipping
+  DELIVERED // Delivered successfully
+  CANCELLED // Cancelled
+  RETURNED // Returned
 }
 
 enum PaymentStatus {
@@ -25,8 +25,8 @@ enum PaymentStatus {
 }
 
 enum DiscountType {
-  PERCENTAGE // Giảm theo %
-  FIXED_AMOUNT // Giảm số tiền cụ thể
+  PERCENTAGE // Discount by percentage
+  FIXED_AMOUNT // Fixed amount discount
 }
 
 enum OAuthProvider {
@@ -61,14 +61,14 @@ enum SessionStatus {
 // =========================================
 
 enum ProductSlug {
-  AO_THUN    // Áo thun WebDev Studios
-  PAD_CHUOT  // Pad chuột WebDev Studios
-  DAY_DEO    // Dây đeo WebDev Studios
-  MOC_KHOA   // Móc khóa WebDev Studios
+  AO_THUN    // T-shirt WebDev Studios
+  PAD_CHUOT  // Mouse pad WebDev Studios
+  DAY_DEO    // Lanyard WebDev Studios
+  MOC_KHOA   // Keychain WebDev Studios
 }
 
 /**
- * Size sản phẩm (chỉ áo thun có size)
+ * Product size (only t-shirt has sizes)
  */
 enum ProductSize {
   S

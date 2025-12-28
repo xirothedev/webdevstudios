@@ -19,7 +19,7 @@ import { CreateOrderRequest, ShippingAddress } from '@/lib/api/orders';
 import { formatPrice } from '@/lib/utils';
 import { ProductSize } from '@/types/product';
 
-// Validation schema với Zod
+// Validation schema with Zod
 const shippingAddressSchema = z.object({
   fullName: z.string().min(1, 'Họ và tên là bắt buộc'),
   phone: z
@@ -66,7 +66,6 @@ export default function CheckoutPage() {
   const createOrderMutation = useCreateOrder();
   const createPaymentLinkMutation = useCreatePaymentLink();
 
-  // Form setup với react-hook-form
   const {
     register,
     handleSubmit,

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     ],
   }),
   robots: {
-    index: false, // Private page - không index
+    index: false, // Private page - do not index
     follow: false,
     googleBot: {
       index: false,

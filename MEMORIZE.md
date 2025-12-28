@@ -1,61 +1,61 @@
-## Trạng thái hiện tại của dự án
+## Current Project Status
 
-- Monorepo `webdevtudios-fullstack-turborepo` với app web sử dụng Next.js (App Router), Tailwind CSS, motion/react và Next Image cho phần landing page / shop.
-- `FeaturesGrid` trên trang web hiển thị 4 sản phẩm merch WebDev Studios: áo thun, huy hiệu, dây đeo (lanyard) và pad chuột limited, với hiệu ứng glassmorphism và animation 3D nhẹ.
+- Monorepo `webdevtudios-fullstack-turborepo` with web app using Next.js (App Router), Tailwind CSS, motion/react and Next Image for landing page / shop.
+- `FeaturesGrid` on the website displays 4 WebDev Studios merch products: t-shirt, badge, lanyard and limited mouse pad, with glassmorphism effects and light 3D animations.
 
-## Những gì đã đạt được trong session này
+## What Has Been Achieved in This Session
 
 ### Frontend (Previous)
 
-- Tăng kích thước block ảnh sản phẩm áo thun WDS trong `FeaturesGrid` theo style hero, đồng thời tăng hiệu ứng hover (scale, dịch trục Y, nhẹ rotate) và làm mạnh glow/shadow để nổi bật hơn.
-- Chỉnh ảnh dây đeo (`/shop/day-deo.webp`) trong card Túi & Balo thành full-width, tỉ lệ ngang rõ ràng hơn, hover nhẹ nhàng để người dùng xem preview chi tiết.
-- Cập nhật lại tiêu đề và mô tả các card để khớp với tên file ảnh/vật phẩm:
-  - Huy hiệu WebDev Studios (`huy-hieu.webp`)
-  - Dây đeo WebDev Studios (`day-deo.webp`)
-  - Pad chuột WebDev Studios Limited Edition (`pad-chuot.webp`)
+- Increased size of WDS t-shirt product image block in `FeaturesGrid` with hero style, while increasing hover effects (scale, translate Y axis, slight rotate) and strengthening glow/shadow for better prominence.
+- Adjusted lanyard image (`/shop/day-deo.webp`) in Bag & Backpack card to full-width, clearer horizontal ratio, gentle hover for users to view detailed preview.
+- Updated card titles and descriptions to match image file/product names:
+  - WebDev Studios Badge (`huy-hieu.webp`)
+  - WebDev Studios Lanyard (`day-deo.webp`)
+  - WebDev Studios Limited Edition Mouse Pad (`pad-chuot.webp`)
 
 ### Backend - Cloudflare R2 Storage Integration
 
-- **Tích hợp Cloudflare R2 Storage**: Tạo module storage hoàn chỉnh với AWS SDK v3 (S3-compatible API)
+- **Cloudflare R2 Storage Integration**: Created complete storage module with AWS SDK v3 (S3-compatible API)
 - **Storage Module** (`apps/api/src/storage/`):
-  - `storage.service.ts`: Service xử lý upload/download/delete với R2
-  - `storage.config.ts`: Configuration cho R2 credentials
+  - `storage.service.ts`: Service handling upload/download/delete with R2
+  - `storage.config.ts`: Configuration for R2 credentials
   - `storage.module.ts`: NestJS module
   - `exceptions/`: Custom exceptions (FileTooLargeException, InvalidFileTypeException, ImageProcessingException, StorageException)
-  - `interfaces/`: TypeScript interfaces cho storage operations
-  - `utils/image-optimization.util.ts`: Image processing với sharp (resize, convert to WebP, validate)
-  - `pipes/file-validation.pipe.ts`: File validation pipe cho upload endpoints
+  - `interfaces/`: TypeScript interfaces for storage operations
+  - `utils/image-optimization.util.ts`: Image processing with sharp (resize, convert to WebP, validate)
+  - `pipes/file-validation.pipe.ts`: File validation pipe for upload endpoints
 - **Avatar Upload Endpoint**:
-  - Updated `PATCH /users/avatar` để accept file upload (multipart/form-data)
+  - Updated `PATCH /users/avatar` to accept file upload (multipart/form-data)
   - File validation: jpg, png, webp, max 5MB
   - Image processing: Resize to 400x400px, convert to WebP
-  - Auto-delete old avatar khi upload mới
+  - Auto-delete old avatar when uploading new one
   - Storage path: `avatars/{userId}/{timestamp}-{uuid}.webp`
-- **Dependencies**: Đã cài đặt `@aws-sdk/client-s3`, `@aws-sdk/lib-storage`, `multer`, `sharp`, `uuid`
-- **Documentation**: Tạo `apps/api/src/storage/README.md` với hướng dẫn setup và usage
+- **Dependencies**: Installed `@aws-sdk/client-s3`, `@aws-sdk/lib-storage`, `multer`, `sharp`, `uuid`
+- **Documentation**: Created `apps/api/src/storage/README.md` with setup and usage instructions
 
-## Next steps cụ thể
+## Specific Next Steps
 
 ### R2 Storage Setup
 
-- Tạo R2 bucket trên Cloudflare Dashboard
-- Tạo API tokens và cấu hình environment variables:
+- Create R2 bucket on Cloudflare Dashboard
+- Create API tokens and configure environment variables:
   - `R2_ACCOUNT_ID`
   - `R2_ACCESS_KEY_ID`
   - `R2_SECRET_ACCESS_KEY`
   - `R2_BUCKET_NAME`
   - `R2_PUBLIC_URL`
   - `R2_ENDPOINT` (optional)
-- Test avatar upload endpoint sau khi setup R2
-- Setup public access cho R2 bucket nếu cần
+- Test avatar upload endpoint after R2 setup
+- Setup public access for R2 bucket if needed
 
 ### Testing
 
-- Test avatar upload với các file types khác nhau
+- Test avatar upload with different file types
 - Test file validation (size, type)
 - Test image optimization
 - Test old avatar deletion
 
 ## Known bugs / edge cases
 
-- Chưa kiểm tra thực tế trên màn hình rất nhỏ (<360px) hoặc rất rộng (>1600px); có thể cần tinh chỉnh thêm class Tailwind cho các breakpoint đó nếu layout bị lệch.
+- Not yet tested on very small screens (<360px) or very wide screens (>1600px); may need additional Tailwind class adjustments for those breakpoints if layout is misaligned.

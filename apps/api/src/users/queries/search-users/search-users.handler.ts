@@ -16,7 +16,7 @@ export class SearchUsersHandler implements IQueryHandler<SearchUsersQuery> {
     const skip = (page - 1) * limit;
 
     // Privacy Logic:
-    // - Nếu requesterRole === ADMIN: Search by email và fullName, return PrivateUserDto
+    // - If requesterRole === ADMIN: Search by email and fullName, return PrivateUserDto
     // - Otherwise (regular users): Search by fullName only, return PublicUserDto (limited data)
     if (requesterRole === UserRole.ADMIN) {
       const where = {

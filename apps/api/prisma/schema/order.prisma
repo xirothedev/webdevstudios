@@ -21,17 +21,17 @@ model CartItem {
   productId String
   product   Product @relation(fields: [productId], references: [id])
 
-  size     ProductSize? // Size sản phẩm (chỉ áo thun có, nullable)
+  size     ProductSize? // Product size (only t-shirt has, nullable)
   quantity Int           @default(1)
 
-  @@unique([cartId, productId, size]) // Một sản phẩm + size chỉ xuất hiện 1 lần trong 1 cart
+  @@unique([cartId, productId, size]) // A product + size can only appear once in a cart
   @@index([cartId])
   @@map("cart_items")
 }
 
 model Order {
   id   String @id @default(cuid())
-  code String @unique // Mã đơn hàng ngắn gọn cho khách đọc (VD: #ORD-1234)
+  code String @unique // Short order code for customer (e.g.: #ORD-1234)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -39,11 +39,11 @@ model Order {
   status        OrderStatus   @default(PENDING)
   paymentStatus PaymentStatus @default(PENDING)
 
-  totalAmount   Decimal @db.Money // Tổng tiền sau cùng
+  totalAmount   Decimal @db.Money // Final total amount
   shippingFee   Decimal @default(0) @db.Money
   discountValue Decimal @default(0) @db.Money
 
-  // Snapshot địa chỉ giao hàng (Lưu cứng dữ liệu text để không bị đổi khi user sửa profile)
+  // Shipping address snapshot (Store text data to prevent changes when user edits profile)
   shippingAddressId String           @unique
   shippingAddress   ShippingAddress  @relation(fields: [shippingAddressId], references: [id], onDelete: Cascade)
 
@@ -57,7 +57,7 @@ model Order {
 }
 
 /**
- * Địa chỉ giao hàng (Snapshot tại thời điểm đặt hàng)
+ * Shipping address (Snapshot at order time)
  */
 model ShippingAddress {
   id          String @id @default(cuid())
@@ -78,20 +78,20 @@ model ShippingAddress {
   @@map("shipping_addresses")
 }
 
-// Lưu lại trạng thái sản phẩm TẠI THỜI ĐIỂM MUA (Snapshot)
+// Store product state AT TIME OF PURCHASE (Snapshot)
 model OrderItem {
   id      String @id @default(cuid())
   orderId String
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  productId String? // Có thể null nếu sản phẩm bị xóa sau này
+  productId String? // Can be null if product is deleted later
   product   Product? @relation(fields: [productId], references: [id])
 
-  // Snapshot data (lưu cứng để không bị ảnh hưởng khi sản phẩm thay đổi)
-  productSlug ProductSlug // Lưu slug để dễ tra cứu
-  productName String      @db.VarChar(255) // Lưu cứng tên sản phẩm
-  size        ProductSize? // Size sản phẩm (nếu có)
-  price       Decimal      @db.Money // Lưu cứng giá lúc mua
+  // Snapshot data (stored to prevent changes when product is updated)
+  productSlug ProductSlug // Store slug for easy lookup
+  productName String      @db.VarChar(255) // Store product name
+  size        ProductSize? // Product size (if available)
+  price       Decimal      @db.Money // Store price at time of purchase
   quantity    Int
 
   @@index([orderId])

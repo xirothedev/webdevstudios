@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRequestPasswordReset } from '@/lib/api/hooks/use-auth';
 
-// Validation schema với Zod
+// Validation schema with Zod
 const forgotPasswordSchema = z.object({
   email: z.email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
 });

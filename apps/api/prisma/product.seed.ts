@@ -32,7 +32,7 @@ Size có sẵn: S, M, L, XL`,
       priceCurrent: 250000,
       priceOriginal: 300000,
       priceDiscount: 50000,
-      stock: 0, // Stock sẽ được tính từ sizeStocks
+      stock: 0, // Stock will be calculated from sizeStocks
       hasSizes: true,
       badge: 'Best Seller',
       ratingValue: 4.5,
@@ -50,7 +50,7 @@ Size có sẵn: S, M, L, XL`,
   });
   console.log(`Created product: ${aoThun.name}`);
 
-  // Create Pad chuột WebDev Studios (without sizes)
+  // Create Mouse Pad WebDev Studios (without sizes)
   const padChuot = await prisma.product.create({
     data: {
       slug: 'PAD_CHUOT',
@@ -76,7 +76,7 @@ Màu sắc: Đen với logo WebDev Studios`,
   });
   console.log(`Created product: ${padChuot.name}`);
 
-  // Create Dây đeo WebDev Studios (without sizes)
+  // Create Lanyard WebDev Studios (without sizes)
   const dayDeo = await prisma.product.create({
     data: {
       slug: 'DAY_DEO',
@@ -102,7 +102,7 @@ Màu sắc: Xanh đen với logo bạc`,
   });
   console.log(`Created product: ${dayDeo.name}`);
 
-  // Create Móc khóa WebDev Studios (without sizes)
+  // Create Keychain WebDev Studios (without sizes)
   const mocKhoa = await prisma.product.create({
     data: {
       slug: 'MOC_KHOA',

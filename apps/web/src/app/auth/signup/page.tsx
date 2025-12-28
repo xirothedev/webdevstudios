@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRegister } from '@/lib/api/hooks/use-auth';
 
-// Validation schema với Zod
+// Validation schema with Zod
 const signupSchema = z
   .object({
     fullName: z.string().min(1, 'Vui lòng nhập họ và tên'),

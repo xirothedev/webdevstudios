@@ -22,7 +22,7 @@ const DEFAULT_OPTIONS: ConvertOptions = {
   deleteOriginal: false,
   quality: 85,
   skipFiles: [
-    // Favicons và icons đặc biệt nên giữ PNG
+    // Favicons and special icons should remain PNG
     'favicon.ico',
     'favicon-16x16.png',
     'favicon-32x32.png',

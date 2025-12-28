@@ -1,19 +1,19 @@
 # Cloudflare R2 Storage Module
 
-Module này cung cấp tích hợp với Cloudflare R2 để lưu trữ files, đặc biệt là avatar images.
+This module provides integration with Cloudflare R2 for file storage, especially avatar images.
 
 ## Setup
 
-### 1. Tạo R2 Bucket trên Cloudflare
+### 1. Create R2 Bucket on Cloudflare
 
-1. Đăng nhập vào Cloudflare Dashboard
-2. Vào R2 Object Storage
-3. Tạo bucket mới (ví dụ: `webdevstudios-storage`)
-4. Tạo API Token với quyền read/write
+1. Log in to Cloudflare Dashboard
+2. Go to R2 Object Storage
+3. Create new bucket (e.g.: `webdevstudios-storage`)
+4. Create API Token with read/write permissions
 
-### 2. Cấu hình Environment Variables
+### 2. Configure Environment Variables
 
-Thêm các biến sau vào file `.env`:
+Add the following variables to `.env` file:
 
 ```env
 R2_ACCOUNT_ID=your_account_id
@@ -24,22 +24,22 @@ R2_PUBLIC_URL=https://pub-xxxxx.r2.dev
 R2_ENDPOINT=https://xxxxx.r2.cloudflarestorage.com
 ```
 
-**Lưu ý:**
+**Notes:**
 
-- `R2_ACCOUNT_ID`: Account ID của Cloudflare (tìm trong dashboard)
-- `R2_ACCESS_KEY_ID` và `R2_SECRET_ACCESS_KEY`: Tạo từ R2 > Manage R2 API Tokens
-- `R2_BUCKET_NAME`: Tên bucket đã tạo
-- `R2_PUBLIC_URL`: Public URL của bucket (có thể setup custom domain)
-- `R2_ENDPOINT`: Endpoint URL (có thể để trống, sẽ tự động generate từ account ID)
+- `R2_ACCOUNT_ID`: Cloudflare Account ID (find in dashboard)
+- `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`: Create from R2 > Manage R2 API Tokens
+- `R2_BUCKET_NAME`: Name of created bucket
+- `R2_PUBLIC_URL`: Public URL of bucket (can setup custom domain)
+- `R2_ENDPOINT`: Endpoint URL (can be left empty, will auto-generate from account ID)
 
 ### 3. Setup Public Access (Optional)
 
-Để files có thể truy cập public, cần:
+To make files publicly accessible:
 
-1. Vào R2 bucket settings
+1. Go to R2 bucket settings
 2. Enable Public Access
-3. Setup CORS nếu cần
-4. Lấy Public URL và thêm vào `R2_PUBLIC_URL`
+3. Setup CORS if needed
+4. Get Public URL and add to `R2_PUBLIC_URL`
 
 ## Usage
 
@@ -53,11 +53,11 @@ R2_ENDPOINT=https://xxxxx.r2.cloudflarestorage.com
 // Allowed types: jpg, jpeg, png, webp
 ```
 
-Image sẽ được:
+Image will be:
 
-- Resize về 400x400px (square, cover fit)
-- Convert sang WebP format
-- Upload lên R2 với path: `avatars/{userId}/{timestamp}-{uuid}.webp`
+- Resized to 400x400px (square, cover fit)
+- Converted to WebP format
+- Uploaded to R2 with path: `avatars/{userId}/{timestamp}-{uuid}.webp`
 
 ### Storage Service
 
@@ -87,7 +87,7 @@ const url = storageService.getFileUrl('path/to/file.jpg');
 
 ## Image Processing
 
-Module sử dụng `sharp` để:
+Module uses `sharp` to:
 
 - Validate image format
 - Resize images
@@ -96,22 +96,22 @@ Module sử dụng `sharp` để:
 
 ## Error Handling
 
-Module cung cấp các custom exceptions:
+Module provides custom exceptions:
 
-- `FileTooLargeException`: File vượt quá kích thước cho phép
-- `InvalidFileTypeException`: File type không được phép
-- `ImageProcessingException`: Lỗi khi xử lý image
-- `StorageException`: Lỗi khi upload/delete file
+- `FileTooLargeException`: File exceeds allowed size
+- `InvalidFileTypeException`: File type not allowed
+- `ImageProcessingException`: Error when processing image
+- `StorageException`: Error when uploading/deleting file
 
 ## Security
 
 - File validation (type, size)
 - Authentication required (JWT guard)
 - File name sanitization
-- Image optimization để giảm kích thước
+- Image optimization to reduce file size
 
 ## Performance
 
-- Image optimization trước khi upload
-- WebP format để giảm kích thước file
-- CDN caching với Cloudflare
+- Image optimization before upload
+- WebP format to reduce file size
+- CDN caching with Cloudflare

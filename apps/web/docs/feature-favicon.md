@@ -1,80 +1,80 @@
-# Favicon và App Icons
+# Favicon and App Icons
 
-## Tổng quan
+## Overview
 
-Dự án đã được cấu hình để sử dụng logo WDS (`wds-logo.png`) làm favicon và các icon cho Android, iOS và các nền tảng khác.
+The project has been configured to use WDS logo (`wds-logo.png`) as favicon and icons for Android, iOS and other platforms.
 
-## Cấu trúc Files
+## File Structure
 
 ### Favicon Files
 
-Script `generate-icons.py` tạo các file sau trong `public/` directory:
+Script `generate-icons.py` creates the following files in `public/` directory:
 
-- `public/favicon.ico` - Favicon chính (multi-size ICO: 16x16, 32x32, 48x48)
+- `public/favicon.ico` - Main favicon (multi-size ICO: 16x16, 32x32, 48x48)
 - `public/favicon-16x16.png` - Favicon PNG 16x16
 - `public/favicon-32x32.png` - Favicon PNG 32x32
-- `public/icon-192x192.png` - Icon 192x192 cho Android Chrome và manifest
-- `public/icon-512x512.png` - Icon 512x512 cho Android Chrome và manifest
+- `public/icon-192x192.png` - Icon 192x192 for Android Chrome and manifest
+- `public/icon-512x512.png` - Icon 512x512 for Android Chrome and manifest
 - `public/apple-touch-icon.png` - Apple touch icon (180x180)
 
 ### Manifest File
 
-- `public/site.webmanifest` - Web app manifest cho PWA
+- `public/site.webmanifest` - Web app manifest for PWA
 
-## Cấu hình
+## Configuration
 
 ### Layout Metadata
 
-File `src/app/layout.tsx` đã được cấu hình với metadata đầy đủ cho:
+File `src/app/layout.tsx` has been configured with complete metadata for:
 
-- Favicon (nhiều kích thước)
+- Favicon (multiple sizes)
 - Apple touch icons
 - Android Chrome icons
 - Web manifest
 
 ### Next.js App Directory
 
-Next.js 16 tự động nhận diện các file favicon trong `public/` directory:
+Next.js 16 automatically recognizes favicon files in `public/` directory:
 
-- `favicon.ico` - Được sử dụng tự động
-- `apple-touch-icon.png` - Được sử dụng cho iOS devices
-- Các file icon khác được tham chiếu trong metadata
+- `favicon.ico` - Automatically used
+- `apple-touch-icon.png` - Used for iOS devices
+- Other icon files are referenced in metadata
 
 ## Script Generation
 
-Script `scripts/generate-icons.py` được sử dụng để tạo tất cả các icon từ file PNG logo.
+Script `scripts/generate-icons.py` is used to generate all icons from PNG logo file.
 
-### Sử dụng script:
+### Using the script:
 
 ```bash
 cd apps/web
 python3 scripts/generate-icons.py
 ```
 
-### Yêu cầu:
+### Requirements:
 
 - Python 3
 - PIL/Pillow library (`pip install Pillow`)
-- File logo PNG: `public/wds-logo.png`
+- Logo PNG file: `public/wds-logo.png`
 
-## Cập nhật Icon
+## Updating Icons
 
-Để cập nhật icon:
+To update icons:
 
-1. Thay thế file `public/wds-logo.png` với logo mới (PNG format)
-2. Chạy script: `python3 scripts/generate-icons.py`
-3. Tất cả các icon sẽ được tự động tạo lại trong `public/` directory
+1. Replace file `public/wds-logo.png` with new logo (PNG format)
+2. Run script: `python3 scripts/generate-icons.py`
+3. All icons will be automatically regenerated in `public/` directory
 
 ## Browser Support
 
-- **Chrome/Edge**: Sử dụng favicon.ico và các PNG icons
-- **Firefox**: Sử dụng favicon.ico
-- **Safari (iOS)**: Sử dụng apple-touch-icon.png
-- **Android Chrome**: Sử dụng icon-192x192.png và icon-512x512.png trong manifest
+- **Chrome/Edge**: Uses favicon.ico and PNG icons
+- **Firefox**: Uses favicon.ico
+- **Safari (iOS)**: Uses apple-touch-icon.png
+- **Android Chrome**: Uses icon-192x192.png and icon-512x512.png in manifest
 
 ## Notes
 
-- Tất cả icons được tạo từ cùng một file PNG gốc để đảm bảo tính nhất quán
-- Icons được tối ưu hóa kích thước file
-- Web manifest hỗ trợ PWA functionality
-- Metadata trong `layout.tsx` và `site.webmanifest` đã được cấu hình để sử dụng đúng các file icon
+- All icons are generated from the same source PNG file to ensure consistency
+- Icons are optimized for file size
+- Web manifest supports PWA functionality
+- Metadata in `layout.tsx` and `site.webmanifest` has been configured to use the correct icon files

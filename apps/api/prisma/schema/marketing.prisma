@@ -6,13 +6,13 @@ model Voucher {
   id    String       @id @default(cuid())
   code  String       @unique @db.VarChar(20)
   type  DiscountType
-  value Decimal      @db.Money // Giá trị giảm (số tiền hoặc %)
+  value Decimal      @db.Money // Discount value (amount or %)
 
-  minSpend    Decimal? @db.Money // Đơn tối thiểu
-  maxDiscount Decimal? @db.Money // Giảm tối đa (cho loại %)
+  minSpend    Decimal? @db.Money // Minimum order
+  maxDiscount Decimal? @db.Money // Maximum discount (for % type)
 
-  usageLimit Int @default(100) // Tổng số lần dùng
-  usedCount  Int @default(0) // Đã dùng
+  usageLimit Int @default(100) // Total usage count
+  usedCount  Int @default(0) // Used count
 
   startDate DateTime
   endDate   DateTime
@@ -23,7 +23,7 @@ model Voucher {
 
 model Review {
   id      String  @id @default(cuid())
-  rating  Int     @default(5) // 1-5 sao
+  rating  Int     @default(5) // 1-5 stars
   comment String? @db.Text
 
   userId String

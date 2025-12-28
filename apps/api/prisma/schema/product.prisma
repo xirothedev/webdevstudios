@@ -5,23 +5,23 @@
 
 model Product {
   id          String      @id @default(cuid())
-  slug        ProductSlug @unique // Enum đảm bảo chỉ có 4 sản phẩm
+  slug        ProductSlug @unique // Enum ensures only 4 products
   name        String      @db.VarChar(255)
   description String      @db.Text
 
-  // Giá sản phẩm
-  priceCurrent  Decimal @db.Money // Giá hiện tại
-  priceOriginal Decimal? @db.Money // Giá gốc (nếu có giảm giá)
-  priceDiscount Decimal? @db.Money // Số tiền giảm
+  // Product pricing
+  priceCurrent  Decimal @db.Money // Current price
+  priceOriginal Decimal? @db.Money // Original price (if discounted)
+  priceDiscount Decimal? @db.Money // Discount amount
 
-  // Thông tin sản phẩm
-  stock       Int     @default(0) // Tổng số lượng tồn kho
-  hasSizes    Boolean @default(false) // Có hỗ trợ chọn size không (chỉ áo thun)
-  badge       String? @db.VarChar(50) // Badge hiển thị (Limited Edition, Official Merch)
+  // Product information
+  stock       Int     @default(0) // Total stock quantity
+  hasSizes    Boolean @default(false) // Whether size selection is supported (only t-shirt)
+  badge       String? @db.VarChar(50) // Display badge (Limited Edition, Official Merch)
 
-  // Đánh giá sản phẩm
-  ratingValue Decimal @default(0) @db.Decimal(3, 2) // Điểm đánh giá (0-5)
-  ratingCount  Int     @default(0) // Số lượng đánh giá
+  // Product ratings
+  ratingValue Decimal @default(0) @db.Decimal(3, 2) // Rating score (0-5)
+  ratingCount  Int     @default(0) // Number of ratings
 
   // Metadata
   isPublished Boolean  @default(true)
@@ -29,7 +29,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  sizeStocks ProductSizeStock[] // Quản lý stock theo size (chỉ áo thun)
+  sizeStocks ProductSizeStock[] // Manage stock by size (only t-shirt)
   cartItems  CartItem[]
   orderItems OrderItem[]
   reviews    Review[]
@@ -39,8 +39,8 @@ model Product {
 }
 
 /**
- * Quản lý tồn kho theo size (chỉ cho áo thun)
- * Nếu sản phẩm không có size, stock được lưu trực tiếp ở Product.stock
+ * Manage stock by size (only for t-shirt)
+ * If product doesn't have sizes, stock is stored directly in Product.stock
  */
 model ProductSizeStock {
   id     String      @id @default(cuid())
@@ -50,7 +50,7 @@ model ProductSizeStock {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, size]) // Mỗi size của 1 sản phẩm chỉ có 1 record
+  @@unique([productId, size]) // Each size of a product has only 1 record
   @@index([productId])
   @@map("product_size_stocks")
 }

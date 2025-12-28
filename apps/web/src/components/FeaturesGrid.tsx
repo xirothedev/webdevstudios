@@ -91,7 +91,7 @@ export function FeaturesGrid() {
         </div>
 
         <div className="grid auto-rows-[340px] grid-cols-1 gap-6 md:grid-cols-3">
-          {/* Feature 1: Áo thun WDS (Large) */}
+          {/* Feature 1: WDS T-shirt (Large) */}
           <GlassCard colSpan="md:col-span-2">
             <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
               {/* Animated border gradient */}
@@ -141,7 +141,7 @@ export function FeaturesGrid() {
             </div>
           </GlassCard>
 
-          {/* Feature 2: Móc khóa WebDev Studios */}
+          {/* Feature 2: Keychain WebDev Studios */}
           <GlassCard>
             <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
               <div className="absolute inset-0 bg-linear-to-r from-purple-500 via-pink-500 to-purple-500 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-50" />
@@ -181,7 +181,7 @@ export function FeaturesGrid() {
             </div>
           </GlassCard>
 
-          {/* Feature 3: Dây đeo WebDev Studios */}
+          {/* Feature 3: Lanyard WebDev Studios */}
           <GlassCard>
             <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
               <div className="absolute inset-0 bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-500 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-50" />
@@ -220,7 +220,7 @@ export function FeaturesGrid() {
             </div>
           </GlassCard>
 
-          {/* Feature 4: Pad chuột WebDev Studios Limited Edition (Large) */}
+          {/* Feature 4: Mouse Pad WebDev Studios Limited Edition (Large) */}
           <GlassCard colSpan="md:col-span-2">
             <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl">
               {/* Shimmer effect */}
