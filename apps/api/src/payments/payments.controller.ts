@@ -1,33 +1,52 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { UserRole } from '@generated/prisma';
 import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
 import { Public } from '@/common/decorators/public.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
 import {
   ThrottleAPI,
   ThrottlePayment,
 } from '@/common/decorators/throttle.decorator';
+import { RolesGuard } from '@/common/guards/roles.guard';
 
 import { CreatePaymentLinkCommand } from './commands/create-payment-link/create-payment-link.command';
 import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook/process-payment-webhook.command';
 import {
   CreatePaymentLinkRequestDto,
   PaymentLinkResponseDto,
+  TransactionListResponseDto,
   WebhookDto,
 } from './dtos/payment.dto';
+import { ListTransactionsQuery } from './queries/list-transactions/list-transactions.query';
 
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
   private readonly logger = new Logger(PaymentsController.name);
 
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
+  ) {}
 
   @ThrottlePayment()
   @Post('create-link')
@@ -137,5 +156,55 @@ export class PaymentsController {
     // This can be implemented as a query if needed
     // For now, return basic info
     return { transactionCode, message: 'Use order endpoint to check status' };
+  }
+
+  @Get('transactions')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List payment transactions (Admin only)',
+    description:
+      'Get a paginated list of all payment transactions. Admin only endpoint.',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number',
+    example: 1,
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Number of items per page',
+    example: 10,
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'status',
+    description: 'Filter by transaction status',
+    enum: ['PENDING', 'PAID', 'CANCELLED', 'EXPIRED', 'FAILED'],
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Transactions retrieved successfully',
+    type: TransactionListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  async listTransactions(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string
+  ): Promise<TransactionListResponseDto> {
+    return this.queryBus.execute(
+      new ListTransactionsQuery(
+        page ? parseInt(page, 10) : 1,
+        limit ? parseInt(limit, 10) : 10,
+        status as any
+      )
+    );
   }
 }

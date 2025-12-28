@@ -155,3 +155,84 @@ export class WebhookDto {
   })
   virtualAccountNumber?: string;
 }
+
+export class TransactionDto {
+  @ApiProperty({
+    description: 'Transaction ID',
+    example: 'clx1234567890',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'Order ID',
+    example: 'clx1234567890',
+  })
+  orderId: string;
+
+  @ApiProperty({
+    description: 'Transaction code from PayOS',
+    example: '1234567890',
+  })
+  transactionCode: string;
+
+  @ApiProperty({
+    description: 'Transaction amount',
+    example: 897000,
+    type: Number,
+  })
+  amount: number;
+
+  @ApiProperty({
+    description: 'Transaction status',
+    enum: ['PENDING', 'PAID', 'CANCELLED', 'EXPIRED', 'FAILED'],
+    example: 'PENDING',
+  })
+  status: string;
+
+  @ApiPropertyOptional({
+    description: 'Payment URL',
+    example: 'https://pay.payos.vn/web/...',
+    nullable: true,
+  })
+  paymentUrl: string | null;
+
+  @ApiProperty({
+    description: 'Created at',
+    example: '2024-01-01T00:00:00.000Z',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Updated at',
+    example: '2024-01-01T00:00:00.000Z',
+  })
+  updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Order information',
+  })
+  order: {
+    id: string;
+    code: string;
+    userId: string;
+    totalAmount: number;
+  };
+}
+
+export class TransactionListResponseDto {
+  @ApiProperty({
+    description: 'List of transactions',
+    type: [TransactionDto],
+  })
+  transactions: TransactionDto[];
+
+  @ApiProperty({
+    description: 'Pagination metadata',
+  })
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
