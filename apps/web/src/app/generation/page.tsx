@@ -10,12 +10,12 @@ import {
   Star,
   Users,
 } from 'lucide-react';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { Footer } from '@/components/Footer';
+import { GenerationMemberAvatar } from '@/components/generation/GenerationMemberAvatar';
 import { Navbar } from '@/components/Navbar';
-import { type Generation, generations, getInitials } from '@/data/generations';
+import { type Generation, generations } from '@/data/generations';
 
 // Expandable Generation Section for Mobile
 function ExpandableGenerationSection({
@@ -90,27 +90,13 @@ function ExpandableGenerationSection({
               <div className="via-wds-accent/10 absolute inset-0 rounded-2xl bg-linear-to-r from-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
               {/* Avatar */}
-              <div className="relative">
-                {member.avatar ? (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 group-hover:shadow-wds-accent/50 overflow-hidden rounded-full bg-linear-to-br shadow-lg transition-shadow">
-                    <Image
-                      src={member.avatar}
-                      alt={member.name}
-                      width={120}
-                      height={120}
-                      className="h-20 w-20 object-cover transition-transform duration-300 group-hover:scale-110 sm:h-28 sm:w-28"
-                    />
-                  </div>
-                ) : (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br text-lg font-black text-black shadow-lg sm:h-28 sm:w-28 sm:text-2xl">
-                    {getInitials(member.name)}
-                  </div>
-                )}
-                {/* Crown badge for leaders */}
-                <div className="text-wds-accent absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-black shadow-lg sm:h-7 sm:w-7">
-                  <Crown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                </div>
-              </div>
+              <GenerationMemberAvatar
+                avatar={member.avatar}
+                name={member.name}
+                isLeader={member.isLeader}
+                size="small"
+                variant="mobile"
+              />
 
               {/* Member info */}
               <div className="relative z-10 flex flex-col items-center gap-1 text-center">
@@ -133,22 +119,13 @@ function ExpandableGenerationSection({
               className="group hover:border-wds-accent/60 hover:shadow-wds-accent/20 relative flex flex-col items-center gap-2 rounded-xl border border-gray-200/50 bg-white/80 p-3 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white sm:gap-3 sm:p-4"
             >
               {/* Avatar */}
-              {member.avatar ? (
-                <div className="bg-wds-accent/20 overflow-hidden rounded-full">
-                  <Image
-                    src={member.avatar}
-                    alt={member.name}
-                    width={64}
-                    height={64}
-                    sizes="(max-width: 768px) 144px, 288px"
-                    className="h-14 w-14 object-cover transition-transform duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
-                  />
-                </div>
-              ) : (
-                <div className="bg-wds-accent/20 text-wds-accent flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold sm:h-20 sm:w-20 sm:text-base">
-                  {getInitials(member.name)}
-                </div>
-              )}
+              <GenerationMemberAvatar
+                avatar={member.avatar}
+                name={member.name}
+                isLeader={member.isLeader}
+                size="small"
+                variant="mobile"
+              />
 
               {/* Member info */}
               <div className="flex flex-col items-center gap-0.5 text-center sm:gap-1">
@@ -225,28 +202,13 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
               <div className="from-wds-accent/0 to-wds-accent/5 absolute inset-0 rounded-2xl bg-linear-to-b opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
               {/* Avatar */}
-              <div className="relative">
-                {leader1.avatar ? (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 group-hover:shadow-wds-accent/50 overflow-hidden rounded-full bg-linear-to-br shadow-lg transition-all duration-300">
-                    <Image
-                      src={leader1.avatar}
-                      alt={leader1.name}
-                      width={160}
-                      height={160}
-                      className="h-40 w-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                ) : (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 flex h-40 w-40 items-center justify-center rounded-full bg-linear-to-br text-2xl font-black text-black shadow-lg">
-                    {getInitials(leader1.name)}
-                  </div>
-                )}
-                {leader1.isLeader && (
-                  <div className="text-wds-accent absolute right-2 bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-black">
-                    <Crown className="h-4 w-4" />
-                  </div>
-                )}
-              </div>
+              <GenerationMemberAvatar
+                avatar={leader1.avatar}
+                name={leader1.name}
+                isLeader={leader1.isLeader}
+                size="small"
+                variant="desktop"
+              />
 
               {/* Member info */}
               <div className="relative z-10 flex flex-col items-center gap-2 text-center">
@@ -264,28 +226,13 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
           <div className="row-span-2">
             <article className="hover:border-wds-accent/60 hover:shadow-wds-accent/20 group relative flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white p-8 transition-all duration-300 hover:-translate-y-1">
               <div className="from-wds-accent/0 to-wds-accent/5 absolute inset-0 rounded-2xl bg-linear-to-b opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <div className="relative">
-                {leader2.avatar ? (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 group-hover:shadow-wds-accent/50 overflow-hidden rounded-full bg-linear-to-br shadow-lg transition-all duration-300">
-                    <Image
-                      src={leader2.avatar}
-                      alt={leader2.name}
-                      width={160}
-                      height={160}
-                      className="h-40 w-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                ) : (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 flex h-40 w-40 items-center justify-center rounded-full bg-linear-to-br text-2xl font-black text-black shadow-lg">
-                    {getInitials(leader2.name)}
-                  </div>
-                )}
-                {leader2.isLeader && (
-                  <div className="text-wds-accent absolute right-2 bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-black">
-                    <Crown className="h-4 w-4" />
-                  </div>
-                )}
-              </div>
+              <GenerationMemberAvatar
+                avatar={leader2.avatar}
+                name={leader2.name}
+                isLeader={leader2.isLeader}
+                size="small"
+                variant="desktop"
+              />
               <div className="relative z-10 flex flex-col items-center gap-2 text-center">
                 <h3 className="group-hover:text-wds-accent text-lg leading-tight font-bold text-black transition-colors">
                   {leader2.name}
@@ -301,28 +248,13 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
           <div className="row-span-2">
             <article className="hover:border-wds-accent/60 hover:shadow-wds-accent/20 group relative flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white p-8 transition-all duration-300 hover:-translate-y-1">
               <div className="from-wds-accent/0 to-wds-accent/5 absolute inset-0 rounded-2xl bg-linear-to-b opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <div className="relative">
-                {leader3.avatar ? (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 group-hover:shadow-wds-accent/50 overflow-hidden rounded-full bg-linear-to-br shadow-lg transition-all duration-300">
-                    <Image
-                      src={leader3.avatar}
-                      alt={leader3.name}
-                      width={160}
-                      height={160}
-                      className="h-40 w-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                ) : (
-                  <div className="from-wds-accent to-wds-accent/70 shadow-wds-accent/30 flex h-40 w-40 items-center justify-center rounded-full bg-linear-to-br text-2xl font-black text-black shadow-lg">
-                    {getInitials(leader3.name)}
-                  </div>
-                )}
-                {leader3.isLeader && (
-                  <div className="text-wds-accent absolute right-2 bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-black">
-                    <Crown className="h-4 w-4" />
-                  </div>
-                )}
-              </div>
+              <GenerationMemberAvatar
+                avatar={leader3.avatar}
+                name={leader3.name}
+                isLeader={leader3.isLeader}
+                size="small"
+                variant="desktop"
+              />
               <div className="relative z-10 flex flex-col items-center gap-2 text-center">
                 <h3 className="group-hover:text-wds-accent text-lg leading-tight font-bold text-black transition-colors">
                   {leader3.name}
@@ -339,22 +271,13 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
         {members.map((member) => (
           <div key={member.id} className="row-span-1">
             <article className="hover:border-wds-accent/60 hover:shadow-wds-accent/20 group relative flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5">
-              {member.avatar ? (
-                <div className="bg-wds-accent/20 overflow-hidden rounded-full">
-                  <Image
-                    src={member.avatar}
-                    alt={member.name}
-                    width={64}
-                    height={64}
-                    sizes="(max-width: 768px) 144px, 288px"
-                    className="h-28 w-28 object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                </div>
-              ) : (
-                <div className="bg-wds-accent/20 text-wds-accent flex h-16 w-16 items-center justify-center rounded-full text-lg font-bold">
-                  {getInitials(member.name)}
-                </div>
-              )}
+              <GenerationMemberAvatar
+                avatar={member.avatar}
+                name={member.name}
+                isLeader={member.isLeader}
+                size="small"
+                variant="desktop"
+              />
               <div className="flex flex-col items-center gap-1 text-center">
                 <h3 className="group-hover:text-wds-accent text-sm leading-snug font-semibold text-black transition-colors">
                   {member.name}
