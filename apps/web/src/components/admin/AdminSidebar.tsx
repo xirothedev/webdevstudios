@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  BookOpen,
   LogOut,
   Package,
   ShoppingCart,
@@ -19,6 +20,7 @@ const navigation = [
   { name: 'Products', href: '/admin/products', icon: Package },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Transactions', href: '/admin/transactions', icon: Wallet },
+  { name: 'Blog', href: '/admin/blog', icon: BookOpen },
 ];
 
 export function AdminSidebar() {
