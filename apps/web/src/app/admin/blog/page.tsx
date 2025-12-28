@@ -26,8 +26,8 @@ export default function AdminBlogPage() {
         description="Quản lý các bài viết blog của WebDev Studios"
         actions={
           <Link href="/admin/blog/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
+            <Button className="bg-wds-accent hover:bg-wds-accent/90 text-black shadow-lg transition-all hover:shadow-xl">
+              <Plus className="h-4 w-4" />
               Tạo bài viết mới
             </Button>
           </Link>
