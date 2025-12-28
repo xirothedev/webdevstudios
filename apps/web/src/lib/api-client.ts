@@ -172,6 +172,7 @@ apiClient.interceptors.response.use(
             '/generation', // Generation page
             '/calendar', // Calendar page
             '/achievements', // Achievements page
+            '/activities', // Activities page
             '/partner', // Partner page
             '/blog', // Blog listing page
           ];

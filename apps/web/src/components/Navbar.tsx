@@ -37,6 +37,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'Trang chủ', href: '/' },
     { label: 'Về chúng tôi', href: '/about' },
     { label: 'Thành tích', href: '/achievements' },
+    { label: 'Hoạt động', href: '/activities' },
     { label: 'Đối tác', href: '/partner' },
     { label: 'Blog', href: '/blog' },
     { label: 'Thế hệ', href: '/generation' },

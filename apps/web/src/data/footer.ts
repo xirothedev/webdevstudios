@@ -24,6 +24,7 @@ export const footerSections: FooterSection[] = [
     links: [
       { label: 'Về chúng tôi', href: '/about' },
       { label: 'Thành tích', href: '/achievements' },
+      { label: 'Hoạt động', href: '/activities' },
       { label: 'Đối tác', href: '/partner' },
       { label: 'FAQ', href: '/faq' },
       { label: 'Thế hệ', href: '/generation' },
