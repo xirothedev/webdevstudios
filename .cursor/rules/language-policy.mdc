@@ -1,0 +1,354 @@
+---
+alwaysApply: true
+---
+# Language Policy
+
+## Overview
+
+This project follows a strict language policy to ensure consistency across documentation, code, and user-facing content.
+
+**CRITICAL RULE:**
+- **Documentation & Comments**: ALWAYS English
+- **Website Content**: ALWAYS Vietnamese (user-facing)
+- **Code**: ALWAYS English (variables, functions, etc.)
+
+## Rules
+
+### 1. Documentation and Comments - ALWAYS English
+
+**All markdown files, code comments, and technical documentation MUST be written in English.**
+
+#### Markdown Files
+- ✅ `docs/**/*.md` - English
+- ✅ `apps/web/docs/**/*.md` - English
+- ✅ `apps/api/**/README.md` - English
+- ✅ `MEMORIZE.md` - English
+- ✅ `.cursor/rules/**/*.md` - English
+- ✅ `.cursor/commands/**/*.md` - English
+- ✅ `.cursor/plans/**/*.md` - English
+
+#### Code Comments
+- ✅ All TypeScript/JavaScript comments (`//`, `/* */`) - English
+- ✅ All Prisma schema comments - English
+- ✅ All inline documentation - English
+- ✅ JSDoc comments - English
+- ✅ Function/class documentation - English
+
+#### Examples:
+
+```typescript
+// ✅ CORRECT - English comment
+/**
+ * Get user by ID with privacy logic
+ * Returns PrivateUserDto if requester is owner or admin
+ */
+export function getUserById(id: string) {
+  // Implementation here
+}
+
+// ❌ WRONG - Vietnamese comment
+/**
+ * Lấy thông tin user theo ID với logic bảo mật
+ * Trả về PrivateUserDto nếu người yêu cầu là chủ sở hữu hoặc admin
+ */
+```
+
+```prisma
+// ✅ CORRECT - English comment
+model Product {
+  id String @id @default(cuid())
+  // Product pricing information
+  priceCurrent Decimal @db.Money
+}
+
+// ❌ WRONG - Vietnamese comment
+model Product {
+  id String @id @default(cuid())
+  // Thông tin giá sản phẩm
+  priceCurrent Decimal @db.Money
+}
+```
+
+### 2. Website Content - Vietnamese
+
+**All user-facing website content MUST be written in Vietnamese.**
+
+#### User-Facing Content Includes:
+- ✅ Page titles and descriptions (metadata)
+- ✅ UI text (buttons, labels, messages)
+- ✅ Form labels and placeholders
+- ✅ Error messages
+- ✅ Success messages
+- ✅ Product descriptions
+- ✅ Legal content (terms, privacy policy)
+- ✅ Blog posts and articles
+- ✅ Email templates
+- ✅ Notification messages
+- ✅ API response messages (user-facing)
+
+#### Examples:
+
+```tsx
+// ✅ CORRECT - Vietnamese user-facing content
+export function ProductSizeGuide() {
+  return (
+    <div>
+      <h2>Bảng size</h2>
+      <p>Đo kích thước áo của bạn để chọn size phù hợp nhất.</p>
+      <button>Thêm vào giỏ hàng</button>
+    </div>
+  );
+}
+
+// ❌ WRONG - English user-facing content
+export function ProductSizeGuide() {
+  return (
+    <div>
+      <h2>Size Chart</h2>
+      <p>Measure your shirt size to choose the best fit.</p>
+      <button>Add to Cart</button>
+    </div>
+  );
+}
+```
+
+```tsx
+// ✅ CORRECT - Vietnamese metadata
+export const metadata = {
+  title: 'Sản phẩm',
+  description: 'Khám phá bộ sưu tập sản phẩm WebDev Studios',
+};
+
+// ❌ WRONG - English metadata
+export const metadata = {
+  title: 'Products',
+  description: 'Explore WebDev Studios product collection',
+};
+```
+
+### 3. Code and Technical Content - English
+
+**All code-related content MUST be in English.**
+
+#### Code Elements:
+- ✅ Variable names - English
+- ✅ Function names - English
+- ✅ Class names - English
+- ✅ File names - English (kebab-case or camelCase)
+- ✅ API endpoint paths - English
+- ✅ Database table/column names - English
+- ✅ Environment variable names - English
+- ✅ Configuration keys - English
+
+#### Examples:
+
+```typescript
+// ✅ CORRECT - English code
+interface ProductSizeGuideProps {
+  title: string;
+  delay: number;
+}
+
+function calculateTotalPrice(items: CartItem[]): number {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
+
+// ❌ WRONG - Vietnamese code
+interface ThongTinSizeProps {
+  tieuDe: string;
+  doTre: number;
+}
+
+function tinhTongGia(sanPham: GioHangItem[]): number {
+  return sanPham.reduce((tong, item) => tong + item.gia, 0);
+}
+```
+
+### 4. API Responses - Context Dependent
+
+**API responses depend on the context:**
+
+- ✅ **Technical/Internal APIs**: English (for developers)
+- ✅ **User-Facing APIs**: Vietnamese (for end users)
+- ✅ **Error codes**: English (technical)
+- ✅ **Error messages (user-facing)**: Vietnamese
+
+#### Examples:
+
+```typescript
+// ✅ CORRECT - Technical API response (English)
+{
+  "statusCode": 404,
+  "message": "User not found",
+  "error": "Not Found"
+}
+
+// ✅ CORRECT - User-facing API response (Vietnamese)
+{
+  "success": false,
+  "message": "Không tìm thấy người dùng",
+  "code": "USER_NOT_FOUND"
+}
+```
+
+## File Type Guidelines
+
+### Markdown Files (`.md`)
+- **Language**: English
+- **Purpose**: Documentation, guides, notes
+- **Exception**: None - always English
+
+### TypeScript/JavaScript Files (`.ts`, `.tsx`, `.js`, `.jsx`)
+- **Comments**: English
+- **Code**: English (variable names, functions, etc.)
+- **User-facing strings**: Vietnamese (if displayed to users)
+- **Technical strings**: English (error codes, etc.)
+
+### Prisma Schema Files (`.prisma`)
+- **Comments**: English
+- **Model/Field names**: English
+- **Enum values**: English (technical identifiers)
+
+### MDX Files (`.mdx`)
+- **Documentation MDX**: English
+- **Content MDX (user-facing)**: Vietnamese
+- **Code examples**: English
+
+### JSON Files (`.json`)
+- **Config files**: English keys
+- **i18n files**: Vietnamese values (if user-facing)
+- **Package.json**: English
+
+## Implementation Checklist
+
+When working on files, ensure:
+
+- [ ] All markdown files are in English
+- [ ] All code comments are in English
+- [ ] All user-facing UI text is in Vietnamese
+- [ ] All variable/function names are in English
+- [ ] All API technical responses are in English
+- [ ] All user-facing API messages are in Vietnamese
+- [ ] Documentation is in English
+- [ ] Error messages shown to users are in Vietnamese
+
+## Examples by File Type
+
+### Documentation File (`docs/feature.md`)
+```markdown
+# Feature: Product Size Guide
+
+## Overview
+This feature allows users to view product size charts and measurements.
+
+## Implementation
+The component uses motion/react for animations.
+```
+
+### Component File (`components/ProductSizeGuide.tsx`)
+```tsx
+// ✅ CORRECT
+'use client';
+
+import { motion } from 'motion/react';
+
+/**
+ * Product size guide component
+ * Displays size chart and measurement instructions
+ */
+export function ProductSizeGuide({
+  title = 'Bảng size', // Vietnamese - user-facing
+  delay = 0.3,
+}: ProductSizeGuideProps) {
+  return (
+    <div>
+      <h2>{title}</h2>
+      <p>Đo kích thước áo của bạn để chọn size phù hợp nhất.</p>
+      {/* Vietnamese - user-facing content */}
+    </div>
+  );
+}
+```
+
+### API Handler (`api/users/handler.ts`)
+```typescript
+// ✅ CORRECT
+/**
+ * Get user by ID with privacy logic
+ * Returns PrivateUserDto if requester is owner or admin
+ */
+export async function getUserById(id: string) {
+  const user = await prisma.user.findUnique({ where: { id } });
+  
+  if (!user) {
+    throw new NotFoundException('User not found'); // English - technical
+  }
+  
+  return {
+    message: 'Lấy thông tin người dùng thành công', // Vietnamese - user-facing
+    data: user,
+  };
+}
+```
+
+### Seed File (`prisma/product.seed.ts`)
+```typescript
+// ✅ CORRECT
+// Create T-shirt product (with sizes)
+const aoThun = await prisma.product.create({
+  data: {
+    slug: 'AO_THUN',
+    name: 'Áo Thun WebDev Studios', // Vietnamese - product name
+    description: `Áo thun chất lượng cao...`, // Vietnamese - product description
+    priceCurrent: 250000,
+    stock: 0, // Stock will be calculated from sizeStocks
+  },
+});
+```
+
+## Common Mistakes to Avoid
+
+### ❌ Don't Do This:
+- ❌ Write markdown files in Vietnamese
+- ❌ Write code comments in Vietnamese
+- ❌ Use Vietnamese for variable/function names
+- ❌ Write user-facing UI text in English
+- ❌ Mix languages in the same file type
+
+### ✅ Do This Instead:
+- ✅ Always write markdown in English
+- ✅ Always write code comments in English
+- ✅ Use English for all code identifiers
+- ✅ Use Vietnamese for all user-facing content
+- ✅ Keep languages consistent within file types
+
+## Enforcement
+
+This rule should be enforced:
+1. **During code review**: Check language consistency
+2. **In pre-commit hooks**: Lint for language violations (if possible)
+3. **In documentation**: Reference this rule
+4. **In AI prompts**: Always mention this language policy
+
+## Quick Reference
+
+| Content Type | Language | Example |
+|-------------|----------|---------|
+| Markdown files | English | `docs/feature.md` |
+| Code comments | English | `// Get user by ID` |
+| Variable names | English | `getUserById` |
+| User-facing UI | Vietnamese | `"Thêm vào giỏ hàng"` |
+| Product descriptions | Vietnamese | `"Áo thun chất lượng cao"` |
+| Error messages (user) | Vietnamese | `"Không tìm thấy sản phẩm"` |
+| Error codes (technical) | English | `USER_NOT_FOUND` |
+| API technical responses | English | `{ statusCode: 404 }` |
+| API user messages | Vietnamese | `{ message: "Đã thêm vào giỏ" }` |
+
+## Summary
+
+**Remember:**
+- 📝 **Documentation & Comments** = English
+- 💻 **Code** = English
+- 🌐 **User-Facing Content** = Vietnamese
+- 🔧 **Technical/Internal** = English
+
