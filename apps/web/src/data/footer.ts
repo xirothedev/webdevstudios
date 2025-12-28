@@ -23,6 +23,7 @@ export const footerSections: FooterSection[] = [
     title: 'VỀ CLB',
     links: [
       { label: 'Về chúng tôi', href: '/about' },
+      { label: 'Thành tích', href: '/achievements' },
       { label: 'Đối tác', href: '/partner' },
       { label: 'FAQ', href: '/faq' },
       { label: 'Thế hệ', href: '/generation' },
