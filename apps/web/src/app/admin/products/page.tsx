@@ -31,7 +31,7 @@ export default function ProductsPage() {
     columns.map((c) => c.id)
   );
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['admin', 'products'],
     queryFn: () => adminApi.listProducts(),
   });
@@ -122,10 +122,6 @@ export default function ProductsPage() {
           selectedProduct && (
             <ProductEditor
               productId={selectedProduct}
-              onSave={() => {
-                refetch();
-                toast.success('Product updated successfully');
-              }}
               onCancel={() => {
                 setSelectedProduct(null);
                 setActiveTab('table');
