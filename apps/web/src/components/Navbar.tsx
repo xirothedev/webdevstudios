@@ -37,7 +37,6 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'Trang chủ', href: '/' },
     { label: 'Về chúng tôi', href: '/about' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Lịch sự kiện', href: '/calendar' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'WDS chia sẻ', href: '/share' },
     { label: 'FAQ', href: '/faq' },
