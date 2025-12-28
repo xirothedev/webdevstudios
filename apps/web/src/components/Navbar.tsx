@@ -53,13 +53,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
       )}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 md:h-16">
-        <Link
-          href="/"
-          className={cn(
-            'group flex cursor-pointer items-center gap-2',
-            isDark ? 'gap-2' : 'gap-3'
-          )}
-        >
+        <Link href="/" className="group flex cursor-pointer items-center gap-2">
           <div className="relative h-6 w-6">
             <Image
               src="/image/wds-logo.svg"
@@ -72,10 +66,8 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           </div>
           <span
             className={cn(
-              'hidden lg:inline',
-              isDark
-                ? 'text-sm font-semibold tracking-tight text-white'
-                : 'text-xl font-bold text-black'
+              'hidden text-sm font-semibold tracking-tight lg:inline',
+              isDark ? 'text-white' : 'text-black'
             )}
           >
             WebDev Studios
@@ -96,8 +88,8 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                       'h-8 text-xs font-medium',
                       isDark
                         ? isActive
-                          ? 'text-wds-accent hover:bg-white/5 hover:text-white'
-                          : 'hover:text-wds-accent text-white/70'
+                          ? 'text-wds-accent hover:bg-white/5 hover:text-white!'
+                          : 'hover:text-wds-accent! text-white/70'
                         : cn(
                             'bg-transparent',
                             isActive
@@ -118,31 +110,17 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           {mounted && user ? (
             <UserAvatar variant={isDark ? 'dark' : 'light'} />
           ) : (
-            <>
-              {isDark ? (
-                <>
-                  <Link
-                    href="/auth/login"
-                    className={cn(
-                      'hidden text-xs font-medium transition-colors sm:block',
-                      'hover:text-wds-accent',
-                      isDark
-                        ? 'text-white/70'
-                        : 'text-gray-600 hover:text-black'
-                    )}
-                  >
-                    Đăng nhập
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  href="/auth/login"
-                  className="bg-wds-accent hover:bg-wds-accent/90 hidden rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors sm:inline-block"
-                >
-                  Đăng nhập
-                </Link>
+            <Link
+              href="/auth/login"
+              className={cn(
+                'hidden rounded-lg px-4 py-2 text-xs font-medium transition-colors sm:block',
+                isDark
+                  ? 'hover:text-wds-accent text-white/70 hover:bg-white/5'
+                  : 'bg-wds-accent hover:bg-wds-accent/90 text-black'
               )}
-            </>
+            >
+              Đăng nhập
+            </Link>
           )}
 
           {/* Mobile Menu Button */}
@@ -212,7 +190,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
             >
               <div className="flex flex-col p-6">
                 {/* Mobile Logo */}
-                <div className="mb-8 flex items-center gap-3">
+                <div className="mb-8 flex items-center gap-2">
                   <div className="relative h-10 w-10">
                     <Image
                       src="/image/wds-logo.svg"
@@ -221,11 +199,14 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                       className="object-contain"
                     />
                   </div>
-                  {!isDark && (
-                    <span className="text-lg font-bold text-black">
-                      WebDev Studios
-                    </span>
-                  )}
+                  <span
+                    className={cn(
+                      'text-sm font-semibold tracking-tight',
+                      isDark ? 'text-white' : 'text-black'
+                    )}
+                  >
+                    WebDev Studios
+                  </span>
                 </div>
 
                 {/* Navigation Items */}
