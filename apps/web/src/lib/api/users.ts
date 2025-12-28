@@ -1,6 +1,8 @@
 import { apiClient } from '@/lib/api-client';
 import type { User } from '@/types/auth.types';
 
+export type UserRole = 'ADMIN' | 'CUSTOMER';
+
 export interface UpdateProfileRequest {
   fullName?: string;
   phone?: string;
@@ -12,7 +14,7 @@ export interface UpdateProfileResponse {
   fullName: string | null;
   phone: string | null;
   avatar: string | null;
-  role: string;
+  role: UserRole;
   emailVerified: boolean;
   phoneVerified: boolean;
   mfaEnabled: boolean;

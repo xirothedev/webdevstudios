@@ -24,6 +24,7 @@ export interface Product {
   priceCurrent: number;
   priceOriginal: number | null;
   priceDiscount: number | null;
+  isPublished: boolean;
   stock: number;
   hasSizes: boolean;
   badge: string | null;
