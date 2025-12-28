@@ -78,7 +78,7 @@ apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error: AxiosError<{ message?: string; error?: string }>) => {
+  async (error: AxiosError<{ data: { message?: string; error?: string } }>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
@@ -91,10 +91,8 @@ apiClient.interceptors.response.use(
       });
     }
 
-    console.log('94 api-client', error.response);
-
     const status = error.response.status;
-    const data = error.response.data;
+    const data = error.response.data.data;
 
     // Handle 401 Unauthorized - try to refresh token
     // Skip refresh logic for auth endpoints (login, register, etc.) and refresh endpoint
@@ -180,7 +178,8 @@ apiClient.interceptors.response.use(
             publicRoutes.includes(currentPath) ||
             currentPath.startsWith('/shop/') || // Shop product pages
             currentPath.startsWith('/auth/') || // Auth pages
-            currentPath.startsWith('/legal/'); // Legal pages
+            currentPath.startsWith('/legal/') || // Legal pages
+            currentPath.startsWith('/blog/'); // Blog pages
 
           if (!isPublicRoute) {
             // Clear any auth-related state
