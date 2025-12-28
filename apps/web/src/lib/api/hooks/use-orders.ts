@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { CreateOrderRequest, ordersApi, OrderStatus } from '@/lib/api/orders';
 
 // Query Keys
-export const orderKeys = {
+const orderKeys = {
   all: ['orders'] as const,
   lists: () => [...orderKeys.all, 'list'] as const,
   list: (page?: number, limit?: number) =>

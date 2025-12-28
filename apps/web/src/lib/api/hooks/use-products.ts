@@ -5,7 +5,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { productsApi, ProductSize, ProductSlug } from '@/lib/api/products';
 
 // Query Keys
-export const productKeys = {
+const productKeys = {
   all: ['products'] as const,
   lists: () => [...productKeys.all, 'list'] as const,
   list: () => [...productKeys.lists()] as const,

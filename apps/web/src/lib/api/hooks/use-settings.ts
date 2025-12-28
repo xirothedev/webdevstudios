@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth.api';
 
 // Query Keys
-export const settingsKeys = {
+const settingsKeys = {
   all: ['settings'] as const,
   sessions: () => [...settingsKeys.all, 'sessions'] as const,
 };

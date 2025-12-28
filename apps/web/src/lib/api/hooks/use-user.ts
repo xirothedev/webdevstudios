@@ -7,7 +7,7 @@ import { authKeys } from '@/lib/api/hooks/use-auth';
 import { type UpdateProfileRequest, usersApi } from '@/lib/api/users';
 
 // Query Keys
-export const userKeys = {
+const userKeys = {
   all: ['users'] as const,
   profile: () => [...userKeys.all, 'profile'] as const,
 };

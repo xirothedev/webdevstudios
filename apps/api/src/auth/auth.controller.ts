@@ -59,6 +59,7 @@ import {
   Verify2FAResponseDto,
 } from './dtos/responses.dto';
 import { Verify2FADto } from './dtos/verify-2fa.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { GitHubOAuthGuard } from './guards/github-oauth.guard';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 // Queries
@@ -180,6 +181,8 @@ export class AuthController {
   @ApiQuery({
     name: 'token',
     description: 'Email verification token',
+    type: String,
+    required: true,
     example: 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
   })
   @ApiResponse({
@@ -193,10 +196,10 @@ export class AuthController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Email is already verified',
+    description: 'Email is already verified or invalid token',
   })
-  async verifyEmail(@Query('token') token: string) {
-    return this.commandBus.execute(new VerifyEmailCommand(token));
+  async verifyEmail(@Query() dto: VerifyEmailDto) {
+    return this.commandBus.execute(new VerifyEmailCommand(dto.token));
   }
 
   @Public()

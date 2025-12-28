@@ -14,7 +14,7 @@ import {
 import { useDebouncedCallback } from '@/lib/hooks/use-debounce';
 
 // Query Keys
-export const cartKeys = {
+const cartKeys = {
   all: ['cart'] as const,
   current: () => [...cartKeys.all, 'current'] as const,
 };
@@ -170,8 +170,6 @@ export function useUpdateCartItem() {
   return {
     ...mutation,
     mutate,
-    // Keep original mutate for immediate API call if needed
-    mutateSync: mutation.mutate,
   };
 }
 

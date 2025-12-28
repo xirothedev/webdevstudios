@@ -10,7 +10,7 @@ import {
 } from '@/lib/api/reviews';
 
 // Query Keys
-export const reviewKeys = {
+const reviewKeys = {
   all: ['reviews'] as const,
   product: (slug: ProductSlug) => [...reviewKeys.all, 'product', slug] as const,
   productList: (slug: ProductSlug, page?: number, limit?: number) =>
