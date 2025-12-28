@@ -15,6 +15,7 @@ import { OrderRepository } from './infrastructure/order.repository';
 import { OrdersController } from './orders.controller';
 // Queries
 import { GetOrderByIdHandler } from './queries/get-order-by-id/get-order-by-id.handler';
+import { ListAllOrdersHandler } from './queries/list-all-orders/list-all-orders.handler';
 import { ListOrdersHandler } from './queries/list-orders/list-orders.handler';
 // Schedulers
 import { OrderExpirationScheduler } from './schedulers/order-expiration.scheduler';
@@ -27,7 +28,11 @@ const CommandHandlers = [
   ExpireOrderHandler,
 ];
 
-const QueryHandlers = [GetOrderByIdHandler, ListOrdersHandler];
+const QueryHandlers = [
+  GetOrderByIdHandler,
+  ListOrdersHandler,
+  ListAllOrdersHandler,
+];
 
 @Module({
   imports: [CqrsModule, ScheduleModule, CartModule, ProductsModule],

@@ -237,4 +237,42 @@ export class OrderRepository {
       },
     });
   }
+
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    status?: OrderStatus
+  ): Promise<OrderWithItems[]> {
+    const skip = (page - 1) * limit;
+
+    const where: { status?: OrderStatus } = {};
+    if (status) {
+      where.status = status;
+    }
+
+    return this.prisma.order.findMany({
+      where,
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+          orderBy: { id: 'asc' },
+        },
+        shippingAddress: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    });
+  }
+
+  async countAll(status?: OrderStatus): Promise<number> {
+    const where: { status?: OrderStatus } = {};
+    if (status) {
+      where.status = status;
+    }
+
+    return this.prisma.order.count({ where });
+  }
 }

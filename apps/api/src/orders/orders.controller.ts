@@ -33,6 +33,7 @@ import {
   UpdateOrderStatusDto,
 } from './dtos/order.dto';
 import { GetOrderByIdQuery } from './queries/get-order-by-id/get-order-by-id.query';
+import { ListAllOrdersQuery } from './queries/list-all-orders/list-all-orders.query';
 import { ListOrdersQuery } from './queries/list-orders/list-orders.query';
 
 @ApiTags('Orders')
@@ -140,6 +141,63 @@ export class OrdersController {
     @CurrentUser() user: { id: string; role: UserRole }
   ): Promise<OrderDto> {
     return this.queryBus.execute(new GetOrderByIdQuery(id, user.id, user.role));
+  }
+
+  @Get('admin/all')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List all orders (Admin only)',
+    description: 'Get a paginated list of all orders. Admin only endpoint.',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number',
+    example: 1,
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Number of items per page',
+    example: 10,
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'status',
+    description: 'Filter by order status',
+    enum: [
+      'PENDING',
+      'CONFIRMED',
+      'PROCESSING',
+      'SHIPPING',
+      'DELIVERED',
+      'CANCELLED',
+      'RETURNED',
+    ],
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Orders retrieved successfully',
+    type: OrderListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  async listAllOrders(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string
+  ): Promise<OrderListResponseDto> {
+    return this.queryBus.execute(
+      new ListAllOrdersQuery(
+        page ? parseInt(page, 10) : 1,
+        limit ? parseInt(limit, 10) : 10,
+        status as any
+      )
+    );
   }
 
   @Patch(':id/status')
