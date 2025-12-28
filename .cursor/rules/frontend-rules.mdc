@@ -486,7 +486,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { authApi } from '@/lib/api/auth.api'
+import { authApi } from '@/lib/api/auth'
 
 // Define validation schema với Zod
 const loginSchema = z.object({
