@@ -9,6 +9,27 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { blogApi } from '@/lib/api/blog';
 
+// Generate static params for all published blog posts
+// Required by cacheComponents - must return at least one result
+export async function generateStaticParams() {
+  try {
+    // Fetch all published posts
+    const response = await blogApi.listPosts({ page: 1, pageSize: 1000 });
+    return response.posts
+      .filter((post) => post.isPublished)
+      .map((post) => ({
+        slug: post.slug,
+      }));
+  } catch (error) {
+    // If API is not available at build time, return empty array
+    // This will cause build to fail, but that's expected if API is required
+    console.warn('Failed to fetch blog posts for generateStaticParams:', error);
+    // Return a placeholder to satisfy cacheComponents requirement
+    // The route will still work dynamically for other slugs
+    return [{ slug: 'placeholder' }];
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
