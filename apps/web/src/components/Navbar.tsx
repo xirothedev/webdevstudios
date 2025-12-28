@@ -38,6 +38,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
   const navItems = [
     { label: 'Trang chủ', href: '/' },
     { label: 'Về chúng tôi', href: '/about' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Shop', href: '/shop' },
     { label: 'Lịch sự kiện', href: '/calendar' },
     { label: 'Thế hệ', href: '/generation' },
