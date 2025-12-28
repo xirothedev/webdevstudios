@@ -1,9 +1,12 @@
+import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { BlogPostContentMDX } from '@/components/blog/BlogPostContentMDX';
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
 import { blogApi } from '@/lib/api/blog';
 
 export async function generateMetadata({
@@ -53,6 +56,20 @@ export default async function BlogPostPage({
         <Navbar />
         <article className="container mx-auto px-4 py-16 pt-24">
           <div className="mx-auto max-w-4xl">
+            {/* Back to Blog Button */}
+            <div className="mb-6">
+              <Button
+                asChild
+                variant="ghost"
+                className="text-wds-text/70 hover:text-wds-text hover:bg-white/5"
+              >
+                <Link href="/blog" className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Quay về blog</span>
+                </Link>
+              </Button>
+            </div>
+
             {post.coverImage && (
               <div className="relative mb-8 h-64 w-full overflow-hidden rounded-lg md:h-96">
                 <Image
