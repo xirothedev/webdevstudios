@@ -3,6 +3,7 @@
 import { Star } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { ProductDescription } from '@/components/shop/ProductDescription';
 import { formatPrice } from '@/lib/utils';
 
 interface ProductInfoProps {
@@ -80,7 +81,7 @@ export function ProductInfo({
 
       {/* Description */}
       <div className="mb-8">
-        <p className="leading-relaxed text-white/80">{description}</p>
+        <ProductDescription markdown={description} />
       </div>
     </motion.div>
   );

@@ -70,7 +70,7 @@ export default function ProductsPage() {
         <div className="border-wds-accent/20 flex items-center gap-2 border-b">
           <button
             onClick={() => setActiveTab('table')}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`cursor-pointer px-4 py-2 font-medium transition-colors ${
               activeTab === 'table'
                 ? 'border-wds-accent text-wds-accent border-b-2'
                 : 'text-wds-text/70 hover:text-wds-text'
@@ -86,7 +86,7 @@ export default function ProductsPage() {
                 toast.info('Vui lòng chọn sản phẩm để chỉnh sửa');
               }
             }}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`cursor-pointer px-4 py-2 font-medium transition-colors ${
               activeTab === 'editor'
                 ? 'border-wds-accent text-wds-accent border-b-2'
                 : 'text-wds-text/70 hover:text-wds-text'

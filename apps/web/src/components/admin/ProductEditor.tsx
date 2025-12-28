@@ -3,12 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { adminApi } from '@/lib/api/admin';
 
 // Validation schema with Zod
@@ -48,6 +49,7 @@ export function ProductEditor({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     reset,
     watch,
@@ -104,7 +106,7 @@ export function ProductEditor({
 
     updateMutation.mutate({
       name: data.name.trim(),
-      description: data.description.trim(),
+      description: data.description || '',
       priceCurrent: data.priceCurrent,
       priceOriginal: data.priceOriginal ?? null,
     });
@@ -154,13 +156,18 @@ export function ProductEditor({
           >
             Description
           </label>
-          <textarea
-            id="description"
-            rows={15}
-            disabled={isLoading}
-            placeholder="Enter product description (supports markdown)..."
-            {...register('description')}
-            className="border-wds-accent/30 bg-wds-background text-wds-text placeholder:text-wds-text/50 focus:border-wds-accent focus:ring-wds-accent/20 w-full rounded-lg border px-4 py-2 text-sm focus:ring-2 focus:outline-none"
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <MarkdownEditor
+                value={field.value || ''}
+                onChange={field.onChange}
+                disabled={isLoading}
+                placeholder="Enter product description (supports markdown)..."
+                theme="dark"
+              />
+            )}
           />
           {errors.description && (
             <p className="text-wds-accent mt-1 text-sm">
