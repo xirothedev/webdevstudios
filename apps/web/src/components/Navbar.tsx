@@ -36,6 +36,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
   const navItems = [
     { label: 'Trang chủ', href: '/' },
     { label: 'Về chúng tôi', href: '/about' },
+    { label: 'Đối tác', href: '/partner' },
     { label: 'Blog', href: '/blog' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'WDS chia sẻ', href: '/share' },
