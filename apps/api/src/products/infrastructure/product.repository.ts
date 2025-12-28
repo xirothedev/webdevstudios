@@ -163,4 +163,56 @@ export class ProductRepository {
       },
     });
   }
+
+  async update(
+    productId: string,
+    data: {
+      name?: string;
+      description?: string;
+      priceCurrent?: number;
+      priceOriginal?: number | null;
+      badge?: string | null;
+      isPublished?: boolean;
+    }
+  ): Promise<Product> {
+    const updateData: {
+      name?: string;
+      description?: string;
+      priceCurrent?: number;
+      priceOriginal?: number | null;
+      priceDiscount?: number | null;
+      badge?: string | null;
+      isPublished?: boolean;
+    } = {};
+
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined)
+      updateData.description = data.description;
+    if (data.priceCurrent !== undefined)
+      updateData.priceCurrent = data.priceCurrent;
+    if (data.priceOriginal !== undefined)
+      updateData.priceOriginal = data.priceOriginal;
+    if (data.badge !== undefined) updateData.badge = data.badge;
+    if (data.isPublished !== undefined)
+      updateData.isPublished = data.isPublished;
+
+    // Calculate priceDiscount if both prices are provided
+    const currentPrice = data.priceCurrent;
+    const originalPrice = data.priceOriginal;
+    if (
+      currentPrice !== undefined &&
+      originalPrice !== undefined &&
+      originalPrice !== null &&
+      originalPrice > currentPrice
+    ) {
+      updateData.priceDiscount = originalPrice - currentPrice;
+    } else if (originalPrice === null) {
+      updateData.priceDiscount = null;
+    }
+
+    return this.prisma.product.update({
+      where: { id: productId },
+      data: updateData,
+    });
+  }
 }

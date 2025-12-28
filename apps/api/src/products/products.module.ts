@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 // Commands
+import { UpdateProductHandler } from './commands/update-product/update-product.handler';
 import { UpdateProductStockHandler } from './commands/update-product-stock/update-product-stock.handler';
 // Repository
 import { ProductRepository } from './infrastructure/product.repository';
@@ -12,7 +13,7 @@ import { GetProductBySlugHandler } from './queries/get-product-by-slug/get-produ
 import { GetProductStockHandler } from './queries/get-product-stock/get-product-stock.handler';
 import { ListProductsHandler } from './queries/list-products/list-products.handler';
 
-const CommandHandlers = [UpdateProductStockHandler];
+const CommandHandlers = [UpdateProductHandler, UpdateProductStockHandler];
 
 const QueryHandlers = [
   GetProductBySlugHandler,

@@ -21,12 +21,14 @@ import {
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { UpdateProductCommand } from './commands/update-product/update-product.command';
 import { UpdateProductStockCommand } from './commands/update-product-stock/update-product-stock.command';
 import {
   ProductDto,
   ProductListResponseDto,
   StockInfoDto,
 } from './dtos/product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { UpdateProductStockDto } from './dtos/update-product-stock.dto';
 import { GetProductBySlugQuery } from './queries/get-product-by-slug/get-product-by-slug.query';
 import { GetProductStockQuery } from './queries/get-product-stock/get-product-stock.query';
@@ -112,6 +114,45 @@ export class ProductsController {
       new GetProductStockQuery(
         slug as ProductSlug,
         size ? (size as ProductSize) : undefined
+      )
+    );
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update product (Admin only)',
+    description: 'Update product information. Admin only endpoint.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Product ID',
+    example: 'clx1234567890',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Product updated successfully',
+    type: ProductDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  async updateProduct(
+    @Param('id') id: string,
+    @Body() dto: UpdateProductDto
+  ): Promise<ProductDto> {
+    return this.commandBus.execute(
+      new UpdateProductCommand(
+        id,
+        dto.name,
+        dto.description,
+        dto.priceCurrent,
+        dto.priceOriginal,
+        dto.badge,
+        dto.isPublished
       )
     );
   }
