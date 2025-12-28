@@ -5,7 +5,7 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-function NavigationMenu({
+export function NavigationMenu({
   className,
   children,
   viewport = true,
@@ -29,7 +29,7 @@ function NavigationMenu({
   );
 }
 
-function NavigationMenuList({
+export function NavigationMenuList({
   className,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.List>) {
@@ -45,7 +45,7 @@ function NavigationMenuList({
   );
 }
 
-function NavigationMenuItem({
+export function NavigationMenuItem({
   className,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Item>) {
@@ -58,11 +58,11 @@ function NavigationMenuItem({
   );
 }
 
-const navigationMenuTriggerStyle = cva(
+export const navigationMenuTriggerStyle = cva(
   'group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-gray-600 hover:text-black hover:bg-transparent focus:bg-transparent focus:text-black disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-transparent data-[state=open]:text-black data-[state=open]:focus:bg-transparent data-[state=open]:bg-transparent focus-visible:ring-ring/50 outline-none transition-colors focus-visible:ring-[3px] focus-visible:outline-1'
 );
 
-function NavigationMenuTrigger({
+export function NavigationMenuTrigger({
   className,
   children,
   ...props
@@ -82,7 +82,7 @@ function NavigationMenuTrigger({
   );
 }
 
-function NavigationMenuContent({
+export function NavigationMenuContent({
   className,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Content>) {
@@ -99,7 +99,7 @@ function NavigationMenuContent({
   );
 }
 
-function NavigationMenuViewport({
+export function NavigationMenuViewport({
   className,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Viewport>) {
@@ -121,7 +121,7 @@ function NavigationMenuViewport({
   );
 }
 
-function NavigationMenuLink({
+export function NavigationMenuLink({
   className,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Link>) {
@@ -137,7 +137,7 @@ function NavigationMenuLink({
   );
 }
 
-function NavigationMenuIndicator({
+export function NavigationMenuIndicator({
   className,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Indicator>) {
@@ -154,15 +154,3 @@ function NavigationMenuIndicator({
     </NavigationMenuPrimitive.Indicator>
   );
 }
-
-export {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-  NavigationMenuViewport,
-};
