@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { authApi } from '@/lib/api/auth.api';
+import { authApi } from '@/lib/api/auth';
 
 // Query Keys
 const settingsKeys = {

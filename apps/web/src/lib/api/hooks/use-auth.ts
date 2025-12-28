@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { authApi } from '@/lib/api/auth.api';
+import { authApi } from '@/lib/api/auth';
 import { API_URL, SITE_URL } from '@/lib/constants';
 import { clearCsrfToken } from '@/lib/csrf';
 import type {
