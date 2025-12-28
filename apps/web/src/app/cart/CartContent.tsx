@@ -2,13 +2,12 @@
 
 import { ShoppingCart, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Suspense } from 'react';
 
 import { QuantitySelector } from '@/components/shop/QuantitySelector';
 import { Button } from '@/components/ui/button';
 import {
+  useCart,
   useRemoveFromCart,
-  useSuspenseCart,
   useUpdateCartItem,
 } from '@/lib/api/hooks/use-cart';
 import { formatPrice } from '@/lib/utils';
@@ -16,8 +15,7 @@ import { formatPrice } from '@/lib/utils';
 function CartContentInner() {
   const router = useRouter();
 
-  // Fetch cart using Suspense Query
-  const { data: cart, error: cartError } = useSuspenseCart();
+  const { data: cart, error: cartError, isLoading } = useCart();
 
   // Mutations
   const updateCartItemMutation = useUpdateCartItem();
@@ -45,6 +43,11 @@ function CartContentInner() {
         removeFromCartMutation.variables === itemId)
     );
   };
+
+  // Show loading state
+  if (isLoading) {
+    return <CartLoading />;
+  }
 
   if (cartError || !cart || !cart.items || cart.items.length === 0) {
     return (
@@ -213,9 +216,5 @@ function CartLoading() {
 }
 
 export function CartContent() {
-  return (
-    <Suspense fallback={<CartLoading />}>
-      <CartContentInner />
-    </Suspense>
-  );
+  return <CartContentInner />;
 }
