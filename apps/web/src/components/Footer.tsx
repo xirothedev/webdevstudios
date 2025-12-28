@@ -17,13 +17,13 @@ export function Footer({ variant = 'dark' }: FooterProps) {
       className={`${isDark ? 'bg-wds-background border-white/5' : 'border-gray-200 bg-white'} border-t py-12`}
     >
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
             <div className="mb-4 flex items-center gap-2">
               <div className="relative h-5 w-5">
                 <Image
                   src="/image/wds-logo.svg"
-                  alt="WDS Shop"
+                  alt="WebDev Studios"
                   fill
                   className="object-contain"
                 />
@@ -35,32 +35,11 @@ export function Footer({ variant = 'dark' }: FooterProps) {
               </span>
             </div>
             <p
-              className={`mb-10 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
+              className={`text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
             >
               WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với
               Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để
               các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.
-            </p>
-
-            <div className="mb-4 flex items-center gap-2">
-              <div className="relative h-5 w-5">
-                <Image
-                  src="/image/wds-logo.svg"
-                  alt="WDS Shop"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <span
-                className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
-              >
-                WDS Shop
-              </span>
-            </div>
-            <p
-              className={`text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
-            >
-              WebDev Studios Shop là nơi bán các sản phẩm chính thức của CLB.
             </p>
           </div>
 

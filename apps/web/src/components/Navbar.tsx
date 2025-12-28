@@ -60,39 +60,26 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
             isDark ? 'gap-2' : 'gap-3'
           )}
         >
-          {isDark ? (
-            <>
-              <div className="relative h-6 w-6">
-                <Image
-                  src="/image/wds-logo.svg"
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              <span className="text-wds-text text-sm font-semibold tracking-tight">
-                WDS Shop
-              </span>
-            </>
-          ) : (
-            <>
-              <div className="relative h-12 w-12">
-                <Image
-                  src="/image/wds-logo.svg"
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              <span className="hidden text-xl font-bold text-black lg:inline">
-                WebDev Studios
-              </span>
-            </>
-          )}
+          <div className="relative h-6 w-6">
+            <Image
+              src="/image/wds-logo.svg"
+              alt="WebDev Studios"
+              aria-hidden="true"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          <span
+            className={cn(
+              'hidden lg:inline',
+              isDark
+                ? 'text-sm font-semibold tracking-tight text-white'
+                : 'text-xl font-bold text-black'
+            )}
+          >
+            WebDev Studios
+          </span>
         </Link>
 
         <NavigationMenu className="hidden md:flex">

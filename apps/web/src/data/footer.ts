@@ -32,7 +32,7 @@ export const footerSections: FooterSection[] = [
     links: [
       { label: 'Điều khoản sử dụng', href: '/terms' },
       { label: 'Chính sách quyền riêng tư', href: '/privacy' },
-      { label: 'Chính sách đổi trả', href: '/refund' },
+      // { label: 'Chính sách đổi trả', href: '/refund' },
     ],
   },
 ];
@@ -47,7 +47,7 @@ export const contactInfo: ContactInfo[] = [
   },
   {
     label: 'Chủ nhiệm:',
-    content: 'Lâm Chí Dĩnh - ',
+    content: 'Lâm Chí Dĩnh - 0794161275',
     href: 'tel:0794161275',
   },
   {
