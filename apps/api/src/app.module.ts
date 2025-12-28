@@ -8,6 +8,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { BlogModule } from './blog/blog.module';
 import { CartModule } from './cart/cart.module';
 import { CommonModule } from './common/common.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -70,6 +71,7 @@ import { UsersModule } from './users/users.module';
     PaymentsModule,
     ReviewsModule,
     EventsModule,
+    BlogModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

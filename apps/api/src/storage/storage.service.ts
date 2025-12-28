@@ -1,5 +1,6 @@
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -163,6 +164,7 @@ export class StorageService {
 
   /**
    * Extract key from R2 URL
+   * Handles both full R2 URLs and relative paths
    */
   extractKeyFromUrl(url: string): string | null {
     try {
@@ -170,13 +172,127 @@ export class StorageService {
         ? this.config.publicUrl.slice(0, -1)
         : this.config.publicUrl;
 
+      // If URL is a full R2 URL, extract the key
       if (url.startsWith(baseUrl)) {
         return url.replace(`${baseUrl}/`, '');
+      }
+
+      // If URL is a relative path (e.g., "blog/posts/slug/content.md"),
+      // treat it as a key directly
+      // Normalize: remove leading slash if present
+      const normalizedKey = url.startsWith('/') ? url.slice(1) : url;
+
+      // Validate: key should not be empty and should not contain "://" (to avoid treating full URLs as keys)
+      if (normalizedKey && !normalizedKey.includes('://')) {
+        return normalizedKey;
       }
 
       return null;
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Upload blog content (markdown) to R2
+   * @param identifier Blog post ID or slug (unique identifier)
+   * @param content Markdown content
+   * @returns R2 URL to the uploaded content
+   */
+  async uploadBlogContent(
+    identifier: string,
+    content: string
+  ): Promise<string> {
+    const key = `blog/posts/${identifier}/content.md`;
+    const contentBuffer = Buffer.from(content, 'utf-8');
+
+    const result = await this.uploadFile({
+      key,
+      file: contentBuffer,
+      contentType: 'text/markdown',
+      cache: { strategy: 'long-lived' }, // Cache for 30 days
+    });
+
+    return result.url;
+  }
+
+  /**
+   * Get blog content from R2
+   * @param contentUrl R2 URL to the content file
+   * @returns Markdown content as string
+   */
+  async getBlogContent(contentUrl: string): Promise<string> {
+    try {
+      const key = this.extractKeyFromUrl(contentUrl);
+      if (!key) {
+        throw new StorageException('Invalid content URL');
+      }
+
+      const command = new GetObjectCommand({
+        Bucket: this.config.bucketName,
+        Key: key,
+      });
+
+      const response = await this.s3Client.send(command);
+      if (!response.Body) {
+        throw new StorageException('Content not found');
+      }
+
+      // Convert stream to string
+      // AWS SDK v3 returns Body as Readable (Node.js stream) which is async iterable
+      const chunks: Uint8Array[] = [];
+      const body = response.Body as AsyncIterable<Uint8Array> | undefined;
+
+      if (!body) {
+        throw new StorageException('Content not found');
+      }
+
+      // Read the stream as async iterable
+      for await (const chunk of body) {
+        chunks.push(chunk);
+      }
+
+      const buffer = Buffer.concat(chunks);
+      return buffer.toString('utf-8');
+    } catch (error) {
+      if (error instanceof StorageException) {
+        throw error;
+      }
+      throw new StorageException(
+        `Failed to get blog content: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Delete blog content from R2
+   * @param contentUrl R2 URL to the content file
+   */
+  async deleteBlogContent(contentUrl: string): Promise<void> {
+    const key = this.extractKeyFromUrl(contentUrl);
+    if (!key) {
+      throw new StorageException('Invalid content URL');
+    }
+    await this.deleteFile(key);
+  }
+
+  /**
+   * Upload blog cover image to R2
+   * @param postId Blog post ID
+   * @param file Image file buffer
+   * @returns R2 URL to the uploaded image
+   */
+  async uploadBlogCoverImage(postId: string, file: Buffer): Promise<string> {
+    const key = `blog/images/covers/${postId}-cover.webp`;
+
+    const result = await this.uploadImage({
+      key,
+      file,
+      contentType: 'image/webp', // Will be converted to WebP by processImage
+      width: 1200, // Cover image width
+      height: 630, // Cover image height (Open Graph recommended size)
+    });
+
+    return result.url;
   }
 }

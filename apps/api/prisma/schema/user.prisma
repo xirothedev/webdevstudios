@@ -31,6 +31,8 @@ model User {
   mfaBackupCodes   MFABackupCode[] // MFA backup codes
   devices          Device[] // Logged devices
   sessions         Session[] // Active sessions
+  blogPosts        BlogPost[] // Blog posts authored by user
+  blogComments     BlogComment[] // Blog comments by user
 
   @@map("users")
 }
