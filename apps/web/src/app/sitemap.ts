@@ -6,10 +6,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     '',
     '/about',
+    '/shop',
     '/faq',
     '/generation',
     '/share',
-    '/faq',
     '/blog',
   ];
 

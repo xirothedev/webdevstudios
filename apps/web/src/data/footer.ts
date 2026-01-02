@@ -20,6 +20,15 @@ export type ContactInfo = {
 
 export const footerSections: FooterSection[] = [
   {
+    title: 'SẢN PHẨM',
+    links: [
+      { label: 'Áo thun', href: '/shop/ao-thun' },
+      { label: 'Móc khóa', href: '/shop/moc-khoa' },
+      { label: 'Dây đeo', href: '/shop/day-deo' },
+      { label: 'Pad chuột', href: '/shop/pad-chuot' },
+    ],
+  },
+  {
     title: 'VỀ CLB',
     links: [
       { label: 'Về chúng tôi', href: '/about' },

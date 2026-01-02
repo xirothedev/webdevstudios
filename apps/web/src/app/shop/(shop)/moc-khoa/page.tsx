@@ -1,5 +1,7 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { ProductPageContent } from '../ProductPageContent';
 
 export default function MocKhoaPage() {
-  notFound();
+  return <ProductPageContent productSlug="moc-khoa" productName="Móc khóa" />;
 }

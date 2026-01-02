@@ -1,5 +1,7 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { ProductPageContent } from '../ProductPageContent';
 
 export default function PadChuotPage() {
-  notFound();
+  return <ProductPageContent productSlug="pad-chuot" productName="Pad chuột" />;
 }

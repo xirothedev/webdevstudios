@@ -40,6 +40,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'Hoạt động', href: '/activities' },
     { label: 'Đối tác', href: '/partner' },
     { label: 'Blog', href: '/blog' },
+    { label: 'Shop', href: '/shop' },
     { label: 'Lịch sự kiện', href: '/calendar' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'FAQ', href: '/faq' },

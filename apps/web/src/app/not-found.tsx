@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Home } from 'lucide-react';
+import { ArrowLeft, Home, Search } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -194,6 +194,14 @@ export default function NotFound() {
               <span className="relative z-10">Về trang chủ</span>
             </Link>
 
+            <Link
+              href="/shop"
+              className="group border-wds-accent/30 text-wds-accent hover:border-wds-accent hover:bg-wds-accent/10 relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border-2 bg-transparent px-6 py-3 text-base font-semibold transition-all"
+            >
+              <Search className="h-5 w-5" />
+              <span>Khám phá Shop</span>
+            </Link>
+
             <button
               onClick={() => window.history.back()}
               className="group inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-base font-semibold text-white/70 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10 hover:text-white"
@@ -218,6 +226,7 @@ export default function NotFound() {
                 {[
                   { label: 'Trang chủ', href: '/' },
                   { label: 'Về chúng tôi', href: '/about' },
+                  { label: 'Shop', href: '/shop' },
                   { label: 'Thế hệ', href: '/generation' },
                   { label: 'FAQ', href: '/faq' },
                 ].map((item, index) => (

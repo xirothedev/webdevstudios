@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { FloatingCartButton } from '@/components/shop/FloatingCartButton';
 import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata';
 
 export const metadata: Metadata = createPageMetadata({
@@ -21,5 +22,10 @@ export default function ShopLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <FloatingCartButton />
+    </>
+  );
 }
