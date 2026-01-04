@@ -1,10 +1,10 @@
 {
   "name": "api",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "1.0.0",
+  "description": "WebDev Studios E-commerce Platform - NestJS Backend API",
+  "author": "Xiro The Dev <lethanhtrung.trungle@gmail.com>",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE.md",
   "scripts": {
     "build": "nest build",
     "postinstall": "pnpm exec prisma generate",

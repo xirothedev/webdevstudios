@@ -1,6 +1,9 @@
 {
   "name": "web",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "WebDev Studios E-commerce Platform - Next.js Frontend",
+  "author": "Xiro The Dev <lethanhtrung.trungle@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--no-deprecation' next dev --turbo",

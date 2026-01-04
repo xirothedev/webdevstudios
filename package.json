@@ -1,6 +1,16 @@
 {
   "name": "webdevstudios-fullstack-turborepo",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": "Xiro The Dev <lethanhtrung.trungle@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xirothedev/webdevstudios.git"
+  },
+  "homepage": "https://github.com/xirothedev/webdevstudios",
+  "bugs": {
+    "url": "https://github.com/xirothedev/webdevstudios/issues"
+  },
   "private": true,
   "scripts": {
     "dev": "turbo run dev --parallel",
