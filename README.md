@@ -1,7 +1,8 @@
 # WebDev Studios E-commerce Platform
 
-![Version](https://img.shields.io/badge/version-0.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-Private-red.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-Source%20Available-orange.svg)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/xirothedev?logo=github&style=flat&color=ea4aaa)](https://github.com/sponsors/xirothedev)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
 ![pnpm](https://img.shields.io/badge/pnpm-%3E%3D8.0.0-orange.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black.svg)
@@ -640,11 +641,39 @@ webdevstudios/
 
 ## 📄 License
 
-Private - WebDev Studios
+Source Available License - Copyright (c) 2026 Xiro The Dev
+
+This project is licensed under a Source Available License. See [LICENSE.md](LICENSE.md) for details.
+
+**Permissions:**
+
+- ✅ View and study for educational purposes
+- ✅ Fork for personal reference
+- ✅ Share links to this repository
+
+**Prohibited:**
+
+- ❌ Using in production or commercial applications
+- ❌ Copying substantial portions into other projects
+- ❌ Distributing modified versions
+
+For commercial licensing inquiries, please contact: lethanhtrung.trungle@gmail.com
+
+## 💝 Support
+
+If you find this project helpful, please consider:
+
+- ⭐ **Starring** this repository
+- 🐛 **Reporting** bugs or suggesting features
+- 💰 **Sponsoring** the project via [GitHub Sponsors](https://github.com/sponsors/xirothedev)
+
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/xirothedev?logo=github&style=for-the-badge&color=ea4aaa)](https://github.com/sponsors/xirothedev)
 
 ## 👥 Contributors
 
-WebDev Studios Team
+- **Xiro The Dev** - [@xirothedev](https://github.com/xirothedev) - Creator & Maintainer
+
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for how to contribute.
 
 ---
 

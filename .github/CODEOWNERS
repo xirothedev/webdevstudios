@@ -1,0 +1,32 @@
+# Code Owners
+# This file defines code ownership for automatic PR review requests
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for all files
+* @xirothedev
+
+# Root configuration files
+/package.json @xirothedev
+/pnpm-workspace.yaml @xirothedev
+/turbo.json @xirothedev
+/LICENSE.md @xirothedev
+/README.md @xirothedev
+
+# GitHub configuration
+/.github/ @xirothedev
+
+# Frontend app
+/apps/web/ @xirothedev
+
+# Backend app
+/apps/api/ @xirothedev
+
+# Documentation
+/docs/ @xirothedev
+
+# Prisma schema
+/apps/api/prisma/schema/ @xirothedev
+
+# Scripts
+/scripts/ @xirothedev
+
