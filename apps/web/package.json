@@ -46,7 +46,7 @@
     "lucide-react": "^0.562.0",
     "motion": "^12.23.26",
     "next": "16.1.5",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.3",
     "react-big-calendar": "^1.19.4",
     "react-dom": "19.2.3",
