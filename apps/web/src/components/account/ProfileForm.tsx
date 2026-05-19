@@ -23,8 +23,12 @@
 'use client';
 
 import { CheckCircle2, Info, Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import * as React from 'react';
+import {
+  type FormEvent,
+  type InputHTMLAttributes,
+  type ReactNode,
+  useState,
+} from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useUpdateProfile } from '@/lib/api/hooks/use-user';
@@ -40,7 +44,7 @@ interface ProfileFormProps {
 function LightInput({
   className,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+}: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={cn(
@@ -62,7 +66,7 @@ function Label({
   className,
 }: {
   htmlFor?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   required?: boolean;
   className?: string;
 }) {
@@ -82,7 +86,7 @@ function HelperText({
   children,
   className,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }) {
   return <p className={cn('text-xs text-gray-500', className)}>{children}</p>;
@@ -94,7 +98,7 @@ function ErrorText({
   className,
   id,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   id?: string;
 }) {
@@ -117,12 +121,12 @@ function VerificationBadge({
     <div className="flex items-center gap-2">
       {verified ? (
         <>
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <CheckCircle2 className="size-4 text-green-600" />
           <span className="text-xs font-medium text-green-600">{label}</span>
         </>
       ) : (
         <>
-          <Info className="h-4 w-4 text-gray-400" />
+          <Info className="size-4 text-gray-400" />
           <span className="text-xs font-medium text-gray-500">
             Chưa {label.toLowerCase()}
           </span>
@@ -161,7 +165,7 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     if (!validate()) {
@@ -270,8 +274,8 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
         >
           {isLoading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Đang lưu...</span>
+              <Loader2 className="size-4 animate-spin" />
+              <span>Đang lưu…</span>
             </>
           ) : (
             'Lưu thay đổi'

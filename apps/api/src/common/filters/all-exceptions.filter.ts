@@ -55,12 +55,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     // Extract error message
-    let originalMessage = 'An internal error occurred';
-    if (exception instanceof Error) {
-      originalMessage = exception.message;
-    } else {
-      originalMessage = String(exception);
-    }
+    const originalMessage =
+      exception instanceof Error ? exception.message : String(exception);
 
     // Log full error details (server-side only)
     this.logger.error(

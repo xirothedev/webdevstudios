@@ -45,7 +45,8 @@ export class MailService {
       return readFileSync(templatePath, 'utf-8');
     } catch (error) {
       throw new Error(
-        `Failed to load email template: ${templatePath}. Error: ${error}`
+        `Failed to load email template: ${templatePath}. Error: ${error}`,
+        { cause: error }
       );
     }
   }

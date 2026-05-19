@@ -22,38 +22,36 @@
 
 'use client';
 
-import {
-  Building2,
-  Clock,
-  Facebook,
-  Mail,
-  MessageCircle,
-  Phone,
-} from 'lucide-react';
-import { motion } from 'motion/react';
+import { Building2, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
+import { m } from 'motion/react';
 import Image from 'next/image';
-import { forwardRef, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { AnimatedBeam } from '@/components/ui/animated-beam';
 import { BentoCard, BentoGrid } from '@/components/ui/bento-grid';
 import { Button } from '@/components/ui/button';
 
-const Circle = forwardRef<
-  HTMLDivElement,
-  {
-    className?: string;
-    children?: React.ReactNode;
-    style?: React.CSSProperties;
-  }
->(({ className, children, style }, ref) => (
-  <div
-    ref={ref}
-    style={style}
-    className={`z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white/60 bg-white/90 p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] ${className ?? ''}`}
-  >
-    {children}
-  </div>
-));
+function Circle({
+  className,
+  children,
+  style,
+  ref,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  ref?: React.Ref<HTMLDivElement>;
+}) {
+  return (
+    <div
+      ref={ref}
+      style={style}
+      className={`z-10 flex size-12 items-center justify-center rounded-full border-2 border-white/60 bg-white/90 p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] ${className ?? ''}`}
+    >
+      {children}
+    </div>
+  );
+}
 Circle.displayName = 'Circle';
 
 function OnlineBeamBackground() {
@@ -68,7 +66,7 @@ function OnlineBeamBackground() {
     <div className="pointer-events-none absolute inset-0">
       <div
         ref={containerRef}
-        className="relative flex h-full w-full items-center justify-center overflow-hidden bg-white/60"
+        className="relative flex size-full items-center justify-center overflow-hidden bg-white/60"
       >
         {/* Absolute positioning to keep arcs aligned like mock */}
         <Circle
@@ -112,7 +110,7 @@ function OnlineBeamBackground() {
         </Circle>
         <Circle
           ref={centerRef}
-          className="h-16 w-16 border-2"
+          className="size-16 border-2"
           style={{
             position: 'absolute',
             top: '55%',
@@ -125,7 +123,7 @@ function OnlineBeamBackground() {
             alt="WebDev Studios"
             width={32}
             height={32}
-            className="h-8 w-8"
+            className="size-8"
           />
         </Circle>
 
@@ -218,7 +216,7 @@ export function WDSContactGrid() {
       ),
     },
     {
-      Icon: Facebook,
+      Icon: MessageCircle,
       name: 'Kênh trực tuyến',
       description: 'Kết nối qua Fanpage, Email hoặc Messenger',
       cta: 'Chọn kênh',
@@ -232,20 +230,20 @@ export function WDSContactGrid() {
     <section className="relative flex snap-start items-center overflow-hidden bg-linear-to-b from-white to-gray-50 py-16 md:py-24">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10">
-        <div className="bg-wds-secondary absolute top-0 left-1/4 h-64 w-64 rounded-full opacity-20 blur-[100px]"></div>
-        <div className="bg-wds-accent/10 absolute right-1/4 bottom-0 h-48 w-48 rounded-full opacity-15 blur-[80px]"></div>
+        <div className="bg-wds-secondary absolute top-0 left-1/4 size-64 rounded-full opacity-20 blur-[100px]"></div>
+        <div className="bg-wds-accent/10 absolute right-1/4 bottom-0 size-48 rounded-full opacity-15 blur-[80px]"></div>
       </div>
 
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <motion.div
+        <m.div
           className="mb-12 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-black sm:text-4xl md:text-5xl">
+          <h2 className="text-3xl font-semibold text-black sm:text-4xl md:text-5xl">
             Liên hệ với chúng tôi
           </h2>
           <div className="from-wds-accent to-wds-accent/50 mx-auto mt-4 h-1 w-20 bg-linear-to-r"></div>
@@ -253,23 +251,25 @@ export function WDSContactGrid() {
             Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với
             chúng tôi qua các kênh sau:
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Bento Grid */}
         <BentoGrid className="md:auto-rows-[18rem]">
-          {contacts.map((contact, index) => (
-            <BentoCard key={index} {...contact} />
+          {contacts.map((contact) => (
+            <BentoCard key={contact.name} {...contact} />
           ))}
         </BentoGrid>
       </div>
 
       {isDialogOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div
+          <button
+            type="button"
+            aria-label="Đóng hộp thoại chọn kênh liên hệ"
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setDialogOpen(false)}
-          ></div>
-          <motion.div
+          />
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -297,10 +297,10 @@ export function WDSContactGrid() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <a
                 href="https://facebook.com"
-                className="group flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white px-3 py-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-center gap-2">
-                  <Facebook className="text-wds-accent h-5 w-5" />
+                  <MessageCircle className="text-wds-accent size-5" />
                   <span className="text-sm font-semibold text-neutral-800">
                     Fanpage
                   </span>
@@ -312,10 +312,10 @@ export function WDSContactGrid() {
 
               <a
                 href="mailto:webdevstudios.org@gmail.com"
-                className="group flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white px-3 py-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-center gap-2">
-                  <Mail className="text-wds-accent h-5 w-5" />
+                  <Mail className="text-wds-accent size-5" />
                   <span className="text-sm font-semibold text-neutral-800">
                     Email
                   </span>
@@ -327,10 +327,10 @@ export function WDSContactGrid() {
 
               <a
                 href="https://m.me"
-                className="group flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white px-3 py-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-center gap-2">
-                  <MessageCircle className="text-wds-accent h-5 w-5" />
+                  <MessageCircle className="text-wds-accent size-5" />
                   <span className="text-sm font-semibold text-neutral-800">
                     Messenger
                   </span>
@@ -340,7 +340,7 @@ export function WDSContactGrid() {
                 </p>
               </a>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       ) : null}
     </section>

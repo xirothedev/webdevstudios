@@ -258,7 +258,7 @@ apiClient.interceptors.response.use(
     }
 
     // Extract error message
-    let message = data?.message || data?.error || 'Đã xảy ra lỗi';
+    let message: string;
 
     // Map status codes to Vietnamese messages
     switch (status) {

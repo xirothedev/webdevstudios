@@ -24,6 +24,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CsrfService } from './common/services/csrf.service';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -31,7 +32,15 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [
+        AppService,
+        {
+          provide: CsrfService,
+          useValue: {
+            generateToken: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);
