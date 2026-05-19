@@ -6,18 +6,18 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--no-deprecation' next dev --turbo",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "test": "echo \"No tests specified\" && exit 0",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
-    "analyze": "next experimental-analyze",
-    "debug": "next dev --inspect",
-    "convert:png-to-webp": "tsx scripts/convert-png-to-webp.ts",
-    "convert:png-to-webp:delete": "tsx scripts/convert-png-to-webp.ts --delete-original",
-    "migrate:tailwind": "npx @tailwindcss/upgrade"
+    "dev": "NODE_OPTIONS='--no-deprecation' bunx --bun --no-install next dev --turbo",
+    "build": "bunx --bun --no-install next build --webpack",
+    "start": "bunx --bun --no-install next start",
+    "lint": "bunx --bun --no-install eslint",
+    "test": "bun test --pass-with-no-tests",
+    "format": "bunx --bun --no-install prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
+    "format:check": "bunx --bun --no-install prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
+    "analyze": "bunx --bun --no-install next experimental-analyze",
+    "debug": "bunx --bun --no-install next dev --inspect",
+    "convert:png-to-webp": "bun scripts/convert-png-to-webp.ts",
+    "convert:png-to-webp:delete": "bun scripts/convert-png-to-webp.ts --delete-original",
+    "migrate:tailwind": "bunx --bun @tailwindcss/upgrade"
   },
   "reactDoctor": {
     "rules": {

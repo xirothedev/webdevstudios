@@ -25,9 +25,9 @@
  * Script to convert all PNG images in public directory to WebP format
  *
  * Usage:
- *   pnpm tsx scripts/convert-png-to-webp.ts
- *   pnpm tsx scripts/convert-png-to-webp.ts --delete-original
- *   pnpm tsx scripts/convert-png-to-webp.ts --quality 90
+ *   bun scripts/convert-png-to-webp.ts
+ *   bun scripts/convert-png-to-webp.ts --delete-original
+ *   bun scripts/convert-png-to-webp.ts --quality 90
  */
 
 import { readdir, stat, unlink } from 'fs/promises';

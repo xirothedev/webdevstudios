@@ -11,7 +11,7 @@ dist
 .turbo
 
 # Lock files
-pnpm-lock.yaml
+bun.lock
 package-lock.json
 yarn.lock
 
@@ -22,4 +22,3 @@ yarn.lock
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
-

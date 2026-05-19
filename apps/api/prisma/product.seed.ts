@@ -156,7 +156,7 @@ Màu sắc: Nhiều màu sắc với logo WebDev Studios`,
   console.log('- Pad Chuột: 100');
   console.log('- Dây Đeo: 200');
   console.log('- Móc Khóa: 500');
-  console.log('\n💡 To seed user data, run: pnpm prisma:seed:user');
+  console.log('\n💡 To seed user data, run: bun run prisma:seed:user');
 }
 
 main()

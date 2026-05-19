@@ -29,13 +29,13 @@ This is a multi-theme web application featuring WebDev Studios club pages and e-
 First, install dependencies:
 
 ```bash
-pnpm install
+bun install
 ```
 
 Then, run the development server:
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

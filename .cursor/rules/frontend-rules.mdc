@@ -604,7 +604,7 @@ export function LoginForm() {
 #### Priority Order:
 1. **shadcn/ui Components** (`src/components/ui/`)
    - Kiểm tra xem component đã có trong `src/components/ui/` chưa
-   - Nếu chưa có, cài đặt từ shadcn/ui registry: `npx shadcn@latest add [component-name]`
+   - Nếu chưa có, cài đặt từ shadcn/ui registry: `bunx shadcn@latest add [component-name]`
    - shadcn/ui components đã có sẵn accessibility, keyboard navigation, ARIA labels
    - **Available Components**: button, input, navigation-menu, và nhiều components khác từ shadcn/ui
 
@@ -666,10 +666,10 @@ export function SearchForm() {
 #### shadcn/ui Component Installation:
 ```bash
 # Cài đặt component từ shadcn/ui
-npx shadcn@latest add button
-npx shadcn@latest add input
-npx shadcn@latest add dialog
-npx shadcn@latest add dropdown-menu
+bunx shadcn@latest add button
+bunx shadcn@latest add input
+bunx shadcn@latest add dialog
+bunx shadcn@latest add dropdown-menu
 # ... và nhiều components khác
 ```
 

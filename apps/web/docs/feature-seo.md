@@ -197,8 +197,8 @@ verification: {
 
 ```bash
 # Build and start production server
-pnpm build
-pnpm start
+bun run build
+bun run start
 
 # Test sitemap
 curl http://localhost:3000/sitemap.xml

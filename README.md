@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/license-Source%20Available-orange.svg)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/xirothedev?logo=github&style=flat&color=ea4aaa)](https://github.com/sponsors/xirothedev)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
-![pnpm](https://img.shields.io/badge/pnpm-%3E%3D8.0.0-orange.svg)
+![Bun](https://img.shields.io/badge/Bun-%3E%3D1.3.14-orange.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black.svg)
 ![NestJS](https://img.shields.io/badge/NestJS-11.x-ea2845.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)
@@ -33,7 +33,7 @@ WebDev Studios E-commerce Platform is a monorepo fullstack application built wit
 - **Frontend**: Next.js 16 (App Router) with TypeScript, Tailwind CSS v4, and motion/react
 - **Backend**: NestJS 11 with CQRS pattern, PostgreSQL, and Prisma ORM
 - **Monorepo**: Turborepo for efficient build and development workflows
-- **Package Manager**: pnpm 10.x
+- **Runtime & Package Manager**: Bun 1.3.x
 
 The platform serves as both a showcase website for WebDev Studios club and an e-commerce store selling 4 fixed products: T-shirt, Mouse Pad, Lanyard, and Keychain.
 
@@ -77,7 +77,7 @@ The platform serves as both a showcase website for WebDev Studios club and an e-
 ### DevOps & Tools
 
 - **Monorepo**: Turborepo 2.x
-- **Package Manager**: pnpm 10.26.1
+- **Runtime & Package Manager**: Bun 1.3.14
 - **Linting**: ESLint 9.x
 - **Formatting**: Prettier 3.x
 - **Git Hooks**: Husky + lint-staged
@@ -437,7 +437,7 @@ webdevstudios/
 ### Prerequisites
 
 - Node.js >= 18.0.0
-- pnpm >= 8.0.0
+- Bun >= 1.3.14
 - PostgreSQL database
 - Redis (optional, for caching and rate limiting)
 - Cloudflare R2 account (for file storage)
@@ -454,7 +454,7 @@ cd webdevstudios
 2. **Install dependencies**
 
 ```bash
-pnpm install
+bun install
 ```
 
 3. **Setup environment variables**
@@ -519,16 +519,16 @@ NEXT_PUBLIC_API_URL=http://localhost:4000/v1
 
 ```bash
 cd apps/api
-pnpm prisma:migrate
-pnpm prisma:generate
-pnpm prisma:seed
+bun run prisma:migrate
+bun run prisma:generate
+bun run prisma:seed
 ```
 
 5. **Start development servers**
 
 ```bash
 # From root directory
-pnpm dev
+bun run dev
 ```
 
 This will start:
@@ -544,34 +544,34 @@ This will start:
 **Root level:**
 
 ```bash
-pnpm dev          # Start all apps in development mode
-pnpm build        # Build all apps
-pnpm lint         # Lint all apps
-pnpm format       # Format code with Prettier
-pnpm clean        # Clean build artifacts
+bun run dev          # Start all apps in development mode
+bun run build        # Build all apps
+bun run lint         # Lint all apps
+bun run format       # Format code with Prettier
+bun run clean        # Clean build artifacts
 ```
 
 **Frontend** (`apps/web`):
 
 ```bash
-pnpm dev          # Start Next.js dev server
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm lint         # Run ESLint
-pnpm format       # Format code
+bun run dev          # Start Next.js dev server
+bun run build        # Build for production
+bun run start        # Start production server
+bun run lint         # Run ESLint
+bun run format       # Format code
 ```
 
 **Backend** (`apps/api`):
 
 ```bash
-pnpm dev          # Start NestJS dev server (watch mode)
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm lint         # Run ESLint
-pnpm prisma:migrate    # Run database migrations
-pnpm prisma:generate   # Generate Prisma Client
-pnpm prisma:studio     # Open Prisma Studio
-pnpm prisma:seed       # Seed database
+bun run dev              # Start NestJS dev server (watch mode)
+bun run build            # Build for production
+bun run start            # Start production server
+bun run lint             # Run ESLint
+bun run prisma:migrate   # Run database migrations
+bun run prisma:generate  # Generate Prisma Client
+bun run prisma:studio    # Open Prisma Studio
+bun run prisma:seed      # Seed database
 ```
 
 ### Code Quality
@@ -626,7 +626,7 @@ webdevstudios/
 ├── .cursor/
 │   └── rules/                  # Cursor IDE rules
 ├── package.json                # Root workspace config
-├── pnpm-workspace.yaml         # pnpm workspace config
+├── bun.lock                    # Bun lockfile
 ├── turbo.json                  # Turborepo config
 └── README.md                    # This file
 ```
@@ -637,7 +637,7 @@ webdevstudios/
 - **CQRS Pattern**: Backend MUST follow CQRS - Controllers only dispatch Commands/Queries, no business logic.
 - **Server Components First**: Frontend prioritizes Server Components, use `'use client'` only when necessary.
 - **Type Safety**: TypeScript strict mode, avoid `any`, use enums for constants.
-- **Code Quality**: Always run `pnpm lint` and `pnpm format` after coding.
+- **Code Quality**: Always run `bun run lint` and `bun run format` after coding.
 
 ## 📄 License
 

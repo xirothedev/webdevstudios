@@ -16,15 +16,15 @@ webdevstudios/
 ├── .cursor/
 │   └── rules/            # Cursor IDE rules
 ├── package.json          # Root workspace config
-├── pnpm-workspace.yaml   # pnpm workspace config
+├── bun.lock              # Bun lockfile
 ├── turbo.json            # Turborepo config
 └── MEMORIZE.md           # Session memory
 ```
 
 ### Package Manager
-- **pnpm**: Version 10.26.1
-- **Workspace**: pnpm workspaces với `pnpm-workspace.yaml`
-- **Install**: `pnpm install` ở root để install tất cả dependencies
+- **Bun**: Version 1.3.14
+- **Workspace**: Bun workspaces qua root `package.json`
+- **Install**: `bun install --linker isolated` ở root để install tất cả dependencies
 
 ## 🚀 Turborepo Configuration
 
@@ -99,20 +99,21 @@ apps/api/
 
 ## 🔧 Workspace Configuration
 
-### pnpm-workspace.yaml
-```yaml
-packages:
-  - 'apps/*'
+### package.json workspaces
+```json
+{
+  "workspaces": ["apps/*", "packages/*"]
+}
 ```
 
 ### Root package.json Scripts
 ```json
 {
   "scripts": {
-    "dev": "turbo run dev --parallel",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "format": "prettier --write ...",
+    "dev": "bunx --bun --no-install turbo run dev --parallel",
+    "build": "bunx --bun --no-install turbo run build",
+    "lint": "bunx --bun --no-install turbo run lint",
+    "format": "bunx --bun --no-install prettier --write ...",
     "clean": "turbo run clean"
   }
 }
@@ -136,28 +137,28 @@ packages:
 ### Starting Development
 ```bash
 # Install all dependencies
-pnpm install
+bun install --linker isolated
 
 # Start all apps in parallel
-pnpm dev
+bun run dev
 ```
 
 ### Building
 ```bash
 # Build all apps
-pnpm build
+bun run build
 
 # Build specific app
-cd apps/web && pnpm build
+cd apps/web && bun run build
 ```
 
 ### Linting & Formatting
 ```bash
 # Lint all apps
-pnpm lint
+bun run lint
 
 # Format all code
-pnpm format
+bun run format
 ```
 
 ## 📁 File Organization Rules
@@ -203,9 +204,9 @@ pnpm format
 ## 📊 Dependency Management
 
 ### Version Management
-- **Lock File**: `pnpm-lock.yaml` ở root
+- **Lock File**: `bun.lock` ở root
 - **Version Sync**: Cùng version cho shared dependencies
-- **Updates**: Update dependencies với `pnpm update`
+- **Updates**: Update dependencies với `bun update`
 
 ### Peer Dependencies
 - **React**: Shared peer dependency giữa apps
@@ -237,10 +238,10 @@ pnpm format
 ### Running Tests
 ```bash
 # Run all tests
-pnpm test
+bun run test
 
 # Run tests for specific app
-cd apps/web && pnpm test
+cd apps/web && bun run test
 ```
 
 ## 📝 Best Practices

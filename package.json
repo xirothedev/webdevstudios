@@ -12,17 +12,22 @@
     "url": "https://github.com/xirothedev/webdevstudios/issues"
   },
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "turbo run dev --parallel",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "format": "prettier --write \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && pnpm format",
-    "format:check": "prettier --check \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && pnpm format:check",
-    "clean": "turbo run clean",
-    "prepare": "husky",
-    "audit": "pnpm audit --audit-level=moderate",
-    "audit:fix": "pnpm audit --fix"
+    "dev": "bunx --bun --no-install turbo run dev --parallel",
+    "build": "bunx --bun --no-install turbo run build",
+    "lint": "bunx --bun --no-install turbo run lint",
+    "test": "bunx --bun --no-install turbo run test",
+    "format": "bunx --bun --no-install prettier --write \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && bun run format",
+    "format:check": "bunx --bun --no-install prettier --check \"apps/api/**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,md,yml,yaml}\" && cd apps/web && bun run format:check",
+    "clean": "bunx --bun --no-install turbo run clean",
+    "prepare": "bunx --bun --no-install husky",
+    "audit": "bun audit --audit-level=moderate",
+    "audit:fix": "bun update --latest && bun audit --audit-level=moderate",
+    "outdated": "bun outdated --recursive"
   },
   "devDependencies": {
     "husky": "^9.1.7",
@@ -32,9 +37,27 @@
     "turbo": "^2.9.14",
     "typescript": "^6.0.3"
   },
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "bun@1.3.14",
   "engines": {
     "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "bun": ">=1.3.14"
+  },
+  "trustedDependencies": [
+    "@nestjs/core",
+    "@prisma/engines",
+    "@scarf/scarf",
+    "esbuild",
+    "prisma",
+    "sharp",
+    "unrs-resolver"
+  ],
+  "overrides": {
+    "glob@>=10.2.0 <10.5.0": ">=10.5.0",
+    "nodemailer@<7.0.11": ">=7.0.11",
+    "nodemailer@<7.0.7": ">=7.0.7",
+    "nodemailer@<=7.0.10": ">=7.0.11",
+    "@nestjs-modules/mailer>mjml": "^5.0.0-alpha.4",
+    "@hono/node-server": "1.19.13",
+    "postcss": "8.5.15"
   }
 }

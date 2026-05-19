@@ -243,7 +243,7 @@ All images are optimized using Next.js Image component with:
 The website can be accessed by running:
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 Then navigate to:

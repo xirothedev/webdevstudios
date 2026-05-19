@@ -169,8 +169,8 @@ stock         Int     @default(0)          // Integer with default
 
 ### Migration Workflow
 1. **Edit Schema**: Sửa các file `.prisma` trong `prisma/schema/`
-2. **Generate**: `pnpm prisma:generate` để generate Prisma Client
-3. **Create Migration**: `pnpm prisma:migrate` để tạo migration
+2. **Generate**: `bun run prisma:generate` để generate Prisma Client
+3. **Create Migration**: `bun run prisma:migrate` để tạo migration
 4. **Review**: Kiểm tra migration SQL trước khi apply
 5. **Apply**: Migration sẽ tự động apply trong dev mode
 

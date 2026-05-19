@@ -26,7 +26,7 @@
  * Script to upload blog post content to R2 after seeding
  * Run this after running blog.seed.ts to upload actual content to R2
  *
- * Usage: npx tsx scripts/upload-blog-content.ts
+ * Usage: bun scripts/upload-blog-content.ts
  */
 
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';

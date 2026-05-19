@@ -29,9 +29,9 @@ import { useLastUpdated } from './last-updated-provider';
 
 export function LastUpdated() {
   const context = useLastUpdated();
-  const dateToFormat = context?.date ? new Date(context.date) : new Date();
+  const dateToFormat = context?.date ? new Date(context.date) : null;
 
-  if (isNaN(dateToFormat.getTime())) {
+  if (!dateToFormat || isNaN(dateToFormat.getTime())) {
     return <strong>{context?.date || ''}</strong>;
   }
 

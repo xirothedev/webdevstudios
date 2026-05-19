@@ -56,7 +56,7 @@ echo -e "\n${GREEN}Step 1: Pulling latest images...${NC}"
 docker compose -f "$COMPOSE_FILE" pull
 
 echo -e "\n${GREEN}Step 2: Running database migrations...${NC}"
-docker compose -f "$COMPOSE_FILE" exec -T api npx prisma migrate deploy || {
+docker compose -f "$COMPOSE_FILE" exec -T api sh -lc "cd apps/api && bun run prisma:deploy" || {
     echo -e "${YELLOW}Warning: Migration failed or already applied${NC}"
 }
 

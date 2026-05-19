@@ -45,7 +45,7 @@ alwaysApply: true
 
 ### DevOps & Tools
 - **Monorepo**: Turborepo 2.x.x
-- **Package Manager**: pnpm 10.x.x
+- **Package Manager**: Bun 1.3.x
 - **Linting**: ESLint 9.x
 - **Formatting**: Prettier 3.x.x
 - **Git Hooks**: Husky + lint-staged
@@ -134,7 +134,7 @@ webdevstudios/
 
 ### Prerequisites
 - Node.js >= 18.0.0
-- pnpm >= 8.0.0
+- Bun >= 1.3.14
 - PostgreSQL database
 - Redis (optional, for caching)
 
@@ -143,10 +143,10 @@ webdevstudios/
 - **Backend**: `JWT_SECRET_KEY`, `JWT_ACCESS_TOKEN_EXPIRES_IN`, database URL, etc.
 
 ### Scripts
-- `pnpm dev` - Start all apps in development mode
-- `pnpm build` - Build all apps
-- `pnpm lint` - Lint all apps
-- `pnpm format` - Format code with Prettier
+- `bun run dev` - Start all apps in development mode
+- `bun run build` - Build all apps
+- `bun run lint` - Lint all apps
+- `bun run format` - Format code with Prettier
 
 ## 📝 Important Notes
 
@@ -154,4 +154,4 @@ webdevstudios/
 2. **CQRS Pattern**: Backend PHẢI tuân thủ CQRS - Controllers chỉ dispatch Commands/Queries, không có business logic.
 3. **Server Components First**: Frontend ưu tiên Server Components, chỉ dùng `'use client'` khi cần thiết.
 4. **Type Safety**: Sử dụng TypeScript strict mode, tránh `any`, sử dụng enums cho constants.
-5. **Code Quality**: Luôn chạy `pnpm lint` và `pnpm format` sau khi code.
+5. **Code Quality**: Luôn chạy `bun run lint` và `bun run format` sau khi code.

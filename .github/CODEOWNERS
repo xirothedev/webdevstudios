@@ -7,7 +7,7 @@
 
 # Root configuration files
 /package.json @xirothedev
-/pnpm-workspace.yaml @xirothedev
+/bun.lock @xirothedev
 /turbo.json @xirothedev
 /LICENSE.md @xirothedev
 /README.md @xirothedev
@@ -29,4 +29,3 @@
 
 # Scripts
 /scripts/ @xirothedev
-

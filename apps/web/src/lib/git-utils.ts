@@ -50,8 +50,8 @@ export function getFileCommitDate(filePath: string): string {
       return getFileModificationDate(fullPath);
     }
 
-    // Return ISO date string for formatting with locale
-    return new Date(dateString).toISOString();
+    // Return git date string for formatting with locale
+    return dateString;
   } catch {
     // Fallback to file modification date if git command fails
     return getFileModificationDate(join(process.cwd(), filePath));
@@ -66,12 +66,19 @@ function findProjectRoot(): string {
   const path = require('path');
   let currentDir = process.cwd();
 
-  // Walk up the directory tree to find .git folder
+  // Walk up the directory tree to find the repository or workspace root.
   while (currentDir !== path.dirname(currentDir)) {
     const gitPath = path.join(currentDir, '.git');
     if (fs.existsSync(gitPath)) {
       return currentDir;
     }
+
+    const lockPath = path.join(currentDir, 'bun.lock');
+    const packageJsonPath = path.join(currentDir, 'package.json');
+    if (fs.existsSync(lockPath) && fs.existsSync(packageJsonPath)) {
+      return currentDir;
+    }
+
     currentDir = path.dirname(currentDir);
   }
 
@@ -96,7 +103,7 @@ function getFileModificationDate(filePath: string): string {
     // Return ISO date string for formatting with locale
     return stats.mtime.toISOString();
   } catch {
-    // Ultimate fallback to current date
-    return new Date().toISOString();
+    // Ultimate fallback: avoid current-time reads during static prerendering.
+    return '';
   }
 }

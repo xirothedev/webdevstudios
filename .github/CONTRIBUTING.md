@@ -56,7 +56,7 @@ By participating in this project, you agree to:
 ### Prerequisites
 
 - Node.js >= 25.0.0
-- pnpm >= 10.0.0
+- Bun >= 1.3.14
 - PostgreSQL
 - Redis (optional)
 
@@ -72,7 +72,7 @@ By participating in this project, you agree to:
 2. **Install dependencies**:
 
    ```bash
-   pnpm install
+   bun install
    ```
 
 3. **Setup environment variables**:
@@ -83,15 +83,15 @@ By participating in this project, you agree to:
 
    ```bash
    cd apps/api
-   pnpm prisma:migrate
-   pnpm prisma:generate
-   pnpm prisma:seed
+   bun run prisma:migrate
+   bun run prisma:generate
+   bun run prisma:seed
    ```
 
 5. **Start development servers**:
    ```bash
    # From root
-   pnpm dev
+   bun run dev
    ```
 
 ## Coding Standards
@@ -149,11 +149,11 @@ Imports MUST be sorted in this order:
 
 ```bash
 # All tests
-pnpm test
+bun run test
 
 # Specific app
-cd apps/web && pnpm test
-cd apps/api && pnpm test
+cd apps/web && bun run test
+cd apps/api && bun run test
 ```
 
 ### Writing Tests
@@ -203,8 +203,8 @@ Examples:
 1. **Update documentation** if needed
 2. **Add tests** if applicable
 3. **Ensure all tests pass**
-4. **Run linting**: `pnpm lint`
-5. **Format code**: `pnpm format`
+4. **Run linting**: `bun run lint`
+5. **Format code**: `bun run format`
 6. **Update CHANGELOG** (if exists)
 7. **Request review** from maintainers
 

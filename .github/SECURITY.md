@@ -37,7 +37,7 @@ We aim to:
 When using this project:
 
 1. **Never commit secrets**: Use environment variables for all sensitive data
-2. **Keep dependencies updated**: Regularly run `pnpm audit` and `pnpm audit:fix`
+2. **Keep dependencies updated**: Regularly run `bun run audit` and `bun run audit:fix`
 3. **Use strong passwords**: For database, admin accounts, etc.
 4. **Enable 2FA**: For all user accounts
 5. **Review code changes**: Before deploying to production
@@ -64,7 +64,7 @@ When using this project:
 - [ ] CORS is properly configured
 - [ ] Rate limiting is enabled
 - [ ] File upload validation is working
-- [ ] Dependencies are up to date (`pnpm audit`)
+- [ ] Dependencies are up to date (`bun run audit`)
 - [ ] No secrets in code or git history
 - [ ] Admin accounts have strong passwords
 - [ ] 2FA is enabled for admin accounts
