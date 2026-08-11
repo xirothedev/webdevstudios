@@ -85,6 +85,13 @@ export class OAuthService {
     if (externalAccount) {
       // User exists - login
       user = externalAccount.user;
+      // Update provider email to reflect current provider state
+      await this.prisma.externalAccount.update({
+        where: {
+          provider_providerId: { provider, providerId },
+        },
+        data: { providerEmail: email },
+      });
     } else {
       // Check if user with this email exists
       const existingUser = await this.userRepository.findByEmail(email);
@@ -105,10 +112,9 @@ export class OAuthService {
         user = await this.userRepository.create({
           email,
           fullName: name,
-          emailVerified: true, // OAuth emails are pre-verified
+          emailVerified: true,
         });
 
-        // Create external account
         await this.prisma.externalAccount.create({
           data: {
             provider,
@@ -118,11 +124,9 @@ export class OAuthService {
           },
         });
 
-        // Update avatar if available
-        if (picture) {
-          await this.userRepository.update(user.id, {
-            avatar: picture,
-          });
+        // Set avatar only on creation if user has no avatar
+        if (picture && !user.avatar) {
+          await this.userRepository.update(user.id, { avatar: picture });
         }
       }
     }

@@ -46,7 +46,6 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
   ): Promise<void> {
     const { id, displayName, username, photos } = profile;
 
-    // Get user email (might need separate call)
     let email = profile.emails?.[0]?.value;
     if (!email) {
       try {
@@ -58,18 +57,20 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
         const primaryEmail = emailsResponse.data.find((e: { primary?: boolean }) => e.primary);
         email = primaryEmail?.email || emailsResponse.data[0]?.email;
       } catch {
-        email = `${username}@users.noreply.github.com`;
+        // fall through
       }
+    }
+
+    if (!email) {
+      return done(new Error('GitHub OAuth did not return email'), undefined);
     }
 
     const user = {
       provider: OAuthProvider.GITHUB,
       providerId: id.toString(),
-      email: email || `${username}@users.noreply.github.com`,
+      email: email.toLowerCase(),
       name: displayName || username,
       picture: photos?.[0]?.value,
-      accessToken,
-      refreshToken,
     };
     done(null, user);
   }
