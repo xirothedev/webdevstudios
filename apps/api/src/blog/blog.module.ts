@@ -22,6 +22,7 @@
 
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { BlogService } from './services/blog.service';
 
 // Storage
 import { StorageModule } from '../storage/storage.module';
@@ -57,7 +58,7 @@ const QueryHandlers = [
 @Module({
   imports: [CqrsModule, StorageModule],
   controllers: [BlogController],
-  providers: [...CommandHandlers, ...QueryHandlers, BlogRepository],
-  exports: [BlogRepository],
+  providers: [...CommandHandlers, ...QueryHandlers, BlogRepository, BlogService],
+  exports: [BlogRepository, BlogService],
 })
 export class BlogModule {}

@@ -37,7 +37,7 @@ import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@ne
 
 import { CurrentUser, Public, Roles } from '@/common/decorators';
 import { RolesGuard } from '@/common/guards';
-import { CreateBlogPostCommand } from './commands/create-post';
+import { BlogService } from './services/blog.service';
 import { DeleteBlogPostCommand } from './commands/delete-post';
 import { PublishBlogPostCommand } from './commands/publish-post';
 import { UpdateBlogPostCommand } from './commands/update-post';
@@ -62,6 +62,7 @@ export class BlogController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly blogService: BlogService,
   ) {}
 
   @Get()
@@ -173,19 +174,17 @@ export class BlogController {
     @CurrentUser() user: { id: string },
     @Body() dto: CreateBlogPostDto,
   ): Promise<BlogPostDto> {
-    return this.commandBus.execute(
-      new CreateBlogPostCommand(
-        user.id,
-        dto.slug,
-        dto.title,
-        dto.content,
-        dto.excerpt || null,
-        dto.coverImage || null,
-        dto.isPublished || false,
-        dto.metaTitle || null,
-        dto.metaDescription || null,
-      ),
-    );
+    return this.blogService.createPost({
+      authorId: user.id,
+      slug: dto.slug,
+      title: dto.title,
+      content: dto.content,
+      excerpt: dto.excerpt || null,
+      coverImage: dto.coverImage || null,
+      isPublished: dto.isPublished || false,
+      metaTitle: dto.metaTitle || null,
+      metaDescription: dto.metaDescription || null,
+    });
   }
 
   @Get('admin/:id')
