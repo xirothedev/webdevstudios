@@ -1,1 +1,2 @@
 bunx --bun --no-install lint-staged
+bunx --bun --no-install turbo run test
