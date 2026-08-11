@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata'
+import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Điều khoản sử dụng',
@@ -31,12 +31,12 @@ export const metadata: Metadata = createPageMetadata({
   path: '/terms',
   image: SEO_IMAGES['/terms'],
   keywords: ['Điều khoản sử dụng', 'Terms of Service', 'WebDev Studios', 'Quy định'],
-})
+});
 
 export default function TermsLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  return children
+  return children;
 }

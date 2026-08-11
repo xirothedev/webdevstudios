@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 
 export default function ShopProductLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">
@@ -44,5 +44,5 @@ export default function ShopProductLayout({
 
       <Footer />
     </div>
-  )
+  );
 }

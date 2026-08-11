@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { BarChart3, BookOpen, LogOut, Package, ShoppingCart, Users, Wallet } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { BarChart3, BookOpen, LogOut, Package, ShoppingCart, Users, Wallet } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { useLogout } from '@/lib/api/hooks/use-auth'
+import { useLogout } from '@/lib/api/hooks/use-auth';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: BarChart3 },
@@ -35,11 +35,11 @@ const navigation = [
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Transactions', href: '/admin/transactions', icon: Wallet },
   { name: 'Blog', href: '/admin/blog', icon: BookOpen },
-]
+];
 
 export function AdminSidebar() {
-  const pathname = usePathname()
-  const { mutate: logout } = useLogout()
+  const pathname = usePathname();
+  const { mutate: logout } = useLogout();
 
   return (
     <div className="border-wds-accent/20 bg-wds-background flex h-screen w-64 flex-col border-r">
@@ -48,7 +48,7 @@ export function AdminSidebar() {
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
@@ -62,7 +62,7 @@ export function AdminSidebar() {
               <item.icon className="h-5 w-5" />
               {item.name}
             </Link>
-          )
+          );
         })}
       </nav>
       <div className="border-wds-accent/20 border-t p-4">
@@ -75,5 +75,5 @@ export function AdminSidebar() {
         </button>
       </div>
     </div>
-  )
+  );
 }

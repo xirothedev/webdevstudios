@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface FilterButtonProps {
-  active: boolean
-  onClick: () => void
-  icon?: ReactNode
-  children: ReactNode
+  active: boolean;
+  onClick: () => void;
+  icon?: ReactNode;
+  children: ReactNode;
 }
 
 export function FilterButton({ active, onClick, icon, children }: FilterButtonProps) {
@@ -44,5 +44,5 @@ export function FilterButton({ active, onClick, icon, children }: FilterButtonPr
       {icon}
       {children}
     </button>
-  )
+  );
 }

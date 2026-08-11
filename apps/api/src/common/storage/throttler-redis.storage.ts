@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common'
-import { ThrottlerStorage } from '@nestjs/throttler'
+import { Injectable } from '@nestjs/common';
+import { ThrottlerStorage } from '@nestjs/throttler';
 
-import { RedisService } from '@/redis'
+import { RedisService } from '@/redis';
 
 /**
  * ThrottlerStorageRecord interface
  * Matches the structure expected by @nestjs/throttler
  */
 interface ThrottlerStorageRecord {
-  totalHits: number
-  timeToExpire: number
-  isBlocked: boolean
-  timeToBlockExpire: number
+  totalHits: number;
+  timeToExpire: number;
+  isBlocked: boolean;
+  timeToBlockExpire: number;
 }
 
 /**
@@ -57,38 +57,38 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
     throttlerName: string,
   ): Promise<ThrottlerStorageRecord> {
     // Create separate keys for tracking and blocking
-    const trackingKey = `throttler:${throttlerName}:${key}`
-    const blockKey = `throttler:block:${throttlerName}:${key}`
+    const trackingKey = `throttler:${throttlerName}:${key}`;
+    const blockKey = `throttler:block:${throttlerName}:${key}`;
 
     // Check if key is blocked
-    const isBlocked = (await this.redisService.exists(blockKey)) > 0
-    const timeToBlockExpire = isBlocked ? (await this.redisService.ttl(blockKey)) * 1000 : 0
+    const isBlocked = (await this.redisService.exists(blockKey)) > 0;
+    const timeToBlockExpire = isBlocked ? (await this.redisService.ttl(blockKey)) * 1000 : 0;
 
     // If blocked, return blocked status
     if (isBlocked) {
-      const totalHits = parseInt((await this.redisService.get(trackingKey)) || '0', 10)
+      const totalHits = parseInt((await this.redisService.get(trackingKey)) || '0', 10);
       return {
         totalHits,
         timeToExpire: (await this.redisService.ttl(trackingKey)) * 1000,
         isBlocked: true,
         timeToBlockExpire,
-      }
+      };
     }
 
     // Increment the counter
-    const exists = (await this.redisService.exists(trackingKey)) > 0
-    let totalHits: number
+    const exists = (await this.redisService.exists(trackingKey)) > 0;
+    let totalHits: number;
 
     if (exists) {
-      totalHits = await this.redisService.incr(trackingKey)
+      totalHits = await this.redisService.incr(trackingKey);
     } else {
       await this.redisService.set(
         trackingKey,
         '1',
         'EX',
         Math.ceil(ttl / 1000), // Convert milliseconds to seconds
-      )
-      totalHits = 1
+      );
+      totalHits = 1;
     }
 
     // Check if limit exceeded
@@ -99,14 +99,14 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
         '1',
         'EX',
         Math.ceil(blockDuration / 1000), // Convert milliseconds to seconds
-      )
+      );
 
       return {
         totalHits,
         timeToExpire: (await this.redisService.ttl(trackingKey)) * 1000,
         isBlocked: true,
         timeToBlockExpire: blockDuration,
-      }
+      };
     }
 
     // Return normal record
@@ -115,6 +115,6 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
       timeToExpire: (await this.redisService.ttl(trackingKey)) * 1000,
       isBlocked: false,
       timeToBlockExpire: 0,
-    }
+    };
   }
 }

@@ -20,23 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import Redis from 'ioredis'
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import Redis from 'ioredis';
 
 @Injectable()
 export class TokenStorageService {
-  private readonly client: Redis
-  private readonly emailVerificationPrefix = 'email-verification:'
-  private readonly passwordResetPrefix = 'password-reset:'
-  private readonly sessionMfaPrefix = 'session:'
+  private readonly client: Redis;
+  private readonly emailVerificationPrefix = 'email-verification:';
+  private readonly passwordResetPrefix = 'password-reset:';
+  private readonly sessionMfaPrefix = 'session:';
 
   constructor(private readonly configService: ConfigService) {
     this.client = new Redis({
       host: this.configService.get<string>('REDIS_HOST', 'localhost'),
       port: this.configService.get<number>('REDIS_PORT', 6379),
       password: this.configService.get<string>('REDIS_PASSWORD'),
-    })
+    });
   }
 
   /**
@@ -46,10 +46,10 @@ export class TokenStorageService {
    * @returns Promise<void>
    */
   async storeEmailVerificationToken(token: string, userId: string): Promise<void> {
-    const key = `${this.emailVerificationPrefix}${token}`
-    const ttl = this.configService.get<number>('EMAIL_VERIFICATION_TOKEN_EXPIRES_IN', 86400) // Default 24 hours
+    const key = `${this.emailVerificationPrefix}${token}`;
+    const ttl = this.configService.get<number>('EMAIL_VERIFICATION_TOKEN_EXPIRES_IN', 86400); // Default 24 hours
 
-    await this.client.setex(key, ttl, userId)
+    await this.client.setex(key, ttl, userId);
   }
 
   /**
@@ -58,9 +58,9 @@ export class TokenStorageService {
    * @returns User ID if token is valid, null otherwise
    */
   async getEmailVerificationToken(token: string): Promise<string | null> {
-    const key = `${this.emailVerificationPrefix}${token}`
-    const userId = await this.client.get(key)
-    return userId
+    const key = `${this.emailVerificationPrefix}${token}`;
+    const userId = await this.client.get(key);
+    return userId;
   }
 
   /**
@@ -68,8 +68,8 @@ export class TokenStorageService {
    * @param token - Verification token
    */
   async deleteEmailVerificationToken(token: string): Promise<void> {
-    const key = `${this.emailVerificationPrefix}${token}`
-    await this.client.del(key)
+    const key = `${this.emailVerificationPrefix}${token}`;
+    await this.client.del(key);
   }
 
   /**
@@ -79,10 +79,10 @@ export class TokenStorageService {
    * @returns Promise<void>
    */
   async storePasswordResetToken(token: string, userId: string): Promise<void> {
-    const key = `${this.passwordResetPrefix}${token}`
-    const ttl = this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRES_IN', 3600) // Default 1 hour
+    const key = `${this.passwordResetPrefix}${token}`;
+    const ttl = this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRES_IN', 3600); // Default 1 hour
 
-    await this.client.setex(key, ttl, userId)
+    await this.client.setex(key, ttl, userId);
   }
 
   /**
@@ -91,9 +91,9 @@ export class TokenStorageService {
    * @returns User ID if token is valid, null otherwise
    */
   async getPasswordResetToken(token: string): Promise<string | null> {
-    const key = `${this.passwordResetPrefix}${token}`
-    const userId = await this.client.get(key)
-    return userId
+    const key = `${this.passwordResetPrefix}${token}`;
+    const userId = await this.client.get(key);
+    return userId;
   }
 
   /**
@@ -101,8 +101,8 @@ export class TokenStorageService {
    * @param token - Reset token
    */
   async deletePasswordResetToken(token: string): Promise<void> {
-    const key = `${this.passwordResetPrefix}${token}`
-    await this.client.del(key)
+    const key = `${this.passwordResetPrefix}${token}`;
+    await this.client.del(key);
   }
 
   /**
@@ -112,8 +112,8 @@ export class TokenStorageService {
    * @returns Promise<void>
    */
   async storeSessionMfaVerified(sessionId: string, ttl: number): Promise<void> {
-    const key = `${this.sessionMfaPrefix}${sessionId}:mfaVerified`
-    await this.client.setex(key, ttl, 'true')
+    const key = `${this.sessionMfaPrefix}${sessionId}:mfaVerified`;
+    await this.client.setex(key, ttl, 'true');
   }
 
   /**
@@ -122,9 +122,9 @@ export class TokenStorageService {
    * @returns true if MFA is verified, false otherwise
    */
   async getSessionMfaVerified(sessionId: string): Promise<boolean> {
-    const key = `${this.sessionMfaPrefix}${sessionId}:mfaVerified`
-    const value = await this.client.get(key)
-    return value === 'true'
+    const key = `${this.sessionMfaPrefix}${sessionId}:mfaVerified`;
+    const value = await this.client.get(key);
+    return value === 'true';
   }
 
   /**
@@ -132,7 +132,7 @@ export class TokenStorageService {
    * @param sessionId - Session ID
    */
   async deleteSessionMfaVerified(sessionId: string): Promise<void> {
-    const key = `${this.sessionMfaPrefix}${sessionId}:mfaVerified`
-    await this.client.del(key)
+    const key = `${this.sessionMfaPrefix}${sessionId}:mfaVerified`;
+    await this.client.del(key);
   }
 }

@@ -20,29 +20,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Star, X } from 'lucide-react'
-import { useState } from 'react'
+import { Star, X } from 'lucide-react';
+import { useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { useUpdateReview } from '@/lib/api/hooks/use-reviews'
-import { Review } from '@/lib/api/reviews'
+import { Button } from '@/components/ui/button';
+import { useUpdateReview } from '@/lib/api/hooks/use-reviews';
+import { Review } from '@/lib/api/reviews';
 
 interface ReviewEditFormProps {
-  review: Review
-  onCancel: () => void
-  onSuccess?: () => void
+  review: Review;
+  onCancel: () => void;
+  onSuccess?: () => void;
 }
 
 export function ReviewEditForm({ review, onCancel, onSuccess }: ReviewEditFormProps) {
-  const [rating, setRating] = useState(review.rating)
-  const [comment, setComment] = useState(review.comment || '')
+  const [rating, setRating] = useState(review.rating);
+  const [comment, setComment] = useState(review.comment || '');
 
-  const updateReviewMutation = useUpdateReview()
+  const updateReviewMutation = useUpdateReview();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     updateReviewMutation.mutate(
       {
@@ -55,12 +55,12 @@ export function ReviewEditForm({ review, onCancel, onSuccess }: ReviewEditFormPr
       {
         onSuccess: () => {
           if (onSuccess) {
-            onSuccess()
+            onSuccess();
           }
         },
       },
-    )
-  }
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-white/10 bg-white/5 p-6">
@@ -134,5 +134,5 @@ export function ReviewEditForm({ review, onCancel, onSuccess }: ReviewEditFormPr
         </Button>
       </div>
     </form>
-  )
+  );
 }

@@ -20,43 +20,43 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { Button } from '@/components/ui/button'
-import { useOrders } from '@/lib/api/hooks/use-orders'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
+import { useOrders } from '@/lib/api/hooks/use-orders';
 
 export default function PaymentReturnPage() {
-  const router = useRouter()
-  const [isChecking, setIsChecking] = useState(true)
-  const { data: ordersData, refetch } = useOrders(1, 10)
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+  const { data: ordersData, refetch } = useOrders(1, 10);
 
   useEffect(() => {
     // Check payment status by refetching orders
     const checkPaymentStatus = async () => {
-      await refetch()
-      setIsChecking(false)
+      await refetch();
+      setIsChecking(false);
 
       // Find the most recent order
-      const recentOrder = ordersData?.orders[0]
+      const recentOrder = ordersData?.orders[0];
       if (recentOrder) {
         // Clear localStorage
-        localStorage.removeItem('pendingOrderId')
-        localStorage.removeItem(`paymentUrl_${recentOrder.id}`)
+        localStorage.removeItem('pendingOrderId');
+        localStorage.removeItem(`paymentUrl_${recentOrder.id}`);
 
         // Redirect to order detail page
         setTimeout(() => {
-          router.push(`/orders/${recentOrder.id}`)
-        }, 2000)
+          router.push(`/orders/${recentOrder.id}`);
+        }, 2000);
       }
-    }
+    };
 
-    checkPaymentStatus()
-  }, [refetch, ordersData, router])
+    checkPaymentStatus();
+  }, [refetch, ordersData, router]);
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -78,11 +78,11 @@ export default function PaymentReturnPage() {
               </p>
               <Button
                 onClick={() => {
-                  const recentOrder = ordersData?.orders[0]
+                  const recentOrder = ordersData?.orders[0];
                   if (recentOrder) {
-                    router.push(`/orders/${recentOrder.id}`)
+                    router.push(`/orders/${recentOrder.id}`);
                   } else {
-                    router.push('/orders')
+                    router.push('/orders');
                   }
                 }}
                 className="bg-wds-accent hover:bg-wds-accent/90 font-semibold text-black"
@@ -95,5 +95,5 @@ export default function PaymentReturnPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

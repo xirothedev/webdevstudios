@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class RegisterDto {
   @ApiProperty({
@@ -30,7 +30,7 @@ export class RegisterDto {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string
+  email: string;
 
   @ApiProperty({
     description: 'User password (minimum 8 characters)',
@@ -40,7 +40,7 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
-  password: string
+  password: string;
 
   @ApiProperty({
     description: 'User full name',
@@ -48,7 +48,7 @@ export class RegisterDto {
   })
   @IsString()
   @IsNotEmpty()
-  fullName: string
+  fullName: string;
 
   @ApiPropertyOptional({
     description: 'User phone number',
@@ -56,5 +56,5 @@ export class RegisterDto {
   })
   @IsString()
   @IsOptional()
-  phone?: string
+  phone?: string;
 }

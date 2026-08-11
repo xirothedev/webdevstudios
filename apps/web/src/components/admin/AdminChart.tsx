@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/components/ui/chart'
+} from '@/components/ui/chart';
 
 interface AdminChartProps {
-  title: string
-  description?: string
-  data: Array<Record<string, string | number>>
-  dataKey: string
-  type?: 'area' | 'bar'
-  className?: string
+  title: string;
+  description?: string;
+  data: Array<Record<string, string | number>>;
+  dataKey: string;
+  type?: 'area' | 'bar';
+  className?: string;
 }
 
 export function AdminChart({
@@ -53,7 +53,7 @@ export function AdminChart({
       label: title,
       color: '#F7931E', // WDS orange accent
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <div
@@ -98,12 +98,12 @@ export function AdminChart({
                         return new Intl.NumberFormat('vi-VN', {
                           style: 'currency',
                           currency: 'VND',
-                        }).format(value)
+                        }).format(value);
                       }
                       // Format other numbers
-                      return value.toLocaleString('vi-VN')
+                      return value.toLocaleString('vi-VN');
                     }
-                    return value
+                    return value;
                   }}
                 />
               }
@@ -144,12 +144,12 @@ export function AdminChart({
                         return new Intl.NumberFormat('vi-VN', {
                           style: 'currency',
                           currency: 'VND',
-                        }).format(value)
+                        }).format(value);
                       }
                       // Format other numbers
-                      return value.toLocaleString('vi-VN')
+                      return value.toLocaleString('vi-VN');
                     }
-                    return value
+                    return value;
                   }}
                 />
               }
@@ -159,5 +159,5 @@ export function AdminChart({
         )}
       </ChartContainer>
     </div>
-  )
+  );
 }

@@ -1,2 +1,2 @@
-export * from './enable-2fa.command'
-export * from './enable-2fa.handler'
+export * from './enable-2fa.command';
+export * from './enable-2fa.handler';

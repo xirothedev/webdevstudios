@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { FloatingCartButton } from '@/components/shop/FloatingCartButton'
-import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata'
+import { FloatingCartButton } from '@/components/shop/FloatingCartButton';
+import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'E-commerce Platform',
@@ -32,17 +32,17 @@ export const metadata: Metadata = createPageMetadata({
   path: '/shop',
   image: SEO_IMAGES['/shop'],
   keywords: ['E-commerce', 'Thương mại điện tử', 'E-commerce platform', 'Mua sắm online'],
-})
+});
 
 export default function ShopLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <>
       {children}
       <FloatingCartButton />
     </>
-  )
+  );
 }

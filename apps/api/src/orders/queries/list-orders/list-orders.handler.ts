@@ -20,26 +20,26 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { OrderDto, OrderListResponseDto } from '../../dtos/order.dto'
-import { OrderRepository } from '../../infrastructure/order.repository'
-import { OrderWithItems } from '../../order.types'
-import { ListOrdersQuery } from './list-orders.query'
+import { OrderDto, OrderListResponseDto } from '../../dtos/order.dto';
+import { OrderRepository } from '../../infrastructure/order.repository';
+import { OrderWithItems } from '../../order.types';
+import { ListOrdersQuery } from './list-orders.query';
 
 @QueryHandler(ListOrdersQuery)
 export class ListOrdersHandler implements IQueryHandler<ListOrdersQuery> {
   constructor(private readonly orderRepository: OrderRepository) {}
 
   async execute(query: ListOrdersQuery): Promise<OrderListResponseDto> {
-    const { userId, page, limit } = query
+    const { userId, page, limit } = query;
 
-    const { orders, total } = await this.orderRepository.findByUserId(userId, page, limit)
+    const { orders, total } = await this.orderRepository.findByUserId(userId, page, limit);
 
     return {
       orders: orders.map((order) => this.mapToDto(order)),
       total,
-    }
+    };
   }
 
   private mapToDto(order: OrderWithItems): OrderDto {
@@ -73,6 +73,6 @@ export class ListOrdersHandler implements IQueryHandler<ListOrdersQuery> {
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    }
+    };
   }
 }

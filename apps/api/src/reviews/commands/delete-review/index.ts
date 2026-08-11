@@ -1,2 +1,2 @@
-export * from './delete-review.command'
-export * from './delete-review.handler'
+export * from './delete-review.command';
+export * from './delete-review.handler';

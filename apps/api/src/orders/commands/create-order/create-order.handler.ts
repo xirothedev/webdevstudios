@@ -20,18 +20,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma'
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CartRepository } from '@/cart/infrastructure/cart.repository'
-import { PrismaService } from '@/prisma'
-import { ProductRepository } from '@/products/infrastructure/product.repository'
+import { CartRepository } from '@/cart/infrastructure/cart.repository';
+import { PrismaService } from '@/prisma';
+import { ProductRepository } from '@/products/infrastructure/product.repository';
 
-import { OrderDto } from '../../dtos/order.dto'
-import { OrderRepository } from '../../infrastructure/order.repository'
-import { OrderWithItems } from '../../order.types'
-import { CreateOrderCommand } from './create-order.command'
+import { OrderDto } from '../../dtos/order.dto';
+import { OrderRepository } from '../../infrastructure/order.repository';
+import { OrderWithItems } from '../../order.types';
+import { CreateOrderCommand } from './create-order.command';
 
 @CommandHandler(CreateOrderCommand)
 export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
@@ -43,61 +43,63 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<OrderDto> {
-    const { userId, shippingAddress, orderType, productId, productSlug, size, quantity } = command
+    const { userId, shippingAddress, orderType, productId, productSlug, size, quantity } = command;
 
     // Check for pending orders - prevent duplicate orders
-    const pendingOrders = await this.orderRepository.findPendingOrdersByUserId(userId)
+    const pendingOrders = await this.orderRepository.findPendingOrdersByUserId(userId);
     if (pendingOrders.length > 0) {
       throw new ConflictException(
         `You have a pending order. Please complete or cancel it before creating a new one. Order ID: ${pendingOrders[0].id}`,
-      )
+      );
     }
 
     const orderItems: Array<{
-      productId: string | null
-      productSlug: ProductSlug
-      productName: string
-      size: ProductSize | null
-      price: number
-      quantity: number
-    }> = []
-    let totalAmount = 0
+      productId: string | null;
+      productSlug: ProductSlug;
+      productName: string;
+      size: ProductSize | null;
+      price: number;
+      quantity: number;
+    }> = [];
+    let totalAmount = 0;
 
     if (orderType === 'FROM_CART') {
       // Get cart
-      const cart = await this.cartRepository.findOrCreateCart(userId)
+      const cart = await this.cartRepository.findOrCreateCart(userId);
       if (!cart.items || cart.items.length === 0) {
-        throw new BadRequestException('Cart is empty')
+        throw new BadRequestException('Cart is empty');
       }
 
       // Validate stock and calculate totals from cart
       for (const cartItem of cart.items) {
-        const product = cartItem.product
+        const product = cartItem.product;
         if (!product) {
-          throw new NotFoundException(`Product ${cartItem.productId} not found`)
+          throw new NotFoundException(`Product ${cartItem.productId} not found`);
         }
 
         // Check stock
-        let availableStock: number
+        let availableStock: number;
         if (product.hasSizes && cartItem.size) {
-          const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size)
+          const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size);
           if (sizeStock === null) {
-            throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`)
+            throw new NotFoundException(
+              `Size ${cartItem.size} not found for product ${product.id}`,
+            );
           }
-          availableStock = sizeStock
+          availableStock = sizeStock;
         } else {
-          availableStock = product.stock
+          availableStock = product.stock;
         }
 
         if (cartItem.quantity > availableStock) {
           throw new ConflictException(
             `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`,
-          )
+          );
         }
 
-        const price = Number(product.priceCurrent)
-        const subtotal = price * cartItem.quantity
-        totalAmount += subtotal
+        const price = Number(product.priceCurrent);
+        const subtotal = price * cartItem.quantity;
+        totalAmount += subtotal;
 
         orderItems.push({
           productId: product.id,
@@ -106,51 +108,51 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
           size: cartItem.size,
           price,
           quantity: cartItem.quantity,
-        })
+        });
       }
     } else if (orderType === 'DIRECT_PURCHASE') {
       // Direct purchase - validate required fields
       if (!productId || !productSlug || !quantity) {
         throw new BadRequestException(
           'productId, productSlug, and quantity are required for direct purchase',
-        )
+        );
       }
 
       // Get product
-      const product = await this.productRepository.findById(productId)
+      const product = await this.productRepository.findById(productId);
       if (!product) {
-        throw new NotFoundException(`Product ${productId} not found`)
+        throw new NotFoundException(`Product ${productId} not found`);
       }
 
       // Validate product slug matches
       if (product.slug !== productSlug) {
-        throw new BadRequestException('Product slug mismatch')
+        throw new BadRequestException('Product slug mismatch');
       }
 
       // Check stock
-      let availableStock: number
+      let availableStock: number;
       if (product.hasSizes && size) {
-        const sizeStock = await this.productRepository.getStockBySize(product.id, size)
+        const sizeStock = await this.productRepository.getStockBySize(product.id, size);
         if (sizeStock === null) {
-          throw new NotFoundException(`Size ${size} not found for product ${product.id}`)
+          throw new NotFoundException(`Size ${size} not found for product ${product.id}`);
         }
-        availableStock = sizeStock
+        availableStock = sizeStock;
       } else {
         if (product.hasSizes && !size) {
-          throw new BadRequestException('Size is required for this product')
+          throw new BadRequestException('Size is required for this product');
         }
-        availableStock = product.stock
+        availableStock = product.stock;
       }
 
       if (quantity > availableStock) {
         throw new ConflictException(
           `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${availableStock}, Requested: ${quantity}`,
-        )
+        );
       }
 
-      const price = Number(product.priceCurrent)
-      const subtotal = price * quantity
-      totalAmount = subtotal
+      const price = Number(product.priceCurrent);
+      const subtotal = price * quantity;
+      totalAmount = subtotal;
 
       orderItems.push({
         productId: product.id,
@@ -159,21 +161,21 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
         size: size || null,
         price,
         quantity,
-      })
+      });
     } else {
-      throw new BadRequestException(`Invalid order type: ${orderType}`)
+      throw new BadRequestException(`Invalid order type: ${orderType}`);
     }
 
     // Calculate shipping fee (free if total > 500k)
-    const shippingFee = totalAmount >= 500000 ? 0 : 30000 // 30k shipping fee
-    const discountValue = 0 // Can be extended later with vouchers
+    const shippingFee = totalAmount >= 500000 ? 0 : 30000; // 30k shipping fee
+    const discountValue = 0; // Can be extended later with vouchers
 
-    const finalAmount = totalAmount + shippingFee - discountValue
+    const finalAmount = totalAmount + shippingFee - discountValue;
 
     // Use Prisma transaction for atomicity
     const order = await this.prisma.$transaction(async (tx) => {
       // Generate order code
-      const orderCode = await this.orderRepository.generateOrderCode()
+      const orderCode = await this.orderRepository.generateOrderCode();
 
       // Create shipping address
       const shippingAddressRecord = await tx.shippingAddress.create({
@@ -187,7 +189,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
           ward: shippingAddress.ward,
           postalCode: shippingAddress.postalCode,
         },
-      })
+      });
 
       // Create order
       const orderRecord = await tx.order.create({
@@ -220,7 +222,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
           },
           shippingAddress: true,
         },
-      })
+      });
 
       // Deduct stock within transaction
       for (const item of orderItems) {
@@ -236,7 +238,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
                   decrement: item.quantity,
                 },
               },
-            })
+            });
           } else {
             await tx.product.update({
               where: { id: item.productId },
@@ -245,21 +247,21 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
                   decrement: item.quantity,
                 },
               },
-            })
+            });
           }
         }
       }
 
-      return orderRecord
-    })
+      return orderRecord;
+    });
 
     // Clear cart only if FROM_CART
     if (orderType === 'FROM_CART') {
-      const cart = await this.cartRepository.findOrCreateCart(userId)
-      await this.cartRepository.clearCart(cart.id)
+      const cart = await this.cartRepository.findOrCreateCart(userId);
+      await this.cartRepository.clearCart(cart.id);
     }
 
-    return this.mapToDto(order)
+    return this.mapToDto(order);
   }
 
   private mapToDto(order: OrderWithItems): OrderDto {
@@ -293,6 +295,6 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    }
+    };
   }
 }

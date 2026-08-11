@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Product, Review, User } from '@generated/prisma'
+import { Product, Review, User } from '@generated/prisma';
 
-export type UserPublic = Pick<User, 'id' | 'fullName' | 'avatar'>
+export type UserPublic = Pick<User, 'id' | 'fullName' | 'avatar'>;
 
-export type ProductPublic = Pick<Product, 'id' | 'slug'>
+export type ProductPublic = Pick<Product, 'id' | 'slug'>;
 
 export type ReviewWithRelations = Review & {
-  user: UserPublic
-  product: ProductPublic
-}
+  user: UserPublic;
+  product: ProductPublic;
+};

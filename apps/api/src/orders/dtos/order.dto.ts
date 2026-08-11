@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
+import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsInt,
@@ -36,33 +36,33 @@ import {
   MinLength,
   ValidateIf,
   ValidateNested,
-} from 'class-validator'
+} from 'class-validator';
 
 export class OrderItemDto {
   @ApiProperty({
     description: 'Order item ID',
     example: 'clx1234567890',
   })
-  id: string
+  id: string;
 
   @ApiPropertyOptional({
     description: 'Product ID',
     example: 'clx1234567890',
     nullable: true,
   })
-  productId: string | null
+  productId: string | null;
 
   @ApiProperty({
     description: 'Product slug',
     example: 'AO_THUN',
   })
-  productSlug: string
+  productSlug: string;
 
   @ApiProperty({
     description: 'Product name',
     example: 'Áo thun WebDev Studios',
   })
-  productName: string
+  productName: string;
 
   @ApiPropertyOptional({
     description: 'Product size',
@@ -70,27 +70,27 @@ export class OrderItemDto {
     example: ProductSize.M,
     nullable: true,
   })
-  size: ProductSize | null
+  size: ProductSize | null;
 
   @ApiProperty({
     description: 'Price at time of purchase',
     example: 299000,
     type: Number,
   })
-  price: number
+  price: number;
 
   @ApiProperty({
     description: 'Quantity',
     example: 2,
   })
-  quantity: number
+  quantity: number;
 
   @ApiProperty({
     description: 'Subtotal',
     example: 598000,
     type: Number,
   })
-  subtotal: number
+  subtotal: number;
 }
 
 export class ShippingAddressDto {
@@ -102,7 +102,7 @@ export class ShippingAddressDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(100)
-  fullName: string
+  fullName: string;
 
   @ApiProperty({
     description: 'Phone number',
@@ -113,7 +113,7 @@ export class ShippingAddressDto {
   @Matches(/^[0-9]{10,11}$/, {
     message: 'Phone number must be 10-11 digits',
   })
-  phone: string
+  phone: string;
 
   @ApiProperty({
     description: 'Address line 1',
@@ -123,7 +123,7 @@ export class ShippingAddressDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(200)
-  addressLine1: string
+  addressLine1: string;
 
   @ApiPropertyOptional({
     description: 'Address line 2',
@@ -133,7 +133,7 @@ export class ShippingAddressDto {
   @IsOptional()
   @IsString()
   @MaxLength(200)
-  addressLine2?: string | null
+  addressLine2?: string | null;
 
   @ApiProperty({
     description: 'City/Province',
@@ -143,7 +143,7 @@ export class ShippingAddressDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(100)
-  city: string
+  city: string;
 
   @ApiProperty({
     description: 'District',
@@ -153,7 +153,7 @@ export class ShippingAddressDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(100)
-  district: string
+  district: string;
 
   @ApiProperty({
     description: 'Ward',
@@ -163,7 +163,7 @@ export class ShippingAddressDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(100)
-  ward: string
+  ward: string;
 
   @ApiProperty({
     description: 'Postal code',
@@ -174,7 +174,7 @@ export class ShippingAddressDto {
   @Matches(/^[0-9]{5,6}$/, {
     message: 'Postal code must be 5-6 digits',
   })
-  postalCode: string
+  postalCode: string;
 }
 
 export class OrderDto {
@@ -182,72 +182,72 @@ export class OrderDto {
     description: 'Order ID',
     example: 'clx1234567890',
   })
-  id: string
+  id: string;
 
   @ApiProperty({
     description: 'Order code',
     example: '#ORD-1234',
   })
-  code: string
+  code: string;
 
   @ApiProperty({
     description: 'Order status',
     enum: OrderStatus,
     example: OrderStatus.PENDING,
   })
-  status: OrderStatus
+  status: OrderStatus;
 
   @ApiProperty({
     description: 'Payment status',
     enum: PaymentStatus,
     example: PaymentStatus.PENDING,
   })
-  paymentStatus: PaymentStatus
+  paymentStatus: PaymentStatus;
 
   @ApiProperty({
     description: 'Total amount',
     example: 897000,
     type: Number,
   })
-  totalAmount: number
+  totalAmount: number;
 
   @ApiProperty({
     description: 'Shipping fee',
     example: 0,
     type: Number,
   })
-  shippingFee: number
+  shippingFee: number;
 
   @ApiProperty({
     description: 'Discount value',
     example: 0,
     type: Number,
   })
-  discountValue: number
+  discountValue: number;
 
   @ApiProperty({
     description: 'Shipping address',
     type: ShippingAddressDto,
   })
-  shippingAddress: ShippingAddressDto
+  shippingAddress: ShippingAddressDto;
 
   @ApiProperty({
     description: 'Order items',
     type: [OrderItemDto],
   })
-  items: OrderItemDto[]
+  items: OrderItemDto[];
 
   @ApiProperty({
     description: 'Order creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  createdAt: Date
+  createdAt: Date;
 
   @ApiProperty({
     description: 'Last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  updatedAt: Date
+  updatedAt: Date;
 }
 
 export enum OrderType {
@@ -262,7 +262,7 @@ export class CreateOrderDto {
   })
   @ValidateNested()
   @Type(() => ShippingAddressDto)
-  shippingAddress: ShippingAddressDto
+  shippingAddress: ShippingAddressDto;
 
   @ApiProperty({
     description: 'Order type',
@@ -271,7 +271,7 @@ export class CreateOrderDto {
   })
   @IsEnum(OrderType)
   @IsNotEmpty()
-  orderType: OrderType
+  orderType: OrderType;
 
   @ApiPropertyOptional({
     description: 'Product ID (for direct purchase)',
@@ -280,7 +280,7 @@ export class CreateOrderDto {
   @ValidateIf((o) => o.orderType === OrderType.DIRECT_PURCHASE)
   @IsString()
   @IsNotEmpty()
-  productId?: string
+  productId?: string;
 
   @ApiPropertyOptional({
     description: 'Product slug (for direct purchase)',
@@ -289,7 +289,7 @@ export class CreateOrderDto {
   @ValidateIf((o) => o.orderType === OrderType.DIRECT_PURCHASE)
   @IsEnum(ProductSlug)
   @IsNotEmpty()
-  productSlug?: ProductSlug
+  productSlug?: ProductSlug;
 
   @ApiPropertyOptional({
     description: 'Product size (for direct purchase)',
@@ -298,7 +298,7 @@ export class CreateOrderDto {
   })
   @IsOptional()
   @IsEnum(ProductSize)
-  size?: ProductSize
+  size?: ProductSize;
 
   @ApiPropertyOptional({
     description: 'Quantity (for direct purchase)',
@@ -310,7 +310,7 @@ export class CreateOrderDto {
   @IsPositive()
   @Min(1)
   @Type(() => Number)
-  quantity?: number
+  quantity?: number;
 }
 
 export class OrderListResponseDto {
@@ -318,13 +318,13 @@ export class OrderListResponseDto {
     description: 'List of orders',
     type: [OrderDto],
   })
-  orders: OrderDto[]
+  orders: OrderDto[];
 
   @ApiProperty({
     description: 'Total number of orders',
     example: 10,
   })
-  total: number
+  total: number;
 }
 
 export class UpdateOrderStatusDto {
@@ -335,5 +335,5 @@ export class UpdateOrderStatusDto {
   })
   @IsEnum(OrderStatus)
   @IsNotEmpty()
-  status: OrderStatus
+  status: OrderStatus;
 }

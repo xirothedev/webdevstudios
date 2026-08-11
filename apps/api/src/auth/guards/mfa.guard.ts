@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common'
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma'
-import { SessionRepository, TokenStorageService } from '../infrastructure'
+import { PrismaService } from '@/prisma';
+import { SessionRepository, TokenStorageService } from '../infrastructure';
 
 @Injectable()
 export class MfaGuard implements CanActivate {
@@ -34,43 +34,43 @@ export class MfaGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest()
-    const user = request.user
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
 
     if (!user) {
-      throw new ForbiddenException('User not authenticated')
+      throw new ForbiddenException('User not authenticated');
     }
 
     // Check if user has 2FA enabled
     const dbUser = await this.prisma.user.findUnique({
       where: { id: user.id },
       select: { mfaEnabled: true },
-    })
+    });
 
     if (!dbUser?.mfaEnabled) {
-      throw new ForbiddenException('2FA is not enabled for this user')
+      throw new ForbiddenException('2FA is not enabled for this user');
     }
 
-    const authHeader = request.headers.authorization
+    const authHeader = request.headers.authorization;
     if (!authHeader) {
-      throw new ForbiddenException('Authorization header missing')
+      throw new ForbiddenException('Authorization header missing');
     }
 
-    const token = authHeader.replace('Bearer ', '')
+    const token = authHeader.replace('Bearer ', '');
 
     // Find session by token
-    const session = await this.sessionRepository.findByToken(token)
+    const session = await this.sessionRepository.findByToken(token);
     if (!session || session.status !== 'ACTIVE') {
-      throw new ForbiddenException('Invalid or expired session')
+      throw new ForbiddenException('Invalid or expired session');
     }
 
     // Check Redis for MFA verification status
-    const mfaVerified = await this.tokenStorage.getSessionMfaVerified(session.id)
+    const mfaVerified = await this.tokenStorage.getSessionMfaVerified(session.id);
 
     if (!mfaVerified) {
-      throw new ForbiddenException('2FA verification required')
+      throw new ForbiddenException('2FA verification required');
     }
 
-    return true
+    return true;
   }
 }

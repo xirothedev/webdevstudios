@@ -20,30 +20,30 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { User } from '@generated/prisma'
-import { Injectable } from '@nestjs/common'
-import { PassportSerializer } from '@nestjs/passport'
+import { User } from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
+import { PassportSerializer } from '@nestjs/passport';
 
-import { PrismaService } from '@/prisma'
+import { PrismaService } from '@/prisma';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
   constructor(private readonly prisma: PrismaService) {
-    super()
+    super();
   }
 
   serializeUser(user: User, done: (err: Error | null, user?: User) => void) {
-    done(null, user)
+    done(null, user);
   }
 
   async deserializeUser(user: User, done: (err: Error | null, user?: User | null) => void) {
     try {
       const data = await this.prisma.user.findUnique({
         where: { id: user.id },
-      })
-      done(null, data)
+      });
+      done(null, data);
     } catch (error) {
-      done(error instanceof Error ? error : new Error(String(error)))
+      done(error instanceof Error ? error : new Error(String(error)));
     }
   }
 }

@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Code, Users, Zap } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { Code, Users, Zap } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 export interface Category {
-  id: string
-  label: string
-  icon?: ReactNode
+  id: string;
+  label: string;
+  icon?: ReactNode;
 }
 
 export interface Activity {
-  id: number
-  title: string
-  category: 'academic' | 'community' | 'event'
-  date: string
-  location: string
-  image: string
-  description: string
-  attendees: number
+  id: number;
+  title: string;
+  category: 'academic' | 'community' | 'event';
+  date: string;
+  location: string;
+  image: string;
+  description: string;
+  attendees: number;
 }
 
 export const CATEGORIES: Category[] = [
@@ -49,7 +49,7 @@ export const CATEGORIES: Category[] = [
     label: 'Sự kiện & Teambuilding',
     icon: <Zap size={16} />,
   },
-]
+];
 
 export const ACTIVITIES: Activity[] = [
   {
@@ -121,4 +121,4 @@ export const ACTIVITIES: Activity[] = [
     description: 'Buổi gặp mặt thân mật, chia sẻ chuyện nghề, chuyện đời của các cựu thành viên.',
     attendees: 40,
   },
-]
+];

@@ -20,25 +20,25 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useCart } from '@/lib/api/hooks/use-cart'
-import { useCreateOrder, useOrders } from '@/lib/api/hooks/use-orders'
-import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments'
-import { CreateOrderRequest, ShippingAddress } from '@/lib/api/orders'
-import { formatPrice } from '@/lib/utils'
-import { ProductSize } from '@/types/product'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useCart } from '@/lib/api/hooks/use-cart';
+import { useCreateOrder, useOrders } from '@/lib/api/hooks/use-orders';
+import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments';
+import { CreateOrderRequest, ShippingAddress } from '@/lib/api/orders';
+import { formatPrice } from '@/lib/utils';
+import { ProductSize } from '@/types/product';
 
 // Validation schema với Zod
 const shippingAddressSchema = z.object({
@@ -56,36 +56,36 @@ const shippingAddressSchema = z.object({
     .string()
     .min(1, 'Mã bưu điện là bắt buộc')
     .regex(/^[0-9]{5,6}$/, 'Mã bưu điện không hợp lệ'),
-})
+});
 
-type ShippingAddressFormData = z.infer<typeof shippingAddressSchema>
+type ShippingAddressFormData = z.infer<typeof shippingAddressSchema>;
 
 export default function CheckoutPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const isBuyNow = searchParams.get('buyNow') === 'true'
-  const buyNowProductId = searchParams.get('productId')
-  const buyNowProductSlug = searchParams.get('productSlug')
-  const buyNowSize = searchParams.get('size') as ProductSize | undefined
-  const buyNowQuantity = searchParams.get('quantity')
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isBuyNow = searchParams.get('buyNow') === 'true';
+  const buyNowProductId = searchParams.get('productId');
+  const buyNowProductSlug = searchParams.get('productSlug');
+  const buyNowSize = searchParams.get('size') as ProductSize | undefined;
+  const buyNowQuantity = searchParams.get('quantity');
 
   // Fetch cart using TanStack Query (only if not Buy Now)
-  const cartQuery = useCart()
+  const cartQuery = useCart();
   const {
     data: cart,
     isLoading: isLoadingCart,
     error: cartError,
-  } = isBuyNow ? { data: null, isLoading: false, error: null } : cartQuery
+  } = isBuyNow ? { data: null, isLoading: false, error: null } : cartQuery;
 
   // Check for pending orders
-  const { data: ordersData } = useOrders(1, 1)
+  const { data: ordersData } = useOrders(1, 1);
   const pendingOrder = ordersData?.orders.find(
     (order) => order.status === 'PENDING' && order.paymentStatus === 'PENDING',
-  )
+  );
 
   // Create order mutation
-  const createOrderMutation = useCreateOrder()
-  const createPaymentLinkMutation = useCreatePaymentLink()
+  const createOrderMutation = useCreateOrder();
+  const createPaymentLinkMutation = useCreatePaymentLink();
 
   // Form setup với react-hook-form
   const {
@@ -104,34 +104,34 @@ export default function CheckoutPage() {
       ward: '',
       postalCode: '',
     },
-  })
+  });
 
   // Redirect to cart if cart is empty or error (only for FROM_CART mode)
   useEffect(() => {
     if (!isBuyNow && (cartError || (cart && cart.items.length === 0))) {
-      router.push('/cart')
+      router.push('/cart');
     }
-  }, [cart, cartError, router, isBuyNow])
+  }, [cart, cartError, router, isBuyNow]);
 
   // Redirect to payment page if there's a pending order
   useEffect(() => {
     if (pendingOrder) {
       // Save orderId to localStorage for recovery
-      localStorage.setItem('pendingOrderId', pendingOrder.id)
-      router.push(`/payments/${pendingOrder.id}`)
+      localStorage.setItem('pendingOrderId', pendingOrder.id);
+      router.push(`/payments/${pendingOrder.id}`);
     }
-  }, [pendingOrder, router])
+  }, [pendingOrder, router]);
 
-  const isFormSubmitting = isSubmitting || createOrderMutation.isPending
+  const isFormSubmitting = isSubmitting || createOrderMutation.isPending;
 
   const onSubmit = (data: ShippingAddressFormData) => {
     // For FROM_CART mode, check if cart exists and has items
-    if (!isBuyNow && (!cart || cart.items.length === 0)) return
+    if (!isBuyNow && (!cart || cart.items.length === 0)) return;
 
     // For DIRECT_PURCHASE mode, check if required fields are present
     if (isBuyNow && (!buyNowProductId || !buyNowProductSlug || !buyNowQuantity)) {
-      toast.error('Thông tin sản phẩm không hợp lệ')
-      return
+      toast.error('Thông tin sản phẩm không hợp lệ');
+      return;
     }
 
     const shippingAddress: ShippingAddress = {
@@ -143,70 +143,70 @@ export default function CheckoutPage() {
       district: data.district,
       ward: data.ward,
       postalCode: data.postalCode,
-    }
+    };
 
     // Prepare order data
     const orderData: CreateOrderRequest = {
       shippingAddress,
       orderType: isBuyNow ? 'DIRECT_PURCHASE' : 'FROM_CART',
-    }
+    };
 
     // Add Buy Now fields if applicable
     if (isBuyNow && buyNowProductId && buyNowProductSlug && buyNowQuantity) {
-      orderData.productId = buyNowProductId
-      orderData.productSlug = buyNowProductSlug
-      orderData.quantity = parseInt(buyNowQuantity, 10)
+      orderData.productId = buyNowProductId;
+      orderData.productSlug = buyNowProductSlug;
+      orderData.quantity = parseInt(buyNowQuantity, 10);
       if (buyNowSize) {
-        orderData.size = buyNowSize
+        orderData.size = buyNowSize;
       }
     }
 
     createOrderMutation.mutate(orderData, {
       onSuccess: async (order) => {
         // Save orderId to localStorage for recovery
-        localStorage.setItem('pendingOrderId', order.id)
+        localStorage.setItem('pendingOrderId', order.id);
 
         // Create payment link
         try {
           await createPaymentLinkMutation.mutateAsync({
             orderId: order.id,
-          })
+          });
 
           // Redirect to payment page
-          router.push(`/payments/${order.id}`)
+          router.push(`/payments/${order.id}`);
         } catch (error) {
           // If payment link creation fails, still redirect to order page
-          console.error('Failed to create payment link:', error)
-          router.push(`/orders/${order.id}`)
+          console.error('Failed to create payment link:', error);
+          router.push(`/orders/${order.id}`);
         }
       },
-    })
-  }
+    });
+  };
 
   if (isLoadingCart && !isBuyNow) {
     return (
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">Đang tải...</div>
       </div>
-    )
+    );
   }
 
   if (!isBuyNow && (cartError || !cart || cart.items.length === 0)) {
-    return null // useEffect will redirect
+    return null; // useEffect will redirect
   }
 
   // Calculate totals
-  let subtotal = 0
+  let subtotal = 0;
   if (isBuyNow && buyNowQuantity) {
     // For Buy Now, we need to fetch product price
     // For now, show a placeholder - in production, fetch product details
-    subtotal = 0 // Will be calculated on backend
+    subtotal = 0; // Will be calculated on backend
   } else if (cart) {
-    subtotal = cart.totalAmount
+    subtotal = cart.totalAmount;
   }
 
-  const shippingFee = subtotal >= 500000 ? 0 : 30000
-  const total = subtotal + shippingFee
+  const shippingFee = subtotal >= 500000 ? 0 : 30000;
+  const total = subtotal + shippingFee;
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -409,5 +409,5 @@ export default function CheckoutPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

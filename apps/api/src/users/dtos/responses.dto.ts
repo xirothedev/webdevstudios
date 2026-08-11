@@ -20,29 +20,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { UserRole } from '@generated/prisma';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PublicUserDto {
   @ApiProperty({
     description: 'User ID',
     example: 'clx1234567890',
   })
-  id: string
+  id: string;
 
   @ApiPropertyOptional({
     description: 'User full name',
     example: 'John Doe',
     nullable: true,
   })
-  fullName: string | null
+  fullName: string | null;
 
   @ApiPropertyOptional({
     description: 'User avatar URL',
     example: 'https://example.com/avatar.jpg',
     nullable: true,
   })
-  avatar: string | null
+  avatar: string | null;
 }
 
 export class PrivateUserDto {
@@ -50,71 +50,71 @@ export class PrivateUserDto {
     description: 'User ID',
     example: 'clx1234567890',
   })
-  id: string
+  id: string;
 
   @ApiProperty({
     description: 'User email',
     example: 'user@example.com',
   })
-  email: string
+  email: string;
 
   @ApiPropertyOptional({
     description: 'User full name',
     example: 'John Doe',
     nullable: true,
   })
-  fullName: string | null
+  fullName: string | null;
 
   @ApiPropertyOptional({
     description: 'User phone number',
     example: '+84123456789',
     nullable: true,
   })
-  phone: string | null
+  phone: string | null;
 
   @ApiPropertyOptional({
     description: 'User avatar URL',
     example: 'https://example.com/avatar.jpg',
     nullable: true,
   })
-  avatar: string | null
+  avatar: string | null;
 
   @ApiProperty({
     description: 'User role',
     enum: UserRole,
     example: UserRole.CUSTOMER,
   })
-  role: UserRole
+  role: UserRole;
 
   @ApiProperty({
     description: 'Email verification status',
     example: true,
   })
-  emailVerified: boolean
+  emailVerified: boolean;
 
   @ApiProperty({
     description: 'Phone verification status',
     example: false,
   })
-  phoneVerified: boolean
+  phoneVerified: boolean;
 
   @ApiProperty({
     description: '2FA enabled status',
     example: false,
   })
-  mfaEnabled: boolean
+  mfaEnabled: boolean;
 
   @ApiProperty({
     description: 'Account creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  createdAt: Date
+  createdAt: Date;
 
   @ApiProperty({
     description: 'Last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  updatedAt: Date
+  updatedAt: Date;
 }
 
 export class PaginationDto {
@@ -122,25 +122,25 @@ export class PaginationDto {
     description: 'Current page number',
     example: 1,
   })
-  page: number
+  page: number;
 
   @ApiProperty({
     description: 'Number of items per page',
     example: 10,
   })
-  limit: number
+  limit: number;
 
   @ApiProperty({
     description: 'Total number of items',
     example: 100,
   })
-  total: number
+  total: number;
 
   @ApiProperty({
     description: 'Total number of pages',
     example: 10,
   })
-  totalPages: number
+  totalPages: number;
 }
 
 export class UserListResponseDto {
@@ -148,13 +148,13 @@ export class UserListResponseDto {
     description: 'List of users',
     type: [PrivateUserDto],
   })
-  users: PrivateUserDto[]
+  users: PrivateUserDto[];
 
   @ApiProperty({
     description: 'Pagination metadata',
     type: PaginationDto,
   })
-  pagination: PaginationDto
+  pagination: PaginationDto;
 }
 
 export class SearchUsersResponseDto {
@@ -165,11 +165,11 @@ export class SearchUsersResponseDto {
       { type: 'array', items: { $ref: '#/components/schemas/PrivateUserDto' } },
     ],
   })
-  users: PublicUserDto[] | PrivateUserDto[]
+  users: PublicUserDto[] | PrivateUserDto[];
 
   @ApiProperty({
     description: 'Pagination metadata',
     type: PaginationDto,
   })
-  pagination: PaginationDto
+  pagination: PaginationDto;
 }

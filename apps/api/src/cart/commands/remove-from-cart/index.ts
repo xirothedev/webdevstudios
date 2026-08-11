@@ -1,2 +1,2 @@
-export * from './remove-from-cart.command'
-export * from './remove-from-cart.handler'
+export * from './remove-from-cart.command';
+export * from './remove-from-cart.handler';

@@ -20,34 +20,34 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
-import { JwtModule } from '@nestjs/jwt'
-import { ScheduleModule } from '@nestjs/schedule'
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { AuthModule } from './auth/auth.module'
-import { BlogModule } from './blog/blog.module'
-import { CartModule } from './cart/cart.module'
-import { CommonModule } from './common/common.module'
-import { AllExceptionsFilter, HttpExceptionFilter } from '@/common/filters'
-import { JwtAuthGuard } from '@/common/guards'
-import { SecurityLoggingInterceptor, TransformInterceptor } from '@/common/interceptors'
-import { CsrfService } from '@/common/services'
-import { ThrottlerRedisStorage } from './common/storage/throttler-redis.storage'
-import { EventsModule } from './events/events.module'
-import { MailModule } from './mail/mail.module'
-import { OrdersModule } from './orders/orders.module'
-import { PaymentsModule } from './payments/payments.module'
-import { PrismaModule } from '@/prisma'
-import { ProductsModule } from './products/products.module'
-import { RedisModule, RedisService } from '@/redis'
-import { ReviewsModule } from './reviews/reviews.module'
-import { StorageModule } from './storage/storage.module'
-import { UsersModule } from './users/users.module'
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { BlogModule } from './blog/blog.module';
+import { CartModule } from './cart/cart.module';
+import { CommonModule } from './common/common.module';
+import { AllExceptionsFilter, HttpExceptionFilter } from '@/common/filters';
+import { JwtAuthGuard } from '@/common/guards';
+import { SecurityLoggingInterceptor, TransformInterceptor } from '@/common/interceptors';
+import { CsrfService } from '@/common/services';
+import { ThrottlerRedisStorage } from './common/storage/throttler-redis.storage';
+import { EventsModule } from './events/events.module';
+import { MailModule } from './mail/mail.module';
+import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
+import { PrismaModule } from '@/prisma';
+import { ProductsModule } from './products/products.module';
+import { RedisModule, RedisService } from '@/redis';
+import { ReviewsModule } from './reviews/reviews.module';
+import { StorageModule } from './storage/storage.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [

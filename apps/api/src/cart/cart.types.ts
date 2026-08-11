@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Cart, CartItem, Product, ProductSizeStock } from '@generated/prisma'
+import { Cart, CartItem, Product, ProductSizeStock } from '@generated/prisma';
 
 export type ProductWithStock = Product & {
-  sizeStocks: ProductSizeStock[]
-}
+  sizeStocks: ProductSizeStock[];
+};
 
 export type CartItemWithProduct = CartItem & {
-  product: ProductWithStock
-}
+  product: ProductWithStock;
+};
 
 export type CartWithItems = Cart & {
-  items: CartItemWithProduct[]
-}
+  items: CartItemWithProduct[];
+};

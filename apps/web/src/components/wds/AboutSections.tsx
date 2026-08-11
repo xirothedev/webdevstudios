@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Clock, Compass, Mountain, Settings, Telescope } from 'lucide-react'
+import { Clock, Compass, Mountain, Settings, Telescope } from 'lucide-react';
 
 interface AboutSectionProps {
-  icon: React.ReactNode
-  title: string
-  description: string
+  icon: React.ReactNode;
+  title: string;
+  description: string;
 }
 
 function AboutSection({ icon, title, description }: AboutSectionProps) {
@@ -43,7 +43,7 @@ function AboutSection({ icon, title, description }: AboutSectionProps) {
         <p className="leading-relaxed text-gray-700">{description}</p>
       </div>
     </div>
-  )
+  );
 }
 
 export function WDSAboutSections() {
@@ -78,7 +78,7 @@ export function WDSAboutSections() {
       description:
         'Hiện tại chúng tôi chủ yếu hoạt động tại trường Đại học Công nghệ Thông tin, và mở rộng các hoạt động trong phạm vi ĐHQG TP.HCM. Trong tương lai chúng tôi muốn mở rộng hơn nữa phạm vi hoạt động của mình ra các trường Đại học trong TP.HCM, và hướng tới phạm vi cả nước.',
     },
-  ]
+  ];
 
   return (
     <section className="bg-white py-20">
@@ -90,5 +90,5 @@ export function WDSAboutSections() {
         </div>
       </div>
     </section>
-  )
+  );
 }

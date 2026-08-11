@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useQuery } from '@tanstack/react-query'
-import { use } from 'react'
+import { useQuery } from '@tanstack/react-query';
+import { use } from 'react';
 
-import { AdminHeader } from '@/components/admin/AdminHeader'
-import { BlogEditor } from '@/components/admin/BlogEditor'
-import { blogApi } from '@/lib/api/blog'
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { BlogEditor } from '@/components/admin/BlogEditor';
+import { blogApi } from '@/lib/api/blog';
 
 export function AdminBlogEditPageClient({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+  const { id } = use(params);
 
   const {
     data: post,
@@ -40,7 +40,7 @@ export function AdminBlogEditPageClient({ params }: { params: Promise<{ id: stri
     queryKey: ['admin', 'blog', 'post', id],
     queryFn: () => blogApi.getPostById(id, true),
     enabled: !!id,
-  })
+  });
 
   if (isLoading) {
     return (
@@ -50,7 +50,7 @@ export function AdminBlogEditPageClient({ params }: { params: Promise<{ id: stri
           <p className="text-wds-text/70">Đang tải bài viết...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error || !post) {
@@ -61,7 +61,7 @@ export function AdminBlogEditPageClient({ params }: { params: Promise<{ id: stri
           <p className="text-wds-text/70">Không tìm thấy bài viết hoặc có lỗi xảy ra.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -72,5 +72,5 @@ export function AdminBlogEditPageClient({ params }: { params: Promise<{ id: stri
         <BlogEditor postId={id} />
       </div>
     </div>
-  )
+  );
 }

@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class RequestPasswordResetDto {
   @ApiProperty({
@@ -30,5 +30,5 @@ export class RequestPasswordResetDto {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string
+  email: string;
 }

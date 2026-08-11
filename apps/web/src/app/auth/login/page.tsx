@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useLogin } from '@/lib/api/hooks/use-auth'
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useLogin } from '@/lib/api/hooks/use-auth';
 
 // Validation schema with Zod
 const loginSchema = z.object({
   email: z.email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
   password: z.string().min(1, 'Mật khẩu là bắt buộc').min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
   rememberMe: z.boolean(),
-})
+});
 
-type LoginFormData = z.infer<typeof loginSchema>
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const {
@@ -55,16 +55,16 @@ export default function LoginPage() {
       password: '',
       rememberMe: false,
     },
-  })
+  });
 
-  const loginMutation = useLogin()
-  const rememberMe = watch('rememberMe')
+  const loginMutation = useLogin();
+  const rememberMe = watch('rememberMe');
 
   const onSubmit = (data: LoginFormData) => {
-    loginMutation.mutate(data)
-  }
+    loginMutation.mutate(data);
+  };
 
-  const isLoading = isSubmitting || loginMutation.isPending
+  const isLoading = isSubmitting || loginMutation.isPending;
 
   return (
     <AuthLayout variant="login">
@@ -159,5 +159,5 @@ export default function LoginPage() {
         </form>
       </div>
     </AuthLayout>
-  )
+  );
 }

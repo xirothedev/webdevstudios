@@ -20,22 +20,22 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { AuthLoading } from '@/components/auth/AuthLoading'
-import { Button } from '@/components/ui/button'
-import { useVerifyEmail } from '@/lib/api/hooks/use-auth'
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthLoading } from '@/components/auth/AuthLoading';
+import { Button } from '@/components/ui/button';
+import { useVerifyEmail } from '@/lib/api/hooks/use-auth';
 
 function VerifyEmailContent() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const token = searchParams.get('token')
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get('token');
 
-  const verifyEmailMutation = useVerifyEmail()
+  const verifyEmailMutation = useVerifyEmail();
 
   useEffect(() => {
     if (
@@ -44,9 +44,9 @@ function VerifyEmailContent() {
       !verifyEmailMutation.isSuccess &&
       !verifyEmailMutation.isError
     ) {
-      verifyEmailMutation.mutate(token)
+      verifyEmailMutation.mutate(token);
     }
-  }, [token, verifyEmailMutation])
+  }, [token, verifyEmailMutation]);
 
   if (!token) {
     return (
@@ -62,7 +62,7 @@ function VerifyEmailContent() {
           </Button>
         </div>
       </AuthLayout>
-    )
+    );
   }
 
   if (verifyEmailMutation.isSuccess) {
@@ -75,14 +75,14 @@ function VerifyEmailContent() {
           </p>
         </div>
       </AuthLayout>
-    )
+    );
   }
 
   if (verifyEmailMutation.isError) {
     const errorMessage =
       verifyEmailMutation.error instanceof Error
         ? verifyEmailMutation.error.message
-        : 'Token không hợp lệ hoặc đã hết hạn'
+        : 'Token không hợp lệ hoặc đã hết hạn';
 
     return (
       <AuthLayout variant="login">
@@ -97,7 +97,7 @@ function VerifyEmailContent() {
           </Button>
         </div>
       </AuthLayout>
-    )
+    );
   }
 
   return (
@@ -112,7 +112,7 @@ function VerifyEmailContent() {
         )}
       </div>
     </AuthLayout>
-  )
+  );
 }
 
 export default function VerifyEmailPage() {
@@ -126,5 +126,5 @@ export default function VerifyEmailPage() {
     >
       <VerifyEmailContent />
     </Suspense>
-  )
+  );
 }

@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType, MFAMethod } from '@generated/prisma'
+import { DeviceType, MFAMethod } from '@generated/prisma';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import * as argon2 from 'argon2'
-import * as UAParser from 'ua-parser-js'
+} from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import * as argon2 from 'argon2';
+import * as UAParser from 'ua-parser-js';
 
-import { addDays } from 'date-fns'
-import { PrismaService } from '@/prisma'
+import { addDays } from 'date-fns';
+import { PrismaService } from '@/prisma';
 import {
   SessionRepository,
   TokenService,
   TokenStorageService,
   TotpService,
   UserRepository,
-} from '../../infrastructure'
-import { Verify2FACommand } from './verify-2fa.command'
+} from '../../infrastructure';
+import { Verify2FACommand } from './verify-2fa.command';
 
 @Injectable()
 @CommandHandler(Verify2FACommand)
@@ -55,23 +55,23 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
   ) {}
 
   async execute(command: Verify2FACommand): Promise<{
-    accessToken?: string
-    refreshToken?: string
+    accessToken?: string;
+    refreshToken?: string;
     user?: {
-      id: string
-      email: string
-      fullName: string | null
-      emailVerified: boolean
-      mfaEnabled: boolean
-    }
-    verified?: boolean
+      id: string;
+      email: string;
+      fullName: string | null;
+      emailVerified: boolean;
+      mfaEnabled: boolean;
+    };
+    verified?: boolean;
   }> {
-    const { userId, code, sessionId, ipAddress, userAgent } = command
+    const { userId, code, sessionId, ipAddress, userAgent } = command;
 
     // Find user
-    const user = await this.userRepository.findById(userId)
+    const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new NotFoundException('User not found')
+      throw new NotFoundException('User not found');
     }
 
     // Find MFA method
@@ -81,19 +81,19 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
         methodType: MFAMethod.TOTP,
         isActive: true,
       },
-    })
+    });
 
     if (!mfaMethod && !user.mfaSecret) {
-      throw new BadRequestException('2FA is not enabled for this user')
+      throw new BadRequestException('2FA is not enabled for this user');
     }
 
-    const secret = mfaMethod?.secret || user.mfaSecret
+    const secret = mfaMethod?.secret || user.mfaSecret;
     if (!secret) {
-      throw new BadRequestException('2FA secret not found')
+      throw new BadRequestException('2FA secret not found');
     }
 
     // Verify TOTP code
-    const isValidTotp = this.totpService.verifyCode(secret, code)
+    const isValidTotp = this.totpService.verifyCode(secret, code);
 
     // If TOTP is invalid, check backup codes
     if (!isValidTotp) {
@@ -102,18 +102,18 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
           userId,
           isUsed: false,
         },
-      })
+      });
 
-      let isValidBackup = false
-      let usedBackupCodeId: string | null = null
+      let isValidBackup = false;
+      let usedBackupCodeId: string | null = null;
 
       for (const backupCode of backupCodes) {
         try {
-          const isValid = await argon2.verify(backupCode.code, code)
+          const isValid = await argon2.verify(backupCode.code, code);
           if (isValid) {
-            isValidBackup = true
-            usedBackupCodeId = backupCode.id
-            break
+            isValidBackup = true;
+            usedBackupCodeId = backupCode.id;
+            break;
           }
         } catch {
           // Continue checking other codes
@@ -121,7 +121,7 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
       }
 
       if (!isValidBackup) {
-        throw new UnauthorizedException('Invalid 2FA code')
+        throw new UnauthorizedException('Invalid 2FA code');
       }
 
       // Mark backup code as used
@@ -132,7 +132,7 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
             isUsed: true,
             usedAt: new Date(),
           },
-        })
+        });
       }
     }
 
@@ -140,18 +140,18 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
     if (sessionId) {
       // This is a login flow - create session
       // Find the pending session or create a new one
-      const sessionUser = await this.userRepository.findById(userId)
+      const sessionUser = await this.userRepository.findById(userId);
       if (!sessionUser) {
-        throw new NotFoundException('User not found')
+        throw new NotFoundException('User not found');
       }
 
       // Create device record
-      let deviceId: string | undefined
+      let deviceId: string | undefined;
       if (userAgent) {
-        const parser = new UAParser.UAParser(userAgent)
-        const result = parser.getResult()
-        const deviceType = this.getDeviceType(result)
-        const deviceName = this.getDeviceName(result)
+        const parser = new UAParser.UAParser(userAgent);
+        const result = parser.getResult();
+        const deviceType = this.getDeviceType(result);
+        const deviceName = this.getDeviceName(result);
 
         const device = await this.prisma.device.create({
           data: {
@@ -162,8 +162,8 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
             ipAddress,
             fingerprint: this.generateFingerprint(userAgent, ipAddress),
           },
-        })
-        deviceId = device.id
+        });
+        deviceId = device.id;
       }
 
       // Generate tokens
@@ -171,14 +171,14 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
         sub: sessionUser.id,
         email: sessionUser.email,
         role: sessionUser.role,
-      })
+      });
 
       const refreshToken = this.tokenService.generateRefreshToken({
         sub: user.id,
-      })
+      });
 
       // Create session
-      const expiresAt = addDays(new Date(), 7) // 7 days
+      const expiresAt = addDays(new Date(), 7); // 7 days
       const session = await this.sessionRepository.create({
         userId: sessionUser.id,
         token: accessToken,
@@ -187,11 +187,11 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
         ipAddress,
         userAgent,
         expiresAt,
-      })
+      });
 
       // Store MFA verification status in Redis with TTL matching session expiration
-      const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000)
-      await this.tokenStorage.storeSessionMfaVerified(session.id, ttl)
+      const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
+      await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
 
       return {
         accessToken,
@@ -203,7 +203,7 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
           emailVerified: sessionUser.emailVerified,
           mfaEnabled: sessionUser.mfaEnabled,
         },
-      }
+      };
     }
 
     // This is a setup flow - mark MFA as verified and active
@@ -214,44 +214,44 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
           isVerified: true,
           isActive: true,
         },
-      })
+      });
 
       await this.userRepository.update(userId, {
         mfaEnabled: true,
-      })
+      });
     }
 
-    return { verified: true }
+    return { verified: true };
   }
 
   private getDeviceType(parser: UAParser.IResult): DeviceType {
-    const { device } = parser
-    if (device?.type === 'mobile') return DeviceType.MOBILE
-    if (device?.type === 'tablet') return DeviceType.TABLET
-    return DeviceType.DESKTOP
+    const { device } = parser;
+    if (device?.type === 'mobile') return DeviceType.MOBILE;
+    if (device?.type === 'tablet') return DeviceType.TABLET;
+    return DeviceType.DESKTOP;
   }
 
   private getDeviceName(parser: UAParser.IResult): string {
-    const browser = parser.browser
-    const os = parser.os
-    const device = parser.device
+    const browser = parser.browser;
+    const os = parser.os;
+    const device = parser.device;
 
-    const parts: string[] = []
+    const parts: string[] = [];
     if (device.vendor && device.model) {
-      parts.push(`${device.vendor} ${device.model}`)
+      parts.push(`${device.vendor} ${device.model}`);
     }
     if (os.name) {
-      parts.push(os.name)
+      parts.push(os.name);
     }
     if (browser.name) {
-      parts.push(browser.name)
+      parts.push(browser.name);
     }
 
-    return parts.join(' - ') || 'Unknown Device'
+    return parts.join(' - ') || 'Unknown Device';
   }
 
   private generateFingerprint(userAgent?: string, ipAddress?: string): string {
-    const parts = [userAgent || '', ipAddress || '']
-    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255)
+    const parts = [userAgent || '', ipAddress || ''];
+    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255);
   }
 }

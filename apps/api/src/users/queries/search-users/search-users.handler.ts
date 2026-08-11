@@ -20,32 +20,32 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma'
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { UserRole } from '@generated/prisma';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '@/auth/infrastructure'
-import { SearchUsersResponseDto, PrivateUserDto, PublicUserDto } from '../../dtos'
-import { SearchUsersQuery } from './search-users.query'
+import { UserRepository } from '@/auth/infrastructure';
+import { SearchUsersResponseDto, PrivateUserDto, PublicUserDto } from '../../dtos';
+import { SearchUsersQuery } from './search-users.query';
 
 @QueryHandler(SearchUsersQuery)
 export class SearchUsersHandler implements IQueryHandler<SearchUsersQuery> {
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: SearchUsersQuery): Promise<SearchUsersResponseDto> {
-    const { query: searchQuery, page, limit, requesterRole } = query
+    const { query: searchQuery, page, limit, requesterRole } = query;
 
     // Privacy Logic:
     // - If requesterRole === ADMIN: Search by email and fullName, return PrivateUserDto
     // - Otherwise (regular users): Search by fullName only, return PublicUserDto (limited data)
-    const isAdmin = requesterRole === UserRole.ADMIN
+    const isAdmin = requesterRole === UserRole.ADMIN;
     const { users, total } = await this.userRepository.searchByKeyword(
       searchQuery,
       page,
       limit,
       isAdmin,
-    )
+    );
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(total / limit);
 
     if (isAdmin) {
       const userDtos: PrivateUserDto[] = users.map((user) => ({
@@ -60,7 +60,7 @@ export class SearchUsersHandler implements IQueryHandler<SearchUsersQuery> {
         mfaEnabled: user.mfaEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      }))
+      }));
 
       return {
         users: userDtos,
@@ -70,14 +70,14 @@ export class SearchUsersHandler implements IQueryHandler<SearchUsersQuery> {
           total,
           totalPages,
         },
-      }
+      };
     }
 
     const userDtos: PublicUserDto[] = users.map((user) => ({
       id: user.id,
       fullName: user.fullName,
       avatar: user.avatar,
-    }))
+    }));
 
     return {
       users: userDtos,
@@ -87,6 +87,6 @@ export class SearchUsersHandler implements IQueryHandler<SearchUsersQuery> {
         total,
         totalPages,
       },
-    }
+    };
   }
 }

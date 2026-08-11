@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { useProductReviews } from '@/lib/api/hooks/use-reviews'
-import { ProductSlug } from '@/lib/api/products'
+import { Button } from '@/components/ui/button';
+import { useProductReviews } from '@/lib/api/hooks/use-reviews';
+import { ProductSlug } from '@/lib/api/products';
 
-import { ReviewItem } from './ReviewItem'
+import { ReviewItem } from './ReviewItem';
 
 interface ProductReviewsProps {
-  productSlug: ProductSlug
-  currentUserId?: string
-  currentUserRole?: string
+  productSlug: ProductSlug;
+  currentUserId?: string;
+  currentUserRole?: string;
 }
 
 export function ProductReviews({
@@ -41,13 +41,13 @@ export function ProductReviews({
   currentUserId,
   currentUserRole,
 }: ProductReviewsProps) {
-  const [page, setPage] = useState(1)
-  const limit = 10
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
-  const { data: reviews, isLoading, isError, error } = useProductReviews(productSlug, page, limit)
+  const { data: reviews, isLoading, isError, error } = useProductReviews(productSlug, page, limit);
 
   if (isLoading) {
-    return <div className="py-8 text-white/60">Đang tải đánh giá...</div>
+    return <div className="py-8 text-white/60">Đang tải đánh giá...</div>;
   }
 
   if (isError) {
@@ -56,11 +56,11 @@ export function ProductReviews({
         <p>Không thể tải đánh giá. Vui lòng thử lại sau.</p>
         {error instanceof Error && <p className="mt-2 text-sm text-white/40">{error.message}</p>}
       </div>
-    )
+    );
   }
 
   if (!reviews || !reviews.reviews || reviews.reviews.length === 0) {
-    return <div className="py-8 text-white/60">Chưa có đánh giá nào cho sản phẩm này.</div>
+    return <div className="py-8 text-white/60">Chưa có đánh giá nào cho sản phẩm này.</div>;
   }
 
   return (
@@ -105,5 +105,5 @@ export function ProductReviews({
         </div>
       )}
     </div>
-  )
+  );
 }

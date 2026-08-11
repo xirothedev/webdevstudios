@@ -20,19 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useOAuth } from '@/lib/api/hooks/use-auth'
-import type { OAuthProvider } from '@/types/auth.types'
+import { useOAuth } from '@/lib/api/hooks/use-auth';
+import type { OAuthProvider } from '@/types/auth.types';
 
-import { SocialButton } from './SocialButton'
+import { SocialButton } from './SocialButton';
 
 export function AuthSocialButtons() {
-  const { initiateOAuth, isLoading } = useOAuth()
+  const { initiateOAuth, isLoading } = useOAuth();
 
   const handleOAuth = (provider: OAuthProvider) => {
-    initiateOAuth(provider)
-  }
+    initiateOAuth(provider);
+  };
 
   return (
     <div className="space-y-3">
@@ -49,5 +49,5 @@ export function AuthSocialButtons() {
         disabled={isLoading}
       />
     </div>
-  )
+  );
 }

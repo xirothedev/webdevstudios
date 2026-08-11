@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ChevronRight, Mail } from 'lucide-react'
+import { ChevronRight, Mail } from 'lucide-react';
 
 export function NewsletterCTA() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     // Placeholder - no API integration
-    console.log('Newsletter subscription placeholder')
-  }
+    console.log('Newsletter subscription placeholder');
+  };
 
   return (
     <section className="mt-32 px-6">
@@ -67,5 +67,5 @@ export function NewsletterCTA() {
         </div>
       </div>
     </section>
-  )
+  );
 }

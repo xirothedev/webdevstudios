@@ -20,17 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma'
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { UserRole } from '@generated/prisma';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CurrentUser, Public, Roles } from '@/common/decorators'
-import { RolesGuard } from '@/common/guards'
-import { CreateBlogPostCommand } from './commands/create-post'
-import { DeleteBlogPostCommand } from './commands/delete-post'
-import { PublishBlogPostCommand } from './commands/publish-post'
-import { UpdateBlogPostCommand } from './commands/update-post'
+import { CurrentUser, Public, Roles } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CreateBlogPostCommand } from './commands/create-post';
+import { DeleteBlogPostCommand } from './commands/delete-post';
+import { PublishBlogPostCommand } from './commands/publish-post';
+import { UpdateBlogPostCommand } from './commands/update-post';
 import {
   BlogPostDto,
   BlogPostListResponseDto,
@@ -40,11 +50,11 @@ import {
   ListBlogPostsQueryDto,
   SearchBlogPostsQueryDto,
   UpdateBlogPostDto,
-} from './dtos'
-import { GetBlogPostByIdQuery } from './queries/get-post-by-id'
-import { GetBlogPostBySlugQuery } from './queries/get-post-by-slug'
-import { ListBlogPostsQuery } from './queries/list-posts'
-import { SearchBlogPostsQuery } from './queries/search-posts'
+} from './dtos';
+import { GetBlogPostByIdQuery } from './queries/get-post-by-id';
+import { GetBlogPostBySlugQuery } from './queries/get-post-by-slug';
+import { ListBlogPostsQuery } from './queries/list-posts';
+import { SearchBlogPostsQuery } from './queries/search-posts';
 
 @ApiTags('Blog')
 @Controller('blog/posts')
@@ -72,7 +82,7 @@ export class BlogController {
         queryDto.pageSize ?? 10,
         true, // Only published posts for public endpoint
       ),
-    )
+    );
   }
 
   @Get('admin/all')
@@ -96,7 +106,7 @@ export class BlogController {
         queryDto.pageSize ?? 20,
         undefined, // No filter - get all posts
       ),
-    )
+    );
   }
 
   @Get('search')
@@ -113,7 +123,7 @@ export class BlogController {
   async searchPosts(@Query() queryDto: SearchBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
     return this.queryBus.execute(
       new SearchBlogPostsQuery(queryDto.q, queryDto.page ?? 1, queryDto.pageSize ?? 10),
-    )
+    );
   }
 
   @Get(':slug')
@@ -137,7 +147,9 @@ export class BlogController {
     @Param('slug') slug: string,
     @Query() queryDto: GetBlogPostQueryDto,
   ): Promise<BlogPostDto | BlogPostWithContentDto> {
-    return this.queryBus.execute(new GetBlogPostBySlugQuery(slug, queryDto.includeContent ?? false))
+    return this.queryBus.execute(
+      new GetBlogPostBySlugQuery(slug, queryDto.includeContent ?? false),
+    );
   }
 
   @Post()
@@ -173,7 +185,7 @@ export class BlogController {
         dto.metaTitle || null,
         dto.metaDescription || null,
       ),
-    )
+    );
   }
 
   @Get('admin/:id')
@@ -199,7 +211,7 @@ export class BlogController {
     @Param('id') id: string,
     @Query() queryDto: GetBlogPostQueryDto,
   ): Promise<BlogPostDto | BlogPostWithContentDto> {
-    return this.queryBus.execute(new GetBlogPostByIdQuery(id, queryDto.includeContent ?? true))
+    return this.queryBus.execute(new GetBlogPostByIdQuery(id, queryDto.includeContent ?? true));
   }
 
   @Patch(':id')
@@ -236,7 +248,7 @@ export class BlogController {
         dto.metaTitle !== undefined ? dto.metaTitle : undefined,
         dto.metaDescription !== undefined ? dto.metaDescription : undefined,
       ),
-    )
+    );
   }
 
   @Delete(':id')
@@ -260,7 +272,7 @@ export class BlogController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Blog post not found' })
   async deletePost(@Param('id') id: string): Promise<void> {
-    return this.commandBus.execute(new DeleteBlogPostCommand(id))
+    return this.commandBus.execute(new DeleteBlogPostCommand(id));
   }
 
   @Post(':id/publish')
@@ -285,6 +297,6 @@ export class BlogController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Blog post not found' })
   async publishPost(@Param('id') id: string): Promise<BlogPostDto> {
-    return this.commandBus.execute(new PublishBlogPostCommand(id))
+    return this.commandBus.execute(new PublishBlogPostCommand(id));
   }
 }

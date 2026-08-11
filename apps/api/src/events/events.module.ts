@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common'
-import { CqrsModule } from '@nestjs/cqrs'
+import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 
 // Commands
-import { CreateEventHandler } from './commands/create-event'
-import { DeleteEventHandler } from './commands/delete-event'
-import { UpdateEventHandler } from './commands/update-event'
+import { CreateEventHandler } from './commands/create-event';
+import { DeleteEventHandler } from './commands/delete-event';
+import { UpdateEventHandler } from './commands/update-event';
 // Controller
-import { EventsController } from './events.controller'
+import { EventsController } from './events.controller';
 // Repository
-import { EventRepository } from './infrastructure/event.repository'
+import { EventRepository } from './infrastructure/event.repository';
 // Queries
-import { GetEventByIdHandler } from './queries/get-event-by-id'
-import { ListEventsHandler } from './queries/list-events'
+import { GetEventByIdHandler } from './queries/get-event-by-id';
+import { ListEventsHandler } from './queries/list-events';
 
-const CommandHandlers = [CreateEventHandler, UpdateEventHandler, DeleteEventHandler]
+const CommandHandlers = [CreateEventHandler, UpdateEventHandler, DeleteEventHandler];
 
-const QueryHandlers = [ListEventsHandler, GetEventByIdHandler]
+const QueryHandlers = [ListEventsHandler, GetEventByIdHandler];
 
 @Module({
   imports: [CqrsModule],

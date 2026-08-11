@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { randomUUID } from 'crypto'
+import { NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { randomUUID } from 'crypto';
 
-import { UserRepository } from '@/auth/infrastructure'
-import { StorageService } from '../../../storage/storage.service'
-import { PrivateUserDto } from '../../dtos'
-import { UpdateAvatarCommand } from './update-avatar.command'
+import { UserRepository } from '@/auth/infrastructure';
+import { StorageService } from '../../../storage/storage.service';
+import { PrivateUserDto } from '../../dtos';
+import { UpdateAvatarCommand } from './update-avatar.command';
 
 @CommandHandler(UpdateAvatarCommand)
 export class UpdateAvatarHandler implements ICommandHandler<UpdateAvatarCommand> {
@@ -37,30 +37,30 @@ export class UpdateAvatarHandler implements ICommandHandler<UpdateAvatarCommand>
   ) {}
 
   async execute(command: UpdateAvatarCommand): Promise<PrivateUserDto> {
-    const { userId, file } = command
+    const { userId, file } = command;
 
-    const user = await this.userRepository.findById(userId)
+    const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new NotFoundException('User not found')
+      throw new NotFoundException('User not found');
     }
 
     // Delete old avatar if exists
     if (user.avatar) {
-      const oldKey = this.storageService.extractKeyFromUrl(user.avatar)
+      const oldKey = this.storageService.extractKeyFromUrl(user.avatar);
       if (oldKey) {
         try {
-          await this.storageService.deleteFile(oldKey)
+          await this.storageService.deleteFile(oldKey);
         } catch (error) {
           // Log error but don't fail the upload
-          console.error('Failed to delete old avatar:', error)
+          console.error('Failed to delete old avatar:', error);
         }
       }
     }
 
     // Generate file key
-    const timestamp = Date.now()
-    const fileId = randomUUID()
-    const key = `avatars/${userId}/${timestamp}-${fileId}.webp`
+    const timestamp = Date.now();
+    const fileId = randomUUID();
+    const key = `avatars/${userId}/${timestamp}-${fileId}.webp`;
 
     // Upload image to R2 with optimization (400x400px, WebP)
     const uploadResult = await this.storageService.uploadImage({
@@ -69,12 +69,12 @@ export class UpdateAvatarHandler implements ICommandHandler<UpdateAvatarCommand>
       contentType: file.mimetype,
       width: 400,
       height: 400,
-    })
+    });
 
     // Update user avatar URL
     const updatedUser = await this.userRepository.update(userId, {
       avatar: uploadResult.url,
-    })
+    });
 
     return {
       id: updatedUser.id,
@@ -88,6 +88,6 @@ export class UpdateAvatarHandler implements ICommandHandler<UpdateAvatarCommand>
       mfaEnabled: updatedUser.mfaEnabled,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
-    }
+    };
   }
 }

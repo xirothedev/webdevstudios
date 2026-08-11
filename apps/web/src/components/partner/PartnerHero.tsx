@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ArrowRight } from 'lucide-react'
-import { motion } from 'motion/react'
-import Link from 'next/link'
+import { ArrowRight } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
 
 export function PartnerHero() {
   return (
@@ -81,5 +81,5 @@ export function PartnerHero() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

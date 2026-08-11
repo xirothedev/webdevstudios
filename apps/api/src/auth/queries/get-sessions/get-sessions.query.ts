@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQuery } from '@nestjs/cqrs'
+import { IQuery } from '@nestjs/cqrs';
 
 export class GetSessionsQuery implements IQuery {
   constructor(public readonly userId: string) {}

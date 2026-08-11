@@ -20,30 +20,30 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common'
-import { CqrsModule } from '@nestjs/cqrs'
+import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 
-import { ProductsModule } from '../products/products.module'
+import { ProductsModule } from '../products/products.module';
 // Controller
-import { CartController } from './cart.controller'
+import { CartController } from './cart.controller';
 // Commands
-import { AddToCartHandler } from './commands/add-to-cart'
-import { ClearCartHandler } from './commands/clear-cart'
-import { RemoveFromCartHandler } from './commands/remove-from-cart'
-import { UpdateCartItemHandler } from './commands/update-cart-item'
+import { AddToCartHandler } from './commands/add-to-cart';
+import { ClearCartHandler } from './commands/clear-cart';
+import { RemoveFromCartHandler } from './commands/remove-from-cart';
+import { UpdateCartItemHandler } from './commands/update-cart-item';
 // Repository
-import { CartRepository } from './infrastructure/cart.repository'
+import { CartRepository } from './infrastructure/cart.repository';
 // Queries
-import { GetCartHandler } from './queries/get-cart'
+import { GetCartHandler } from './queries/get-cart';
 
 const CommandHandlers = [
   AddToCartHandler,
   UpdateCartItemHandler,
   RemoveFromCartHandler,
   ClearCartHandler,
-]
+];
 
-const QueryHandlers = [GetCartHandler]
+const QueryHandlers = [GetCartHandler];
 
 @Module({
   imports: [CqrsModule, ProductsModule],

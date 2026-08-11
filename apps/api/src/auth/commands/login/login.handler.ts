@@ -20,21 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType } from '@generated/prisma'
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import * as argon2 from 'argon2'
-import * as UAParser from 'ua-parser-js'
+import { DeviceType } from '@generated/prisma';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import * as argon2 from 'argon2';
+import * as UAParser from 'ua-parser-js';
 
-import { addSeconds } from 'date-fns'
-import { PrismaService } from '@/prisma'
+import { addSeconds } from 'date-fns';
+import { PrismaService } from '@/prisma';
 import {
   SessionRepository,
   TokenService,
   TokenStorageService,
   UserRepository,
-} from '../../infrastructure'
-import { LoginCommand } from './login.command'
+} from '../../infrastructure';
+import { LoginCommand } from './login.command';
 
 @Injectable()
 @CommandHandler(LoginCommand)
@@ -48,39 +48,39 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
   ) {}
 
   async execute(command: LoginCommand): Promise<{
-    accessToken: string
-    refreshToken: string
+    accessToken: string;
+    refreshToken: string;
     user: {
-      id: string
-      email: string
-      fullName: string | null
-      emailVerified: boolean
-      mfaEnabled: boolean
-    }
-    requires2FA?: boolean
+      id: string;
+      email: string;
+      fullName: string | null;
+      emailVerified: boolean;
+      mfaEnabled: boolean;
+    };
+    requires2FA?: boolean;
   }> {
-    const { email, password, rememberMe, ipAddress, userAgent } = command
+    const { email, password, rememberMe, ipAddress, userAgent } = command;
 
     // Find user
-    const user = await this.userRepository.findByEmail(email)
+    const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Check if user has password (OAuth users might not have password)
     if (!user.password) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Verify password
-    const isPasswordValid = await argon2.verify(user.password, password)
+    const isPasswordValid = await argon2.verify(user.password, password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Check email verification
     if (!user.emailVerified) {
-      throw new BadRequestException('Please verify your email before logging in')
+      throw new BadRequestException('Please verify your email before logging in');
     }
 
     // Check if 2FA is enabled
@@ -97,16 +97,16 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
           mfaEnabled: user.mfaEnabled,
         },
         requires2FA: true,
-      }
+      };
     }
 
     // Create device record
-    let deviceId: string | undefined
+    let deviceId: string | undefined;
     if (userAgent) {
-      const parser = new UAParser.UAParser(userAgent)
-      const result = parser.getResult()
-      const deviceType = this.getDeviceType(result)
-      const deviceName = this.getDeviceName(result)
+      const parser = new UAParser.UAParser(userAgent);
+      const result = parser.getResult();
+      const deviceType = this.getDeviceType(result);
+      const deviceName = this.getDeviceName(result);
 
       const device = await this.prisma.device.create({
         data: {
@@ -117,8 +117,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
           ipAddress,
           fingerprint: this.generateFingerprint(userAgent, ipAddress),
         },
-      })
-      deviceId = device.id
+      });
+      deviceId = device.id;
     }
 
     // Generate tokens
@@ -126,15 +126,15 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       sub: user.id,
       email: user.email,
       role: user.role,
-    })
+    });
 
     const refreshToken = this.tokenService.generateRefreshToken({
       sub: user.id,
-    })
+    });
 
     // Calculate expiration
-    const expiresIn = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60 // 30 days or 7 days
-    const expiresAt = addSeconds(new Date(), expiresIn)
+    const expiresIn = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60; // 30 days or 7 days
+    const expiresAt = addSeconds(new Date(), expiresIn);
 
     // Create session
     const session = await this.sessionRepository.create({
@@ -145,13 +145,13 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       ipAddress,
       userAgent,
       expiresAt,
-    })
+    });
 
     // If user doesn't have 2FA enabled, mark MFA as verified (no verification needed)
     // If user has 2FA, this will be set to true after 2FA verification in Verify2FAHandler
     if (!user.mfaEnabled) {
-      const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000)
-      await this.tokenStorage.storeSessionMfaVerified(session.id, ttl)
+      const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
+      await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
     }
 
     return {
@@ -164,39 +164,39 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         emailVerified: user.emailVerified,
         mfaEnabled: user.mfaEnabled,
       },
-    }
+    };
   }
 
   private getDeviceType(parser: UAParser.IResult): DeviceType {
-    const { device } = parser
-    if (device.type === 'mobile') return DeviceType.MOBILE
-    if (device.type === 'tablet') return DeviceType.TABLET
-    return DeviceType.DESKTOP
+    const { device } = parser;
+    if (device.type === 'mobile') return DeviceType.MOBILE;
+    if (device.type === 'tablet') return DeviceType.TABLET;
+    return DeviceType.DESKTOP;
   }
 
   private getDeviceName(parser: UAParser.IResult): string {
-    const browser = parser.browser
-    const os = parser.os
-    const device = parser.device
+    const browser = parser.browser;
+    const os = parser.os;
+    const device = parser.device;
 
-    const parts: string[] = []
+    const parts: string[] = [];
     if (device.vendor && device.model) {
-      parts.push(`${device.vendor} ${device.model}`)
+      parts.push(`${device.vendor} ${device.model}`);
     }
     if (os.name) {
-      parts.push(os.name)
+      parts.push(os.name);
     }
     if (browser.name) {
-      parts.push(browser.name)
+      parts.push(browser.name);
     }
 
-    return parts.join(' - ') || 'Unknown Device'
+    return parts.join(' - ') || 'Unknown Device';
   }
 
   private generateFingerprint(userAgent?: string, ipAddress?: string): string {
     // Simple fingerprint generation
     // In production, use a more sophisticated method
-    const parts = [userAgent || '', ipAddress || '']
-    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255)
+    const parts = [userAgent || '', ipAddress || ''];
+    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255);
   }
 }

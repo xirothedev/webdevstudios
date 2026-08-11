@@ -20,21 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common'
-import { Observable, throwError } from 'rxjs'
-import { catchError, tap } from 'rxjs/operators'
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
-import { SecurityEventType, SecurityLoggerService } from '../services'
+import { SecurityEventType, SecurityLoggerService } from '../services';
 
 @Injectable()
 export class SecurityLoggingInterceptor implements NestInterceptor {
   constructor(private readonly securityLogger: SecurityLoggerService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const request = context.switchToHttp().getRequest()
-    const { method, path, ip, headers } = request
-    const userAgent = headers['user-agent']
-    const userId = (request as { user?: { id: string } }).user?.id
+    const request = context.switchToHttp().getRequest();
+    const { method, path, ip, headers } = request;
+    const userAgent = headers['user-agent'];
+    const userId = (request as { user?: { id: string } }).user?.id;
 
     return next.handle().pipe(
       tap(() => {
@@ -49,11 +49,11 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
             userAgent,
             path,
             method,
-          })
+          });
         }
       }),
       catchError((error) => {
-        const status = error?.status || error?.statusCode || 500
+        const status = error?.status || error?.statusCode || 500;
 
         // Log security-related errors
         if (status === 401) {
@@ -62,7 +62,7 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
             error.message,
             ip,
             userAgent,
-          )
+          );
         } else if (status === 403) {
           this.securityLogger.logEvent({
             type: SecurityEventType.AUTHORIZATION_FAILURE,
@@ -73,14 +73,14 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
             userAgent,
             path,
             method,
-          })
+          });
         } else if (status === 429) {
-          this.securityLogger.logRateLimitExceeded(path, method, ip, userId)
+          this.securityLogger.logRateLimitExceeded(path, method, ip, userId);
         }
 
-        return throwError(() => error)
+        return throwError(() => error);
       }),
-    )
+    );
   }
 
   private isSensitiveOperation(path: string, method: string): boolean {
@@ -91,10 +91,10 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
       '/users',
       '/payments',
       '/orders',
-    ]
+    ];
 
-    const sensitiveMethods = ['POST', 'PUT', 'PATCH', 'DELETE']
+    const sensitiveMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
-    return sensitiveMethods.includes(method) && sensitivePaths.some((p) => path.includes(p))
+    return sensitiveMethods.includes(method) && sensitivePaths.some((p) => path.includes(p));
   }
 }

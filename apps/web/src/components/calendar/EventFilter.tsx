@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { EventType } from '@/lib/events/types'
-import { getEventTypeColor, getEventTypeLabel } from '@/lib/events/utils'
-import { cn } from '@/lib/utils'
+import { EventType } from '@/lib/events/types';
+import { getEventTypeColor, getEventTypeLabel } from '@/lib/events/utils';
+import { cn } from '@/lib/utils';
 
 interface EventFilterProps {
-  selectedTypes: EventType[]
-  onToggleType: (type: EventType) => void
-  eventCounts: Record<EventType, number>
+  selectedTypes: EventType[];
+  onToggleType: (type: EventType) => void;
+  eventCounts: Record<EventType, number>;
 }
 
 export function EventFilter({ selectedTypes, onToggleType, eventCounts }: EventFilterProps) {
-  const allTypes = Object.values(EventType)
+  const allTypes = Object.values(EventType);
 
   return (
     <div className="flex flex-wrap gap-2">
       {allTypes.map((type) => {
-        const isSelected = selectedTypes.includes(type)
-        const count = eventCounts[type] || 0
-        const color = getEventTypeColor(type)
+        const isSelected = selectedTypes.includes(type);
+        const count = eventCounts[type] || 0;
+        const color = getEventTypeColor(type);
 
         return (
           <button
@@ -77,8 +77,8 @@ export function EventFilter({ selectedTypes, onToggleType, eventCounts }: EventF
               </span>
             )}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

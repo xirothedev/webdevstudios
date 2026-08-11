@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Check } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Check } from 'lucide-react';
+import { motion } from 'motion/react';
 
-import { ProductSize } from '@/lib/api/products'
-import { cn } from '@/lib/utils'
+import { ProductSize } from '@/lib/api/products';
+import { cn } from '@/lib/utils';
 
 interface ProductSizeSelectorProps {
-  sizes: ProductSize[]
-  selectedSize: ProductSize
-  onSizeChange: (size: ProductSize) => void
-  showSizeGuide?: boolean
-  stockBySize?: Record<ProductSize, number>
+  sizes: ProductSize[];
+  selectedSize: ProductSize;
+  onSizeChange: (size: ProductSize) => void;
+  showSizeGuide?: boolean;
+  stockBySize?: Record<ProductSize, number>;
 }
 
 export function ProductSizeSelector({
@@ -48,9 +48,9 @@ export function ProductSizeSelector({
       <label className="mb-3 block text-sm font-semibold text-white/90">Chọn size</label>
       <div className="flex flex-wrap gap-3">
         {sizes.map((size) => {
-          const isSelected = selectedSize === size
-          const stock = stockBySize?.[size] ?? undefined
-          const isOutOfStock = stock !== undefined && stock === 0
+          const isSelected = selectedSize === size;
+          const stock = stockBySize?.[size] ?? undefined;
+          const isOutOfStock = stock !== undefined && stock === 0;
           return (
             <button
               key={size}
@@ -86,7 +86,7 @@ export function ProductSizeSelector({
                 <span className="mt-0.5 text-[10px] text-white/60">{stock}</span>
               )}
             </button>
-          )
+          );
         })}
       </div>
       {showSizeGuide && (
@@ -98,5 +98,5 @@ export function ProductSizeSelector({
         </a>
       )}
     </div>
-  )
+  );
 }

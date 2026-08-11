@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'modern-javascript-features',
@@ -115,4 +115,4 @@ Modern JavaScript makes development easier. Use these features!`,
   metaDescription:
     'Explore modern JavaScript features including ES6+, async/await, destructuring, and optional chaining.',
   isPublished: true,
-}
+};

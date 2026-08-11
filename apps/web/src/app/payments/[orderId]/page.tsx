@@ -20,61 +20,61 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { Button } from '@/components/ui/button'
-import { useOrder } from '@/lib/api/hooks/use-orders'
-import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments'
-import { formatPrice } from '@/lib/utils'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
+import { useOrder } from '@/lib/api/hooks/use-orders';
+import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments';
+import { formatPrice } from '@/lib/utils';
 
 export default function PaymentPage() {
-  const params = useParams()
-  const router = useRouter()
-  const orderId = params.orderId as string
+  const params = useParams();
+  const router = useRouter();
+  const orderId = params.orderId as string;
 
-  const { data: order, isLoading: isLoadingOrder } = useOrder(orderId)
-  const createPaymentLinkMutation = useCreatePaymentLink()
+  const { data: order, isLoading: isLoadingOrder } = useOrder(orderId);
+  const createPaymentLinkMutation = useCreatePaymentLink();
   const [paymentUrl, setPaymentUrl] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null
-    return localStorage.getItem(`paymentUrl_${orderId}`)
-  })
-  const isLoadingPayment = createPaymentLinkMutation.isPending
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(`paymentUrl_${orderId}`);
+  });
+  const isLoadingPayment = createPaymentLinkMutation.isPending;
 
   // Create payment link if the order is pending and no URL was saved yet
   useEffect(() => {
-    if (!order || paymentUrl) return
+    if (!order || paymentUrl) return;
 
     if (order.paymentStatus === 'PENDING' && order.status === 'PENDING') {
       createPaymentLinkMutation.mutate(
         { orderId: order.id },
         {
           onSuccess: (data) => {
-            setPaymentUrl(data.paymentUrl)
-            localStorage.setItem(`paymentUrl_${orderId}`, data.paymentUrl)
+            setPaymentUrl(data.paymentUrl);
+            localStorage.setItem(`paymentUrl_${orderId}`, data.paymentUrl);
           },
         },
-      )
+      );
     }
-  }, [order, orderId, paymentUrl, createPaymentLinkMutation])
+  }, [order, orderId, paymentUrl, createPaymentLinkMutation]);
 
   // Redirect if order is already paid
   useEffect(() => {
     if (order && order.paymentStatus === 'PAID') {
-      router.push(`/orders/${orderId}`)
+      router.push(`/orders/${orderId}`);
     }
-  }, [order, orderId, router])
+  }, [order, orderId, router]);
 
   if (isLoadingOrder) {
     return (
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">Đang tải...</div>
       </div>
-    )
+    );
   }
 
   if (!order) {
@@ -82,14 +82,14 @@ export default function PaymentPage() {
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">Không tìm thấy đơn hàng</div>
       </div>
-    )
+    );
   }
 
   const handleRedirectToPayOS = () => {
     if (paymentUrl) {
-      window.location.href = paymentUrl
+      window.location.href = paymentUrl;
     }
-  }
+  };
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -168,5 +168,5 @@ export default function PaymentPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

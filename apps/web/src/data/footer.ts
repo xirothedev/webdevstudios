@@ -21,24 +21,24 @@
  */
 
 export type FooterLink = {
-  label: string
-  href: string
-  target?: '_blank'
-  rel?: string
-}
+  label: string;
+  href: string;
+  target?: '_blank';
+  rel?: string;
+};
 
 export type FooterSection = {
-  title: string
-  links: FooterLink[]
-}
+  title: string;
+  links: FooterLink[];
+};
 
 export type ContactInfo = {
-  label: string
-  content: string
-  href?: string
-  target?: '_blank'
-  rel?: string
-}
+  label: string;
+  content: string;
+  href?: string;
+  target?: '_blank';
+  rel?: string;
+};
 
 export const footerSections: FooterSection[] = [
   {
@@ -69,7 +69,7 @@ export const footerSections: FooterSection[] = [
       // { label: 'Chính sách đổi trả', href: '/refund' },
     ],
   },
-]
+];
 
 export const contactInfo: ContactInfo[] = [
   {
@@ -95,4 +95,4 @@ export const contactInfo: ContactInfo[] = [
     label: 'Văn phòng:',
     content: 'B8.04, tòa B, trường Đại học Công nghệ Thông tin – ĐHQG TP.HCM.',
   },
-]
+];

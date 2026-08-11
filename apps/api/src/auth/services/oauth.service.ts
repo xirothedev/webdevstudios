@@ -20,25 +20,25 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType, OAuthProvider } from '@generated/prisma'
-import { Injectable } from '@nestjs/common'
-import * as UAParser from 'ua-parser-js'
+import { DeviceType, OAuthProvider } from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
+import * as UAParser from 'ua-parser-js';
 
-import { addDays } from 'date-fns'
-import { PrismaService } from '@/prisma'
+import { addDays } from 'date-fns';
+import { PrismaService } from '@/prisma';
 import {
   SessionRepository,
   TokenService,
   TokenStorageService,
   UserRepository,
-} from '../infrastructure'
+} from '../infrastructure';
 
 export interface OAuthUser {
-  provider: OAuthProvider
-  providerId: string
-  email: string
-  name?: string
-  picture?: string
+  provider: OAuthProvider;
+  providerId: string;
+  email: string;
+  name?: string;
+  picture?: string;
 }
 
 @Injectable()
@@ -56,16 +56,16 @@ export class OAuthService {
     ipAddress?: string,
     userAgent?: string,
   ): Promise<{
-    accessToken: string
-    refreshToken: string
+    accessToken: string;
+    refreshToken: string;
     user: {
-      id: string
-      email: string
-      fullName: string | null
-      emailVerified: boolean
-    }
+      id: string;
+      email: string;
+      fullName: string | null;
+      emailVerified: boolean;
+    };
   }> {
-    const { provider, providerId, email, name, picture } = oauthUser
+    const { provider, providerId, email, name, picture } = oauthUser;
 
     // Find or create external account
     const externalAccount = await this.prisma.externalAccount.findUnique({
@@ -78,20 +78,20 @@ export class OAuthService {
       include: {
         user: true,
       },
-    })
+    });
 
-    let user
+    let user;
 
     if (externalAccount) {
       // User exists - login
-      user = externalAccount.user
+      user = externalAccount.user;
     } else {
       // Check if user with this email exists
-      const existingUser = await this.userRepository.findByEmail(email)
+      const existingUser = await this.userRepository.findByEmail(email);
 
       if (existingUser) {
         // Link OAuth account to existing user
-        user = existingUser
+        user = existingUser;
         await this.prisma.externalAccount.create({
           data: {
             provider,
@@ -99,14 +99,14 @@ export class OAuthService {
             providerEmail: email,
             userId: user.id,
           },
-        })
+        });
       } else {
         // Create new user
         user = await this.userRepository.create({
           email,
           fullName: name,
           emailVerified: true, // OAuth emails are pre-verified
-        })
+        });
 
         // Create external account
         await this.prisma.externalAccount.create({
@@ -116,24 +116,24 @@ export class OAuthService {
             providerEmail: email,
             userId: user.id,
           },
-        })
+        });
 
         // Update avatar if available
         if (picture) {
           await this.userRepository.update(user.id, {
             avatar: picture,
-          })
+          });
         }
       }
     }
 
     // Create device record
-    let deviceId: string | undefined
+    let deviceId: string | undefined;
     if (userAgent) {
-      const parser = new UAParser.UAParser(userAgent)
-      const result = parser.getResult()
-      const deviceType = this.getDeviceType(result)
-      const deviceName = this.getDeviceName(result)
+      const parser = new UAParser.UAParser(userAgent);
+      const result = parser.getResult();
+      const deviceType = this.getDeviceType(result);
+      const deviceName = this.getDeviceName(result);
 
       const device = await this.prisma.device.create({
         data: {
@@ -144,8 +144,8 @@ export class OAuthService {
           ipAddress,
           fingerprint: this.generateFingerprint(userAgent, ipAddress),
         },
-      })
-      deviceId = device.id
+      });
+      deviceId = device.id;
     }
 
     // Generate tokens
@@ -153,14 +153,14 @@ export class OAuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
-    })
+    });
 
     const refreshToken = this.tokenService.generateRefreshToken({
       sub: user.id,
-    })
+    });
 
     // Create session
-    const expiresAt = addDays(new Date(), 30) // 30 days
+    const expiresAt = addDays(new Date(), 30); // 30 days
     const session = await this.sessionRepository.create({
       userId: user.id,
       token: accessToken,
@@ -169,11 +169,11 @@ export class OAuthService {
       ipAddress,
       userAgent,
       expiresAt,
-    })
+    });
 
     // Mark MFA as verified (OAuth users don't need 2FA for OAuth login)
-    const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000)
-    await this.tokenStorage.storeSessionMfaVerified(session.id, ttl)
+    const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
+    await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
 
     return {
       accessToken,
@@ -184,37 +184,37 @@ export class OAuthService {
         fullName: user.fullName,
         emailVerified: user.emailVerified,
       },
-    }
+    };
   }
 
   private getDeviceType(parser: UAParser.IResult): DeviceType {
-    const { device } = parser
-    if (device?.type === 'mobile') return DeviceType.MOBILE
-    if (device?.type === 'tablet') return DeviceType.TABLET
-    return DeviceType.DESKTOP
+    const { device } = parser;
+    if (device?.type === 'mobile') return DeviceType.MOBILE;
+    if (device?.type === 'tablet') return DeviceType.TABLET;
+    return DeviceType.DESKTOP;
   }
 
   private getDeviceName(parser: UAParser.IResult): string {
-    const browser = parser.browser
-    const os = parser.os
-    const device = parser.device
+    const browser = parser.browser;
+    const os = parser.os;
+    const device = parser.device;
 
-    const parts: string[] = []
+    const parts: string[] = [];
     if (device?.vendor && device?.model) {
-      parts.push(`${device.vendor} ${device.model}`)
+      parts.push(`${device.vendor} ${device.model}`);
     }
     if (os?.name) {
-      parts.push(os.name)
+      parts.push(os.name);
     }
     if (browser?.name) {
-      parts.push(browser.name)
+      parts.push(browser.name);
     }
 
-    return parts.join(' - ') || 'Unknown Device'
+    return parts.join(' - ') || 'Unknown Device';
   }
 
   private generateFingerprint(userAgent?: string, ipAddress?: string): string {
-    const parts = [userAgent || '', ipAddress || '']
-    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255)
+    const parts = [userAgent || '', ipAddress || ''];
+    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255);
   }
 }

@@ -20,35 +20,35 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus } from '@generated/prisma'
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { OrderStatus } from '@generated/prisma';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { OrderDto, OrderListResponseDto } from '../../dtos/order.dto'
-import { OrderRepository } from '../../infrastructure/order.repository'
-import { OrderWithItems } from '../../order.types'
-import { ListAllOrdersQuery } from './list-all-orders.query'
+import { OrderDto, OrderListResponseDto } from '../../dtos/order.dto';
+import { OrderRepository } from '../../infrastructure/order.repository';
+import { OrderWithItems } from '../../order.types';
+import { ListAllOrdersQuery } from './list-all-orders.query';
 
 @QueryHandler(ListAllOrdersQuery)
 export class ListAllOrdersHandler implements IQueryHandler<ListAllOrdersQuery> {
   constructor(private readonly orderRepository: OrderRepository) {}
 
   async execute(query: ListAllOrdersQuery): Promise<OrderListResponseDto> {
-    const { page, limit, status } = query
+    const { page, limit, status } = query;
 
-    const where: { status?: OrderStatus } = {}
+    const where: { status?: OrderStatus } = {};
     if (status) {
-      where.status = status
+      where.status = status;
     }
 
     const [orders, total] = await Promise.all([
       this.orderRepository.findAll(page, limit, status),
       this.orderRepository.countAll(status),
-    ])
+    ]);
 
     return {
       orders: orders.map((order) => this.mapToDto(order)),
       total,
-    }
+    };
   }
 
   private mapToDto(order: OrderWithItems): OrderDto {
@@ -82,6 +82,6 @@ export class ListAllOrdersHandler implements IQueryHandler<ListAllOrdersQuery> {
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    }
+    };
   }
 }

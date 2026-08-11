@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'database-design-principles',
@@ -103,4 +103,4 @@ Good database design pays off in the long run.`,
   metaDescription:
     'Learn fundamental database design principles, normalization, indexing strategies, and performance optimization.',
   isPublished: true,
-}
+};

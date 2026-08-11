@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Building2, Clock, Mail, MessageCircle, Phone } from 'lucide-react'
-import { m } from 'motion/react'
-import Image from 'next/image'
-import { useRef, useState } from 'react'
+import { Building2, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
+import { m } from 'motion/react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
 
-import { AnimatedBeam } from '@/components/ui/animated-beam'
-import { BentoCard, BentoGrid } from '@/components/ui/bento-grid'
-import { Button } from '@/components/ui/button'
+import { AnimatedBeam } from '@/components/ui/animated-beam';
+import { BentoCard, BentoGrid } from '@/components/ui/bento-grid';
+import { Button } from '@/components/ui/button';
 
 function Circle({
   className,
@@ -37,10 +37,10 @@ function Circle({
   style,
   ref,
 }: {
-  className?: string
-  children?: React.ReactNode
-  style?: React.CSSProperties
-  ref?: React.Ref<HTMLDivElement>
+  className?: string;
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  ref?: React.Ref<HTMLDivElement>;
 }) {
   return (
     <div
@@ -50,17 +50,17 @@ function Circle({
     >
       {children}
     </div>
-  )
+  );
 }
-Circle.displayName = 'Circle'
+Circle.displayName = 'Circle';
 
 function OnlineBeamBackground() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const centerRef = useRef<HTMLDivElement>(null)
-  const mailRef = useRef<HTMLDivElement>(null)
-  const fbRef = useRef<HTMLDivElement>(null)
-  const msgRef = useRef<HTMLDivElement>(null)
-  const phoneRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const centerRef = useRef<HTMLDivElement>(null);
+  const mailRef = useRef<HTMLDivElement>(null);
+  const fbRef = useRef<HTMLDivElement>(null);
+  const msgRef = useRef<HTMLDivElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -139,11 +139,11 @@ function OnlineBeamBackground() {
         />
       </div>
     </div>
-  )
+  );
 }
 
 export function WDSContactGrid() {
-  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
   const contacts = [
     {
@@ -197,7 +197,7 @@ export function WDSContactGrid() {
       onClick: () => setDialogOpen(true),
       background: <OnlineBeamBackground />,
     },
-  ]
+  ];
 
   return (
     <section className="relative flex snap-start items-center overflow-hidden bg-linear-to-b from-white to-gray-50 py-16 md:py-24">
@@ -303,5 +303,5 @@ export function WDSContactGrid() {
         </div>
       ) : null}
     </section>
-  )
+  );
 }

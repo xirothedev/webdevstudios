@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Check } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Check } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface ProductFeaturesProps {
-  features: string[]
-  title?: string
+  features: string[];
+  title?: string;
 }
 
 export function ProductFeatures({ features, title = 'Đặc điểm nổi bật' }: ProductFeaturesProps) {
@@ -51,5 +51,5 @@ export function ProductFeatures({ features, title = 'Đặc điểm nổi bật'
         ))}
       </ul>
     </div>
-  )
+  );
 }

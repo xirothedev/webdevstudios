@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ExternalLink, Mail, Zap } from 'lucide-react'
-import { motion } from 'motion/react'
+import { ExternalLink, Mail, Zap } from 'lucide-react';
+import { motion } from 'motion/react';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { PartnerCard } from '@/components/partner/PartnerCard'
-import { PartnerHero } from '@/components/partner/PartnerHero'
-import { PartnerSection } from '@/components/partner/PartnerSection'
-import { COMMUNITY_PARTNERS, MEDIA_PARTNERS, STRATEGIC_PARTNERS } from '@/data/partners'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { PartnerCard } from '@/components/partner/PartnerCard';
+import { PartnerHero } from '@/components/partner/PartnerHero';
+import { PartnerSection } from '@/components/partner/PartnerSection';
+import { COMMUNITY_PARTNERS, MEDIA_PARTNERS, STRATEGIC_PARTNERS } from '@/data/partners';
 
 export default function PartnerPage() {
   return (
@@ -171,5 +171,5 @@ export default function PartnerPage() {
 
       <Footer variant="dark" />
     </div>
-  )
+  );
 }

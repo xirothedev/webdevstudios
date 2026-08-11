@@ -21,8 +21,8 @@
  */
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { execSync } from 'child_process'
-import { join } from 'path'
+import { execSync } from 'child_process';
+import { join } from 'path';
 
 /**
  * Gets the last commit date for a specific file
@@ -32,29 +32,29 @@ import { join } from 'path'
 export function getFileCommitDate(filePath: string): string {
   try {
     // Try to find the project root (where .git folder is)
-    const projectRoot = findProjectRoot()
-    const fullPath = join(projectRoot, filePath)
+    const projectRoot = findProjectRoot();
+    const fullPath = join(projectRoot, filePath);
 
     // Get the last commit date for the file
-    const command = `git log -1 --format=%ci -- "${fullPath}"`
+    const command = `git log -1 --format=%ci -- "${fullPath}"`;
     const dateString = execSync(command, {
       encoding: 'utf-8',
       cwd: projectRoot,
       stdio: ['pipe', 'pipe', 'pipe'],
     })
       .toString()
-      .trim()
+      .trim();
 
     if (!dateString) {
       // If no commit found, try to get file modification date
-      return getFileModificationDate(fullPath)
+      return getFileModificationDate(fullPath);
     }
 
     // Return git date string for formatting with locale
-    return dateString
+    return dateString;
   } catch {
     // Fallback to file modification date if git command fails
-    return getFileModificationDate(join(process.cwd(), filePath))
+    return getFileModificationDate(join(process.cwd(), filePath));
   }
 }
 
@@ -62,28 +62,28 @@ export function getFileCommitDate(filePath: string): string {
  * Finds the project root by looking for .git folder
  */
 function findProjectRoot(): string {
-  const fs = require('fs')
-  const path = require('path')
-  let currentDir = process.cwd()
+  const fs = require('fs');
+  const path = require('path');
+  let currentDir = process.cwd();
 
   // Walk up the directory tree to find the repository or workspace root.
   while (currentDir !== path.dirname(currentDir)) {
-    const gitPath = path.join(currentDir, '.git')
+    const gitPath = path.join(currentDir, '.git');
     if (fs.existsSync(gitPath)) {
-      return currentDir
+      return currentDir;
     }
 
-    const lockPath = path.join(currentDir, 'bun.lock')
-    const packageJsonPath = path.join(currentDir, 'package.json')
+    const lockPath = path.join(currentDir, 'bun.lock');
+    const packageJsonPath = path.join(currentDir, 'package.json');
     if (fs.existsSync(lockPath) && fs.existsSync(packageJsonPath)) {
-      return currentDir
+      return currentDir;
     }
 
-    currentDir = path.dirname(currentDir)
+    currentDir = path.dirname(currentDir);
   }
 
   // Fallback to current working directory
-  return process.cwd()
+  return process.cwd();
 }
 
 /**
@@ -93,15 +93,15 @@ function findProjectRoot(): string {
  */
 function getFileModificationDate(filePath: string): string {
   try {
-    const fs = require('fs')
-    const path = require('path')
+    const fs = require('fs');
+    const path = require('path');
     // If path is not absolute, make it relative to cwd
-    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath)
-    const stats = fs.statSync(fullPath)
+    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+    const stats = fs.statSync(fullPath);
     // Return ISO date string for formatting with locale
-    return stats.mtime.toISOString()
+    return stats.mtime.toISOString();
   } catch {
     // Ultimate fallback: avoid current-time reads during static prerendering.
-    return ''
+    return '';
   }
 }

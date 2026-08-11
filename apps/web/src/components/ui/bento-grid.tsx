@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ArrowRightIcon } from '@radix-ui/react-icons'
-import Link from 'next/link'
-import { ComponentPropsWithoutRef, ReactNode } from 'react'
+import { ArrowRightIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface BentoGridProps extends ComponentPropsWithoutRef<'div'> {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 interface BentoCardProps extends ComponentPropsWithoutRef<'div'> {
-  name: string
-  className: string
-  background: ReactNode
-  Icon: React.ElementType
-  description: string
-  href?: string
-  cta?: string
-  onClick?: () => void
+  name: string;
+  className: string;
+  background: ReactNode;
+  Icon: React.ElementType;
+  description: string;
+  href?: string;
+  cta?: string;
+  onClick?: () => void;
 }
 
 export const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
@@ -48,8 +48,8 @@ export const BentoGrid = ({ children, className, ...props }: BentoGridProps) => 
     <div className={cn('grid w-full auto-rows-[22rem] grid-cols-3 gap-4', className)} {...props}>
       {children}
     </div>
-  )
-}
+  );
+};
 
 export const BentoCard = ({
   name,
@@ -130,4 +130,4 @@ export const BentoCard = ({
 
     <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3" />
   </div>
-)
+);

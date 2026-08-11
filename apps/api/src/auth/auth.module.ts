@@ -20,42 +20,42 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { CqrsModule } from '@nestjs/cqrs'
-import { JwtModule } from '@nestjs/jwt'
-import { PassportModule } from '@nestjs/passport'
-import { StringValue } from 'ms'
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { StringValue } from 'ms';
 
-import { MailModule } from '../mail/mail.module'
+import { MailModule } from '../mail/mail.module';
 // Controller
-import { AuthController } from './auth.controller'
+import { AuthController } from './auth.controller';
 // Commands
-import { Enable2FAHandler } from './commands/enable-2fa'
-import { LoginHandler } from './commands/login'
-import { LogoutHandler } from './commands/logout'
-import { RefreshTokenHandler } from './commands/refresh-token'
-import { RegisterHandler } from './commands/register'
-import { RequestPasswordResetHandler } from './commands/request-password-reset'
-import { ResetPasswordHandler } from './commands/reset-password'
-import { Verify2FAHandler } from './commands/verify-2fa'
-import { VerifyEmailHandler } from './commands/verify-email'
+import { Enable2FAHandler } from './commands/enable-2fa';
+import { LoginHandler } from './commands/login';
+import { LogoutHandler } from './commands/logout';
+import { RefreshTokenHandler } from './commands/refresh-token';
+import { RegisterHandler } from './commands/register';
+import { RequestPasswordResetHandler } from './commands/request-password-reset';
+import { ResetPasswordHandler } from './commands/reset-password';
+import { Verify2FAHandler } from './commands/verify-2fa';
+import { VerifyEmailHandler } from './commands/verify-email';
 // Guards
-import { GitHubOAuthGuard, GoogleOAuthGuard, MfaGuard } from './guards'
+import { GitHubOAuthGuard, GoogleOAuthGuard, MfaGuard } from './guards';
 import {
   SessionRepository,
   TokenService,
   TokenStorageService,
   TotpService,
   UserRepository,
-} from './infrastructure'
+} from './infrastructure';
 // Queries
-import { GetCurrentUserHandler } from './queries/get-current-user'
-import { GetSessionsHandler } from './queries/get-sessions'
-import { OAuthService, OAuthRedirectService } from './services'
+import { GetCurrentUserHandler } from './queries/get-current-user';
+import { GetSessionsHandler } from './queries/get-sessions';
+import { OAuthService, OAuthRedirectService } from './services';
 // Services
 // Strategies
-import { GitHubStrategy, GoogleStrategy, JwtStrategy } from './strategies'
+import { GitHubStrategy, GoogleStrategy, JwtStrategy } from './strategies';
 
 const CommandHandlers = [
   RegisterHandler,
@@ -67,9 +67,9 @@ const CommandHandlers = [
   ResetPasswordHandler,
   RefreshTokenHandler,
   LogoutHandler,
-]
+];
 
-const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler]
+const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
 
 @Module({
   imports: [

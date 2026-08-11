@@ -20,29 +20,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Search } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
-import { useState } from 'react'
+import { Search } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
 
-import { ActivityCard } from '@/components/activities/ActivityCard'
-import { ActivityFilters } from '@/components/activities/ActivityFilters'
-import { ActivityHero } from '@/components/activities/ActivityHero'
-import { NewsletterCTA } from '@/components/activities/NewsletterCTA'
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { ACTIVITIES, CATEGORIES } from '@/data/activities'
+import { ActivityCard } from '@/components/activities/ActivityCard';
+import { ActivityFilters } from '@/components/activities/ActivityFilters';
+import { ActivityHero } from '@/components/activities/ActivityHero';
+import { NewsletterCTA } from '@/components/activities/NewsletterCTA';
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { ACTIVITIES, CATEGORIES } from '@/data/activities';
 
 export default function ActivitiesPage() {
-  const [activeCategory, setActiveCategory] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const filteredActivities = ACTIVITIES.filter((item) => {
-    const matchesCategory = activeCategory === 'all' || item.category === activeCategory
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="selection:bg-wds-accent min-h-screen bg-black font-sans text-white selection:text-black">
@@ -110,5 +110,5 @@ export default function ActivitiesPage() {
 
       <Footer variant="dark" />
     </div>
-  )
+  );
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSlug } from '@generated/prisma'
+import { ProductSlug } from '@generated/prisma';
 
 /**
  * Map product slug to image URL (hardcoded in frontend)
@@ -32,7 +32,7 @@ export function getProductImageUrl(slug: ProductSlug): string {
     PAD_CHUOT: '/shop/pad-chuot.webp',
     DAY_DEO: '/shop/day-deo.webp',
     MOC_KHOA: '/shop/moc-khoa.webp',
-  }
+  };
 
-  return imageMap[slug] || '/shop/default.webp'
+  return imageMap[slug] || '/shop/default.webp';
 }

@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { AuthFooter } from './AuthFooter'
-import { AuthHeader } from './AuthHeader'
-import { AuthSocialButtons } from './AuthSocialButtons'
-import { AuthWelcome } from './AuthWelcome'
+import { AuthFooter } from './AuthFooter';
+import { AuthHeader } from './AuthHeader';
+import { AuthSocialButtons } from './AuthSocialButtons';
+import { AuthWelcome } from './AuthWelcome';
 
 interface AuthLayoutProps {
-  children: React.ReactNode
-  variant?: 'login' | 'signup'
+  children: React.ReactNode;
+  variant?: 'login' | 'signup';
 }
 
 export function AuthLayout({ children, variant = 'login' }: AuthLayoutProps) {
@@ -59,5 +59,5 @@ export function AuthLayout({ children, variant = 'login' }: AuthLayoutProps) {
         </div>
       </main>
     </div>
-  )
+  );
 }

@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateBlogPostDto {
   @ApiProperty({
@@ -30,7 +30,7 @@ export class CreateBlogPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  slug: string
+  slug: string;
 
   @ApiProperty({
     description: 'Blog post title',
@@ -39,7 +39,7 @@ export class CreateBlogPostDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  title: string
+  title: string;
 
   @ApiProperty({
     description: 'Markdown content',
@@ -47,7 +47,7 @@ export class CreateBlogPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  content: string
+  content: string;
 
   @ApiPropertyOptional({
     description: 'Blog post excerpt (auto-generated if not provided)',
@@ -57,7 +57,7 @@ export class CreateBlogPostDto {
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  excerpt?: string | null
+  excerpt?: string | null;
 
   @ApiPropertyOptional({
     description: 'Cover image URL',
@@ -66,7 +66,7 @@ export class CreateBlogPostDto {
   })
   @IsString()
   @IsOptional()
-  coverImage?: string | null
+  coverImage?: string | null;
 
   @ApiPropertyOptional({
     description: 'Whether post is published',
@@ -75,7 +75,7 @@ export class CreateBlogPostDto {
   })
   @IsBoolean()
   @IsOptional()
-  isPublished?: boolean
+  isPublished?: boolean;
 
   @ApiPropertyOptional({
     description: 'SEO meta title',
@@ -85,7 +85,7 @@ export class CreateBlogPostDto {
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  metaTitle?: string | null
+  metaTitle?: string | null;
 
   @ApiPropertyOptional({
     description: 'SEO meta description',
@@ -95,5 +95,5 @@ export class CreateBlogPostDto {
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  metaDescription?: string | null
+  metaDescription?: string | null;
 }

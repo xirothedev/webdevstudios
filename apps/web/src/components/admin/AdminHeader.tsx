@@ -20,21 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useContext } from 'react'
+import { useContext } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { AuthContext } from '@/contexts/auth.context'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AuthContext } from '@/contexts/auth.context';
 
 interface AdminHeaderProps {
-  title: string
-  description?: string
-  actions?: React.ReactNode
+  title: string;
+  description?: string;
+  actions?: React.ReactNode;
 }
 
 export function AdminHeader({ title, description, actions }: AdminHeaderProps) {
-  const { user } = useContext(AuthContext) ?? {}
+  const { user } = useContext(AuthContext) ?? {};
 
   return (
     <div className="border-wds-accent/20 bg-wds-background flex items-center justify-between border-b px-6 py-4">
@@ -67,5 +67,5 @@ export function AdminHeader({ title, description, actions }: AdminHeaderProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

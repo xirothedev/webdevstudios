@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { createPageMetadata } from '@/lib/metadata'
+import { createPageMetadata } from '@/lib/metadata';
 
 export const metadata: Metadata = {
   ...createPageMetadata({
@@ -45,12 +45,12 @@ export const metadata: Metadata = {
       follow: false,
     },
   },
-}
+};
 
 export default function ProfileLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  return children
+  return children;
 }

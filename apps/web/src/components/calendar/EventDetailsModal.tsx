@@ -20,26 +20,26 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Calendar as CalendarIcon, ExternalLink, MapPin, Users, X } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
-import { useSyncExternalStore } from 'react'
-import { createPortal } from 'react-dom'
+import { Calendar as CalendarIcon, ExternalLink, MapPin, Users, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 
-import { Button } from '@/components/ui/button'
-import { Event, EventType } from '@/lib/events/types'
+import { Button } from '@/components/ui/button';
+import { Event, EventType } from '@/lib/events/types';
 import {
   formatEventTime,
   getEventTypeColor,
   getEventTypeLabel,
   getRelativeTime,
-} from '@/lib/events/utils'
+} from '@/lib/events/utils';
 
 interface EventDetailsModalProps {
-  event: Event | null
-  isOpen: boolean
-  onClose: () => void
+  event: Event | null;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function EventDetailsModal({ event, isOpen, onClose }: EventDetailsModalProps) {
@@ -47,12 +47,12 @@ export function EventDetailsModal({ event, isOpen, onClose }: EventDetailsModalP
     () => () => {},
     () => true,
     () => false,
-  )
+  );
 
-  if (!event || !mounted) return null
+  if (!event || !mounted) return null;
 
-  const eventColor = getEventTypeColor(event.type)
-  const eventTypeLabel = getEventTypeLabel(event.type)
+  const eventColor = getEventTypeColor(event.type);
+  const eventTypeLabel = getEventTypeLabel(event.type);
 
   const modalContent = (
     <AnimatePresence>
@@ -183,7 +183,7 @@ export function EventDetailsModal({ event, isOpen, onClose }: EventDetailsModalP
         </>
       )}
     </AnimatePresence>
-  )
+  );
 
-  return createPortal(modalContent, document.body)
+  return createPortal(modalContent, document.body);
 }

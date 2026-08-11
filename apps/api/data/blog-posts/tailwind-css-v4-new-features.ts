@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'tailwind-css-v4-new-features',
@@ -87,4 +87,4 @@ Tailwind CSS v4 is a significant improvement. Upgrade today!`,
   metaDescription:
     'Learn about new features in Tailwind CSS v4 including improved performance, new utilities, and better developer experience.',
   isPublished: true,
-}
+};

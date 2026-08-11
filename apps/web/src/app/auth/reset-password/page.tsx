@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { AuthLoading } from '@/components/auth/AuthLoading'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useResetPassword } from '@/lib/api/hooks/use-auth'
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthLoading } from '@/components/auth/AuthLoading';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useResetPassword } from '@/lib/api/hooks/use-auth';
 
 // Validation schema with Zod
 const resetPasswordSchema = z
@@ -44,14 +44,14 @@ const resetPasswordSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Mật khẩu không khớp',
     path: ['confirmPassword'],
-  })
+  });
 
-type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 function ResetPasswordContent() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const token = searchParams.get('token')
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get('token');
 
   const {
     register,
@@ -63,28 +63,28 @@ function ResetPasswordContent() {
       password: '',
       confirmPassword: '',
     },
-  })
+  });
 
-  const resetPasswordMutation = useResetPassword()
+  const resetPasswordMutation = useResetPassword();
 
   const onSubmit = (data: ResetPasswordFormData) => {
     if (!token) {
-      return
+      return;
     }
     resetPasswordMutation.mutate({
       token,
       newPassword: data.password,
-    })
-  }
+    });
+  };
 
-  const isLoading = isSubmitting || resetPasswordMutation.isPending
-  const isSuccess = resetPasswordMutation.isSuccess
+  const isLoading = isSubmitting || resetPasswordMutation.isPending;
+  const isSuccess = resetPasswordMutation.isSuccess;
 
   useEffect(() => {
     if (!token) {
-      router.push('/auth/login')
+      router.push('/auth/login');
     }
-  }, [token, router])
+  }, [token, router]);
 
   if (!token) {
     return (
@@ -101,7 +101,7 @@ function ResetPasswordContent() {
           </div>
         </div>
       </AuthLayout>
-    )
+    );
   }
 
   if (isSuccess) {
@@ -129,7 +129,7 @@ function ResetPasswordContent() {
           </div>
         </div>
       </AuthLayout>
-    )
+    );
   }
 
   return (
@@ -200,7 +200,7 @@ function ResetPasswordContent() {
         </form>
       </div>
     </AuthLayout>
-  )
+  );
 }
 
 export default function ResetPasswordPage() {
@@ -214,5 +214,5 @@ export default function ResetPasswordPage() {
     >
       <ResetPasswordContent />
     </Suspense>
-  )
+  );
 }

@@ -20,48 +20,48 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize } from '@generated/prisma'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
-import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Min } from 'class-validator'
+import { ProductSize } from '@generated/prisma';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 
 export class CartItemDto {
   @ApiProperty({
     description: 'Cart item ID',
     example: 'clx1234567890',
   })
-  id: string
+  id: string;
 
   @ApiProperty({
     description: 'Product ID',
     example: 'clx1234567890',
   })
-  productId: string
+  productId: string;
 
   @ApiProperty({
     description: 'Product name',
     example: 'Áo thun WebDev Studios',
   })
-  productName: string
+  productName: string;
 
   @ApiProperty({
     description: 'Product slug',
     example: 'AO_THUN',
   })
-  productSlug: string
+  productSlug: string;
 
   @ApiProperty({
     description: 'Product price',
     example: 299000,
     type: Number,
   })
-  productPrice: number
+  productPrice: number;
 
   @ApiProperty({
     description: 'Product image URL',
     example: 'https://example.com/image.webp',
   })
-  productImage: string
+  productImage: string;
 
   @ApiPropertyOptional({
     description: 'Product size (for products with sizes)',
@@ -69,26 +69,26 @@ export class CartItemDto {
     example: ProductSize.M,
     nullable: true,
   })
-  size: ProductSize | null
+  size: ProductSize | null;
 
   @ApiProperty({
     description: 'Quantity',
     example: 2,
   })
-  quantity: number
+  quantity: number;
 
   @ApiProperty({
     description: 'Subtotal (price * quantity)',
     example: 598000,
     type: Number,
   })
-  subtotal: number
+  subtotal: number;
 
   @ApiProperty({
     description: 'Stock available',
     example: 10,
   })
-  stockAvailable: number
+  stockAvailable: number;
 }
 
 export class CartDto {
@@ -96,32 +96,32 @@ export class CartDto {
     description: 'Cart ID',
     example: 'clx1234567890',
   })
-  id: string
+  id: string;
 
   @ApiProperty({
     description: 'Cart items',
     type: [CartItemDto],
   })
-  items: CartItemDto[]
+  items: CartItemDto[];
 
   @ApiProperty({
     description: 'Total items count',
     example: 3,
   })
-  totalItems: number
+  totalItems: number;
 
   @ApiProperty({
     description: 'Total amount',
     example: 897000,
     type: Number,
   })
-  totalAmount: number
+  totalAmount: number;
 
   @ApiProperty({
     description: 'Last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  updatedAt: Date
+  updatedAt: Date;
 }
 
 export class AddToCartDto {
@@ -131,7 +131,7 @@ export class AddToCartDto {
   })
   @IsString()
   @IsNotEmpty()
-  productId: string
+  productId: string;
 
   @ApiPropertyOptional({
     description: 'Product size (required for products with sizes)',
@@ -140,7 +140,7 @@ export class AddToCartDto {
   })
   @IsEnum(ProductSize)
   @IsOptional()
-  size?: ProductSize
+  size?: ProductSize;
 
   @ApiProperty({
     description: 'Quantity',
@@ -151,7 +151,7 @@ export class AddToCartDto {
   @IsInt()
   @IsPositive()
   @Min(1)
-  quantity: number
+  quantity: number;
 }
 
 export class UpdateCartItemDto {
@@ -164,5 +164,5 @@ export class UpdateCartItemDto {
   @IsInt()
   @IsPositive()
   @Min(1)
-  quantity: number
+  quantity: number;
 }

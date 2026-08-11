@@ -20,19 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { CheckCircle2, Info, Loader2 } from 'lucide-react'
-import { type FormEvent, type InputHTMLAttributes, type ReactNode, useState } from 'react'
+import { CheckCircle2, Info, Loader2 } from 'lucide-react';
+import { type FormEvent, type InputHTMLAttributes, type ReactNode, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { useUpdateProfile } from '@/lib/api/hooks/use-user'
-import { cn } from '@/lib/utils'
-import type { User } from '@/types/auth.types'
+import { Button } from '@/components/ui/button';
+import { useUpdateProfile } from '@/lib/api/hooks/use-user';
+import { cn } from '@/lib/utils';
+import type { User } from '@/types/auth.types';
 
 interface ProfileFormProps {
-  user: User
-  className?: string
+  user: User;
+  className?: string;
 }
 
 // Light theme Input component for profile form
@@ -47,7 +47,7 @@ function LightInput({ className, ...props }: InputHTMLAttributes<HTMLInputElemen
       )}
       {...props}
     />
-  )
+  );
 }
 
 // Label component
@@ -57,22 +57,22 @@ function Label({
   required,
   className,
 }: {
-  htmlFor?: string
-  children: ReactNode
-  required?: boolean
-  className?: string
+  htmlFor?: string;
+  children: ReactNode;
+  required?: boolean;
+  className?: string;
 }) {
   return (
     <label htmlFor={htmlFor} className={cn('text-sm font-semibold text-gray-900', className)}>
       {children}
       {required && <span className="ml-1 text-red-500">*</span>}
     </label>
-  )
+  );
 }
 
 // Helper text component
 function HelperText({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cn('text-xs text-gray-500', className)}>{children}</p>
+  return <p className={cn('text-xs text-gray-500', className)}>{children}</p>;
 }
 
 // Error text component
@@ -81,15 +81,15 @@ function ErrorText({
   className,
   id,
 }: {
-  children: ReactNode
-  className?: string
-  id?: string
+  children: ReactNode;
+  className?: string;
+  id?: string;
 }) {
   return (
     <p id={id} className={cn('text-xs text-red-600', className)}>
       {children}
     </p>
-  )
+  );
 }
 
 // Verification badge component
@@ -108,55 +108,55 @@ function VerificationBadge({ verified, label }: { verified: boolean; label: stri
         </>
       )}
     </div>
-  )
+  );
 }
 
 export function ProfileForm({ user, className }: ProfileFormProps) {
-  const [fullName, setFullName] = useState(user.fullName || '')
-  const [phone, setPhone] = useState(user.phone || '')
+  const [fullName, setFullName] = useState(user.fullName || '');
+  const [phone, setPhone] = useState(user.phone || '');
   const [errors, setErrors] = useState<{
-    fullName?: string
-    phone?: string
-  }>({})
+    fullName?: string;
+    phone?: string;
+  }>({});
 
-  const updateProfile = useUpdateProfile()
+  const updateProfile = useUpdateProfile();
 
   const validate = (): boolean => {
-    const newErrors: { fullName?: string; phone?: string } = {}
+    const newErrors: { fullName?: string; phone?: string } = {};
 
     // Validate fullName
     if (!fullName.trim()) {
-      newErrors.fullName = 'Họ tên là bắt buộc'
+      newErrors.fullName = 'Họ tên là bắt buộc';
     } else if (fullName.trim().length > 100) {
-      newErrors.fullName = 'Họ tên không được vượt quá 100 ký tự'
+      newErrors.fullName = 'Họ tên không được vượt quá 100 ký tự';
     }
 
     // Validate phone (optional but if provided, check format)
     if (phone && phone.length > 15) {
-      newErrors.phone = 'Số điện thoại không được vượt quá 15 ký tự'
+      newErrors.phone = 'Số điện thoại không được vượt quá 15 ký tự';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validate()) {
-      return
+      return;
     }
 
     updateProfile.mutate({
       fullName: fullName.trim() || undefined,
       phone: phone.trim() || undefined,
-    })
-  }
+    });
+  };
 
   const hasChanges =
-    fullName.trim() !== (user.fullName || '') || phone.trim() !== (user.phone || '')
+    fullName.trim() !== (user.fullName || '') || phone.trim() !== (user.phone || '');
 
-  const isLoading = updateProfile.isPending
+  const isLoading = updateProfile.isPending;
 
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-6', className)}>
@@ -186,9 +186,9 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
           type="text"
           value={fullName}
           onChange={(e) => {
-            setFullName(e.target.value)
+            setFullName(e.target.value);
             if (errors.fullName) {
-              setErrors((prev) => ({ ...prev, fullName: undefined }))
+              setErrors((prev) => ({ ...prev, fullName: undefined }));
             }
           }}
           placeholder="Nhập họ tên của bạn"
@@ -212,9 +212,9 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
           type="tel"
           value={phone}
           onChange={(e) => {
-            setPhone(e.target.value)
+            setPhone(e.target.value);
             if (errors.phone) {
-              setErrors((prev) => ({ ...prev, phone: undefined }))
+              setErrors((prev) => ({ ...prev, phone: undefined }));
             }
           }}
           placeholder="Nhập số điện thoại của bạn"
@@ -251,5 +251,5 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
         </Button>
       </div>
     </form>
-  )
+  );
 }

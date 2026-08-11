@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class VerifyEmailDto {
   @ApiProperty({
@@ -30,5 +30,5 @@ export class VerifyEmailDto {
   })
   @IsString()
   @IsNotEmpty()
-  token: string
+  token: string;
 }

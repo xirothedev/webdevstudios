@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { ProductDto, ProductListResponseDto } from '../../dtos'
-import { ProductRepository } from '../../infrastructure/product.repository'
-import { ProductWithRelations } from '../../product.types'
-import { ListProductsQuery } from './list-products.query'
+import { ProductDto, ProductListResponseDto } from '../../dtos';
+import { ProductRepository } from '../../infrastructure/product.repository';
+import { ProductWithRelations } from '../../product.types';
+import { ListProductsQuery } from './list-products.query';
 
 @QueryHandler(ListProductsQuery)
 export class ListProductsHandler implements IQueryHandler<ListProductsQuery> {
@@ -33,16 +33,16 @@ export class ListProductsHandler implements IQueryHandler<ListProductsQuery> {
 
   async execute(_query: ListProductsQuery): Promise<ProductListResponseDto> {
     // TODO: Add pagination
-    const products = await this.productRepository.findAll()
+    const products = await this.productRepository.findAll();
 
     return {
       products: products.map((product) => this.mapToDto(product)),
       total: products.length,
-    }
+    };
   }
 
   private mapToDto(product: ProductWithRelations): ProductDto {
-    const stockStatus = this.calculateStockStatus(product)
+    const stockStatus = this.calculateStockStatus(product);
 
     return {
       id: product.id,
@@ -65,21 +65,21 @@ export class ListProductsHandler implements IQueryHandler<ListProductsQuery> {
       isPublished: product.isPublished,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
-    }
+    };
   }
 
   private calculateStockStatus(
     product: ProductWithRelations,
   ): 'in_stock' | 'low_stock' | 'out_of_stock' {
     if (product.hasSizes && product.sizeStocks?.length > 0) {
-      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0)
-      if (totalStock === 0) return 'out_of_stock'
-      if (totalStock < 5) return 'low_stock'
-      return 'in_stock'
+      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
+      if (totalStock === 0) return 'out_of_stock';
+      if (totalStock < 5) return 'low_stock';
+      return 'in_stock';
     }
 
-    if (product.stock === 0) return 'out_of_stock'
-    if (product.stock < 5) return 'low_stock'
-    return 'in_stock'
+    if (product.stock === 0) return 'out_of_stock';
+    if (product.stock < 5) return 'low_stock';
+    return 'in_stock';
   }
 }

@@ -1,2 +1,2 @@
-export * from './expire-order.command'
-export * from './expire-order.handler'
+export * from './expire-order.command';
+export * from './expire-order.handler';

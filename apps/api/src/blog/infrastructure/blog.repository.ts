@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPost } from '@generated/prisma'
-import { Injectable } from '@nestjs/common'
+import { BlogPost } from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma'
+import { PrismaService } from '@/prisma';
 
-import { BlogPostWithRelations } from '../blog.types'
+import { BlogPostWithRelations } from '../blog.types';
 
 @Injectable()
 export class BlogRepository {
@@ -44,7 +44,7 @@ export class BlogRepository {
         },
         tags: true,
       },
-    })
+    });
   }
 
   async findById(id: string): Promise<BlogPostWithRelations | null> {
@@ -60,29 +60,29 @@ export class BlogRepository {
         },
         tags: true,
       },
-    })
+    });
   }
 
   async findAll(options?: {
-    isPublished?: boolean
-    page?: number
-    pageSize?: number
-    authorId?: string
+    isPublished?: boolean;
+    page?: number;
+    pageSize?: number;
+    authorId?: string;
   }): Promise<{ posts: BlogPostWithRelations[]; total: number }> {
-    const { isPublished, page = 1, pageSize = 10, authorId } = options || {}
-    const skip = (page - 1) * pageSize
+    const { isPublished, page = 1, pageSize = 10, authorId } = options || {};
+    const skip = (page - 1) * pageSize;
 
     const where: {
-      isPublished?: boolean
-      authorId?: string
-    } = {}
+      isPublished?: boolean;
+      authorId?: string;
+    } = {};
 
     if (isPublished !== undefined) {
-      where.isPublished = isPublished
+      where.isPublished = isPublished;
     }
 
     if (authorId) {
-      where.authorId = authorId
+      where.authorId = authorId;
     }
 
     const [posts, total] = await Promise.all([
@@ -103,20 +103,20 @@ export class BlogRepository {
         take: pageSize,
       }),
       this.prisma.blogPost.count({ where }),
-    ])
+    ]);
 
-    return { posts, total }
+    return { posts, total };
   }
 
   async search(
     query: string,
     options?: {
-      page?: number
-      pageSize?: number
+      page?: number;
+      pageSize?: number;
     },
   ): Promise<{ posts: BlogPostWithRelations[]; total: number }> {
-    const { page = 1, pageSize = 10 } = options || {}
-    const skip = (page - 1) * pageSize
+    const { page = 1, pageSize = 10 } = options || {};
+    const skip = (page - 1) * pageSize;
 
     // Use case-insensitive contains for search (compatible with all PostgreSQL versions)
     const [posts, total] = await Promise.all([
@@ -159,53 +159,53 @@ export class BlogRepository {
           ],
         },
       }),
-    ])
+    ]);
 
-    return { posts, total }
+    return { posts, total };
   }
 
   async create(data: {
-    slug: string
-    title: string
-    contentUrl: string
-    contentSize: number | null
-    excerpt: string | null
-    coverImage: string | null
-    authorId: string
-    isPublished: boolean
-    publishedAt: Date | null
-    metaTitle: string | null
-    metaDescription: string | null
+    slug: string;
+    title: string;
+    contentUrl: string;
+    contentSize: number | null;
+    excerpt: string | null;
+    coverImage: string | null;
+    authorId: string;
+    isPublished: boolean;
+    publishedAt: Date | null;
+    metaTitle: string | null;
+    metaDescription: string | null;
   }): Promise<BlogPost> {
     return this.prisma.blogPost.create({
       data,
-    })
+    });
   }
 
   async update(
     id: string,
     data: {
-      title?: string
-      contentUrl?: string
-      contentSize?: number | null
-      excerpt?: string | null
-      coverImage?: string | null
-      isPublished?: boolean
-      publishedAt?: Date | null
-      metaTitle?: string | null
-      metaDescription?: string | null
+      title?: string;
+      contentUrl?: string;
+      contentSize?: number | null;
+      excerpt?: string | null;
+      coverImage?: string | null;
+      isPublished?: boolean;
+      publishedAt?: Date | null;
+      metaTitle?: string | null;
+      metaDescription?: string | null;
     },
   ): Promise<BlogPost> {
     return this.prisma.blogPost.update({
       where: { id },
       data,
-    })
+    });
   }
 
   async delete(id: string): Promise<void> {
     await this.prisma.blogPost.delete({
       where: { id },
-    })
+    });
   }
 
   async incrementViewCount(id: string): Promise<BlogPost> {
@@ -216,6 +216,6 @@ export class BlogRepository {
           increment: 1,
         },
       },
-    })
+    });
   }
 }

@@ -20,42 +20,42 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { LogOut, Settings, ShoppingBag, User } from 'lucide-react'
-import Link from 'next/link'
+import { LogOut, Settings, ShoppingBag, User } from 'lucide-react';
+import Link from 'next/link';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useCurrentUser, useLogout } from '@/lib/api/hooks/use-auth'
-import { cn } from '@/lib/utils'
-import { getAvatarInitials } from '@/lib/utils/avatar'
+} from '@/components/ui/dropdown-menu';
+import { useCurrentUser, useLogout } from '@/lib/api/hooks/use-auth';
+import { cn } from '@/lib/utils';
+import { getAvatarInitials } from '@/lib/utils/avatar';
 
 interface UserAvatarProps {
-  variant?: 'dark' | 'light'
+  variant?: 'dark' | 'light';
 }
 
 export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
-  const { data: user, isLoading } = useCurrentUser()
-  const logout = useLogout()
-  const isDark = variant === 'dark'
+  const { data: user, isLoading } = useCurrentUser();
+  const logout = useLogout();
+  const isDark = variant === 'dark';
 
   // Don't render if user is not loaded or doesn't exist
   if (isLoading || !user) {
-    return null
+    return null;
   }
 
-  const initials = getAvatarInitials(user.fullName, user.email)
+  const initials = getAvatarInitials(user.fullName, user.email);
 
   const handleLogout = () => {
-    logout.mutate('')
-  }
+    logout.mutate('');
+  };
 
   return (
     <DropdownMenu>
@@ -191,5 +191,5 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

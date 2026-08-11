@@ -20,22 +20,22 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '@/auth/infrastructure'
-import { UserListResponseDto, PrivateUserDto } from '../../dtos'
-import { ListUsersQuery } from './list-users.query'
+import { UserRepository } from '@/auth/infrastructure';
+import { UserListResponseDto, PrivateUserDto } from '../../dtos';
+import { ListUsersQuery } from './list-users.query';
 
 @QueryHandler(ListUsersQuery)
 export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: ListUsersQuery): Promise<UserListResponseDto> {
-    const { page, limit, role } = query
+    const { page, limit, role } = query;
 
-    const { users, total } = await this.userRepository.list(page, limit, role)
+    const { users, total } = await this.userRepository.list(page, limit, role);
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(total / limit);
 
     const userDtos: PrivateUserDto[] = users.map((user) => ({
       id: user.id,
@@ -49,7 +49,7 @@ export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
       mfaEnabled: user.mfaEnabled,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-    }))
+    }));
 
     return {
       users: userDtos,
@@ -59,6 +59,6 @@ export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
         total,
         totalPages,
       },
-    }
+    };
   }
 }

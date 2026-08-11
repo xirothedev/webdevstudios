@@ -20,49 +20,49 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { siteUrl } from './metadata'
+import { siteUrl } from './metadata';
 
 export interface OrganizationSchema {
-  '@context': string
-  '@type': string
-  name: string
-  url: string
-  logo: string
-  description: string
-  sameAs?: string[]
+  '@context': string;
+  '@type': string;
+  name: string;
+  url: string;
+  logo: string;
+  description: string;
+  sameAs?: string[];
   contactPoint?: {
-    '@type': string
-    contactType: string
-    email?: string
-    url?: string
-  }
+    '@type': string;
+    contactType: string;
+    email?: string;
+    url?: string;
+  };
 }
 
 export interface WebSiteSchema {
-  '@context': string
-  '@type': string
-  name: string
-  url: string
-  description: string
+  '@context': string;
+  '@type': string;
+  name: string;
+  url: string;
+  description: string;
   potentialAction?: {
-    '@type': string
+    '@type': string;
     target: {
-      '@type': string
-      urlTemplate: string
-    }
-    'query-input': string
-  }
+      '@type': string;
+      urlTemplate: string;
+    };
+    'query-input': string;
+  };
 }
 
 export interface BreadcrumbSchema {
-  '@context': string
-  '@type': string
+  '@context': string;
+  '@type': string;
   itemListElement: Array<{
-    '@type': string
-    position: number
-    name: string
-    item?: string
-  }>
+    '@type': string;
+    position: number;
+    name: string;
+    item?: string;
+  }>;
 }
 
 export function getOrganizationSchema(): OrganizationSchema {
@@ -86,7 +86,7 @@ export function getOrganizationSchema(): OrganizationSchema {
       // email: 'contact@webdevstudios.org',
       // url: `${siteUrl}/contact`,
     },
-  }
+  };
 }
 
 export function getWebSiteSchema(): WebSiteSchema {
@@ -105,7 +105,7 @@ export function getWebSiteSchema(): WebSiteSchema {
       },
       'query-input': 'required name=search_term_string',
     },
-  }
+  };
 }
 
 export function getBreadcrumbSchema(
@@ -120,7 +120,7 @@ export function getBreadcrumbSchema(
       name: item.name,
       ...(item.url && { item: item.url }),
     })),
-  }
+  };
 }
 
 export function getPageSchema({
@@ -131,12 +131,12 @@ export function getPageSchema({
   datePublished,
   dateModified,
 }: {
-  title: string
-  description: string
-  url: string
-  image?: string
-  datePublished?: string
-  dateModified?: string
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  datePublished?: string;
+  dateModified?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -150,5 +150,5 @@ export function getPageSchema({
     ...(datePublished && { datePublished }),
     ...(dateModified && { dateModified }),
     publisher: getOrganizationSchema(),
-  }
+  };
 }

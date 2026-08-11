@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { applyDecorators } from '@nestjs/common'
-import { Throttle } from '@nestjs/throttler'
+import { applyDecorators } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 
 /**
  * Rate limit decorators for different route types
@@ -44,7 +44,7 @@ import { Throttle } from '@nestjs/throttler'
  * Dùng 'short' throttler đã config: 3 requests per second
  * Không override, dùng trực tiếp config từ AppModule
  */
-export const ThrottleStrict = () => applyDecorators(Throttle({ short: {} }))
+export const ThrottleStrict = () => applyDecorators(Throttle({ short: {} }));
 
 /**
  * Rate limit for password reset requests
@@ -52,34 +52,34 @@ export const ThrottleStrict = () => applyDecorators(Throttle({ short: {} }))
  * Cần override vì password reset cần strict hơn
  */
 export const ThrottlePasswordReset = () =>
-  applyDecorators(Throttle({ long: { limit: 3, ttl: 3600000 } })) // 3 per hour
+  applyDecorators(Throttle({ long: { limit: 3, ttl: 3600000 } })); // 3 per hour
 
 /**
  * Rate limit for OAuth endpoints
  * Dùng 'medium' throttler đã config: 20 requests per 10 seconds
  */
-export const ThrottleOAuth = () => applyDecorators(Throttle({ medium: {} }))
+export const ThrottleOAuth = () => applyDecorators(Throttle({ medium: {} }));
 
 /**
  * Rate limit for refresh token endpoint
  * Dùng 'medium' throttler đã config: 20 requests per 10 seconds
  */
-export const ThrottleRefresh = () => applyDecorators(Throttle({ medium: {} }))
+export const ThrottleRefresh = () => applyDecorators(Throttle({ medium: {} }));
 
 /**
  * Rate limit for 2FA operations
  * Dùng 'medium' throttler đã config: 20 requests per 10 seconds
  */
-export const Throttle2FA = () => applyDecorators(Throttle({ medium: {} }))
+export const Throttle2FA = () => applyDecorators(Throttle({ medium: {} }));
 
 /**
  * Rate limit for API endpoints (moderate)
  * Dùng 'long' throttler đã config: 100 requests per minute
  */
-export const ThrottleAPI = () => applyDecorators(Throttle({ long: {} }))
+export const ThrottleAPI = () => applyDecorators(Throttle({ long: {} }));
 
 /**
  * Rate limit for payment endpoints (strict)
  * Dùng 'short' throttler đã config: 3 requests per second
  */
-export const ThrottlePayment = () => applyDecorators(Throttle({ short: {} }))
+export const ThrottlePayment = () => applyDecorators(Throttle({ short: {} }));

@@ -20,23 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { PaymentTransactionStatus } from '@generated/prisma'
-import { Injectable } from '@nestjs/common'
+import { PaymentTransactionStatus } from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
 
-import { subMinutes } from 'date-fns'
-import { PrismaService } from '@/prisma'
+import { subMinutes } from 'date-fns';
+import { PrismaService } from '@/prisma';
 
 @Injectable()
 export class PaymentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
-    orderId: string
-    transactionCode: string
-    amount: number
-    status: PaymentTransactionStatus
-    paymentUrl?: string
-    payosData?: unknown
+    orderId: string;
+    transactionCode: string;
+    amount: number;
+    status: PaymentTransactionStatus;
+    paymentUrl?: string;
+    payosData?: unknown;
   }) {
     return this.prisma.paymentTransaction.create({
       data: {
@@ -47,13 +47,13 @@ export class PaymentRepository {
         paymentUrl: data.paymentUrl,
         payosData: data.payosData as object,
       },
-    })
+    });
   }
 
   async findByOrderId(orderId: string) {
     return this.prisma.paymentTransaction.findUnique({
       where: { orderId },
-    })
+    });
   }
 
   async findByTransactionCode(transactionCode: string) {
@@ -66,7 +66,7 @@ export class PaymentRepository {
           },
         },
       },
-    })
+    });
   }
 
   async updateStatus(id: string, status: PaymentTransactionStatus, payosData?: unknown) {
@@ -76,11 +76,11 @@ export class PaymentRepository {
         status,
         payosData: payosData ? (payosData as object) : undefined,
       },
-    })
+    });
   }
 
   async findExpiredPendingTransactions() {
-    const fifteenMinutesAgo = subMinutes(new Date(), 15)
+    const fifteenMinutesAgo = subMinutes(new Date(), 15);
 
     return this.prisma.paymentTransaction.findMany({
       where: {
@@ -92,6 +92,6 @@ export class PaymentRepository {
       include: {
         order: true,
       },
-    })
+    });
   }
 }

@@ -20,19 +20,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Award, Calendar, ChevronDown, ChevronUp, Crown, Sparkles, Star, Users } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import {
+  Award,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Crown,
+  Sparkles,
+  Star,
+  Users,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { Footer } from '@/components/Footer'
-import { GenerationMemberAvatar } from '@/components/generation/GenerationMemberAvatar'
-import { Navbar } from '@/components/Navbar'
-import { type Generation, generations } from '@/data/generations'
+import { Footer } from '@/components/Footer';
+import { GenerationMemberAvatar } from '@/components/generation/GenerationMemberAvatar';
+import { Navbar } from '@/components/Navbar';
+import { type Generation, generations } from '@/data/generations';
 
 // Expandable Generation Section for Mobile
 function ExpandableGenerationSection({ generation }: { generation: Generation }) {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <section className="relative">
@@ -145,12 +154,12 @@ function ExpandableGenerationSection({ generation }: { generation: Generation })
           ))}
       </div>
     </section>
-  )
+  );
 }
 
 // Desktop Bento Grid (original layout for larger screens)
 function DesktopBentoGrid({ generation }: { generation: Generation }) {
-  const [leader1, leader2, leader3, ...members] = generation.members
+  const [leader1, leader2, leader3, ...members] = generation.members;
 
   return (
     <section className="hidden lg:block">
@@ -303,18 +312,18 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent" />
       </div>
     </section>
-  )
+  );
 }
 
 export default function GenerationPage() {
   const [starPositions, setStarPositions] = useState<
     Array<{
-      left: number
-      top: number
-      delay: number
-      duration: number
+      left: number;
+      top: number;
+      delay: number;
+      duration: number;
     }>
-  >([])
+  >([]);
 
   useEffect(() => {
     // Generate random positions only on client side
@@ -325,8 +334,8 @@ export default function GenerationPage() {
         delay: Math.random() * 3,
         duration: 4 + Math.random() * 4,
       })),
-    )
-  }, [])
+    );
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -449,5 +458,5 @@ export default function GenerationPage() {
         }
       `}</style>
     </div>
-  )
+  );
 }

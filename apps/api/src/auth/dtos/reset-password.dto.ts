@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, MinLength } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
   @ApiProperty({
@@ -30,7 +30,7 @@ export class ResetPasswordDto {
   })
   @IsString()
   @IsNotEmpty()
-  token: string
+  token: string;
 
   @ApiProperty({
     description: 'New password (minimum 8 characters)',
@@ -40,5 +40,5 @@ export class ResetPasswordDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
-  newPassword: string
+  newPassword: string;
 }

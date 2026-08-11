@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Controller, Get, Req, Res } from '@nestjs/common'
-import type { Request, Response } from 'express'
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import type { Request, Response } from 'express';
 
-import { AppService } from './app.service'
-import { Public } from '@/common/decorators'
-import { CsrfService } from '@/common/services'
+import { AppService } from './app.service';
+import { Public } from '@/common/decorators';
+import { CsrfService } from '@/common/services';
 
 @Controller()
 export class AppController {
@@ -36,13 +36,13 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    return this.appService.getHello()
+    return this.appService.getHello();
   }
 
   @Public()
   @Get('csrf-token')
   getCsrfToken(@Req() req: Request, @Res() res: Response) {
-    const token = this.csrfService.generateToken(req, res)
-    return res.json({ csrfToken: token })
+    const token = this.csrfService.generateToken(req, res);
+    return res.json({ csrfToken: token });
   }
 }

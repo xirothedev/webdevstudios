@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BadRequestException } from '@nestjs/common'
+import { BadRequestException } from '@nestjs/common';
 
 export class InvalidFileTypeException extends BadRequestException {
   constructor(allowedTypes: string[]) {
-    super(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`)
+    super(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`);
   }
 }

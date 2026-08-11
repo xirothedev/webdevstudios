@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Zap } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Zap } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export function ActivityHero() {
   return (
@@ -64,5 +64,5 @@ export function ActivityHero() {
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { EventRepository } from '../../infrastructure/event.repository'
-import { ListEventsQuery } from './list-events.query'
+import { EventRepository } from '../../infrastructure/event.repository';
+import { ListEventsQuery } from './list-events.query';
 
 @QueryHandler(ListEventsQuery)
 export class ListEventsHandler implements IQueryHandler<ListEventsQuery> {
@@ -34,6 +34,6 @@ export class ListEventsHandler implements IQueryHandler<ListEventsQuery> {
       startDate: query.startDate,
       endDate: query.endDate,
       types: query.types,
-    })
+    });
   }
 }

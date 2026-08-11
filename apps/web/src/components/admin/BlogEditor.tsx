@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { MarkdownEditor } from '@/components/ui/markdown-editor'
-import { blogApi, type BlogPostWithContent } from '@/lib/api/blog'
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { blogApi, type BlogPostWithContent } from '@/lib/api/blog';
 
 // Validation schema with Zod
 const blogPostFormSchema = z.object({
@@ -51,26 +51,26 @@ const blogPostFormSchema = z.object({
     .optional()
     .nullable(),
   isPublished: z.boolean().optional(),
-})
+});
 
-type BlogPostFormData = z.infer<typeof blogPostFormSchema>
+type BlogPostFormData = z.infer<typeof blogPostFormSchema>;
 
 interface BlogEditorProps {
-  postId?: string
-  onSave?: () => void
-  onCancel?: () => void
+  postId?: string;
+  onSave?: () => void;
+  onCancel?: () => void;
 }
 
 export function BlogEditor({ postId, onSave, onCancel }: BlogEditorProps) {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const isEditing = !!postId
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const isEditing = !!postId;
 
   const { data: post, isLoading: isLoadingPost } = useQuery({
     queryKey: ['blog', 'post', postId],
     queryFn: () => blogApi.getPostById(postId!, true),
     enabled: isEditing,
-  })
+  });
 
   const {
     register,
@@ -90,10 +90,10 @@ export function BlogEditor({ postId, onSave, onCancel }: BlogEditorProps) {
       metaDescription: null,
       isPublished: false,
     },
-  })
+  });
 
   // Watch title for dynamic header
-  const watchedTitle = watch('title')
+  const watchedTitle = watch('title');
 
   // Reset form when post data is loaded
   useEffect(() => {
@@ -106,9 +106,9 @@ export function BlogEditor({ postId, onSave, onCancel }: BlogEditorProps) {
         metaTitle: post.metaTitle || null,
         metaDescription: post.metaDescription || null,
         isPublished: post.isPublished,
-      })
+      });
     }
-  }, [post, reset])
+  }, [post, reset]);
 
   const createMutation = useMutation({
     mutationFn: (data: BlogPostFormData) =>
@@ -122,16 +122,16 @@ export function BlogEditor({ postId, onSave, onCancel }: BlogEditorProps) {
         isPublished: data.isPublished || false,
       }),
     onSuccess: (newPost) => {
-      queryClient.invalidateQueries({ queryKey: ['blog', 'posts'] })
-      toast.success('Bài viết đã được tạo thành công')
-      router.push(`/admin/blog/${newPost.id}`)
-      onSave?.()
+      queryClient.invalidateQueries({ queryKey: ['blog', 'posts'] });
+      toast.success('Bài viết đã được tạo thành công');
+      router.push(`/admin/blog/${newPost.id}`);
+      onSave?.();
     },
     onError: (error: Error | unknown) => {
-      const message = error instanceof Error ? error.message : 'Không thể tạo bài viết'
-      toast.error(message)
+      const message = error instanceof Error ? error.message : 'Không thể tạo bài viết';
+      toast.error(message);
     },
-  })
+  });
 
   const updateMutation = useMutation({
     mutationFn: (data: BlogPostFormData) =>
@@ -144,34 +144,34 @@ export function BlogEditor({ postId, onSave, onCancel }: BlogEditorProps) {
         isPublished: data.isPublished,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['blog', 'post', postId] })
-      queryClient.invalidateQueries({ queryKey: ['blog', 'posts'] })
-      toast.success('Bài viết đã được cập nhật thành công')
-      onSave?.()
+      queryClient.invalidateQueries({ queryKey: ['blog', 'post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['blog', 'posts'] });
+      toast.success('Bài viết đã được cập nhật thành công');
+      onSave?.();
     },
     onError: (error: Error | unknown) => {
-      const message = error instanceof Error ? error.message : 'Không thể cập nhật bài viết'
-      toast.error(message)
+      const message = error instanceof Error ? error.message : 'Không thể cập nhật bài viết';
+      toast.error(message);
     },
-  })
+  });
 
   if (isEditing && isLoadingPost) {
-    return <div className="text-wds-text/70">Đang tải...</div>
+    return <div className="text-wds-text/70">Đang tải...</div>;
   }
 
   if (isEditing && !post) {
-    return <div className="text-wds-text/70">Không tìm thấy bài viết</div>
+    return <div className="text-wds-text/70">Không tìm thấy bài viết</div>;
   }
 
   const onSubmit = (data: BlogPostFormData) => {
     if (isEditing) {
-      updateMutation.mutate(data)
+      updateMutation.mutate(data);
     } else {
-      createMutation.mutate(data)
+      createMutation.mutate(data);
     }
-  }
+  };
 
-  const isLoading = isSubmitting || createMutation.isPending || updateMutation.isPending
+  const isLoading = isSubmitting || createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="border-wds-accent/30 bg-wds-background space-y-4 rounded-2xl border p-6">
@@ -333,5 +333,5 @@ export function BlogEditor({ postId, onSave, onCancel }: BlogEditorProps) {
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Code, Cpu, Globe, Handshake, Layers, MessageSquare, Zap } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { Code, Cpu, Globe, Handshake, Layers, MessageSquare, Zap } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 export interface StrategicPartner {
-  id: number
-  name: string
-  category: string
-  icon: ReactNode
+  id: number;
+  name: string;
+  category: string;
+  icon: ReactNode;
 }
 
 export interface CommunityPartner {
-  id: number
-  name: string
-  category: string
-  icon: ReactNode
+  id: number;
+  name: string;
+  category: string;
+  icon: ReactNode;
 }
 
 export interface MediaPartner {
-  id: number
-  name: string
-  icon: ReactNode
+  id: number;
+  name: string;
+  icon: ReactNode;
 }
 
 export const STRATEGIC_PARTNERS: StrategicPartner[] = [
@@ -62,7 +62,7 @@ export const STRATEGIC_PARTNERS: StrategicPartner[] = [
     category: 'Community',
     icon: <Cpu size={40} />,
   },
-]
+];
 
 export const COMMUNITY_PARTNERS: CommunityPartner[] = [
   {
@@ -89,7 +89,7 @@ export const COMMUNITY_PARTNERS: CommunityPartner[] = [
     category: 'University',
     icon: <Handshake size={32} />,
   },
-]
+];
 
 export const MEDIA_PARTNERS: MediaPartner[] = [
   {
@@ -112,4 +112,4 @@ export const MEDIA_PARTNERS: MediaPartner[] = [
     name: 'Designer Viet',
     icon: <Layers size={24} />,
   },
-]
+];

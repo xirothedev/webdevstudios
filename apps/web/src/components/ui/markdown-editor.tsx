@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import * as Dialog from '@radix-ui/react-dialog'
-import CodeBlock from '@tiptap/extension-code-block'
-import Link from '@tiptap/extension-link'
-import Placeholder from '@tiptap/extension-placeholder'
-import { Markdown } from '@tiptap/markdown'
-import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
+import * as Dialog from '@radix-ui/react-dialog';
+import CodeBlock from '@tiptap/extension-code-block';
+import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
+import { Markdown } from '@tiptap/markdown';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
   Code,
@@ -42,29 +42,29 @@ import {
   Redo,
   Undo,
   X,
-} from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
-export type MarkdownEditorTheme = 'light' | 'dark'
+export type MarkdownEditorTheme = 'light' | 'dark';
 
 interface MarkdownEditorThemeConfig {
-  container: string
-  toolbar: string
-  toolbarDivider: string
+  container: string;
+  toolbar: string;
+  toolbarDivider: string;
   toolbarButton: {
-    base: string
-    active: string
-    inactive: string
-  }
+    base: string;
+    active: string;
+    inactive: string;
+  };
   editor: {
-    container: string
-    content: string
-  }
-  placeholder: string
+    container: string;
+    content: string;
+  };
+  placeholder: string;
 }
 
 const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
@@ -102,16 +102,16 @@ const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
     },
     placeholder: 'text-gray-400',
   },
-}
+};
 
 export interface MarkdownEditorProps {
-  value: string
-  onChange: (value: string) => void
-  disabled?: boolean
-  placeholder?: string
-  theme?: MarkdownEditorTheme
-  minHeight?: string
-  className?: string
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+  theme?: MarkdownEditorTheme;
+  minHeight?: string;
+  className?: string;
 }
 
 /**
@@ -137,12 +137,12 @@ export function MarkdownEditor({
   minHeight = '300px',
   className,
 }: MarkdownEditorProps) {
-  const isUpdatingFromProp = useRef(false)
-  const themeConfig = themeConfigs[theme]
-  const [linkDialogOpen, setLinkDialogOpen] = useState(false)
-  const [linkUrl, setLinkUrl] = useState('')
-  const [codeBlockDialogOpen, setCodeBlockDialogOpen] = useState(false)
-  const [codeBlockLanguage, setCodeBlockLanguage] = useState('')
+  const isUpdatingFromProp = useRef(false);
+  const themeConfig = themeConfigs[theme];
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [codeBlockDialogOpen, setCodeBlockDialogOpen] = useState(false);
+  const [codeBlockLanguage, setCodeBlockLanguage] = useState('');
 
   // Common programming languages
   const codeLanguages = [
@@ -171,7 +171,7 @@ export function MarkdownEditor({
     { value: 'sql', label: 'SQL' },
     { value: 'dockerfile', label: 'Dockerfile' },
     { value: 'nginx', label: 'Nginx' },
-  ]
+  ];
 
   const editor = useEditor({
     extensions: [
@@ -188,20 +188,20 @@ export function MarkdownEditor({
                 const lang =
                   element.getAttribute('data-language') ||
                   element.getAttribute('class')?.match(/language-(\w+)/)?.[1] ||
-                  null
-                return lang
+                  null;
+                return lang;
               },
               renderHTML: (attributes) => {
                 if (!attributes.language) {
-                  return {}
+                  return {};
                 }
                 return {
                   'data-language': attributes.language,
                   class: `language-${attributes.language}`,
-                }
+                };
               },
             },
-          }
+          };
         },
       }).configure({
         HTMLAttributes: {
@@ -227,11 +227,11 @@ export function MarkdownEditor({
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       if (isUpdatingFromProp.current) {
-        return
+        return;
       }
       if (editor.markdown) {
-        const markdown = editor.markdown.serialize(editor.getJSON())
-        onChange(markdown)
+        const markdown = editor.markdown.serialize(editor.getJSON());
+        onChange(markdown);
       }
     },
     editorProps: {
@@ -239,87 +239,87 @@ export function MarkdownEditor({
         class: 'prose prose-invert max-w-none focus:outline-none',
       },
     },
-  })
+  });
 
   // Update editor content when value prop changes
   useEffect(() => {
     if (editor && value !== undefined && editor.markdown) {
-      const currentMarkdown = editor.markdown.serialize(editor.getJSON())
+      const currentMarkdown = editor.markdown.serialize(editor.getJSON());
       if (currentMarkdown !== value) {
-        isUpdatingFromProp.current = true
+        isUpdatingFromProp.current = true;
         editor.commands.setContent(value || '', {
           contentType: 'markdown',
-        })
+        });
         // Reset flag after a short delay to allow update to complete
         setTimeout(() => {
-          isUpdatingFromProp.current = false
-        }, 0)
+          isUpdatingFromProp.current = false;
+        }, 0);
       }
     }
-  }, [value, editor])
+  }, [value, editor]);
 
   if (!editor) {
-    return null
+    return null;
   }
 
   const getButtonClassName = (isActive: boolean) => {
     return cn(
       themeConfig.toolbarButton.base,
       isActive ? themeConfig.toolbarButton.active : themeConfig.toolbarButton.inactive,
-    )
-  }
+    );
+  };
 
   const handleLinkClick = () => {
-    if (!editor) return
+    if (!editor) return;
 
-    const { from, to } = editor.state.selection
-    const attrs = editor.getAttributes('link')
+    const { from, to } = editor.state.selection;
+    const attrs = editor.getAttributes('link');
 
     if (attrs.href) {
       // Editing existing link
-      setLinkUrl(attrs.href)
+      setLinkUrl(attrs.href);
     } else {
       // Creating new link - check if there's selected text
-      const selectedText = editor.state.doc.textBetween(from, to)
-      setLinkUrl(selectedText.startsWith('http') ? selectedText : '')
+      const selectedText = editor.state.doc.textBetween(from, to);
+      setLinkUrl(selectedText.startsWith('http') ? selectedText : '');
     }
 
-    setLinkDialogOpen(true)
-  }
+    setLinkDialogOpen(true);
+  };
 
   const handleLinkSubmit = () => {
-    if (!editor || !linkUrl.trim()) return
+    if (!editor || !linkUrl.trim()) return;
 
-    const trimmedUrl = linkUrl.trim()
+    const trimmedUrl = linkUrl.trim();
     if (!trimmedUrl) {
-      setLinkDialogOpen(false)
-      return
+      setLinkDialogOpen(false);
+      return;
     }
 
     // Add protocol if missing
-    const urlWithProtocol = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`
+    const urlWithProtocol = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
 
-    editor.chain().focus().setLink({ href: urlWithProtocol }).run()
-    setLinkDialogOpen(false)
-    setLinkUrl('')
-  }
+    editor.chain().focus().setLink({ href: urlWithProtocol }).run();
+    setLinkDialogOpen(false);
+    setLinkUrl('');
+  };
 
   const handleRemoveLink = () => {
-    if (!editor) return
-    editor.chain().focus().unsetLink().run()
-    setLinkDialogOpen(false)
-    setLinkUrl('')
-  }
+    if (!editor) return;
+    editor.chain().focus().unsetLink().run();
+    setLinkDialogOpen(false);
+    setLinkUrl('');
+  };
 
   const handleLinkDialogOpenChange = (open: boolean) => {
-    setLinkDialogOpen(open)
+    setLinkDialogOpen(open);
     if (!open) {
-      setLinkUrl('')
+      setLinkUrl('');
     }
-  }
+  };
 
   const handleCodeBlockSubmit = () => {
-    if (!editor) return
+    if (!editor) return;
 
     if (editor.isActive('codeBlock')) {
       // Update existing code block language
@@ -329,7 +329,7 @@ export function MarkdownEditor({
         .updateAttributes('codeBlock', {
           language: codeBlockLanguage || null,
         })
-        .run()
+        .run();
     } else {
       // Insert new code block
       if (codeBlockLanguage) {
@@ -340,15 +340,15 @@ export function MarkdownEditor({
           .updateAttributes('codeBlock', {
             language: codeBlockLanguage,
           })
-          .run()
+          .run();
       } else {
-        editor.chain().focus().toggleCodeBlock().run()
+        editor.chain().focus().toggleCodeBlock().run();
       }
     }
 
-    setCodeBlockDialogOpen(false)
-    setCodeBlockLanguage('')
-  }
+    setCodeBlockDialogOpen(false);
+    setCodeBlockLanguage('');
+  };
 
   return (
     <div className={cn(themeConfig.container, className)}>
@@ -452,12 +452,12 @@ export function MarkdownEditor({
               size="sm"
               onClick={() => {
                 if (editor.isActive('codeBlock')) {
-                  const attrs = editor.getAttributes('codeBlock')
-                  setCodeBlockLanguage(attrs.language || '')
-                  setCodeBlockDialogOpen(true)
+                  const attrs = editor.getAttributes('codeBlock');
+                  setCodeBlockLanguage(attrs.language || '');
+                  setCodeBlockDialogOpen(true);
                 } else {
-                  setCodeBlockLanguage('')
-                  setCodeBlockDialogOpen(true)
+                  setCodeBlockLanguage('');
+                  setCodeBlockDialogOpen(true);
                 }
               }}
               disabled={disabled}
@@ -510,11 +510,11 @@ export function MarkdownEditor({
                     onChange={(e) => setCodeBlockLanguage(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        e.preventDefault()
-                        handleCodeBlockSubmit()
+                        e.preventDefault();
+                        handleCodeBlockSubmit();
                       }
                       if (e.key === 'Escape') {
-                        setCodeBlockDialogOpen(false)
+                        setCodeBlockDialogOpen(false);
                       }
                     }}
                     className={cn(
@@ -636,11 +636,11 @@ export function MarkdownEditor({
                     onChange={(e) => setLinkUrl(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        e.preventDefault()
-                        handleLinkSubmit()
+                        e.preventDefault();
+                        handleLinkSubmit();
                       }
                       if (e.key === 'Escape') {
-                        setLinkDialogOpen(false)
+                        setLinkDialogOpen(false);
                       }
                     }}
                     placeholder="https://example.com"
@@ -747,5 +747,5 @@ export function MarkdownEditor({
         />
       </div>
     </div>
-  )
+  );
 }

@@ -20,41 +20,41 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Edit2, Star } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Edit2, Star } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { useCreateReview, useProductReviews } from '@/lib/api/hooks/use-reviews'
-import { ProductSlug } from '@/lib/api/products'
+import { Button } from '@/components/ui/button';
+import { useCreateReview, useProductReviews } from '@/lib/api/hooks/use-reviews';
+import { ProductSlug } from '@/lib/api/products';
 
-import { ReviewEditForm } from './ReviewEditForm'
+import { ReviewEditForm } from './ReviewEditForm';
 
 interface ReviewFormProps {
-  productSlug: ProductSlug
-  currentUserId?: string
-  onSuccess?: () => void
+  productSlug: ProductSlug;
+  currentUserId?: string;
+  onSuccess?: () => void;
 }
 
 export function ReviewForm({ productSlug, currentUserId, onSuccess }: ReviewFormProps) {
-  const [rating, setRating] = useState(5)
-  const [comment, setComment] = useState('')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Check if user has already reviewed
-  const { data: reviewsData } = useProductReviews(productSlug, 1, 100)
+  const { data: reviewsData } = useProductReviews(productSlug, 1, 100);
   const existingReview = useMemo(() => {
-    if (!currentUserId || !reviewsData) return null
-    return reviewsData.reviews.find((review) => review.userId === currentUserId)
-  }, [currentUserId, reviewsData])
+    if (!currentUserId || !reviewsData) return null;
+    return reviewsData.reviews.find((review) => review.userId === currentUserId);
+  }, [currentUserId, reviewsData]);
 
-  const createReviewMutation = useCreateReview(productSlug)
+  const createReviewMutation = useCreateReview(productSlug);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrorMessage(null)
+    e.preventDefault();
+    setErrorMessage(null);
 
     createReviewMutation.mutate(
       {
@@ -64,32 +64,32 @@ export function ReviewForm({ productSlug, currentUserId, onSuccess }: ReviewForm
       {
         onSuccess: () => {
           // Reset form
-          setComment('')
-          setRating(5)
-          setErrorMessage(null)
+          setComment('');
+          setRating(5);
+          setErrorMessage(null);
           // Call onSuccess callback if provided
           if (onSuccess) {
-            onSuccess()
+            onSuccess();
           }
         },
         onError: (error: unknown) => {
           // Handle different error types
           if (error && typeof error === 'object' && 'message' in error) {
-            const message = (error as { message: string }).message
+            const message = (error as { message: string }).message;
             if (message.includes('purchase') || message.includes('must purchase')) {
-              setErrorMessage('Bạn cần mua sản phẩm này trước khi đánh giá.')
+              setErrorMessage('Bạn cần mua sản phẩm này trước khi đánh giá.');
             } else if (message.includes('already reviewed') || message.includes('Conflict')) {
-              setErrorMessage('Bạn đã đánh giá sản phẩm này rồi.')
+              setErrorMessage('Bạn đã đánh giá sản phẩm này rồi.');
             } else {
-              setErrorMessage(message)
+              setErrorMessage(message);
             }
           } else {
-            setErrorMessage('Không thể gửi đánh giá. Vui lòng thử lại.')
+            setErrorMessage('Không thể gửi đánh giá. Vui lòng thử lại.');
           }
         },
       },
-    )
-  }
+    );
+  };
 
   // If user has already reviewed, show edit option
   if (existingReview && !isEditing) {
@@ -110,7 +110,7 @@ export function ReviewForm({ productSlug, currentUserId, onSuccess }: ReviewForm
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   if (existingReview && isEditing) {
@@ -119,13 +119,13 @@ export function ReviewForm({ productSlug, currentUserId, onSuccess }: ReviewForm
         review={existingReview}
         onCancel={() => setIsEditing(false)}
         onSuccess={() => {
-          setIsEditing(false)
+          setIsEditing(false);
           if (onSuccess) {
-            onSuccess()
+            onSuccess();
           }
         }}
       />
-    )
+    );
   }
 
   return (
@@ -184,5 +184,5 @@ export function ReviewForm({ productSlug, currentUserId, onSuccess }: ReviewForm
         {createReviewMutation.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
       </Button>
     </form>
-  )
+  );
 }

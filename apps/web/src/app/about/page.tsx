@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { WDSAboutHero } from '@/components/wds/AboutHero'
-import { WDSAboutSections } from '@/components/wds/AboutSections'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { WDSAboutHero } from '@/components/wds/AboutHero';
+import { WDSAboutSections } from '@/components/wds/AboutSections';
 
 export default function AboutPage() {
   return (
@@ -33,5 +33,5 @@ export default function AboutPage() {
       <WDSAboutSections />
       <Footer variant="light" />
     </div>
-  )
+  );
 }

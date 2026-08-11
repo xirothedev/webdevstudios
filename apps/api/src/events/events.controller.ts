@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { EventType, UserRole } from '@generated/prisma'
+import { EventType, UserRole } from '@generated/prisma';
 import {
   Body,
   Controller,
@@ -32,8 +32,8 @@ import {
   Query,
   Request,
   UseGuards,
-} from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -41,17 +41,17 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger'
+} from '@nestjs/swagger';
 
-import { parseISO } from 'date-fns'
-import { Public, Roles } from '@/common/decorators'
-import { RolesGuard } from '@/common/guards'
-import { CreateEventCommand } from './commands/create-event'
-import { DeleteEventCommand } from './commands/delete-event'
-import { UpdateEventCommand } from './commands/update-event'
-import { CreateEventDto, EventDto, UpdateEventDto } from './dtos'
-import { GetEventByIdQuery } from './queries/get-event-by-id'
-import { ListEventsQuery } from './queries/list-events'
+import { parseISO } from 'date-fns';
+import { Public, Roles } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CreateEventCommand } from './commands/create-event';
+import { DeleteEventCommand } from './commands/delete-event';
+import { UpdateEventCommand } from './commands/update-event';
+import { CreateEventDto, EventDto, UpdateEventDto } from './dtos';
+import { GetEventByIdQuery } from './queries/get-event-by-id';
+import { ListEventsQuery } from './queries/list-events';
 
 @ApiTags('Events')
 @Controller('events')
@@ -93,7 +93,7 @@ export class EventsController {
     @Query('endDate') endDate?: string,
     @Query('types') types?: string,
   ) {
-    const eventTypes = types ? (types.split(',') as EventType[]) : undefined
+    const eventTypes = types ? (types.split(',') as EventType[]) : undefined;
 
     const events = await this.queryBus.execute(
       new ListEventsQuery(
@@ -101,9 +101,9 @@ export class EventsController {
         endDate ? parseISO(endDate) : undefined,
         eventTypes,
       ),
-    )
+    );
 
-    return events.map(EventDto.fromEntity)
+    return events.map(EventDto.fromEntity);
   }
 
   @Get(':id')
@@ -120,8 +120,8 @@ export class EventsController {
   })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async getEventById(@Param('id') id: string) {
-    const event = await this.queryBus.execute(new GetEventByIdQuery(id))
-    return EventDto.fromEntity(event)
+    const event = await this.queryBus.execute(new GetEventByIdQuery(id));
+    return EventDto.fromEntity(event);
   }
 
   @Post()
@@ -152,9 +152,9 @@ export class EventsController {
         dto.surveyLink,
         req.user?.id,
       ),
-    )
+    );
 
-    return EventDto.fromEntity(event)
+    return EventDto.fromEntity(event);
   }
 
   @Patch(':id')
@@ -187,9 +187,9 @@ export class EventsController {
         dto.attendees,
         dto.surveyLink,
       ),
-    )
+    );
 
-    return EventDto.fromEntity(event)
+    return EventDto.fromEntity(event);
   }
 
   @Delete(':id')
@@ -209,7 +209,7 @@ export class EventsController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async deleteEvent(@Param('id') id: string) {
-    const event = await this.commandBus.execute(new DeleteEventCommand(id))
-    return EventDto.fromEntity(event)
+    const event = await this.commandBus.execute(new DeleteEventCommand(id));
+    return EventDto.fromEntity(event);
   }
 }

@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { INestApplication } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
-import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
-import cookieParser from 'cookie-parser'
-import type { App } from 'supertest/types'
+import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import cookieParser from 'cookie-parser';
+import type { App } from 'supertest/types';
 
-import { AppModule } from '../src/app.module'
-import { TokenStorageService } from '../src/auth/infrastructure/token-storage.service'
-import { PrismaService } from '../src/prisma/prisma.service'
-import { RedisService } from '../src/redis/redis.service'
+import { AppModule } from '../src/app.module';
+import { TokenStorageService } from '../src/auth/infrastructure/token-storage.service';
+import { PrismaService } from '../src/prisma/prisma.service';
+import { RedisService } from '../src/redis/redis.service';
 
 Object.assign(process.env, {
   CSRF_SECRET: 'test-csrf-secret',
@@ -59,7 +59,7 @@ Object.assign(process.env, {
   SESSION_SECRET: 'test-session-secret',
   SWAGGER_PASSWORD: 'test-swagger-password',
   SWAGGER_USERNAME: 'test-swagger-user',
-})
+});
 
 const redisServiceMock = {
   exists: async () => 0,
@@ -67,7 +67,7 @@ const redisServiceMock = {
   incr: async () => 1,
   set: async () => undefined,
   ttl: async () => 1,
-}
+};
 
 const prismaServiceMock = {
   $connect: async () => undefined,
@@ -75,7 +75,7 @@ const prismaServiceMock = {
   order: {
     findMany: async () => [],
   },
-}
+};
 
 const tokenStorageServiceMock = {
   deleteEmailVerificationToken: async () => undefined,
@@ -87,11 +87,11 @@ const tokenStorageServiceMock = {
   storeEmailVerificationToken: async () => undefined,
   storePasswordResetToken: async () => undefined,
   storeSessionMfaVerified: async () => undefined,
-}
+};
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App> | undefined
-  let baseUrl: string | undefined
+  let app: INestApplication<App> | undefined;
+  let baseUrl: string | undefined;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -103,30 +103,30 @@ describe('AppController (e2e)', () => {
       .useValue(redisServiceMock)
       .overrideProvider(TokenStorageService)
       .useValue(tokenStorageServiceMock)
-      .compile()
+      .compile();
 
-    app = moduleFixture.createNestApplication()
-    app.use(cookieParser())
-    await app.init()
-    const port = 45000 + (process.pid % 10000)
-    await app.listen(port, '127.0.0.1')
-    baseUrl = `http://127.0.0.1:${port}`
-  })
+    app = moduleFixture.createNestApplication();
+    app.use(cookieParser());
+    await app.init();
+    const port = 45000 + (process.pid % 10000);
+    await app.listen(port, '127.0.0.1');
+    baseUrl = `http://127.0.0.1:${port}`;
+  });
 
   afterEach(async () => {
-    await app?.close()
-  })
+    await app?.close();
+  });
 
   it('/csrf-token (GET)', async () => {
     if (!baseUrl) {
-      throw new Error('Nest application failed to initialize')
+      throw new Error('Nest application failed to initialize');
     }
 
-    const response = await fetch(`${baseUrl}/csrf-token`)
-    const body = (await response.json()) as { csrfToken?: unknown }
+    const response = await fetch(`${baseUrl}/csrf-token`);
+    const body = (await response.json()) as { csrfToken?: unknown };
 
-    expect(response.status).toBe(200)
-    expect(typeof body.csrfToken).toBe('string')
-    expect((body.csrfToken as string).length).toBeGreaterThan(0)
-  })
-})
+    expect(response.status).toBe(200);
+    expect(typeof body.csrfToken).toBe('string');
+    expect((body.csrfToken as string).length).toBeGreaterThan(0);
+  });
+});

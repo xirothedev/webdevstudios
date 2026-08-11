@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'nestjs-cqrs-pattern-guide',
@@ -100,4 +100,4 @@ CQRS is a powerful pattern that can significantly improve your application's arc
   metaDescription:
     'Learn how to implement the CQRS pattern in NestJS to build scalable and maintainable applications with clear separation of concerns.',
   isPublished: true,
-}
+};

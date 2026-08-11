@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Package } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { Package } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 
 export function OrdersEmpty() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="flex flex-col items-center justify-center py-20">
@@ -46,5 +46,5 @@ export function OrdersEmpty() {
         Tiếp tục mua sắm
       </Button>
     </div>
-  )
+  );
 }

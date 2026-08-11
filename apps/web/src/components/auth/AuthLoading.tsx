@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react';
 
 export function AuthLoading() {
   return (
@@ -30,5 +30,5 @@ export function AuthLoading() {
         <p className="text-sm text-white/80">Đang tải...</p>
       </div>
     </div>
-  )
+  );
 }

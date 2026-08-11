@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { motion } from 'motion/react'
+import { motion } from 'motion/react';
 
-import type { CommunityPartner, MediaPartner, StrategicPartner } from '@/data/partners'
+import type { CommunityPartner, MediaPartner, StrategicPartner } from '@/data/partners';
 
 interface PartnerCardProps {
-  partner: StrategicPartner | CommunityPartner | MediaPartner
-  size?: 'lg' | 'md' | 'sm'
+  partner: StrategicPartner | CommunityPartner | MediaPartner;
+  size?: 'lg' | 'md' | 'sm';
 }
 
 export function PartnerCard({ partner, size = 'md' }: PartnerCardProps) {
@@ -36,13 +36,13 @@ export function PartnerCard({ partner, size = 'md' }: PartnerCardProps) {
     lg: 'h-40 p-8 md:h-48',
     md: 'h-32 p-6',
     sm: 'h-24 p-4',
-  }
+  };
 
   const iconSizes = {
     lg: 'scale-125',
     md: 'scale-100',
     sm: 'scale-75',
-  }
+  };
 
   return (
     <motion.div
@@ -72,5 +72,5 @@ export function PartnerCard({ partner, size = 'md' }: PartnerCardProps) {
         </div>
       )}
     </motion.div>
-  )
+  );
 }

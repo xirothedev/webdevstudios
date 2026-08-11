@@ -21,17 +21,17 @@
  */
 
 export interface TeamMember {
-  id: string
-  name: string
-  role: string
-  avatar?: string
-  isLeader?: boolean
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+  isLeader?: boolean;
 }
 
 export interface Generation {
-  gen: number
-  period: string
-  members: TeamMember[]
+  gen: number;
+  period: string;
+  members: TeamMember[];
 }
 
 export const generations: Generation[] = [
@@ -386,7 +386,7 @@ export const generations: Generation[] = [
       },
     ],
   },
-]
+];
 
 // Helper function to get initials from name
 export const getInitials = (name: string) => {
@@ -395,5 +395,5 @@ export const getInitials = (name: string) => {
     .map((n) => n[0])
     .join('')
     .toUpperCase()
-    .slice(0, 2)
-}
+    .slice(0, 2);
+};

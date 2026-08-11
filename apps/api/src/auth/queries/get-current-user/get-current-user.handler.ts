@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '../../infrastructure'
-import { GetCurrentUserQuery } from './get-current-user.query'
+import { UserRepository } from '../../infrastructure';
+import { GetCurrentUserQuery } from './get-current-user.query';
 
 @Injectable()
 @QueryHandler(GetCurrentUserQuery)
@@ -32,11 +32,11 @@ export class GetCurrentUserHandler implements IQueryHandler<GetCurrentUserQuery>
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: GetCurrentUserQuery) {
-    const { userId } = query
+    const { userId } = query;
 
-    const user = await this.userRepository.findById(userId)
+    const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new NotFoundException('User not found')
+      throw new NotFoundException('User not found');
     }
 
     return {
@@ -51,6 +51,6 @@ export class GetCurrentUserHandler implements IQueryHandler<GetCurrentUserQuery>
       mfaEnabled: user.mfaEnabled,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-    }
+    };
   }
 }

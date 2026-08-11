@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { type LucideIcon } from 'lucide-react'
+import { type LucideIcon } from 'lucide-react';
 
-import { AccountHero } from '@/components/account/AccountHero'
-import { AccountSidebar } from '@/components/account/AccountSidebar'
-import { AvatarUpload } from '@/components/account/AvatarUpload'
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { useUserProfile } from '@/lib/api/hooks/use-user'
+import { AccountHero } from '@/components/account/AccountHero';
+import { AccountSidebar } from '@/components/account/AccountSidebar';
+import { AvatarUpload } from '@/components/account/AvatarUpload';
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { useUserProfile } from '@/lib/api/hooks/use-user';
 
 interface AccountLayoutProps {
-  title: string
-  description: string
-  icon: LucideIcon
-  label: string
-  children: React.ReactNode
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  label: string;
+  children: React.ReactNode;
   error?: {
-    title: string
-    message: string
-  }
+    title: string;
+    message: string;
+  };
 }
 
 export function AccountLayout({
@@ -51,7 +51,7 @@ export function AccountLayout({
   children,
   error,
 }: AccountLayoutProps) {
-  const { data: user } = useUserProfile()
+  const { data: user } = useUserProfile();
 
   if (error) {
     return (
@@ -65,7 +65,7 @@ export function AccountLayout({
         </div>
         <Footer variant="light" />
       </div>
-    )
+    );
   }
 
   return (
@@ -97,5 +97,5 @@ export function AccountLayout({
       </section>
       <Footer variant="light" />
     </div>
-  )
+  );
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'getting-started-with-nextjs-16',
@@ -87,4 +87,4 @@ Next.js 16 is a significant step forward for the framework. Start exploring thes
   metaDescription:
     'Learn how to get started with Next.js 16, including new features like Server Components, enhanced caching, and improved developer experience.',
   isPublished: true,
-}
+};

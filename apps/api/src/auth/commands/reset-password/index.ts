@@ -1,2 +1,2 @@
-export * from './reset-password.command'
-export * from './reset-password.handler'
+export * from './reset-password.command';
+export * from './reset-password.handler';

@@ -20,48 +20,48 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Edit2, Star, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { Edit2, Star, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { useDeleteReview } from '@/lib/api/hooks/use-reviews'
-import { Review } from '@/lib/api/reviews'
+import { Button } from '@/components/ui/button';
+import { useDeleteReview } from '@/lib/api/hooks/use-reviews';
+import { Review } from '@/lib/api/reviews';
 
-import { DeleteReviewDialog } from './DeleteReviewDialog'
-import { ReviewEditForm } from './ReviewEditForm'
+import { DeleteReviewDialog } from './DeleteReviewDialog';
+import { ReviewEditForm } from './ReviewEditForm';
 
 interface ReviewItemProps {
-  review: Review
-  currentUserId?: string
-  currentUserRole?: string
+  review: Review;
+  currentUserId?: string;
+  currentUserRole?: string;
 }
 
 export function ReviewItem({ review, currentUserId, currentUserRole }: ReviewItemProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const deleteReviewMutation = useDeleteReview()
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const deleteReviewMutation = useDeleteReview();
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    })
-  }
+    });
+  };
 
-  const canEdit = currentUserId === review.userId
-  const canDelete = currentUserRole === 'ADMIN'
+  const canEdit = currentUserId === review.userId;
+  const canDelete = currentUserRole === 'ADMIN';
 
   const handleEditSuccess = () => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleDelete = () => {
-    setShowDeleteDialog(true)
-  }
+    setShowDeleteDialog(true);
+  };
 
   if (isEditing) {
     return (
@@ -70,7 +70,7 @@ export function ReviewItem({ review, currentUserId, currentUserRole }: ReviewIte
         onCancel={() => setIsEditing(false)}
         onSuccess={handleEditSuccess}
       />
-    )
+    );
   }
 
   return (
@@ -146,13 +146,13 @@ export function ReviewItem({ review, currentUserId, currentUserRole }: ReviewIte
           onConfirm={() => {
             deleteReviewMutation.mutate(review.id, {
               onSuccess: () => {
-                setShowDeleteDialog(false)
+                setShowDeleteDialog(false);
               },
-            })
+            });
           }}
           isDeleting={deleteReviewMutation.isPending}
         />
       )}
     </>
-  )
+  );
 }

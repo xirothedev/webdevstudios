@@ -1,2 +1,2 @@
-export * from './security-logging.interceptor'
-export * from './transform.interceptor'
+export * from './security-logging.interceptor';
+export * from './transform.interceptor';

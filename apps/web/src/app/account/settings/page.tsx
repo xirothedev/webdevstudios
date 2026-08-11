@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Settings } from 'lucide-react'
+import { Settings } from 'lucide-react';
 
-import { AccountLayout } from '@/components/account/AccountLayout'
-import { ProfileLoading } from '@/components/account/ProfileLoading'
-import { SettingsContent } from '@/components/account/SettingsContent'
-import { useUserProfile } from '@/lib/api/hooks/use-user'
+import { AccountLayout } from '@/components/account/AccountLayout';
+import { ProfileLoading } from '@/components/account/ProfileLoading';
+import { SettingsContent } from '@/components/account/SettingsContent';
+import { useUserProfile } from '@/lib/api/hooks/use-user';
 
 export default function SettingsPage() {
-  const { data: user, isLoading, error } = useUserProfile()
+  const { data: user, isLoading, error } = useUserProfile();
 
   if (isLoading) {
-    return <ProfileLoading />
+    return <ProfileLoading />;
   }
 
   if (error || !user) {
@@ -50,7 +50,7 @@ export default function SettingsPage() {
       >
         <div />
       </AccountLayout>
-    )
+    );
   }
 
   return (
@@ -62,5 +62,5 @@ export default function SettingsPage() {
     >
       <SettingsContent />
     </AccountLayout>
-  )
+  );
 }

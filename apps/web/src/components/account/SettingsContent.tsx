@@ -20,21 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { SecuritySettings } from '@/components/account/SecuritySettings'
-import { SessionsList } from '@/components/account/SessionsList'
-import { useUserProfile } from '@/lib/api/hooks/use-user'
+import { SecuritySettings } from '@/components/account/SecuritySettings';
+import { SessionsList } from '@/components/account/SessionsList';
+import { useUserProfile } from '@/lib/api/hooks/use-user';
 
 export function SettingsContent() {
-  const { data: user, isLoading, error } = useUserProfile()
+  const { data: user, isLoading, error } = useUserProfile();
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <p className="text-sm text-gray-600">Đang tải...</p>
       </div>
-    )
+    );
   }
 
   if (error || !user) {
@@ -43,7 +43,7 @@ export function SettingsContent() {
         <p className="text-sm font-semibold text-gray-900">Không thể tải thông tin cài đặt</p>
         <p className="text-xs text-gray-600">Vui lòng thử lại sau</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -71,5 +71,5 @@ export function SettingsContent() {
         <SessionsList />
       </div>
     </div>
-  )
+  );
 }

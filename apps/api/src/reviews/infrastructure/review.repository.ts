@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma'
-import { ReviewWithRelations } from '../review.types'
+import { PrismaService } from '@/prisma';
+import { ReviewWithRelations } from '../review.types';
 
 @Injectable()
 export class ReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
-    userId: string
-    productId: string
-    rating: number
-    comment?: string | null
+    userId: string;
+    productId: string;
+    rating: number;
+    comment?: string | null;
   }): Promise<ReviewWithRelations> {
     return this.prisma.review.create({
       data: {
@@ -57,7 +57,7 @@ export class ReviewRepository {
           },
         },
       },
-    })
+    });
   }
 
   async findById(id: string): Promise<ReviewWithRelations | null> {
@@ -78,7 +78,7 @@ export class ReviewRepository {
           },
         },
       },
-    })
+    });
   }
 
   async findByProductId(
@@ -86,7 +86,7 @@ export class ReviewRepository {
     page: number = 1,
     limit: number = 10,
   ): Promise<{ reviews: ReviewWithRelations[]; total: number }> {
-    const skip = (page - 1) * limit
+    const skip = (page - 1) * limit;
 
     const [reviews, total] = await Promise.all([
       this.prisma.review.findMany({
@@ -113,9 +113,9 @@ export class ReviewRepository {
       this.prisma.review.count({
         where: { productId },
       }),
-    ])
+    ]);
 
-    return { reviews, total }
+    return { reviews, total };
   }
 
   async findByUserAndProduct(userId: string, productId: string) {
@@ -124,7 +124,7 @@ export class ReviewRepository {
         userId,
         productId,
       },
-    })
+    });
   }
 
   async update(
@@ -149,7 +149,7 @@ export class ReviewRepository {
           },
         },
       },
-    })
+    });
   }
 
   async delete(id: string) {
@@ -162,29 +162,29 @@ export class ReviewRepository {
           },
         },
       },
-    })
+    });
   }
 
   async calculateProductRating(productId: string): Promise<{
-    ratingValue: number
-    ratingCount: number
+    ratingValue: number;
+    ratingCount: number;
   }> {
     const reviews = await this.prisma.review.findMany({
       where: { productId },
       select: { rating: true },
-    })
+    });
 
     if (reviews.length === 0) {
-      return { ratingValue: 0, ratingCount: 0 }
+      return { ratingValue: 0, ratingCount: 0 };
     }
 
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
-    const ratingValue = totalRating / reviews.length
-    const ratingCount = reviews.length
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const ratingValue = totalRating / reviews.length;
+    const ratingCount = reviews.length;
 
     return {
       ratingValue: Math.round(ratingValue * 100) / 100, // Round to 2 decimal places
       ratingCount,
-    }
+    };
   }
 }

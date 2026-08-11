@@ -20,39 +20,39 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ArrowLeft, Home, Search } from 'lucide-react'
-import { motion } from 'motion/react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { ArrowLeft, Home, Search } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 
 export default function NotFound() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [floatingElements, setFloatingElements] = useState<
     Array<{
-      initialX: number
-      initialY: number
-      animateX: number
-      animateY: number
-      duration: number
+      initialX: number;
+      initialY: number;
+      animateX: number;
+      animateY: number;
+      duration: number;
     }>
-  >([])
+  >([]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth) * 100,
         y: (e.clientY / window.innerHeight) * 100,
-      })
-    }
+      });
+    };
 
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     // Generate random positions only on client side
@@ -64,8 +64,8 @@ export default function NotFound() {
         animateY: Math.random() * 400 - 200,
         duration: 3 + Math.random() * 2,
       })),
-    )
-  }, [])
+    );
+  }, []);
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text relative min-h-screen overflow-hidden">
@@ -272,5 +272,5 @@ export default function NotFound() {
 
       <Footer />
     </div>
-  )
+  );
 }

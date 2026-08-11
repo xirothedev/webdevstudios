@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 
-import { CartContent } from './CartContent'
+import { CartContent } from './CartContent';
 
 export default function CartPage() {
   return (
@@ -36,5 +36,5 @@ export default function CartPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

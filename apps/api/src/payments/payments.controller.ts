@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { PaymentTransactionStatus, UserRole } from '@generated/prisma'
-import { Body, Controller, Get, Logger, Param, Post, Query, UseGuards } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { PaymentTransactionStatus, UserRole } from '@generated/prisma';
+import { Body, Controller, Get, Logger, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -31,25 +31,25 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger'
+} from '@nestjs/swagger';
 
-import { Public, Roles, ThrottleAPI, ThrottlePayment } from '@/common/decorators'
-import { RolesGuard } from '@/common/guards'
+import { Public, Roles, ThrottleAPI, ThrottlePayment } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
 
-import { CreatePaymentLinkCommand } from './commands/create-payment-link'
-import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook'
+import { CreatePaymentLinkCommand } from './commands/create-payment-link';
+import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook';
 import {
   CreatePaymentLinkRequestDto,
   PaymentLinkResponseDto,
   TransactionListResponseDto,
   WebhookDto,
-} from './dtos/payment.dto'
-import { ListTransactionsQuery } from './queries/list-transactions'
+} from './dtos/payment.dto';
+import { ListTransactionsQuery } from './queries/list-transactions';
 
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
-  private readonly logger = new Logger(PaymentsController.name)
+  private readonly logger = new Logger(PaymentsController.name);
 
   constructor(
     private readonly commandBus: CommandBus,
@@ -74,12 +74,12 @@ export class PaymentsController {
   async createPaymentLink(
     @Body() dto: CreatePaymentLinkRequestDto,
   ): Promise<PaymentLinkResponseDto> {
-    const result = await this.commandBus.execute(new CreatePaymentLinkCommand(dto.orderId))
+    const result = await this.commandBus.execute(new CreatePaymentLinkCommand(dto.orderId));
 
     return {
       paymentUrl: result.paymentUrl,
       transactionCode: result.transactionCode,
-    }
+    };
   }
 
   @Post('webhook')
@@ -95,51 +95,51 @@ export class PaymentsController {
   async handleWebhook(
     @Body()
     webhookData: {
-      code: string
-      desc: string
-      success: boolean
+      code: string;
+      desc: string;
+      success: boolean;
       data: {
-        orderCode: number | string
-        amount: number
-        description: string
-        accountNumber: string
-        reference: string
-        transactionDateTime: string
-        currency: string
-        paymentLinkId: string
-        code: string
-        desc: string
-        counterAccountBankId?: string
-        counterAccountBankName?: string
-        counterAccountName?: string
-        counterAccountNumber?: string
-        virtualAccountName?: string
-        virtualAccountNumber?: string
-      }
-      signature: string
+        orderCode: number | string;
+        amount: number;
+        description: string;
+        accountNumber: string;
+        reference: string;
+        transactionDateTime: string;
+        currency: string;
+        paymentLinkId: string;
+        code: string;
+        desc: string;
+        counterAccountBankId?: string;
+        counterAccountBankName?: string;
+        counterAccountName?: string;
+        counterAccountNumber?: string;
+        virtualAccountName?: string;
+        virtualAccountNumber?: string;
+      };
+      signature: string;
     },
   ): Promise<{ success: boolean }> {
     try {
       // PayOS webhook includes signature in the body
-      await this.commandBus.execute(new ProcessPaymentWebhookCommand(webhookData))
+      await this.commandBus.execute(new ProcessPaymentWebhookCommand(webhookData));
 
       this.logger.log(
         `Webhook processed successfully for paymentLinkId: ${webhookData.data?.paymentLinkId || 'unknown'}`,
-      )
+      );
 
-      return { success: true }
+      return { success: true };
     } catch (error) {
       // Log error but return 200 to PayOS to prevent retries for invalid webhooks
       // This is important for webhook URL verification
       this.logger.error(
         `Webhook processing failed: ${error instanceof Error ? error.message : String(error)}`,
         error instanceof Error ? error.stack : undefined,
-      )
+      );
 
       // For webhook URL verification, PayOS expects 200 response
       // Even if we can't process the webhook, we should return 200
       // to confirm the endpoint is reachable
-      return { success: false }
+      return { success: false };
     }
   }
 
@@ -159,7 +159,7 @@ export class PaymentsController {
   async verifyPayment(@Param('transactionCode') transactionCode: string) {
     // This can be implemented as a query if needed
     // For now, return basic info
-    return { transactionCode, message: 'Use order endpoint to check status' }
+    return { transactionCode, message: 'Use order endpoint to check status' };
   }
 
   @Get('transactions')
@@ -208,6 +208,6 @@ export class PaymentsController {
         limit ? parseInt(limit, 10) : 10,
         status as PaymentTransactionStatus | undefined,
       ),
-    )
+    );
   }
 }

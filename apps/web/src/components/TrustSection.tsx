@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { RefreshCw, ShieldCheck, Truck, Zap } from 'lucide-react'
+import { RefreshCw, ShieldCheck, Truck, Zap } from 'lucide-react';
 
 export function TrustSection() {
   const brands = [
@@ -30,14 +30,14 @@ export function TrustSection() {
     { icon: Truck, text: 'Giao hàng nhanh chóng' },
     { icon: RefreshCw, text: 'Đổi trả trong 7 ngày' },
     { icon: Zap, text: 'Hỗ trợ 24/7' },
-  ]
+  ];
 
   return (
     <section className="border-y border-white/5 bg-black/20 py-12">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-wrap items-center justify-center gap-8 md:justify-between md:gap-4">
           {brands.map((item, idx) => {
-            const Icon = item.icon
+            const Icon = item.icon;
             return (
               <div key={idx} className="group flex cursor-default items-center gap-3">
                 <div className="group-hover:bg-wds-accent/10 group-hover:text-wds-accent rounded-lg bg-white/5 p-2 text-white/70 transition-all duration-300">
@@ -47,10 +47,10 @@ export function TrustSection() {
                   {item.text}
                 </span>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }

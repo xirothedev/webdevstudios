@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import rehypeShiki from '@shikijs/rehype'
-import type { MDXComponents } from 'mdx/types'
-import { compileMDX } from 'next-mdx-remote/rsc'
-import remarkGfm from 'remark-gfm'
+import rehypeShiki from '@shikijs/rehype';
+import type { MDXComponents } from 'mdx/types';
+import { compileMDX } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
 
 /**
  * Compile markdown string to MDX component (RSC)
@@ -32,7 +32,7 @@ import remarkGfm from 'remark-gfm'
  */
 export async function compileMarkdownToMDX(markdown: string, components?: MDXComponents) {
   try {
-    console.log('compileMarkdownToMDX: Starting compilation, markdown length:', markdown.length)
+    console.log('compileMarkdownToMDX: Starting compilation, markdown length:', markdown.length);
 
     const { content } = await compileMDX({
       source: markdown,
@@ -50,19 +50,19 @@ export async function compileMarkdownToMDX(markdown: string, components?: MDXCom
           ],
         },
       },
-    })
+    });
 
-    console.log('compileMarkdownToMDX: Compilation successful')
+    console.log('compileMarkdownToMDX: Compilation successful');
 
-    return content
+    return content;
   } catch (error) {
-    console.error('Error compiling markdown to MDX:', error)
+    console.error('Error compiling markdown to MDX:', error);
     if (error instanceof Error) {
       console.error('Error details:', {
         message: error.message,
         stack: error.stack,
-      })
+      });
     }
-    throw error
+    throw error;
   }
 }

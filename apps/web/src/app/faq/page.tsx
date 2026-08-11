@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import Link from 'next/link'
+import Link from 'next/link';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { faqItems } from '@/data/faq'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { faqItems } from '@/data/faq';
 
 export default function FAQPage() {
   return (
@@ -105,5 +105,5 @@ export default function FAQPage() {
 
       <Footer variant="light" />
     </div>
-  )
+  );
 }

@@ -20,28 +20,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Calendar, Crown, Globe, Medal, Star, Target, Trophy } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { Calendar, Crown, Globe, Medal, Star, Target, Trophy } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 export interface StatItem {
-  id: number
-  label: string
-  value: string
-  icon: ReactNode
+  id: number;
+  label: string;
+  value: string;
+  icon: ReactNode;
 }
 
 export interface AwardItem {
-  id: number
-  title: string
-  rank: string
-  organizer: string
-  description: string
-  icon: ReactNode
+  id: number;
+  title: string;
+  rank: string;
+  organizer: string;
+  description: string;
+  icon: ReactNode;
 }
 
 export interface AwardYearGroup {
-  year: number
-  items: AwardItem[]
+  year: number;
+  items: AwardItem[];
 }
 
 export const STATS: StatItem[] = [
@@ -63,7 +63,7 @@ export const STATS: StatItem[] = [
     value: '50+',
     icon: <Target size={20} />,
   },
-]
+];
 
 export const AWARDS: AwardYearGroup[] = [
   {
@@ -117,4 +117,4 @@ export const AWARDS: AwardYearGroup[] = [
       },
     ],
   },
-]
+];

@@ -20,25 +20,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common'
-import { CqrsModule } from '@nestjs/cqrs'
+import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 
 // Commands
-import { UpdateProductHandler } from './commands/update-product'
-import { UpdateProductSizesHandler } from './commands/update-product-sizes'
-import { UpdateProductStockHandler } from './commands/update-product-stock'
+import { UpdateProductHandler } from './commands/update-product';
+import { UpdateProductSizesHandler } from './commands/update-product-sizes';
+import { UpdateProductStockHandler } from './commands/update-product-stock';
 // Repository
-import { ProductRepository } from './infrastructure/product.repository'
+import { ProductRepository } from './infrastructure/product.repository';
 // Controller
-import { ProductsController } from './products.controller'
+import { ProductsController } from './products.controller';
 // Queries
-import { GetProductBySlugHandler } from './queries/get-product-by-slug'
-import { GetProductStockHandler } from './queries/get-product-stock'
-import { ListProductsHandler } from './queries/list-products'
+import { GetProductBySlugHandler } from './queries/get-product-by-slug';
+import { GetProductStockHandler } from './queries/get-product-stock';
+import { ListProductsHandler } from './queries/list-products';
 
-const CommandHandlers = [UpdateProductHandler, UpdateProductStockHandler, UpdateProductSizesHandler]
+const CommandHandlers = [
+  UpdateProductHandler,
+  UpdateProductStockHandler,
+  UpdateProductSizesHandler,
+];
 
-const QueryHandlers = [GetProductBySlugHandler, GetProductStockHandler, ListProductsHandler]
+const QueryHandlers = [GetProductBySlugHandler, GetProductStockHandler, ListProductsHandler];
 
 @Module({
   imports: [CqrsModule],

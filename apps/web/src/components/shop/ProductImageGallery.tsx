@@ -20,21 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { AnimatePresence, motion } from 'motion/react'
-import Image from 'next/image'
-import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import { useState } from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 interface ProductImageGalleryProps {
-  images: Array<{ src: string; alt: string }>
-  badge?: string
+  images: Array<{ src: string; alt: string }>;
+  badge?: string;
 }
 
 export function ProductImageGallery({ images, badge }: ProductImageGalleryProps) {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   return (
     <motion.div
@@ -100,5 +100,5 @@ export function ProductImageGallery({ images, badge }: ProductImageGalleryProps)
         </div>
       )}
     </motion.div>
-  )
+  );
 }

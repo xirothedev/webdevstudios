@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'microservices-architecture-patterns',
@@ -96,4 +96,4 @@ Microservices require careful planning but offer great scalability.`,
   metaDescription:
     'Learn microservices architecture patterns, communication strategies, and best practices for scalable systems.',
   isPublished: true,
-}
+};

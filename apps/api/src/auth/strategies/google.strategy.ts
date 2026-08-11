@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OAuthProvider } from '@generated/prisma'
-import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { PassportStrategy } from '@nestjs/passport'
-import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20'
+import { OAuthProvider } from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -34,7 +34,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientSecret: configService.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
       callbackURL: configService.getOrThrow<string>('GOOGLE_CALLBACK_URL'),
       scope: ['email', 'profile'],
-    })
+    });
   }
 
   async validate(
@@ -43,12 +43,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: Profile,
     done: VerifyCallback,
   ): Promise<void> {
-    const { id, emails, name, photos } = profile
-    const email = emails?.[0]?.value || ''
+    const { id, emails, name, photos } = profile;
+    const email = emails?.[0]?.value || '';
     const userName =
       name?.givenName && name?.familyName
         ? `${name.givenName} ${name.familyName}`
-        : name?.givenName || name?.familyName || email
+        : name?.givenName || name?.familyName || email;
     const user = {
       provider: OAuthProvider.GOOGLE,
       providerId: id,
@@ -57,7 +57,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       picture: photos?.[0]?.value,
       accessToken,
       refreshToken,
-    }
-    done(null, user)
+    };
+    done(null, user);
   }
 }

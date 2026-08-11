@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { getMDXComponents } from '@/app/mdx-components'
-import { compileMarkdownToMDX } from '@/lib/mdx-compile'
+import { getMDXComponents } from '@/app/mdx-components';
+import { compileMarkdownToMDX } from '@/lib/mdx-compile';
 
 interface BlogPostContentMDXProps {
-  content: string
+  content: string;
 }
 
 /**
@@ -34,33 +34,33 @@ interface BlogPostContentMDXProps {
  */
 export async function BlogPostContentMDX({ content }: BlogPostContentMDXProps) {
   if (!content) {
-    console.warn('BlogPostContentMDX: No content provided')
-    return null
+    console.warn('BlogPostContentMDX: No content provided');
+    return null;
   }
 
   // Get MDX components before the try block (render-scope, not error path)
-  const components = getMDXComponents({})
+  const components = getMDXComponents({});
 
   try {
-    console.log('BlogPostContentMDX: Compiling content, length:', content.length)
+    console.log('BlogPostContentMDX: Compiling content, length:', content.length);
 
     // Compile markdown to MDX content (RSC) with components
-    const mdxContent = await compileMarkdownToMDX(content, components)
+    const mdxContent = await compileMarkdownToMDX(content, components);
 
-    console.log('BlogPostContentMDX: Compiled successfully')
+    console.log('BlogPostContentMDX: Compiled successfully');
 
     return (
       <div className="prose prose-invert max-w-none [&_pre]:bg-transparent! [&_pre]:text-inherit! [&_pre_code]:text-inherit!">
         {mdxContent}
       </div>
-    )
+    );
   } catch (error) {
-    console.error('BlogPostContentMDX: Error rendering content', error)
+    console.error('BlogPostContentMDX: Error rendering content', error);
     if (error instanceof Error) {
       console.error('Error details:', {
         message: error.message,
         stack: error.stack,
-      })
+      });
     }
     // Fallback: render plain text
     return (
@@ -79,6 +79,6 @@ export async function BlogPostContentMDX({ content }: BlogPostContentMDXProps) {
           </pre>
         </div>
       </div>
-    )
+    );
   }
 }

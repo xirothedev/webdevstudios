@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import { Minus, Plus } from 'lucide-react'
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Minus, Plus } from 'lucide-react';
 
-import { NumberTicker } from '@/components/ui/number-ticker'
-import { cn } from '@/lib/utils'
+import { NumberTicker } from '@/components/ui/number-ticker';
+import { cn } from '@/lib/utils';
 
 const quantitySelectorVariants = cva('flex items-center gap-2 rounded-lg border border-white/10', {
   variants: {
@@ -44,7 +44,7 @@ const quantitySelectorVariants = cva('flex items-center gap-2 rounded-lg border 
     variant: 'default',
     size: 'md',
   },
-})
+});
 
 const quantityButtonVariants = cva(
   'cursor-pointer text-white/70 transition-colors disabled:cursor-not-allowed disabled:opacity-30 hover:text-wds-accent',
@@ -65,17 +65,17 @@ const quantityButtonVariants = cva(
       size: 'md',
     },
   },
-)
+);
 
 interface QuantitySelectorProps extends VariantProps<typeof quantitySelectorVariants> {
-  quantity: number
-  onIncrease: () => void
-  onDecrease: () => void
-  max?: number
-  stock?: number
-  disabled?: boolean
-  showIcons?: boolean
-  className?: string
+  quantity: number;
+  onIncrease: () => void;
+  onDecrease: () => void;
+  max?: number;
+  stock?: number;
+  disabled?: boolean;
+  showIcons?: boolean;
+  className?: string;
 }
 
 export function QuantitySelector({
@@ -91,13 +91,13 @@ export function QuantitySelector({
   className,
 }: QuantitySelectorProps) {
   // Use stock if available, otherwise use max
-  const maxQuantity = stock !== undefined ? stock : max
+  const maxQuantity = stock !== undefined ? stock : max;
 
   // Disable decrease if quantity is 1 or less, or if disabled
-  const isDecreaseDisabled = disabled || quantity <= 1
+  const isDecreaseDisabled = disabled || quantity <= 1;
 
   // Disable increase if quantity reaches max (stock or max), or if disabled
-  const isIncreaseDisabled = disabled || quantity >= maxQuantity
+  const isIncreaseDisabled = disabled || quantity >= maxQuantity;
 
   return (
     <div className={cn('flex items-center gap-4', className)}>
@@ -140,5 +140,5 @@ export function QuantitySelector({
         </span>
       )}
     </div>
-  )
+  );
 }

@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateProfileDto {
   @ApiPropertyOptional({
@@ -34,7 +34,7 @@ export class UpdateProfileDto {
   @IsString()
   @MinLength(1)
   @MaxLength(100)
-  fullName?: string
+  fullName?: string;
 
   @ApiPropertyOptional({
     description: 'User phone number',
@@ -44,5 +44,5 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   @MaxLength(15)
-  phone?: string
+  phone?: string;
 }

@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ProductPageContent } from '../ProductPageContent'
+import { ProductPageContent } from '../ProductPageContent';
 
 export default function PadChuotPage() {
-  return <ProductPageContent productSlug="pad-chuot" productName="Pad chuột" />
+  return <ProductPageContent productSlug="pad-chuot" productName="Pad chuột" />;
 }

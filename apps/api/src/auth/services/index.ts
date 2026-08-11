@@ -1,2 +1,2 @@
-export * from './oauth-redirect.service'
-export * from './oauth.service'
+export * from './oauth-redirect.service';
+export * from './oauth.service';

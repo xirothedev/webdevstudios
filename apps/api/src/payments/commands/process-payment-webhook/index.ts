@@ -1,2 +1,2 @@
-export * from './process-payment-webhook.command'
-export * from './process-payment-webhook.handler'
+export * from './process-payment-webhook.command';
+export * from './process-payment-webhook.handler';

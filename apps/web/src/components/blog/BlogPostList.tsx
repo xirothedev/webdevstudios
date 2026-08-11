@@ -20,28 +20,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import Link from 'next/link'
+import Link from 'next/link';
 
-import { BlogPost } from '@/lib/api/blog'
+import { BlogPost } from '@/lib/api/blog';
 
-import { BlogPostCard } from './BlogPostCard'
+import { BlogPostCard } from './BlogPostCard';
 
 interface BlogPostListProps {
-  posts: BlogPost[]
-  total: number
-  page: number
-  pageSize: number
+  posts: BlogPost[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 export function BlogPostList({ posts, total, page, pageSize }: BlogPostListProps) {
-  const totalPages = Math.ceil(total / pageSize)
+  const totalPages = Math.ceil(total / pageSize);
 
   if (posts.length === 0) {
     return (
       <div className="py-12 text-center">
         <p className="text-wds-text/70">Chưa có bài viết nào.</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -88,5 +88,5 @@ export function BlogPostList({ posts, total, page, pageSize }: BlogPostListProps
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 /**
  * Component to handle OAuth redirect after page reload
  */
 export function OAuthRedirectHandler() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
-    const redirectUrl = sessionStorage.getItem('oauth_redirect_url')
+    const redirectUrl = sessionStorage.getItem('oauth_redirect_url');
     if (redirectUrl) {
-      sessionStorage.removeItem('oauth_redirect_url')
-      router.push(redirectUrl)
+      sessionStorage.removeItem('oauth_redirect_url');
+      router.push(redirectUrl);
     }
-  }, [router])
+  }, [router]);
 
-  return null
+  return null;
 }

@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ArrowRight, Crown } from 'lucide-react'
-import Link from 'next/link'
+import { ArrowRight, Crown } from 'lucide-react';
+import Link from 'next/link';
 
-import { AchievementHero } from '@/components/achievements/AchievementHero'
-import { AchievementSection } from '@/components/achievements/AchievementSection'
-import { TimelineYear } from '@/components/achievements/TimelineYear'
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { AWARDS } from '@/data/achievements'
+import { AchievementHero } from '@/components/achievements/AchievementHero';
+import { AchievementSection } from '@/components/achievements/AchievementSection';
+import { TimelineYear } from '@/components/achievements/TimelineYear';
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { AWARDS } from '@/data/achievements';
 
 export default function AchievementsPage() {
   return (
@@ -113,5 +113,5 @@ export default function AchievementsPage() {
 
       <Footer variant="dark" />
     </div>
-  )
+  );
 }

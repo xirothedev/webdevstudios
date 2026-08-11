@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata'
+import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Chính sách đổi trả và hoàn tiền',
@@ -31,12 +31,12 @@ export const metadata: Metadata = createPageMetadata({
   path: '/refund',
   image: SEO_IMAGES['/refund'],
   keywords: ['Chính sách đổi trả', 'Refund Policy', 'WebDev Studios', 'Hoàn tiền'],
-})
+});
 
 export default function RefundLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  return children
+  return children;
 }

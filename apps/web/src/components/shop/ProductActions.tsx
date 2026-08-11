@@ -20,21 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ShoppingCart } from 'lucide-react'
-import { motion } from 'motion/react'
+import { ShoppingCart } from 'lucide-react';
+import { motion } from 'motion/react';
 
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface ProductActionsProps {
-  onAddToCart: () => Promise<void> | void
-  onBuyNow?: () => void
-  isAddingToCart?: boolean
-  disabled?: boolean
-  addToCartText?: string
-  buyNowText?: string
+  onAddToCart: () => Promise<void> | void;
+  onBuyNow?: () => void;
+  isAddingToCart?: boolean;
+  disabled?: boolean;
+  addToCartText?: string;
+  buyNowText?: string;
 }
 
 export function ProductActions({
@@ -89,5 +89,5 @@ export function ProductActions({
         </Button>
       )}
     </div>
-  )
+  );
 }

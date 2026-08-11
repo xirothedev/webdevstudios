@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductDto } from '../../dtos'
-import { ProductRepository } from '../../infrastructure/product.repository'
-import { ProductWithRelations } from '../../product.types'
-import { UpdateProductCommand } from './update-product.command'
+import { ProductDto } from '../../dtos';
+import { ProductRepository } from '../../infrastructure/product.repository';
+import { ProductWithRelations } from '../../product.types';
+import { UpdateProductCommand } from './update-product.command';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler implements ICommandHandler<UpdateProductCommand> {
@@ -34,11 +34,11 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
 
   async execute(command: UpdateProductCommand): Promise<ProductDto> {
     const { productId, name, description, priceCurrent, priceOriginal, badge, isPublished } =
-      command
+      command;
 
-    const product = await this.productRepository.findById(productId)
+    const product = await this.productRepository.findById(productId);
     if (!product) {
-      throw new NotFoundException(`Product with id ${productId} not found`)
+      throw new NotFoundException(`Product with id ${productId} not found`);
     }
 
     await this.productRepository.update(productId, {
@@ -48,18 +48,18 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
       priceOriginal,
       badge,
       isPublished,
-    })
+    });
 
-    const updatedProduct = await this.productRepository.findById(productId)
+    const updatedProduct = await this.productRepository.findById(productId);
     if (!updatedProduct) {
-      throw new NotFoundException('Product not found after update')
+      throw new NotFoundException('Product not found after update');
     }
 
-    return this.mapToDto(updatedProduct)
+    return this.mapToDto(updatedProduct);
   }
 
   private mapToDto(product: ProductWithRelations): ProductDto {
-    const stockStatus = this.calculateStockStatus(product)
+    const stockStatus = this.calculateStockStatus(product);
 
     return {
       id: product.id,
@@ -82,21 +82,21 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
       isPublished: product.isPublished,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
-    }
+    };
   }
 
   private calculateStockStatus(
     product: ProductWithRelations,
   ): 'in_stock' | 'low_stock' | 'out_of_stock' {
     if (product.hasSizes && product.sizeStocks?.length > 0) {
-      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0)
-      if (totalStock === 0) return 'out_of_stock'
-      if (totalStock < 5) return 'low_stock'
-      return 'in_stock'
+      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
+      if (totalStock === 0) return 'out_of_stock';
+      if (totalStock < 5) return 'low_stock';
+      return 'in_stock';
     }
 
-    if (product.stock === 0) return 'out_of_stock'
-    if (product.stock < 5) return 'low_stock'
-    return 'in_stock'
+    if (product.stock === 0) return 'out_of_stock';
+    if (product.stock < 5) return 'low_stock';
+    return 'in_stock';
   }
 }

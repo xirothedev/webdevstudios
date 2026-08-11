@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Award } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Award } from 'lucide-react';
+import { motion } from 'motion/react';
 
-import { STATS } from '@/data/achievements'
+import { STATS } from '@/data/achievements';
 
 export function AchievementHero() {
   return (
@@ -92,5 +92,5 @@ export function AchievementHero() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

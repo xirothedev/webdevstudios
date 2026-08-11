@@ -20,32 +20,32 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { Button } from '@/components/ui/button'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
 
 export default function PaymentCancelPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     // Get pending order ID from localStorage
-    const pendingOrderId = localStorage.getItem('pendingOrderId')
+    const pendingOrderId = localStorage.getItem('pendingOrderId');
     if (pendingOrderId) {
       // Clear localStorage
-      localStorage.removeItem('pendingOrderId')
-      localStorage.removeItem(`paymentUrl_${pendingOrderId}`)
+      localStorage.removeItem('pendingOrderId');
+      localStorage.removeItem(`paymentUrl_${pendingOrderId}`);
 
       // Redirect to order detail page after 3 seconds
       setTimeout(() => {
-        router.push(`/orders/${pendingOrderId}`)
-      }, 3000)
+        router.push(`/orders/${pendingOrderId}`);
+      }, 3000);
     }
-  }, [router])
+  }, [router]);
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -60,11 +60,11 @@ export default function PaymentCancelPage() {
           <div className="flex justify-center gap-4">
             <Button
               onClick={() => {
-                const pendingOrderId = localStorage.getItem('pendingOrderId')
+                const pendingOrderId = localStorage.getItem('pendingOrderId');
                 if (pendingOrderId) {
-                  router.push(`/orders/${pendingOrderId}`)
+                  router.push(`/orders/${pendingOrderId}`);
                 } else {
-                  router.push('/orders')
+                  router.push('/orders');
                 }
               }}
               className="bg-wds-accent hover:bg-wds-accent/90 font-semibold text-black"
@@ -83,5 +83,5 @@ export default function PaymentCancelPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

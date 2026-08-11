@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { motion } from 'motion/react'
+import { motion } from 'motion/react';
 
 interface PartnerSectionProps {
-  label?: string
-  title?: string
-  subtitle?: string
+  label?: string;
+  title?: string;
+  subtitle?: string;
 }
 
 export function PartnerSection({ label, title, subtitle }: PartnerSectionProps) {
@@ -66,5 +66,5 @@ export function PartnerSection({ label, title, subtitle }: PartnerSectionProps) 
         </motion.p>
       )}
     </div>
-  )
+  );
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ICommand } from '@nestjs/cqrs'
+import { ICommand } from '@nestjs/cqrs';
 
 export class VerifyEmailCommand implements ICommand {
   constructor(public readonly token: string) {}

@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
@@ -30,7 +30,7 @@ export class LoginDto {
   })
   @IsEmail()
   @IsNotEmpty()
-  email: string
+  email: string;
 
   @ApiProperty({
     description: 'User password',
@@ -38,7 +38,7 @@ export class LoginDto {
   })
   @IsString()
   @IsNotEmpty()
-  password: string
+  password: string;
 
   @ApiPropertyOptional({
     description: 'Remember me option (extends session duration)',
@@ -47,5 +47,5 @@ export class LoginDto {
   })
   @IsBoolean()
   @IsOptional()
-  rememberMe?: boolean
+  rememberMe?: boolean;
 }

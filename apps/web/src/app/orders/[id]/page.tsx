@@ -20,31 +20,31 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useParams } from 'next/navigation'
+import { useParams } from 'next/navigation';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { Button } from '@/components/ui/button'
-import { useCancelOrder, useOrder } from '@/lib/api/hooks/use-orders'
-import { formatPrice } from '@/lib/utils'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
+import { useCancelOrder, useOrder } from '@/lib/api/hooks/use-orders';
+import { formatPrice } from '@/lib/utils';
 
 export default function OrderDetailPage() {
-  const params = useParams()
-  const orderId = params.id as string
+  const params = useParams();
+  const orderId = params.id as string;
 
   // Fetch order data
-  const { data: order, isLoading, error: orderError } = useOrder(orderId)
+  const { data: order, isLoading, error: orderError } = useOrder(orderId);
 
   // Cancel order mutation
-  const cancelOrderMutation = useCancelOrder()
+  const cancelOrderMutation = useCancelOrder();
 
   const handleCancel = () => {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return
+    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return;
 
-    cancelOrderMutation.mutate(orderId)
-  }
+    cancelOrderMutation.mutate(orderId);
+  };
 
   const getStatusText = (status: string) => {
     const statusMap: Record<string, string> = {
@@ -55,29 +55,29 @@ export default function OrderDetailPage() {
       DELIVERED: 'Đã giao',
       CANCELLED: 'Đã hủy',
       RETURNED: 'Đã trả hàng',
-    }
-    return statusMap[status] || status
-  }
+    };
+    return statusMap[status] || status;
+  };
 
   if (isLoading) {
     return (
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">Đang tải...</div>
       </div>
-    )
+    );
   }
 
   if (orderError || !order) {
     const errorMessage =
-      orderError instanceof Error ? orderError.message : 'Không tìm thấy đơn hàng'
+      orderError instanceof Error ? orderError.message : 'Không tìm thấy đơn hàng';
     return (
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">{errorMessage}</div>
       </div>
-    )
+    );
   }
 
-  const canCancel = order.status === 'PENDING'
+  const canCancel = order.status === 'PENDING';
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -169,5 +169,5 @@ export default function OrderDetailPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

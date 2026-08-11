@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { motion } from 'motion/react'
+import { motion } from 'motion/react';
 
 interface SizeMeasurement {
-  size: string
-  chest: string // Chest width
-  length: string // Shirt length
-  shoulder: string // Shoulder width
-  sleeve: string // Sleeve length
+  size: string;
+  chest: string; // Chest width
+  length: string; // Shirt length
+  shoulder: string; // Shoulder width
+  sleeve: string; // Sleeve length
 }
 
 const sizeChart: SizeMeasurement[] = [
@@ -61,11 +61,11 @@ const sizeChart: SizeMeasurement[] = [
     shoulder: '48cm',
     sleeve: '23cm',
   },
-]
+];
 
 interface ProductSizeGuideProps {
-  title?: string
-  delay?: number
+  title?: string;
+  delay?: number;
 }
 
 export function ProductSizeGuide({ title = 'Bảng size', delay = 0.3 }: ProductSizeGuideProps) {
@@ -172,5 +172,5 @@ export function ProductSizeGuide({ title = 'Bảng size', delay = 0.3 }: Product
         </div>
       </div>
     </motion.section>
-  )
+  );
 }

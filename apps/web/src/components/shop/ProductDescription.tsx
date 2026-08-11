@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import React from 'react'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
-import remarkGfm from 'remark-gfm'
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 interface ProductDescriptionProps {
-  markdown: string
+  markdown: string;
 }
 
 /**
@@ -141,11 +141,11 @@ const markdownComponents = {
       {...props}
     />
   ),
-}
+};
 
 export function ProductDescription({ markdown }: ProductDescriptionProps) {
   if (!markdown) {
-    return null
+    return null;
   }
 
   return (
@@ -158,5 +158,5 @@ export function ProductDescription({ markdown }: ProductDescriptionProps) {
         {markdown}
       </ReactMarkdown>
     </div>
-  )
+  );
 }

@@ -20,33 +20,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { BlogPostWithRelations } from '../../blog.types'
-import { BlogPostDto, BlogPostListResponseDto } from '../../dtos'
-import { BlogRepository } from '../../infrastructure/blog.repository'
-import { ListBlogPostsQuery } from './list-posts.query'
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto, BlogPostListResponseDto } from '../../dtos';
+import { BlogRepository } from '../../infrastructure/blog.repository';
+import { ListBlogPostsQuery } from './list-posts.query';
 
 @QueryHandler(ListBlogPostsQuery)
 export class ListBlogPostsHandler implements IQueryHandler<ListBlogPostsQuery> {
   constructor(private readonly blogRepository: BlogRepository) {}
 
   async execute(query: ListBlogPostsQuery): Promise<BlogPostListResponseDto> {
-    const { page = 1, pageSize = 10, isPublished, authorId } = query
+    const { page = 1, pageSize = 10, isPublished, authorId } = query;
 
     const { posts, total } = await this.blogRepository.findAll({
       isPublished,
       page,
       pageSize,
       authorId,
-    })
+    });
 
     return {
       posts: posts.map((post) => this.mapToDto(post)),
       total,
       page,
       pageSize,
-    }
+    };
   }
 
   private mapToDto(post: BlogPostWithRelations): BlogPostDto {
@@ -70,6 +70,6 @@ export class ListBlogPostsHandler implements IQueryHandler<ListBlogPostsQuery> {
       metaDescription: post.metaDescription,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    }
+    };
   }
 }

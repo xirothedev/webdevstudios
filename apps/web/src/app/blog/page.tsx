@@ -20,34 +20,34 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostList } from '@/components/blog/BlogPostList'
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
-import { blogApi } from '@/lib/api/blog'
+import { BlogPostList } from '@/components/blog/BlogPostList';
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { blogApi } from '@/lib/api/blog';
 
 export const metadata = {
   title: 'Blog - WebDev Studios',
   description:
     'Khám phá các bài viết về công nghệ, phát triển web và nhiều chủ đề thú vị khác từ WebDev Studios',
-}
+};
 
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; q?: string }>
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
-  const { page, q } = await searchParams
-  const pageNumber = page ? Number(page) : 1
-  const query = q
+  const { page, q } = await searchParams;
+  const pageNumber = page ? Number(page) : 1;
+  const query = q;
 
-  let postsData
+  let postsData;
   if (query) {
     postsData = await blogApi.searchPosts(query, {
       page: pageNumber,
       pageSize: 10,
-    })
+    });
   } else {
-    postsData = await blogApi.listPosts({ page: pageNumber, pageSize: 10 })
+    postsData = await blogApi.listPosts({ page: pageNumber, pageSize: 10 });
   }
 
   return (
@@ -70,5 +70,5 @@ export default async function BlogPage({
       </div>
       <Footer />
     </div>
-  )
+  );
 }

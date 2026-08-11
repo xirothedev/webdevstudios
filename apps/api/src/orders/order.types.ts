@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Order, OrderItem, Product, ShippingAddress } from '@generated/prisma'
+import { Order, OrderItem, Product, ShippingAddress } from '@generated/prisma';
 
 export type OrderItemWithProduct = OrderItem & {
-  product: Product | null
-}
+  product: Product | null;
+};
 
 export type OrderWithItems = Order & {
-  items: OrderItemWithProduct[]
-  shippingAddress: ShippingAddress
-}
+  items: OrderItemWithProduct[];
+  shippingAddress: ShippingAddress;
+};

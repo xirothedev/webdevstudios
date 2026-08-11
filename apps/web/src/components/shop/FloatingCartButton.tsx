@@ -20,77 +20,77 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ShoppingCart, Trash2, X } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect } from 'react'
+import { ShoppingCart, Trash2, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { useCartDrawer } from '@/contexts/cart-drawer.context'
-import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart'
-import { formatPrice } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { useCartDrawer } from '@/contexts/cart-drawer.context';
+import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
+import { formatPrice } from '@/lib/utils';
 
-import { QuantitySelector } from './QuantitySelector'
+import { QuantitySelector } from './QuantitySelector';
 
 export function FloatingCartButton() {
-  const { isOpen, openDrawer, closeDrawer } = useCartDrawer()
-  const { data: cart, isLoading } = useCart()
-  const updateCartItemMutation = useUpdateCartItem()
-  const removeFromCartMutation = useRemoveFromCart()
+  const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
+  const { data: cart, isLoading } = useCart();
+  const updateCartItemMutation = useUpdateCartItem();
+  const removeFromCartMutation = useRemoveFromCart();
 
-  const totalItems = cart?.totalItems ?? 0
-  const hasItems = totalItems > 0 && !isLoading
+  const totalItems = cart?.totalItems ?? 0;
+  const hasItems = totalItems > 0 && !isLoading;
 
   const handleUpdateQuantity = (itemId: string, quantity: number) => {
-    if (quantity < 1) return
+    if (quantity < 1) return;
 
     updateCartItemMutation.mutate({
       cartItemId: itemId,
       data: { quantity },
-    })
-  }
+    });
+  };
 
   const handleRemoveItem = (itemId: string) => {
-    removeFromCartMutation.mutate(itemId)
-  }
+    removeFromCartMutation.mutate(itemId);
+  };
 
   const isItemUpdating = (itemId: string) => {
     return (
       (updateCartItemMutation.isPending &&
         updateCartItemMutation.variables?.cartItemId === itemId) ||
       (removeFromCartMutation.isPending && removeFromCartMutation.variables === itemId)
-    )
-  }
+    );
+  };
 
   // Close drawer when clicking outside
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
+      const target = e.target as HTMLElement;
       if (!target.closest('[data-cart-drawer]') && !target.closest('[data-cart-button]')) {
-        closeDrawer()
+        closeDrawer();
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen, closeDrawer])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, closeDrawer]);
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -268,5 +268,5 @@ export function FloatingCartButton() {
         )}
       </AnimatePresence>
     </>
-  )
+  );
 }

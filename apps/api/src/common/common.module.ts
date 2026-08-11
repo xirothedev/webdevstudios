@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Global, Module } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common';
 
-import { SecurityLoggerService } from './services'
+import { SecurityLoggerService } from './services';
 
 /**
  * Common module for shared services

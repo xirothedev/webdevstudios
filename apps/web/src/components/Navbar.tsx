@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Menu, X } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useSyncExternalStore, useState } from 'react'
+import { Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useSyncExternalStore, useState } from 'react';
 
 import {
   NavigationMenu,
@@ -35,25 +35,25 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
-import { UserAvatar } from '@/components/wds/UserAvatar'
-import { useCurrentUser } from '@/lib/api/hooks/use-auth'
-import { cn } from '@/lib/utils'
+} from '@/components/ui/navigation-menu';
+import { UserAvatar } from '@/components/wds/UserAvatar';
+import { useCurrentUser } from '@/lib/api/hooks/use-auth';
+import { cn } from '@/lib/utils';
 
 interface NavbarProps {
-  variant?: 'dark' | 'light'
+  variant?: 'dark' | 'light';
 }
 
 export function Navbar({ variant = 'dark' }: NavbarProps) {
-  const pathname = usePathname()
-  const isDark = variant === 'dark'
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname();
+  const isDark = variant === 'dark';
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false,
-  )
-  const { data: user } = useCurrentUser()
+  );
+  const { data: user } = useCurrentUser();
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -66,7 +66,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'Lịch sự kiện', href: '/calendar' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'FAQ', href: '/faq' },
-  ]
+  ];
 
   return (
     <nav
@@ -101,7 +101,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           <NavigationMenuList className="gap-2">
             {/* Main navigation items */}
             {navItems.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href;
               return (
                 <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink
@@ -124,7 +124,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                     <Link href={item.href}>{item.label}</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
-              )
+              );
             })}
           </NavigationMenuList>
         </NavigationMenu>
@@ -235,7 +235,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                 {/* Navigation Items */}
                 <nav className="flex flex-col gap-2">
                   {navItems.map((item, index) => {
-                    const isActive = pathname === item.href
+                    const isActive = pathname === item.href;
                     return (
                       <motion.div
                         key={item.href}
@@ -264,7 +264,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                           {item.label}
                         </Link>
                       </motion.div>
-                    )
+                    );
                   })}
                 </nav>
 
@@ -311,5 +311,5 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
         )}
       </AnimatePresence>
     </nav>
-  )
+  );
 }

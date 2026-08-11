@@ -20,35 +20,35 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma'
-import { Injectable } from '@nestjs/common'
+import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma';
+import { Injectable } from '@nestjs/common';
 
-import { subMinutes } from 'date-fns'
-import { PrismaService } from '@/prisma'
-import { ShippingAddressDto } from '../dtos/order.dto'
-import { OrderWithItems } from '../order.types'
+import { subMinutes } from 'date-fns';
+import { PrismaService } from '@/prisma';
+import { ShippingAddressDto } from '../dtos/order.dto';
+import { OrderWithItems } from '../order.types';
 
 @Injectable()
 export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
-    userId: string
-    code: string
-    status: OrderStatus
-    paymentStatus: PaymentStatus
-    totalAmount: number
-    shippingFee: number
-    discountValue: number
-    shippingAddress: ShippingAddressDto
+    userId: string;
+    code: string;
+    status: OrderStatus;
+    paymentStatus: PaymentStatus;
+    totalAmount: number;
+    shippingFee: number;
+    discountValue: number;
+    shippingAddress: ShippingAddressDto;
     items: Array<{
-      productId: string | null
-      productSlug: ProductSlug
-      productName: string
-      size: ProductSize | null
-      price: number
-      quantity: number
-    }>
+      productId: string | null;
+      productSlug: ProductSlug;
+      productName: string;
+      size: ProductSize | null;
+      price: number;
+      quantity: number;
+    }>;
   }): Promise<OrderWithItems> {
     // Create shipping address first
     const shippingAddress = await this.prisma.shippingAddress.create({
@@ -62,7 +62,7 @@ export class OrderRepository {
         ward: data.shippingAddress.ward,
         postalCode: data.shippingAddress.postalCode,
       },
-    })
+    });
 
     // Then create order with shippingAddressId
     const result = await this.prisma.order.create({
@@ -95,8 +95,8 @@ export class OrderRepository {
         },
         shippingAddress: true,
       },
-    })
-    return result
+    });
+    return result;
   }
 
   async findById(id: string): Promise<OrderWithItems | null> {
@@ -111,7 +111,7 @@ export class OrderRepository {
         },
         shippingAddress: true,
       },
-    })
+    });
   }
 
   async findByCode(code: string): Promise<OrderWithItems | null> {
@@ -126,7 +126,7 @@ export class OrderRepository {
         },
         shippingAddress: true,
       },
-    })
+    });
   }
 
   async findByUserId(
@@ -134,7 +134,7 @@ export class OrderRepository {
     page: number = 1,
     limit: number = 10,
   ): Promise<{ orders: OrderWithItems[]; total: number }> {
-    const skip = (page - 1) * limit
+    const skip = (page - 1) * limit;
 
     const [orders, total] = await Promise.all([
       this.prisma.order.findMany({
@@ -155,9 +155,9 @@ export class OrderRepository {
       this.prisma.order.count({
         where: { userId },
       }),
-    ])
+    ]);
 
-    return { orders, total }
+    return { orders, total };
   }
 
   async updateStatus(id: string, status: OrderStatus): Promise<OrderWithItems> {
@@ -173,7 +173,7 @@ export class OrderRepository {
         },
         shippingAddress: true,
       },
-    })
+    });
   }
 
   async updatePaymentStatus(id: string, paymentStatus: PaymentStatus): Promise<OrderWithItems> {
@@ -189,25 +189,25 @@ export class OrderRepository {
         },
         shippingAddress: true,
       },
-    })
+    });
   }
 
   async generateOrderCode(): Promise<string> {
     // Generate order code like #ORD-1234
-    const prefix = 'ORD'
+    const prefix = 'ORD';
     const randomNum = Math.floor(Math.random() * 10000)
       .toString()
-      .padStart(4, '0')
-    const code = `#${prefix}-${randomNum}`
+      .padStart(4, '0');
+    const code = `#${prefix}-${randomNum}`;
 
     // Check if code exists
-    const existing = await this.findByCode(code)
+    const existing = await this.findByCode(code);
     if (existing) {
       // Retry with new random number
-      return this.generateOrderCode()
+      return this.generateOrderCode();
     }
 
-    return code
+    return code;
   }
 
   async findPendingOrdersByUserId(userId: string): Promise<OrderWithItems[]> {
@@ -227,11 +227,11 @@ export class OrderRepository {
         shippingAddress: true,
       },
       orderBy: { createdAt: 'desc' },
-    })
+    });
   }
 
   async findExpiredPendingOrders(): Promise<OrderWithItems[]> {
-    const fifteenMinutesAgo = subMinutes(new Date(), 15)
+    const fifteenMinutesAgo = subMinutes(new Date(), 15);
 
     return this.prisma.order.findMany({
       where: {
@@ -250,7 +250,7 @@ export class OrderRepository {
         },
         shippingAddress: true,
       },
-    })
+    });
   }
 
   async findAll(
@@ -258,11 +258,11 @@ export class OrderRepository {
     limit: number = 10,
     status?: OrderStatus,
   ): Promise<OrderWithItems[]> {
-    const skip = (page - 1) * limit
+    const skip = (page - 1) * limit;
 
-    const where: { status?: OrderStatus } = {}
+    const where: { status?: OrderStatus } = {};
     if (status) {
-      where.status = status
+      where.status = status;
     }
 
     return this.prisma.order.findMany({
@@ -279,15 +279,15 @@ export class OrderRepository {
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
-    })
+    });
   }
 
   async countAll(status?: OrderStatus): Promise<number> {
-    const where: { status?: OrderStatus } = {}
+    const where: { status?: OrderStatus } = {};
     if (status) {
-      where.status = status
+      where.status = status;
     }
 
-    return this.prisma.order.count({ where })
+    return this.prisma.order.count({ where });
   }
 }

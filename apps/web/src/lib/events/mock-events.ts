@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { addDays, addHours, addMonths, addWeeks, subDays, subWeeks } from 'date-fns'
+import { addDays, addHours, addMonths, addWeeks, subDays, subWeeks } from 'date-fns';
 
-import { Event, EventType } from './types'
+import { Event, EventType } from './types';
 
-const now = new Date()
-const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+const now = new Date();
+const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 export const mockEvents: Event[] = [
   // Past events
@@ -260,4 +260,4 @@ export const mockEvents: Event[] = [
     organizer: 'Ban Tổ chức',
     attendees: 0,
   },
-]
+];

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus } from '@generated/prisma'
+import { OrderStatus } from '@generated/prisma';
 
 export class ListAllOrdersQuery {
   constructor(

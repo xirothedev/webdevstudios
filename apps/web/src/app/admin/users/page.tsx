@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useQuery } from '@tanstack/react-query'
-import { format } from 'date-fns'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
-import { AdminHeader } from '@/components/admin/AdminHeader'
-import { ColumnVisibilityToggle } from '@/components/admin/ColumnVisibilityToggle'
-import { DataTable } from '@/components/admin/DataTable'
-import { TableActions } from '@/components/admin/TableActions'
-import { TableFilters } from '@/components/admin/TableFilters'
-import { adminApi } from '@/lib/api/admin'
-import type { UserRole } from '@/lib/api/users'
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { ColumnVisibilityToggle } from '@/components/admin/ColumnVisibilityToggle';
+import { DataTable } from '@/components/admin/DataTable';
+import { TableActions } from '@/components/admin/TableActions';
+import { TableFilters } from '@/components/admin/TableFilters';
+import { adminApi } from '@/lib/api/admin';
+import type { UserRole } from '@/lib/api/users';
 
 const columns = [
   { id: 'id', label: 'ID' },
@@ -43,19 +43,19 @@ const columns = [
   { id: 'role', label: 'Role' },
   { id: 'createdAt', label: 'Created At' },
   { id: 'actions', label: 'Actions' },
-]
+];
 
 export default function UsersPage() {
-  const [page, setPage] = useState(1)
-  const [limit] = useState(10)
-  const [search, setSearch] = useState('')
-  const [roleFilter, setRoleFilter] = useState<UserRole | undefined>()
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id))
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<UserRole | undefined>();
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id));
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin', 'users', page, limit, roleFilter],
     queryFn: () => adminApi.listUsers(page, limit, roleFilter),
-  })
+  });
 
   const filteredData = !data?.users
     ? []
@@ -65,19 +65,19 @@ export default function UsersPage() {
           (user) =>
             user.email.toLowerCase().includes(search.toLowerCase()) ||
             user.fullName?.toLowerCase().includes(search.toLowerCase()),
-        )
+        );
 
   const handleDelete = async (userId: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa user này?')) return
+    if (!confirm('Bạn có chắc chắn muốn xóa user này?')) return;
 
     try {
-      await adminApi.deleteUser(userId)
-      toast.success('Đã xóa user thành công')
-      refetch()
+      await adminApi.deleteUser(userId);
+      toast.success('Đã xóa user thành công');
+      refetch();
     } catch {
-      toast.error('Xóa user thất bại')
+      toast.error('Xóa user thất bại');
     }
-  }
+  };
 
   const tableData = filteredData.map((user) => ({
     ...user,
@@ -86,12 +86,12 @@ export default function UsersPage() {
       <TableActions
         onEdit={() => {
           // TODO: Implement edit
-          toast.info('Edit functionality coming soon')
+          toast.info('Edit functionality coming soon');
         }}
         onDelete={() => handleDelete(user.id)}
       />
     ),
-  }))
+  }));
 
   return (
     <div className="flex h-full flex-col">
@@ -116,8 +116,8 @@ export default function UsersPage() {
               },
             ]}
             onClear={() => {
-              setSearch('')
-              setRoleFilter(undefined)
+              setSearch('');
+              setRoleFilter(undefined);
             }}
           />
           <ColumnVisibilityToggle
@@ -159,5 +159,5 @@ export default function UsersPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

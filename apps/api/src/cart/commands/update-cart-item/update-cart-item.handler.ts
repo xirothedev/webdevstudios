@@ -25,15 +25,15 @@ import {
   ConflictException,
   ForbiddenException,
   NotFoundException,
-} from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+} from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductRepository } from '../../../products/infrastructure/product.repository'
-import { CartDto } from '../../dtos/cart.dto'
-import { CartRepository } from '../../infrastructure/cart.repository'
-import { CartWithItems } from '../../cart.types'
-import { getProductImageUrl } from '../../utils/product-image.util'
-import { UpdateCartItemCommand } from './update-cart-item.command'
+import { ProductRepository } from '../../../products/infrastructure/product.repository';
+import { CartDto } from '../../dtos/cart.dto';
+import { CartRepository } from '../../infrastructure/cart.repository';
+import { CartWithItems } from '../../cart.types';
+import { getProductImageUrl } from '../../utils/product-image.util';
+import { UpdateCartItemCommand } from './update-cart-item.command';
 
 @CommandHandler(UpdateCartItemCommand)
 export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemCommand> {
@@ -43,64 +43,64 @@ export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemComm
   ) {}
 
   async execute(command: UpdateCartItemCommand): Promise<CartDto> {
-    const { userId, cartItemId, quantity } = command
+    const { userId, cartItemId, quantity } = command;
 
     if (quantity <= 0) {
-      throw new BadRequestException('Quantity must be greater than 0')
+      throw new BadRequestException('Quantity must be greater than 0');
     }
 
     // Get cart item
-    const cartItem = await this.cartRepository.getCartItemById(cartItemId)
+    const cartItem = await this.cartRepository.getCartItemById(cartItemId);
     if (!cartItem) {
-      throw new NotFoundException(`Cart item with id ${cartItemId} not found`)
+      throw new NotFoundException(`Cart item with id ${cartItemId} not found`);
     }
 
     // Verify cart belongs to user
-    const cart = await this.cartRepository.findOrCreateCart(userId)
+    const cart = await this.cartRepository.findOrCreateCart(userId);
     if (cartItem.cartId !== cart.id) {
-      throw new ForbiddenException('Cart item does not belong to user')
+      throw new ForbiddenException('Cart item does not belong to user');
     }
 
     // Get product and check stock
-    const product = cartItem.product
-    let availableStock: number
+    const product = cartItem.product;
+    let availableStock: number;
 
     if (product.hasSizes && cartItem.size) {
-      const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size)
+      const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size);
       if (sizeStock === null) {
-        throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`)
+        throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`);
       }
-      availableStock = sizeStock
+      availableStock = sizeStock;
     } else {
-      availableStock = product.stock
+      availableStock = product.stock;
     }
 
     if (quantity > availableStock) {
       throw new ConflictException(
         `Insufficient stock. Available: ${availableStock}, Requested: ${quantity}`,
-      )
+      );
     }
 
     // Update quantity
-    await this.cartRepository.updateItemQuantity(cartItemId, quantity)
+    await this.cartRepository.updateItemQuantity(cartItemId, quantity);
 
     // Return updated cart
-    const updatedCart = await this.cartRepository.findOrCreateCart(userId)
-    return this.mapToDto(updatedCart)
+    const updatedCart = await this.cartRepository.findOrCreateCart(userId);
+    return this.mapToDto(updatedCart);
   }
 
   private mapToDto(cart: CartWithItems): CartDto {
     const items = cart.items.map((item) => {
-      const product = item.product
-      const productPrice = Number(product.priceCurrent)
-      const subtotal = productPrice * item.quantity
+      const product = item.product;
+      const productPrice = Number(product.priceCurrent);
+      const subtotal = productPrice * item.quantity;
 
-      let stockAvailable: number
+      let stockAvailable: number;
       if (product.hasSizes && item.size) {
-        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size)
-        stockAvailable = sizeStock?.stock || 0
+        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size);
+        stockAvailable = sizeStock?.stock || 0;
       } else {
-        stockAvailable = product.stock
+        stockAvailable = product.stock;
       }
 
       return {
@@ -114,11 +114,11 @@ export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemComm
         quantity: item.quantity,
         subtotal,
         stockAvailable,
-      }
-    })
+      };
+    });
 
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-    const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0)
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
 
     return {
       id: cart.id,
@@ -126,6 +126,6 @@ export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemComm
       totalItems,
       totalAmount,
       updatedAt: cart.updatedAt,
-    }
+    };
   }
 }

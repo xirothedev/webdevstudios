@@ -20,23 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { SITE_URL } from '@/lib/constants'
+import { SITE_URL } from '@/lib/constants';
 
 export default function OAuthCallbackPage() {
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const error = searchParams.get('error')
-    const errorDescription = searchParams.get('error_description')
-    const redirectUrl = searchParams.get('redirect_url')
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    const redirectUrl = searchParams.get('redirect_url');
 
     if (window.opener) {
-      const allowedOrigin = new URL(SITE_URL).origin
+      const allowedOrigin = new URL(SITE_URL).origin;
 
       if (error) {
         window.opener.postMessage(
@@ -48,7 +48,7 @@ export default function OAuthCallbackPage() {
             },
           },
           allowedOrigin,
-        )
+        );
       } else {
         window.opener.postMessage(
           {
@@ -56,12 +56,12 @@ export default function OAuthCallbackPage() {
             data: { redirectUrl: redirectUrl || '/' },
           },
           allowedOrigin,
-        )
+        );
       }
     }
 
-    setTimeout(() => window.close(), 100)
-  }, [searchParams])
+    setTimeout(() => window.close(), 100);
+  }, [searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-black text-white">
@@ -72,5 +72,5 @@ export default function OAuthCallbackPage() {
         <p className="text-sm text-white/70">Đang xử lý đăng nhập...</p>
       </div>
     </div>
-  )
+  );
 }

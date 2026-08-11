@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'state-management-react',
@@ -114,4 +114,4 @@ Choose state management based on your needs. Start simple!`,
   metaDescription:
     'Explore state management solutions for React including Context API, Redux, Zustand, and when to use each.',
   isPublished: true,
-}
+};

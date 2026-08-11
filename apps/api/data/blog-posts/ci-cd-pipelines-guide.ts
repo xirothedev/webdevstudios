@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'ci-cd-pipelines-guide',
@@ -99,4 +99,4 @@ CI/CD pipelines save time and reduce errors. Set one up today!`,
   metaDescription:
     'Learn how to set up and optimize CI/CD pipelines for automated testing, building, and deployment.',
   isPublished: true,
-}
+};

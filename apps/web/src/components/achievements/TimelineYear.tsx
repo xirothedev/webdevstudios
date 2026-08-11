@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import type { AwardItem } from '@/data/achievements'
+import type { AwardItem } from '@/data/achievements';
 
-import { AchievementCard } from './AchievementCard'
+import { AchievementCard } from './AchievementCard';
 
 interface TimelineYearProps {
-  year: number
-  items: AwardItem[]
-  isLast?: boolean
+  year: number;
+  items: AwardItem[];
+  isLast?: boolean;
 }
 
 export function TimelineYear({ year, items, isLast = false }: TimelineYearProps) {
@@ -55,5 +55,5 @@ export function TimelineYear({ year, items, isLast = false }: TimelineYearProps)
         ))}
       </div>
     </div>
-  )
+  );
 }

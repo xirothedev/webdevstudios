@@ -20,31 +20,31 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common'
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { NotFoundException } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { ProductDto } from '../../dtos'
-import { ProductRepository } from '../../infrastructure/product.repository'
-import { ProductWithRelations } from '../../product.types'
-import { GetProductBySlugQuery } from './get-product-by-slug.query'
+import { ProductDto } from '../../dtos';
+import { ProductRepository } from '../../infrastructure/product.repository';
+import { ProductWithRelations } from '../../product.types';
+import { GetProductBySlugQuery } from './get-product-by-slug.query';
 
 @QueryHandler(GetProductBySlugQuery)
 export class GetProductBySlugHandler implements IQueryHandler<GetProductBySlugQuery> {
   constructor(private readonly productRepository: ProductRepository) {}
 
   async execute(query: GetProductBySlugQuery): Promise<ProductDto> {
-    const { slug } = query
+    const { slug } = query;
 
-    const product = await this.productRepository.findBySlug(slug)
+    const product = await this.productRepository.findBySlug(slug);
     if (!product) {
-      throw new NotFoundException(`Product with slug ${slug} not found`)
+      throw new NotFoundException(`Product with slug ${slug} not found`);
     }
 
-    return this.mapToDto(product)
+    return this.mapToDto(product);
   }
 
   private mapToDto(product: ProductWithRelations): ProductDto {
-    const stockStatus = this.calculateStockStatus(product)
+    const stockStatus = this.calculateStockStatus(product);
 
     return {
       id: product.id,
@@ -67,7 +67,7 @@ export class GetProductBySlugHandler implements IQueryHandler<GetProductBySlugQu
       isPublished: product.isPublished,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
-    }
+    };
   }
 
   private calculateStockStatus(
@@ -75,15 +75,15 @@ export class GetProductBySlugHandler implements IQueryHandler<GetProductBySlugQu
   ): 'in_stock' | 'low_stock' | 'out_of_stock' {
     if (product.hasSizes && product.sizeStocks?.length > 0) {
       // For products with sizes, check if any size has stock
-      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0)
-      if (totalStock === 0) return 'out_of_stock'
-      if (totalStock < 5) return 'low_stock'
-      return 'in_stock'
+      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
+      if (totalStock === 0) return 'out_of_stock';
+      if (totalStock < 5) return 'low_stock';
+      return 'in_stock';
     }
 
     // For products without sizes, use main stock
-    if (product.stock === 0) return 'out_of_stock'
-    if (product.stock < 5) return 'low_stock'
-    return 'in_stock'
+    if (product.stock === 0) return 'out_of_stock';
+    if (product.stock < 5) return 'low_stock';
+    return 'in_stock';
   }
 }

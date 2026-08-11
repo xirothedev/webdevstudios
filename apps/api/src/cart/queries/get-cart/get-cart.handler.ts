@@ -20,37 +20,37 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { CartDto } from '../../dtos/cart.dto'
-import { CartRepository } from '../../infrastructure/cart.repository'
-import { CartWithItems } from '../../cart.types'
-import { getProductImageUrl } from '../../utils/product-image.util'
-import { GetCartQuery } from './get-cart.query'
+import { CartDto } from '../../dtos/cart.dto';
+import { CartRepository } from '../../infrastructure/cart.repository';
+import { CartWithItems } from '../../cart.types';
+import { getProductImageUrl } from '../../utils/product-image.util';
+import { GetCartQuery } from './get-cart.query';
 
 @QueryHandler(GetCartQuery)
 export class GetCartHandler implements IQueryHandler<GetCartQuery> {
   constructor(private readonly cartRepository: CartRepository) {}
 
   async execute(query: GetCartQuery): Promise<CartDto> {
-    const { userId } = query
+    const { userId } = query;
 
-    const cart = await this.cartRepository.findOrCreateCart(userId)
-    return this.mapToDto(cart)
+    const cart = await this.cartRepository.findOrCreateCart(userId);
+    return this.mapToDto(cart);
   }
 
   private mapToDto(cart: CartWithItems): CartDto {
     const items = cart.items.map((item) => {
-      const product = item.product
-      const productPrice = Number(product.priceCurrent)
-      const subtotal = productPrice * item.quantity
+      const product = item.product;
+      const productPrice = Number(product.priceCurrent);
+      const subtotal = productPrice * item.quantity;
 
-      let stockAvailable: number
+      let stockAvailable: number;
       if (product.hasSizes && item.size) {
-        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size)
-        stockAvailable = sizeStock?.stock || 0
+        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size);
+        stockAvailable = sizeStock?.stock || 0;
       } else {
-        stockAvailable = product.stock
+        stockAvailable = product.stock;
       }
 
       return {
@@ -64,11 +64,11 @@ export class GetCartHandler implements IQueryHandler<GetCartQuery> {
         quantity: item.quantity,
         subtotal,
         stockAvailable,
-      }
-    })
+      };
+    });
 
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-    const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0)
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
 
     return {
       id: cart.id,
@@ -76,6 +76,6 @@ export class GetCartHandler implements IQueryHandler<GetCartQuery> {
       totalItems,
       totalAmount,
       updatedAt: cart.updatedAt,
-    }
+    };
   }
 }

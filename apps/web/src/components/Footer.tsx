@@ -20,19 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { contactInfo, footerSections } from '@/data/footer'
+import { contactInfo, footerSections } from '@/data/footer';
 
 interface FooterProps {
-  variant?: 'dark' | 'light'
+  variant?: 'dark' | 'light';
 }
 
 export function Footer({ variant = 'dark' }: FooterProps) {
-  const isDark = variant === 'dark'
+  const isDark = variant === 'dark';
 
   return (
     <footer
@@ -135,5 +135,5 @@ export function Footer({ variant = 'dark' }: FooterProps) {
         </div>
       </div>
     </footer>
-  )
+  );
 }

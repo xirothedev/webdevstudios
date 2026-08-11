@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator'
-import { AddToCartCommand } from './commands/add-to-cart'
-import { ClearCartCommand } from './commands/clear-cart'
-import { RemoveFromCartCommand } from './commands/remove-from-cart'
-import { UpdateCartItemCommand } from './commands/update-cart-item'
-import { AddToCartDto, CartDto, UpdateCartItemDto } from './dtos/cart.dto'
-import { GetCartQuery } from './queries/get-cart'
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AddToCartCommand } from './commands/add-to-cart';
+import { ClearCartCommand } from './commands/clear-cart';
+import { RemoveFromCartCommand } from './commands/remove-from-cart';
+import { UpdateCartItemCommand } from './commands/update-cart-item';
+import { AddToCartDto, CartDto, UpdateCartItemDto } from './dtos/cart.dto';
+import { GetCartQuery } from './queries/get-cart';
 
 @ApiTags('Cart')
 @Controller('cart')
@@ -53,7 +53,7 @@ export class CartController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getCart(@CurrentUser() user: { id: string }): Promise<CartDto> {
-    return this.queryBus.execute(new GetCartQuery(user.id))
+    return this.queryBus.execute(new GetCartQuery(user.id));
   }
 
   @Post('items')
@@ -77,7 +77,7 @@ export class CartController {
   ): Promise<CartDto> {
     return this.commandBus.execute(
       new AddToCartCommand(user.id, dto.productId, dto.size || null, dto.quantity),
-    )
+    );
   }
 
   @Patch('items/:id')
@@ -106,7 +106,7 @@ export class CartController {
     @Param('id') cartItemId: string,
     @Body() dto: UpdateCartItemDto,
   ): Promise<CartDto> {
-    return this.commandBus.execute(new UpdateCartItemCommand(user.id, cartItemId, dto.quantity))
+    return this.commandBus.execute(new UpdateCartItemCommand(user.id, cartItemId, dto.quantity));
   }
 
   @Delete('items/:id')
@@ -132,7 +132,7 @@ export class CartController {
     @CurrentUser() user: { id: string },
     @Param('id') cartItemId: string,
   ): Promise<CartDto> {
-    return this.commandBus.execute(new RemoveFromCartCommand(user.id, cartItemId))
+    return this.commandBus.execute(new RemoveFromCartCommand(user.id, cartItemId));
   }
 
   @Delete()
@@ -148,6 +148,6 @@ export class CartController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async clearCart(@CurrentUser() user: { id: string }): Promise<CartDto> {
-    return this.commandBus.execute(new ClearCartCommand(user.id))
+    return this.commandBus.execute(new ClearCartCommand(user.id));
   }
 }

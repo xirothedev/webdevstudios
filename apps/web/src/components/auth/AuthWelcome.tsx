@@ -29,5 +29,5 @@ export function AuthWelcome() {
         build · ship · learn
       </p>
     </div>
-  )
+  );
 }

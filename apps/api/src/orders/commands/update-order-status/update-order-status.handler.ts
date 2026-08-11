@@ -20,42 +20,42 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma'
-import { ForbiddenException, NotFoundException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { UserRole } from '@generated/prisma';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { OrderDto } from '../../dtos/order.dto'
-import { OrderRepository } from '../../infrastructure/order.repository'
-import { OrderWithItems } from '../../order.types'
-import { UpdateOrderStatusCommand } from './update-order-status.command'
+import { OrderDto } from '../../dtos/order.dto';
+import { OrderRepository } from '../../infrastructure/order.repository';
+import { OrderWithItems } from '../../order.types';
+import { UpdateOrderStatusCommand } from './update-order-status.command';
 
 @CommandHandler(UpdateOrderStatusCommand)
 export class UpdateOrderStatusHandler implements ICommandHandler<UpdateOrderStatusCommand> {
   constructor(private readonly orderRepository: OrderRepository) {}
 
   async execute(command: UpdateOrderStatusCommand): Promise<OrderDto> {
-    const { orderId, status, requesterRole } = command
+    const { orderId, status, requesterRole } = command;
 
     // Only admin can update order status
     if (requesterRole !== UserRole.ADMIN) {
-      throw new ForbiddenException('Only admin can update order status')
+      throw new ForbiddenException('Only admin can update order status');
     }
 
-    const order = await this.orderRepository.findById(orderId)
+    const order = await this.orderRepository.findById(orderId);
     if (!order) {
-      throw new NotFoundException(`Order with id ${orderId} not found`)
+      throw new NotFoundException(`Order with id ${orderId} not found`);
     }
 
-    const updatedOrder = await this.orderRepository.updateStatus(orderId, status)
+    const updatedOrder = await this.orderRepository.updateStatus(orderId, status);
 
     // If order is confirmed, update payment status to PAID
     if (status === 'CONFIRMED' && updatedOrder.paymentStatus === 'PENDING') {
-      await this.orderRepository.updatePaymentStatus(orderId, 'PAID')
-      const finalOrder = await this.orderRepository.findById(orderId)
-      return this.mapToDto(finalOrder!)
+      await this.orderRepository.updatePaymentStatus(orderId, 'PAID');
+      const finalOrder = await this.orderRepository.findById(orderId);
+      return this.mapToDto(finalOrder!);
     }
 
-    return this.mapToDto(updatedOrder)
+    return this.mapToDto(updatedOrder);
   }
 
   private mapToDto(order: OrderWithItems): OrderDto {
@@ -89,6 +89,6 @@ export class UpdateOrderStatusHandler implements ICommandHandler<UpdateOrderStat
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    }
+    };
   }
 }

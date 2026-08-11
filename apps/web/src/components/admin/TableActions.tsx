@@ -20,29 +20,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Eye, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { Eye, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu';
 
 interface TableActionsProps {
-  onView?: () => void
-  onEdit?: () => void
-  onDelete?: () => void
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   customActions?: Array<{
-    label: string
-    icon?: React.ReactNode
-    onClick: () => void
-    variant?: 'default' | 'destructive'
-  }>
+    label: string;
+    icon?: React.ReactNode;
+    onClick: () => void;
+    variant?: 'default' | 'destructive';
+  }>;
 }
 
 export function TableActions({ onView, onEdit, onDelete, customActions }: TableActionsProps) {
@@ -101,5 +101,5 @@ export function TableActions({ onView, onEdit, onDelete, customActions }: TableA
         )}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { CheckCircle2, Info, Key, Shield } from 'lucide-react'
-import Link from 'next/link'
+import { CheckCircle2, Info, Key, Shield } from 'lucide-react';
+import Link from 'next/link';
 
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import type { User } from '@/types/auth.types'
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import type { User } from '@/types/auth.types';
 
 interface SecuritySettingsProps {
-  user: User
+  user: User;
 }
 
 export function SecuritySettings({ user }: SecuritySettingsProps) {
@@ -182,5 +182,5 @@ export function SecuritySettings({ user }: SecuritySettingsProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { SetMetadata } from '@nestjs/common'
+import { SetMetadata } from '@nestjs/common';
 
-export const SKIP_TRANSFORM_KEY = 'skipTransform'
-export const SkipTransform = () => SetMetadata(SKIP_TRANSFORM_KEY, true)
+export const SKIP_TRANSFORM_KEY = 'skipTransform';
+export const SkipTransform = () => SetMetadata(SKIP_TRANSFORM_KEY, true);

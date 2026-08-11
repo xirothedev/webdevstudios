@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 
 interface DeleteReviewDialogProps {
-  reviewId: string
-  onClose: () => void
-  onConfirm: () => void
-  isDeleting: boolean
+  reviewId: string;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
 }
 
 export function DeleteReviewDialog({ onClose, onConfirm, isDeleting }: DeleteReviewDialogProps) {
@@ -72,5 +72,5 @@ export function DeleteReviewDialog({ onClose, onConfirm, isDeleting }: DeleteRev
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu'
-import { cva } from 'class-variance-authority'
-import { ChevronDownIcon } from 'lucide-react'
-import * as React from 'react'
+import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu';
+import { cva } from 'class-variance-authority';
+import { ChevronDownIcon } from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 export function NavigationMenu({
   className,
@@ -33,7 +33,7 @@ export function NavigationMenu({
   viewport = true,
   ...props
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Root> & {
-  viewport?: boolean
+  viewport?: boolean;
 }) {
   return (
     <NavigationMenuPrimitive.Root
@@ -48,7 +48,7 @@ export function NavigationMenu({
       {children}
       {viewport && <NavigationMenuViewport />}
     </NavigationMenuPrimitive.Root>
-  )
+  );
 }
 
 export function NavigationMenuList({
@@ -61,7 +61,7 @@ export function NavigationMenuList({
       className={cn('group flex flex-1 list-none items-center justify-center gap-1', className)}
       {...props}
     />
-  )
+  );
 }
 
 export function NavigationMenuItem({
@@ -74,12 +74,12 @@ export function NavigationMenuItem({
       className={cn('relative', className)}
       {...props}
     />
-  )
+  );
 }
 
 export const navigationMenuTriggerStyle = cva(
   'group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-gray-600 hover:text-black hover:bg-transparent focus:bg-transparent focus:text-black disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-transparent data-[state=open]:text-black data-[state=open]:focus:bg-transparent data-[state=open]:bg-transparent focus-visible:ring-ring/50 outline-none transition-colors focus-visible:ring-[3px] focus-visible:outline-1',
-)
+);
 
 export function NavigationMenuTrigger({
   className,
@@ -98,7 +98,7 @@ export function NavigationMenuTrigger({
         aria-hidden="true"
       />
     </NavigationMenuPrimitive.Trigger>
-  )
+  );
 }
 
 export function NavigationMenuContent({
@@ -115,7 +115,7 @@ export function NavigationMenuContent({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export function NavigationMenuViewport({
@@ -133,7 +133,7 @@ export function NavigationMenuViewport({
         {...props}
       />
     </div>
-  )
+  );
 }
 
 export function NavigationMenuLink({
@@ -149,7 +149,7 @@ export function NavigationMenuLink({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export function NavigationMenuIndicator({
@@ -167,5 +167,5 @@ export function NavigationMenuIndicator({
     >
       <div className="bg-border relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md" />
     </NavigationMenuPrimitive.Indicator>
-  )
+  );
 }

@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react';
 
-import { Footer } from '@/components/Footer'
-import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 
 interface PageLoadingProps {
-  variant?: 'light' | 'dark'
-  message?: string
-  showNavbar?: boolean
-  showFooter?: boolean
+  variant?: 'light' | 'dark';
+  message?: string;
+  showNavbar?: boolean;
+  showFooter?: boolean;
 }
 
 export function PageLoading({
@@ -38,7 +38,7 @@ export function PageLoading({
   showNavbar = true,
   showFooter = true,
 }: PageLoadingProps) {
-  const isLight = variant === 'light'
+  const isLight = variant === 'light';
 
   return (
     <div
@@ -57,5 +57,5 @@ export function PageLoading({
       </div>
       {showFooter && <Footer variant={isLight ? 'light' : 'dark'} />}
     </div>
-  )
+  );
 }

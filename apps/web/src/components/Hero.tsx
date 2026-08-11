@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Package, Users } from 'lucide-react'
-import { motion } from 'motion/react'
-import Image from 'next/image'
+import { Package, Users } from 'lucide-react';
+import { motion } from 'motion/react';
+import Image from 'next/image';
 
 export function Hero() {
   return (
@@ -175,5 +175,5 @@ export function Hero() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

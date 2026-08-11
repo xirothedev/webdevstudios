@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common'
-import * as QRCode from 'qrcode'
-import * as speakeasy from 'speakeasy'
+import { Injectable } from '@nestjs/common';
+import * as QRCode from 'qrcode';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class TotpService {
@@ -33,7 +33,7 @@ export class TotpService {
       name: `WebDev Studios (${email})`,
       issuer: 'WebDev Studios',
       length: 32,
-    }).base32
+    }).base32;
   }
 
   async generateQRCode(secret: string, email: string): Promise<string> {
@@ -42,9 +42,9 @@ export class TotpService {
       label: email,
       issuer: 'WebDev Studios',
       encoding: 'base32',
-    })
+    });
 
-    return QRCode.toDataURL(otpauthUrl)
+    return QRCode.toDataURL(otpauthUrl);
   }
 
   verifyCode(secret: string, token: string): boolean {
@@ -53,16 +53,16 @@ export class TotpService {
       encoding: 'base32',
       token,
       window: 2, // Allow 2 time steps (60 seconds) of tolerance
-    })
+    });
   }
 
   generateBackupCodes(count: number = 10): string[] {
-    const codes: string[] = []
+    const codes: string[] = [];
     for (let i = 0; i < count; i++) {
       // Generate 8-digit backup codes
-      const code = Math.floor(10000000 + Math.random() * 90000000).toString()
-      codes.push(code)
+      const code = Math.floor(10000000 + Math.random() * 90000000).toString();
+      codes.push(code);
     }
-    return codes
+    return codes;
   }
 }

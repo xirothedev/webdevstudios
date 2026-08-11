@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize } from '@generated/prisma'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsInt, IsPositive } from 'class-validator'
+import { ProductSize } from '@generated/prisma';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsInt, IsPositive } from 'class-validator';
 
 export class UpdateProductStockDto {
   @ApiProperty({
@@ -32,7 +32,7 @@ export class UpdateProductStockDto {
   })
   @IsInt()
   @IsPositive()
-  stock: number
+  stock: number;
 
   @ApiPropertyOptional({
     description: 'Product size (required for products with sizes)',
@@ -40,5 +40,5 @@ export class UpdateProductStockDto {
     example: ProductSize.M,
   })
   @IsEnum(ProductSize)
-  size?: ProductSize
+  size?: ProductSize;
 }

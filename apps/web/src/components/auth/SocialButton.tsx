@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 
-type SocialPlatform = 'google' | 'github'
+type SocialPlatform = 'google' | 'github';
 
 interface SocialButtonProps {
-  platform: SocialPlatform
-  label: string
-  onClick?: () => void
-  disabled?: boolean
+  platform: SocialPlatform;
+  label: string;
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
 const platformIcons: Record<SocialPlatform, React.ReactElement> = {
@@ -61,7 +61,7 @@ const platformIcons: Record<SocialPlatform, React.ReactElement> = {
       />
     </svg>
   ),
-}
+};
 
 export function SocialButton({ platform, label, onClick, disabled }: SocialButtonProps) {
   return (
@@ -81,5 +81,5 @@ export function SocialButton({ platform, label, onClick, disabled }: SocialButto
       {/* Gradient overlay on the right */}
       <div className="bg-linear-to-lrom-wds-accent/20 via-wds-accent/10 absolute top-0 right-0 h-full w-1/3 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
     </Button>
-  )
+  );
 }

@@ -20,26 +20,26 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useQuery } from '@tanstack/react-query'
-import { Edit, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query';
+import { Edit, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
-import { AdminHeader } from '@/components/admin/AdminHeader'
-import { BlogPostCard } from '@/components/blog/BlogPostCard'
-import { Button } from '@/components/ui/button'
-import { blogApi } from '@/lib/api/blog'
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { BlogPostCard } from '@/components/blog/BlogPostCard';
+import { Button } from '@/components/ui/button';
+import { blogApi } from '@/lib/api/blog';
 
 export default function AdminBlogPage() {
-  const [page, setPage] = useState(1)
-  const pageSize = 20
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
 
   const { data: postsData, isLoading } = useQuery({
     queryKey: ['admin', 'blog', 'posts', page, pageSize],
     queryFn: () => blogApi.listAllPosts({ page, pageSize }),
-  })
+  });
 
   return (
     <div className="p-6">
@@ -116,5 +116,5 @@ export default function AdminBlogPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

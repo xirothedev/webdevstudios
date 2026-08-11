@@ -20,37 +20,37 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ShoppingCart, Trash2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { ShoppingCart, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-import { QuantitySelector } from '@/components/shop/QuantitySelector'
-import { Button } from '@/components/ui/button'
-import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart'
-import { formatPrice } from '@/lib/utils'
+import { QuantitySelector } from '@/components/shop/QuantitySelector';
+import { Button } from '@/components/ui/button';
+import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
+import { formatPrice } from '@/lib/utils';
 
 function CartContentInner() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const { data: cart, error: cartError, isLoading } = useCart()
+  const { data: cart, error: cartError, isLoading } = useCart();
 
   // Mutations
-  const updateCartItemMutation = useUpdateCartItem()
-  const removeFromCartMutation = useRemoveFromCart()
+  const updateCartItemMutation = useUpdateCartItem();
+  const removeFromCartMutation = useRemoveFromCart();
 
   const handleUpdateQuantity = (itemId: string, quantity: number) => {
-    if (quantity < 1) return
+    if (quantity < 1) return;
 
     updateCartItemMutation.mutate({
       cartItemId: itemId,
       data: { quantity },
-    })
-  }
+    });
+  };
 
   const handleRemoveItem = (itemId: string) => {
-    removeFromCartMutation.mutate(itemId)
-  }
+    removeFromCartMutation.mutate(itemId);
+  };
 
   // Check if specific item is being updated (only during actual API call, not during debounce)
   const isItemUpdating = (itemId: string) => {
@@ -58,12 +58,12 @@ function CartContentInner() {
       (updateCartItemMutation.isPending &&
         updateCartItemMutation.variables?.cartItemId === itemId) ||
       (removeFromCartMutation.isPending && removeFromCartMutation.variables === itemId)
-    )
-  }
+    );
+  };
 
   // Show loading state
   if (isLoading) {
-    return <CartLoading />
+    return <CartLoading />;
   }
 
   if (cartError || !cart || !cart.items || cart.items.length === 0) {
@@ -79,7 +79,7 @@ function CartContentInner() {
           Tiếp tục mua sắm
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -165,7 +165,7 @@ function CartContentInner() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 function CartLoading() {
@@ -201,9 +201,9 @@ function CartLoading() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function CartContent() {
-  return <CartContentInner />
+  return <CartContentInner />;
 }

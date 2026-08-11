@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { MDXComponents } from 'mdx/types'
-import Image from 'next/image'
+import type { MDXComponents } from 'mdx/types';
+import Image from 'next/image';
 
 /**
  * MDX components for blog posts
@@ -95,10 +95,10 @@ export function getMDXComponents(components: MDXComponents): MDXComponents {
     ),
     code: ({ className, ...props }) => {
       // Check if this is inline code or code block
-      const isCodeBlock = className?.includes('language-')
+      const isCodeBlock = className?.includes('language-');
       if (isCodeBlock) {
         // Code block - Shiki will handle styling
-        return <code className={className} {...props} />
+        return <code className={className} {...props} />;
       }
       // Inline code
       return (
@@ -106,7 +106,7 @@ export function getMDXComponents(components: MDXComponents): MDXComponents {
           className={`text-wds-text rounded px-1.5 py-0.5 text-sm ${className ?? ''}`.trim()}
           {...props}
         />
-      )
+      );
     },
 
     // Blockquote
@@ -119,7 +119,7 @@ export function getMDXComponents(components: MDXComponents): MDXComponents {
 
     // Images
     img: ({ src, alt, ...props }) => {
-      if (!src) return null
+      if (!src) return null;
       // If it's a relative path or external URL, use Next.js Image
       if (src.startsWith('http') || src.startsWith('/')) {
         return (
@@ -131,10 +131,10 @@ export function getMDXComponents(components: MDXComponents): MDXComponents {
             className="my-4 rounded-lg"
             {...props}
           />
-        )
+        );
       }
       // Fallback to regular img tag
-      return <img src={src} alt={alt} className="my-4 rounded-lg" {...props} />
+      return <img src={src} alt={alt} className="my-4 rounded-lg" {...props} />;
     },
 
     // Horizontal rule
@@ -179,5 +179,5 @@ export function getMDXComponents(components: MDXComponents): MDXComponents {
 
     // Spread any other components
     ...components,
-  }
+  };
 }

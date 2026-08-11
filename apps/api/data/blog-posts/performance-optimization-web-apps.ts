@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'performance-optimization-web-apps',
@@ -99,4 +99,4 @@ Performance optimization is an ongoing process. Monitor and iterate!`,
   metaDescription:
     'Learn techniques for optimizing web application performance including code splitting, lazy loading, and caching.',
   isPublished: true,
-}
+};

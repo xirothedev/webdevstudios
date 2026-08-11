@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import Link from 'next/link'
+import Link from 'next/link';
 
 interface AuthFooterProps {
-  variant?: 'login' | 'signup'
+  variant?: 'login' | 'signup';
 }
 
 export function AuthFooter({ variant = 'login' }: AuthFooterProps) {
@@ -72,5 +72,5 @@ export function AuthFooter({ variant = 'login' }: AuthFooterProps) {
         )}
       </div>
     </>
-  )
+  );
 }

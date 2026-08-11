@@ -20,19 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { ChevronRight, X } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, X } from 'lucide-react';
+import Link from 'next/link';
 
-import { Button } from '@/components/ui/button'
-import { Order, OrderStatus, PaymentStatus } from '@/lib/api/orders'
-import { formatPrice } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { Order, OrderStatus, PaymentStatus } from '@/lib/api/orders';
+import { formatPrice } from '@/lib/utils';
 
 interface OrderCardProps {
-  order: Order
-  onCancel?: (orderId: string) => void
-  isCancelling?: boolean
+  order: Order;
+  onCancel?: (orderId: string) => void;
+  isCancelling?: boolean;
 }
 
 const getStatusConfig = (status: OrderStatus) => {
@@ -65,9 +65,9 @@ const getStatusConfig = (status: OrderStatus) => {
       text: 'Đã trả hàng',
       className: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
     },
-  }
-  return configs[status]
-}
+  };
+  return configs[status];
+};
 
 const getPaymentStatusConfig = (status: PaymentStatus) => {
   const configs: Record<PaymentStatus, { text: string; className: string }> = {
@@ -87,25 +87,25 @@ const getPaymentStatusConfig = (status: PaymentStatus) => {
       text: 'Đã hoàn tiền',
       className: 'text-gray-400',
     },
-  }
-  return configs[status]
-}
+  };
+  return configs[status];
+};
 
 export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
-  const statusConfig = getStatusConfig(order.status)
-  const paymentStatusConfig = getPaymentStatusConfig(order.paymentStatus)
-  const canCancel = order.status === 'PENDING' && order.paymentStatus !== 'PAID'
-  const displayedItems = order.items.slice(0, 3)
-  const hasMoreItems = order.items.length > 3
+  const statusConfig = getStatusConfig(order.status);
+  const paymentStatusConfig = getPaymentStatusConfig(order.paymentStatus);
+  const canCancel = order.status === 'PENDING' && order.paymentStatus !== 'PAID';
+  const displayedItems = order.items.slice(0, 3);
+  const hasMoreItems = order.items.length > 3;
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-    })
-  }
+    });
+  };
 
   return (
     <div className="group hover:border-wds-accent/30 flex h-full flex-col rounded-xl border border-white/10 bg-white/5 p-6 transition-all">
@@ -192,5 +192,5 @@ export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

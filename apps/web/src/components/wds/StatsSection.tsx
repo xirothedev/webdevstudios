@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { BriefcaseBusiness, Layers3, Timer, Users } from 'lucide-react'
-import { motion } from 'motion/react'
+import { BriefcaseBusiness, Layers3, Timer, Users } from 'lucide-react';
+import { motion } from 'motion/react';
 
-import { NumberTicker } from '@/components/ui/number-ticker'
+import { NumberTicker } from '@/components/ui/number-ticker';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
   animate: { opacity: 1, y: 0 },
-}
+};
 
 export function WDSStatsSection() {
   return (
@@ -77,15 +77,15 @@ export function WDSStatsSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
 
 interface StatItemProps {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  label: string
-  value: number
-  suffix?: string
-  delay?: number
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  label: string;
+  value: number;
+  suffix?: string;
+  delay?: number;
 }
 
 function StatItem({ icon: Icon, label, value, suffix, delay = 0 }: StatItemProps) {
@@ -106,5 +106,5 @@ function StatItem({ icon: Icon, label, value, suffix, delay = 0 }: StatItemProps
       </div>
       <p className="max-w-xs text-sm font-medium text-gray-800 sm:text-base">{label}</p>
     </motion.div>
-  )
+  );
 }

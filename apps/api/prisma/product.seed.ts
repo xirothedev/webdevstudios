@@ -22,22 +22,22 @@
 
 /// <reference types="node" />
 
-import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaPg } from '@prisma/adapter-pg';
 
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient } from '../generated/prisma/client';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
-})
+});
 
 async function main() {
-  console.log('Starting seed...')
+  console.log('Starting seed...');
 
   // Clean existing products
-  await prisma.productSizeStock.deleteMany({})
-  await prisma.product.deleteMany({})
+  await prisma.productSizeStock.deleteMany({});
+  await prisma.product.deleteMany({});
 
-  console.log('Seeding products...')
+  console.log('Seeding products...');
 
   // Create Áo thun WebDev Studios (with sizes)
   const aoThun = await prisma.product.create({
@@ -69,8 +69,8 @@ Size có sẵn: S, M, L, XL`,
         ],
       },
     },
-  })
-  console.log(`Created product: ${aoThun.name}`)
+  });
+  console.log(`Created product: ${aoThun.name}`);
 
   // Create Mouse Pad WebDev Studios (without sizes)
   const padChuot = await prisma.product.create({
@@ -95,8 +95,8 @@ Màu sắc: Đen với logo WebDev Studios`,
       ratingCount: 256,
       isPublished: true,
     },
-  })
-  console.log(`Created product: ${padChuot.name}`)
+  });
+  console.log(`Created product: ${padChuot.name}`);
 
   // Create Lanyard WebDev Studios (without sizes)
   const dayDeo = await prisma.product.create({
@@ -121,8 +121,8 @@ Màu sắc: Xanh đen với logo bạc`,
       ratingCount: 89,
       isPublished: true,
     },
-  })
-  console.log(`Created product: ${dayDeo.name}`)
+  });
+  console.log(`Created product: ${dayDeo.name}`);
 
   // Create Keychain WebDev Studios (without sizes)
   const mocKhoa = await prisma.product.create({
@@ -147,23 +147,23 @@ Màu sắc: Nhiều màu sắc với logo WebDev Studios`,
       ratingCount: 312,
       isPublished: true,
     },
-  })
-  console.log(`Created product: ${mocKhoa.name}`)
+  });
+  console.log(`Created product: ${mocKhoa.name}`);
 
-  console.log('Seed completed successfully!')
-  console.log('\n📊 Summary:')
-  console.log('- Áo Thun: 4 sizes (S:50, M:45, L:30, XL:20)')
-  console.log('- Pad Chuột: 100')
-  console.log('- Dây Đeo: 200')
-  console.log('- Móc Khóa: 500')
-  console.log('\n💡 To seed user data, run: bun run prisma:seed:user')
+  console.log('Seed completed successfully!');
+  console.log('\n📊 Summary:');
+  console.log('- Áo Thun: 4 sizes (S:50, M:45, L:30, XL:20)');
+  console.log('- Pad Chuột: 100');
+  console.log('- Dây Đeo: 200');
+  console.log('- Móc Khóa: 500');
+  console.log('\n💡 To seed user data, run: bun run prisma:seed:user');
 }
 
 main()
   .catch((e) => {
-    console.error('Error during seed:', e)
-    process.exit(1)
+    console.error('Error during seed:', e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });

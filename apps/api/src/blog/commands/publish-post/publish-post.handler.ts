@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { BlogPostWithRelations } from '../../blog.types'
-import { BlogPostDto } from '../../dtos'
-import { BlogRepository } from '../../infrastructure/blog.repository'
-import { PublishBlogPostCommand } from './publish-post.command'
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto } from '../../dtos';
+import { BlogRepository } from '../../infrastructure/blog.repository';
+import { PublishBlogPostCommand } from './publish-post.command';
 
 @CommandHandler(PublishBlogPostCommand)
 @Injectable()
@@ -34,24 +34,24 @@ export class PublishBlogPostHandler implements ICommandHandler<PublishBlogPostCo
   constructor(private readonly blogRepository: BlogRepository) {}
 
   async execute(command: PublishBlogPostCommand): Promise<BlogPostDto> {
-    const { postId } = command
+    const { postId } = command;
 
-    const post = await this.blogRepository.findById(postId)
+    const post = await this.blogRepository.findById(postId);
     if (!post) {
-      throw new NotFoundException(`Blog post with id ${postId} not found`)
+      throw new NotFoundException(`Blog post with id ${postId} not found`);
     }
 
     await this.blogRepository.update(postId, {
       isPublished: true,
       publishedAt: post.publishedAt || new Date(),
-    })
+    });
 
-    const updatedPost = await this.blogRepository.findById(postId)
+    const updatedPost = await this.blogRepository.findById(postId);
     if (!updatedPost) {
-      throw new NotFoundException('Blog post not found after update')
+      throw new NotFoundException('Blog post not found after update');
     }
 
-    return this.mapToDto(updatedPost)
+    return this.mapToDto(updatedPost);
   }
 
   private mapToDto(post: BlogPostWithRelations): BlogPostDto {
@@ -75,6 +75,6 @@ export class PublishBlogPostHandler implements ICommandHandler<PublishBlogPostCo
       metaDescription: post.metaDescription,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    }
+    };
   }
 }

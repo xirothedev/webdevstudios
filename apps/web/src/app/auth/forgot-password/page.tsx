@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useRequestPasswordReset } from '@/lib/api/hooks/use-auth'
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useRequestPasswordReset } from '@/lib/api/hooks/use-auth';
 
 // Validation schema with Zod
 const forgotPasswordSchema = z.object({
   email: z.email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
-})
+});
 
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
   const {
@@ -49,16 +49,16 @@ export default function ForgotPasswordPage() {
     defaultValues: {
       email: '',
     },
-  })
+  });
 
-  const requestPasswordResetMutation = useRequestPasswordReset()
+  const requestPasswordResetMutation = useRequestPasswordReset();
 
   const onSubmit = (data: ForgotPasswordFormData) => {
-    requestPasswordResetMutation.mutate(data.email)
-  }
+    requestPasswordResetMutation.mutate(data.email);
+  };
 
-  const isLoading = isSubmitting || requestPasswordResetMutation.isPending
-  const isSuccess = requestPasswordResetMutation.isSuccess
+  const isLoading = isSubmitting || requestPasswordResetMutation.isPending;
+  const isSuccess = requestPasswordResetMutation.isSuccess;
 
   return (
     <AuthLayout variant="login">
@@ -133,5 +133,5 @@ export default function ForgotPasswordPage() {
         )}
       </div>
     </AuthLayout>
-  )
+  );
 }

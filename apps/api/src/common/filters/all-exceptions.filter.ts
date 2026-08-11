@@ -27,8 +27,8 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from '@nestjs/common'
-import { Request, Response } from 'express'
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 
 /**
  * Catch all unhandled exceptions (non-HTTP exceptions)
@@ -37,25 +37,25 @@ import { Request, Response } from 'express'
  */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(AllExceptionsFilter.name)
-  private readonly isProduction: boolean
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+  private readonly isProduction: boolean;
 
   constructor() {
-    this.isProduction = process.env.NODE_ENV === 'production'
+    this.isProduction = process.env.NODE_ENV === 'production';
   }
 
   catch(exception: unknown, host: ArgumentsHost) {
     // Skip if it's an HttpException (let HttpExceptionFilter handle it)
     if (exception instanceof HttpException) {
-      return
+      return;
     }
 
-    const ctx = host.switchToHttp()
-    const response = ctx.getResponse<Response>()
-    const request = ctx.getRequest<Request>()
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     // Extract error message
-    const originalMessage = exception instanceof Error ? exception.message : String(exception)
+    const originalMessage = exception instanceof Error ? exception.message : String(exception);
 
     // Log full error details (server-side only)
     this.logger.error(
@@ -68,12 +68,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         userAgent: request.headers['user-agent'],
         userId: (request as { user?: { id: string } }).user?.id,
       },
-    )
+    );
 
     // Sanitize response for production
     const safeMessage = this.isProduction
       ? 'An internal error occurred. Please try again later.'
-      : originalMessage
+      : originalMessage;
 
     const errorResponse = {
       success: false,
@@ -90,8 +90,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
             details: originalMessage,
             stack: exception instanceof Error ? exception.stack : undefined,
           }),
-    }
+    };
 
-    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(errorResponse)
+    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(errorResponse);
   }
 }

@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus, UserRole } from '@generated/prisma'
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { OrderStatus, UserRole } from '@generated/prisma';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -30,23 +30,23 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger'
+} from '@nestjs/swagger';
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator'
-import { Roles, ThrottleAPI } from '@/common/decorators'
-import { RolesGuard } from '@/common/guards'
-import { CancelOrderCommand } from './commands/cancel-order'
-import { CreateOrderCommand } from './commands/create-order'
-import { UpdateOrderStatusCommand } from './commands/update-order-status'
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Roles, ThrottleAPI } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CancelOrderCommand } from './commands/cancel-order';
+import { CreateOrderCommand } from './commands/create-order';
+import { UpdateOrderStatusCommand } from './commands/update-order-status';
 import {
   CreateOrderDto,
   OrderDto,
   OrderListResponseDto,
   UpdateOrderStatusDto,
-} from './dtos/order.dto'
-import { GetOrderByIdQuery } from './queries/get-order-by-id'
-import { ListAllOrdersQuery } from './queries/list-all-orders'
-import { ListOrdersQuery } from './queries/list-orders'
+} from './dtos/order.dto';
+import { GetOrderByIdQuery } from './queries/get-order-by-id';
+import { ListAllOrdersQuery } from './queries/list-all-orders';
+import { ListOrdersQuery } from './queries/list-orders';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -86,7 +86,7 @@ export class OrdersController {
         dto.size,
         dto.quantity,
       ),
-    )
+    );
   }
 
   @Get()
@@ -122,7 +122,7 @@ export class OrdersController {
   ): Promise<OrderListResponseDto> {
     return this.queryBus.execute(
       new ListOrdersQuery(user.id, page ? parseInt(page, 10) : 1, limit ? parseInt(limit, 10) : 10),
-    )
+    );
   }
 
   @Get(':id')
@@ -148,7 +148,7 @@ export class OrdersController {
     @Param('id') id: string,
     @CurrentUser() user: { id: string; role: UserRole },
   ): Promise<OrderDto> {
-    return this.queryBus.execute(new GetOrderByIdQuery(id, user.id, user.role))
+    return this.queryBus.execute(new GetOrderByIdQuery(id, user.id, user.role));
   }
 
   @Get('admin/all')
@@ -197,7 +197,7 @@ export class OrdersController {
         limit ? parseInt(limit, 10) : 10,
         status as OrderStatus | undefined,
       ),
-    )
+    );
   }
 
   @Patch(':id/status')
@@ -226,7 +226,7 @@ export class OrdersController {
     @Body() dto: UpdateOrderStatusDto,
     @CurrentUser() user: { role: UserRole },
   ): Promise<OrderDto> {
-    return this.commandBus.execute(new UpdateOrderStatusCommand(id, dto.status, user.role))
+    return this.commandBus.execute(new UpdateOrderStatusCommand(id, dto.status, user.role));
   }
 
   @Patch(':id/cancel')
@@ -256,6 +256,6 @@ export class OrdersController {
     @Param('id') id: string,
     @CurrentUser() user: { id: string },
   ): Promise<OrderDto> {
-    return this.commandBus.execute(new CancelOrderCommand(id, user.id))
+    return this.commandBus.execute(new CancelOrderCommand(id, user.id));
   }
 }

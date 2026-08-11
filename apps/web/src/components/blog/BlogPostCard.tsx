@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { BlogPost } from '@/lib/api/blog'
+import { BlogPost } from '@/lib/api/blog';
 
 interface BlogPostCardProps {
-  post: BlogPost
+  post: BlogPost;
 }
 
 export function BlogPostCard({ post }: BlogPostCardProps) {
@@ -72,5 +72,5 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         </div>
       </div>
     </Link>
-  )
+  );
 }

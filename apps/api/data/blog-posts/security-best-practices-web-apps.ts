@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types'
+import { BlogPostSeedData } from './types';
 
 export const blogPost: BlogPostSeedData = {
   slug: 'security-best-practices-web-apps',
@@ -121,4 +121,4 @@ Security is not optional. Implement these practices from the start!`,
   metaDescription:
     'Learn essential security practices for web applications including authentication, authorization, and vulnerability prevention.',
   isPublished: true,
-}
+};

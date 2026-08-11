@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Session, SessionData } from 'express-session'
+import type { Session, SessionData } from 'express-session';
 
 declare module 'express-session' {
   interface SessionData {
-    oauthRedirectUrl?: string
+    oauthRedirectUrl?: string;
   }
 }
 
 export interface AuthenticatedUser {
-  id: string
-  email: string
-  role?: string
+  id: string;
+  email: string;
+  role?: string;
 }
 
 declare module 'express-serve-static-core' {
   interface Request {
-    sessionID: string
-    session: Session & Partial<SessionData>
-    user?: AuthenticatedUser
+    sessionID: string;
+    session: Session & Partial<SessionData>;
+    user?: AuthenticatedUser;
   }
 }

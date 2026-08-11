@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query';
 
-import { AdminChart } from '@/components/admin/AdminChart'
-import { AdminHeader } from '@/components/admin/AdminHeader'
-import { adminApi } from '@/lib/api/admin'
+import { AdminChart } from '@/components/admin/AdminChart';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { adminApi } from '@/lib/api/admin';
 
 // Mock data for charts (will be replaced with real data later)
 const revenueData = [
@@ -36,7 +36,7 @@ const revenueData = [
   { name: 'Tháng 4', revenue: 6100000 },
   { name: 'Tháng 5', revenue: 5500000 },
   { name: 'Tháng 6', revenue: 6700000 },
-]
+];
 
 const ordersData = [
   { name: 'Tháng 1', orders: 12 },
@@ -45,28 +45,28 @@ const ordersData = [
   { name: 'Tháng 4', orders: 22 },
   { name: 'Tháng 5', orders: 18 },
   { name: 'Tháng 6', orders: 25 },
-]
+];
 
 export function AdminDashboardContent() {
   const { data: usersData } = useQuery({
     queryKey: ['admin', 'users', 1, 1],
     queryFn: () => adminApi.listUsers(1, 1),
-  })
+  });
 
   const { data: productsData } = useQuery({
     queryKey: ['admin', 'products'],
     queryFn: () => adminApi.listProducts(),
-  })
+  });
 
   const { data: ordersListData } = useQuery({
     queryKey: ['admin', 'orders', 1, 1],
     queryFn: () => adminApi.listOrders(1, 1),
-  })
+  });
 
-  const totalUsers = usersData?.pagination.total || 0
-  const totalProducts = productsData?.total || 0
-  const totalOrders = ordersListData?.total || 0
-  const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0)
+  const totalUsers = usersData?.pagination.total || 0;
+  const totalProducts = productsData?.total || 0;
+  const totalOrders = ordersListData?.total || 0;
+  const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);
 
   return (
     <div className="flex h-full flex-col">
@@ -118,5 +118,5 @@ export function AdminDashboardContent() {
         </div>
       </div>
     </div>
-  )
+  );
 }

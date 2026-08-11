@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { doubleCsrf, DoubleCsrfConfigOptions, DoubleCsrfUtilities } from 'csrf-csrf'
-import type { Request, Response } from 'express'
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { doubleCsrf, DoubleCsrfConfigOptions, DoubleCsrfUtilities } from 'csrf-csrf';
+import type { Request, Response } from 'express';
 
 /**
  * CSRF Service
@@ -31,19 +31,19 @@ import type { Request, Response } from 'express'
  */
 @Injectable()
 export class CsrfService {
-  private readonly csrfUtilities: DoubleCsrfUtilities
-  private readonly isProduction: boolean
+  private readonly csrfUtilities: DoubleCsrfUtilities;
+  private readonly isProduction: boolean;
 
   constructor(private readonly configService: ConfigService) {
-    this.isProduction = process.env.NODE_ENV === 'production'
+    this.isProduction = process.env.NODE_ENV === 'production';
 
     const csrfOptions: DoubleCsrfConfigOptions = {
       getSecret: () => {
-        return this.configService.getOrThrow<string>('CSRF_SECRET')
+        return this.configService.getOrThrow<string>('CSRF_SECRET');
       },
       getSessionIdentifier: (req: Request) => {
         // Use session ID or IP as identifier
-        return req.sessionID || req.ip || 'anonymous'
+        return req.sessionID || req.ip || 'anonymous';
       },
       cookieName: '_csrf',
       cookieOptions: {
@@ -58,25 +58,25 @@ export class CsrfService {
           (req.headers['x-csrf-token'] as string | undefined) ||
           (req.body && req.body._csrf) ||
           (req.query && (req.query._csrf as string | undefined))
-        )
+        );
       },
       size: 32,
-    }
+    };
 
-    this.csrfUtilities = doubleCsrf(csrfOptions)
+    this.csrfUtilities = doubleCsrf(csrfOptions);
   }
 
   /**
    * Generate CSRF token for client
    */
   generateToken(req: Request, res: Response): string {
-    return this.csrfUtilities.generateCsrfToken(req, res)
+    return this.csrfUtilities.generateCsrfToken(req, res);
   }
 
   /**
    * Get CSRF protection middleware function
    */
   getProtection() {
-    return this.csrfUtilities.doubleCsrfProtection
+    return this.csrfUtilities.doubleCsrfProtection;
   }
 }

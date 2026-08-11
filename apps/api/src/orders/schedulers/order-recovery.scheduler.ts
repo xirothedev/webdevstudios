@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { CommandBus } from '@nestjs/cqrs'
-import { Cron, CronExpression } from '@nestjs/schedule'
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { ExpireOrderCommand } from '../commands/expire-order'
-import { OrderRepository } from '../infrastructure/order.repository'
+import { ExpireOrderCommand } from '../commands/expire-order';
+import { OrderRepository } from '../infrastructure/order.repository';
 
 @Injectable()
 export class OrderRecoveryScheduler implements OnModuleInit {
-  private readonly logger = new Logger(OrderRecoveryScheduler.name)
+  private readonly logger = new Logger(OrderRecoveryScheduler.name);
 
   constructor(
     private readonly orderRepository: OrderRepository,
@@ -38,42 +38,42 @@ export class OrderRecoveryScheduler implements OnModuleInit {
 
   // Run on module init (app startup)
   async onModuleInit() {
-    this.logger.log('Running order recovery on startup...')
-    await this.recoverStuckOrders()
+    this.logger.log('Running order recovery on startup...');
+    await this.recoverStuckOrders();
   }
 
   // Also run periodically every 5 minutes
   @Cron(CronExpression.EVERY_5_MINUTES)
   async handleRecovery() {
-    await this.recoverStuckOrders()
+    await this.recoverStuckOrders();
   }
 
   private async recoverStuckOrders() {
     try {
-      const expiredOrders = await this.orderRepository.findExpiredPendingOrders()
+      const expiredOrders = await this.orderRepository.findExpiredPendingOrders();
 
       if (expiredOrders.length === 0) {
-        this.logger.debug('No stuck orders found')
-        return
+        this.logger.debug('No stuck orders found');
+        return;
       }
 
-      this.logger.log(`Found ${expiredOrders.length} stuck orders to recover`)
+      this.logger.log(`Found ${expiredOrders.length} stuck orders to recover`);
 
       // Process each stuck order
       for (const order of expiredOrders) {
         try {
-          await this.commandBus.execute(new ExpireOrderCommand(order.id))
-          this.logger.log(`Recovered stuck order ${order.id} (${order.code})`)
+          await this.commandBus.execute(new ExpireOrderCommand(order.id));
+          this.logger.log(`Recovered stuck order ${order.id} (${order.code})`);
         } catch (error) {
           this.logger.error(
             `Failed to recover order ${order.id}: ${error instanceof Error ? error.message : String(error)}`,
-          )
+          );
         }
       }
     } catch (error) {
       this.logger.error(
         `Error in order recovery scheduler: ${error instanceof Error ? error.message : String(error)}`,
-      )
+      );
     }
   }
 }

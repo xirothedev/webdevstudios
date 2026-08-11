@@ -20,19 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { MarkdownEditor } from '@/components/ui/markdown-editor'
-import { adminApi } from '@/lib/api/admin'
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { adminApi } from '@/lib/api/admin';
 
 // Validation schema with Zod
 const productFormSchema = z.object({
@@ -40,25 +40,25 @@ const productFormSchema = z.object({
   description: z.string().min(1, 'Mô tả sản phẩm là bắt buộc'),
   priceCurrent: z.number().min(0, 'Giá phải lớn hơn hoặc bằng 0').optional(),
   priceOriginal: z.number().min(0, 'Giá gốc phải lớn hơn hoặc bằng 0').nullable().optional(),
-})
+});
 
-type ProductFormData = z.infer<typeof productFormSchema>
+type ProductFormData = z.infer<typeof productFormSchema>;
 
 interface ProductEditorProps {
-  productId: string
-  onSave?: () => void
-  onCancel?: () => void
+  productId: string;
+  onSave?: () => void;
+  onCancel?: () => void;
 }
 
 export function ProductEditor({ productId, onSave, onCancel }: ProductEditorProps) {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const { data: products } = useQuery({
     queryKey: ['admin', 'products'],
     queryFn: () => adminApi.listProducts(),
-  })
+  });
 
-  const product = products?.products.find((p) => p.id === productId)
+  const product = products?.products.find((p) => p.id === productId);
 
   const {
     register,
@@ -75,10 +75,10 @@ export function ProductEditor({ productId, onSave, onCancel }: ProductEditorProp
       priceCurrent: undefined,
       priceOriginal: undefined,
     },
-  })
+  });
 
   // Watch name for dynamic header
-  const watchedName = watch('name')
+  const watchedName = watch('name');
 
   // Reset form when product data is loaded
   useEffect(() => {
@@ -88,45 +88,45 @@ export function ProductEditor({ productId, onSave, onCancel }: ProductEditorProp
         description: product.description,
         priceCurrent: product.priceCurrent,
         priceOriginal: product.priceOriginal ?? undefined,
-      })
+      });
     }
-  }, [product, reset])
+  }, [product, reset]);
 
   const updateMutation = useMutation({
     mutationFn: (data: {
-      name?: string
-      description?: string
-      priceCurrent?: number
-      priceOriginal?: number | null
-      badge?: string | null
-      isPublished?: boolean
+      name?: string;
+      description?: string;
+      priceCurrent?: number;
+      priceOriginal?: number | null;
+      badge?: string | null;
+      isPublished?: boolean;
     }) => adminApi.updateProduct(productId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
-      toast.success('Product updated successfully')
-      onSave?.()
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      toast.success('Product updated successfully');
+      onSave?.();
     },
     onError: () => {
-      toast.error('Failed to update product')
+      toast.error('Failed to update product');
     },
-  })
+  });
 
   if (!product) {
-    return <div className="text-wds-text/70">Product not found</div>
+    return <div className="text-wds-text/70">Product not found</div>;
   }
 
   const onSubmit = (data: ProductFormData) => {
-    console.log(data)
+    console.log(data);
 
     updateMutation.mutate({
       name: data.name.trim(),
       description: data.description || '',
       priceCurrent: data.priceCurrent,
       priceOriginal: data.priceOriginal ?? null,
-    })
-  }
+    });
+  };
 
-  const isLoading = isSubmitting || updateMutation.isPending
+  const isLoading = isSubmitting || updateMutation.isPending;
 
   return (
     <div className="border-wds-accent/30 bg-wds-background space-y-4 rounded-2xl border p-6">
@@ -236,5 +236,5 @@ export function ProductEditor({ productId, onSave, onCancel }: ProductEditorProp
         </div>
       </form>
     </div>
-  )
+  );
 }

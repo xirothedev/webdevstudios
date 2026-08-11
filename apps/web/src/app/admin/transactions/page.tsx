@@ -20,18 +20,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { useQuery } from '@tanstack/react-query'
-import { format } from 'date-fns'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { useState } from 'react';
 
-import { AdminHeader } from '@/components/admin/AdminHeader'
-import { ColumnVisibilityToggle } from '@/components/admin/ColumnVisibilityToggle'
-import { DataTable } from '@/components/admin/DataTable'
-import { TableFilters } from '@/components/admin/TableFilters'
-import { adminApi, type PaymentTransactionStatus } from '@/lib/api/admin'
-import { formatPrice } from '@/lib/utils'
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { ColumnVisibilityToggle } from '@/components/admin/ColumnVisibilityToggle';
+import { DataTable } from '@/components/admin/DataTable';
+import { TableFilters } from '@/components/admin/TableFilters';
+import { adminApi, type PaymentTransactionStatus } from '@/lib/api/admin';
+import { formatPrice } from '@/lib/utils';
 
 const columns = [
   { id: 'transactionCode', label: 'Transaction Code' },
@@ -39,18 +39,18 @@ const columns = [
   { id: 'amount', label: 'Amount' },
   { id: 'status', label: 'Status' },
   { id: 'createdAt', label: 'Created At' },
-]
+];
 
 export default function TransactionsPage() {
-  const [page, setPage] = useState(1)
-  const [limit] = useState(10)
-  const [statusFilter, setStatusFilter] = useState<PaymentTransactionStatus | undefined>()
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id))
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [statusFilter, setStatusFilter] = useState<PaymentTransactionStatus | undefined>();
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id));
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'transactions', page, limit, statusFilter],
     queryFn: () => adminApi.listTransactions(page, limit, statusFilter),
-  })
+  });
 
   const tableData =
     data?.transactions.map((transaction) => ({
@@ -71,7 +71,7 @@ export default function TransactionsPage() {
         </span>
       ),
       createdAt: format(new Date(transaction.createdAt), 'dd/MM/yyyy HH:mm'),
-    })) || []
+    })) || [];
 
   return (
     <div className="flex h-full flex-col">
@@ -141,5 +141,5 @@ export default function TransactionsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

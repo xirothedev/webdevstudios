@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common'
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { SessionRepository } from '../../infrastructure'
-import { LogoutCommand } from './logout.command'
+import { SessionRepository } from '../../infrastructure';
+import { LogoutCommand } from './logout.command';
 
 @Injectable()
 @CommandHandler(LogoutCommand)
@@ -32,16 +32,16 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
   constructor(private readonly sessionRepository: SessionRepository) {}
 
   async execute(command: LogoutCommand): Promise<{ success: boolean }> {
-    const { userId, sessionId } = command
+    const { userId, sessionId } = command;
 
     if (sessionId) {
       // Revoke specific session
-      await this.sessionRepository.revoke(sessionId)
+      await this.sessionRepository.revoke(sessionId);
     } else {
       // Revoke all sessions for user
-      await this.sessionRepository.revokeAllByUserId(userId)
+      await this.sessionRepository.revokeAllByUserId(userId);
     }
 
-    return { success: true }
+    return { success: true };
   }
 }

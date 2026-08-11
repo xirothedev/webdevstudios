@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata'
+import { createPageMetadata, SEO_IMAGES } from '@/lib/metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Đăng ký',
@@ -31,12 +31,12 @@ export const metadata: Metadata = createPageMetadata({
   path: '/auth/signup',
   image: SEO_IMAGES['/'],
   keywords: ['Đăng ký WDS', 'WebDev Studios signup', 'Tạo tài khoản WebDev Studios'],
-})
+});
 
 export default function SignupLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  return children
+  return children;
 }

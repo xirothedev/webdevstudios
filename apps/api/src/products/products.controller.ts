@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize, ProductSlug, UserRole } from '@generated/prisma'
-import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { ProductSize, ProductSlug, UserRole } from '@generated/prisma';
+import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -30,13 +30,13 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger'
+} from '@nestjs/swagger';
 
-import { Public, Roles } from '@/common/decorators'
-import { RolesGuard } from '@/common/guards'
-import { UpdateProductCommand } from './commands/update-product'
-import { UpdateProductSizesCommand } from './commands/update-product-sizes'
-import { UpdateProductStockCommand } from './commands/update-product-stock'
+import { Public, Roles } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { UpdateProductCommand } from './commands/update-product';
+import { UpdateProductSizesCommand } from './commands/update-product-sizes';
+import { UpdateProductStockCommand } from './commands/update-product-stock';
 import {
   ProductDto,
   ProductListResponseDto,
@@ -44,10 +44,10 @@ import {
   UpdateProductDto,
   UpdateProductSizesDto,
   UpdateProductStockDto,
-} from './dtos'
-import { GetProductBySlugQuery } from './queries/get-product-by-slug'
-import { GetProductStockQuery } from './queries/get-product-stock'
-import { ListProductsQuery } from './queries/list-products'
+} from './dtos';
+import { GetProductBySlugQuery } from './queries/get-product-by-slug';
+import { GetProductStockQuery } from './queries/get-product-stock';
+import { ListProductsQuery } from './queries/list-products';
 
 @ApiTags('Products')
 @Controller('products')
@@ -69,7 +69,7 @@ export class ProductsController {
     type: ProductListResponseDto,
   })
   async listProducts(): Promise<ProductListResponseDto> {
-    return this.queryBus.execute(new ListProductsQuery())
+    return this.queryBus.execute(new ListProductsQuery());
   }
 
   @Get(':slug')
@@ -91,7 +91,7 @@ export class ProductsController {
   })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async getProductBySlug(@Param('slug') slug: string): Promise<ProductDto> {
-    return this.queryBus.execute(new GetProductBySlugQuery(slug as ProductSlug))
+    return this.queryBus.execute(new GetProductBySlugQuery(slug as ProductSlug));
   }
 
   @Get(':slug/stock')
@@ -125,7 +125,7 @@ export class ProductsController {
   ): Promise<StockInfoDto> {
     return this.queryBus.execute(
       new GetProductStockQuery(slug as ProductSlug, size ? (size as ProductSize) : undefined),
-    )
+    );
   }
 
   @Patch(':id')
@@ -161,7 +161,7 @@ export class ProductsController {
         dto.badge,
         dto.isPublished,
       ),
-    )
+    );
   }
 
   @Patch(':id/stock')
@@ -191,7 +191,7 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() dto: UpdateProductStockDto,
   ): Promise<ProductDto> {
-    return this.commandBus.execute(new UpdateProductStockCommand(id, dto.stock, dto.size))
+    return this.commandBus.execute(new UpdateProductStockCommand(id, dto.stock, dto.size));
   }
 
   @Patch(':id/sizes')
@@ -226,6 +226,6 @@ export class ProductsController {
         id,
         dto.sizeStocks.map((ss) => ({ size: ss.size, stock: ss.stock })),
       ),
-    )
+    );
   }
 }

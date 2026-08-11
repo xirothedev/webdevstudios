@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { motion } from 'motion/react'
+import { motion } from 'motion/react';
 
-import type { AwardItem } from '@/data/achievements'
+import type { AwardItem } from '@/data/achievements';
 
 interface AchievementCardProps {
-  item: AwardItem
-  index: number
+  item: AwardItem;
+  index: number;
 }
 
 export function AchievementCard({ item, index }: AchievementCardProps) {
@@ -64,5 +64,5 @@ export function AchievementCard({ item, index }: AchievementCardProps) {
         </p>
       </div>
     </motion.div>
-  )
+  );
 }

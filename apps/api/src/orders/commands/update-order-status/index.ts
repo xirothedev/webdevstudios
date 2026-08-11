@@ -1,2 +1,2 @@
-export * from './update-order-status.command'
-export * from './update-order-status.handler'
+export * from './update-order-status.command';
+export * from './update-order-status.handler';

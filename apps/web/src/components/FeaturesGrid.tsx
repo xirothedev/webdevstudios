@@ -20,52 +20,52 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { Circle, Shirt, ShoppingBag, Star } from 'lucide-react'
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRef } from 'react'
+import { Circle, Shirt, ShoppingBag, Star } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRef } from 'react';
 
 interface GlassCardProps {
-  children: React.ReactNode
-  className?: string
-  colSpan?: string
+  children: React.ReactNode;
+  className?: string;
+  colSpan?: string;
 }
 
 function GlassCard({ children, className = '', colSpan = 'col-span-1' }: GlassCardProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 })
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 })
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [8, -8])
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-8, 8])
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [8, -8]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-8, 8]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return
+    if (!ref.current) return;
 
-    const rect = ref.current.getBoundingClientRect()
-    const width = rect.width
-    const height = rect.height
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
 
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-    const xPct = mouseX / width - 0.5
-    const yPct = mouseY / height - 0.5
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
 
-    x.set(xPct)
-    y.set(yPct)
-  }
+    x.set(xPct);
+    y.set(yPct);
+  };
 
   const handleMouseLeave = () => {
-    x.set(0)
-    y.set(0)
-  }
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <div
@@ -85,7 +85,7 @@ function GlassCard({ children, className = '', colSpan = 'col-span-1' }: GlassCa
         {children}
       </motion.div>
     </div>
-  )
+  );
 }
 
 export function FeaturesGrid() {
@@ -306,5 +306,5 @@ export function FeaturesGrid() {
         </div>
       </div>
     </section>
-  )
+  );
 }

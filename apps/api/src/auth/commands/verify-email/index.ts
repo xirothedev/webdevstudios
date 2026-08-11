@@ -1,2 +1,2 @@
-export * from './verify-email.command'
-export * from './verify-email.handler'
+export * from './verify-email.command';
+export * from './verify-email.handler';

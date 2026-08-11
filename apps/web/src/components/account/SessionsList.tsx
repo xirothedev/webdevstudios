@@ -20,63 +20,63 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client'
+'use client';
 
-import { createElement } from 'react'
-import { formatDistanceToNow } from 'date-fns'
-import { LogOut, Monitor, Smartphone, Tablet } from 'lucide-react'
+import { createElement } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { LogOut, Monitor, Smartphone, Tablet } from 'lucide-react';
 
-import { Button } from '@/components/ui/button'
-import { useRevokeSession, useSessions } from '@/lib/api/hooks/use-settings'
-import { cn } from '@/lib/utils'
-import type { Session } from '@/types/auth.types'
+import { Button } from '@/components/ui/button';
+import { useRevokeSession, useSessions } from '@/lib/api/hooks/use-settings';
+import { cn } from '@/lib/utils';
+import type { Session } from '@/types/auth.types';
 
 function getDeviceIcon(type: string | null) {
   switch (type?.toUpperCase()) {
     case 'MOBILE':
-      return Smartphone
+      return Smartphone;
     case 'TABLET':
-      return Tablet
+      return Tablet;
     case 'DESKTOP':
-      return Monitor
+      return Monitor;
     default:
-      return Monitor
+      return Monitor;
   }
 }
 
 function DeviceTypeIcon({ type, className }: { type: string | null; className?: string }) {
-  return createElement(getDeviceIcon(type), { className })
+  return createElement(getDeviceIcon(type), { className });
 }
 
 function getDeviceTypeLabel(type: string | null): string {
   switch (type?.toUpperCase()) {
     case 'MOBILE':
-      return 'Điện thoại'
+      return 'Điện thoại';
     case 'TABLET':
-      return 'Máy tính bảng'
+      return 'Máy tính bảng';
     case 'DESKTOP':
-      return 'Máy tính'
+      return 'Máy tính';
     default:
-      return 'Thiết bị'
+      return 'Thiết bị';
   }
 }
 
 interface SessionCardProps {
-  session: Session
-  isCurrent: boolean
-  onRevoke: (sessionId: string) => void
-  isRevoking: boolean
+  session: Session;
+  isCurrent: boolean;
+  onRevoke: (sessionId: string) => void;
+  isRevoking: boolean;
 }
 
 function SessionCard({ session, isCurrent, onRevoke, isRevoking }: SessionCardProps) {
-  const deviceName = session.device?.name || getDeviceTypeLabel(session.device?.type || null)
+  const deviceName = session.device?.name || getDeviceTypeLabel(session.device?.type || null);
   const lastSeen = session.device?.lastSeenAt
     ? formatDistanceToNow(new Date(session.device.lastSeenAt), {
         addSuffix: true,
       })
     : formatDistanceToNow(new Date(session.createdAt), {
         addSuffix: true,
-      })
+      });
 
   return (
     <div
@@ -155,26 +155,26 @@ function SessionCard({ session, isCurrent, onRevoke, isRevoking }: SessionCardPr
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export function SessionsList() {
-  const { data: sessions, isLoading, error } = useSessions()
-  const revokeSession = useRevokeSession()
+  const { data: sessions, isLoading, error } = useSessions();
+  const revokeSession = useRevokeSession();
 
   const handleRevoke = (sessionId: string) => {
     if (!confirm('Bạn có chắc chắn muốn đăng xuất phiên làm việc này?')) {
-      return
+      return;
     }
-    revokeSession.mutate(sessionId)
-  }
+    revokeSession.mutate(sessionId);
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <p className="text-sm text-gray-600">Đang tải danh sách phiên làm việc...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -185,7 +185,7 @@ export function SessionsList() {
         </p>
         <p className="text-xs text-gray-600">Vui lòng thử lại sau</p>
       </div>
-    )
+    );
   }
 
   if (!sessions || sessions.length === 0) {
@@ -193,11 +193,11 @@ export function SessionsList() {
       <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
         <p className="text-sm text-gray-600">Không có phiên làm việc nào</p>
       </div>
-    )
+    );
   }
 
   // Get current session ID from localStorage or cookie (simplified - might need better detection)
-  const currentSessionId = sessions.find((s) => s.status === 'ACTIVE')?.id
+  const currentSessionId = sessions.find((s) => s.status === 'ACTIVE')?.id;
 
   return (
     <div className="space-y-3">
@@ -211,5 +211,5 @@ export function SessionsList() {
         />
       ))}
     </div>
-  )
+  );
 }

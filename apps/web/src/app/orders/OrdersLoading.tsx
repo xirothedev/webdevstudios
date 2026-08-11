@@ -64,5 +64,5 @@ export function OrdersLoading() {
         ))}
       </div>
     </div>
-  )
+  );
 }
