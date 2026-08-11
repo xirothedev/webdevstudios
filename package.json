@@ -27,9 +27,11 @@
     "prepare": "bunx --bun --no-install husky",
     "audit": "bun audit --audit-level=moderate",
     "audit:fix": "bun update --latest && bun audit --audit-level=moderate",
-    "outdated": "bun outdated --recursive"
+    "outdated": "bun outdated --recursive",
+    "lint:boundaries": "depcruise packages"
   },
   "devDependencies": {
+    "dependency-cruiser": "^18.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
