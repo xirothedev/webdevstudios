@@ -1,0 +1,14 @@
+name: Setup bun + Node
+description: >
+  Shared setup for CI jobs: bun install with frozen lockfile (postinstall
+  runs api's prisma generate). Assumes actions/checkout already ran in the
+  calling job.
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    - run: bun install --frozen-lockfile
+      shell: bash
