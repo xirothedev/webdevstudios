@@ -20,32 +20,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { PrismaService } from '../../../prisma/prisma.service';
-import { DeleteUserCommand } from './delete-user.command';
+import { UserRepository } from '@/auth/infrastructure'
+import { DeleteUserCommand } from './delete-user.command'
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async execute(command: DeleteUserCommand): Promise<{ success: boolean }> {
-    const { userId } = command;
+    const { userId } = command
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const user = await this.userRepository.findById(userId)
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found')
     }
 
     // Hard delete - remove user and all related data (cascade)
-    await this.prisma.user.delete({
-      where: { id: userId },
-    });
+    await this.userRepository.remove(userId)
 
-    return { success: true };
+    return { success: true }
   }
 }

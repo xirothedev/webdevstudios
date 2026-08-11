@@ -25,6 +25,6 @@ export class UpdateReviewCommand {
     public readonly reviewId: string,
     public readonly userId: string,
     public readonly rating?: number,
-    public readonly comment?: string | null
+    public readonly comment?: string | null,
   ) {}
 }

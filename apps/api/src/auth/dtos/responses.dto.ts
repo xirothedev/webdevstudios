@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class RegisterResponseDto {
   @ApiProperty({
     description: 'User ID',
     example: 'clx1234567890',
   })
-  userId: string;
+  userId: string
 }
 
 export class LoginResponseDto {
@@ -35,31 +35,31 @@ export class LoginResponseDto {
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  accessToken: string;
+  accessToken: string
 
   @ApiProperty({
     description: 'JWT refresh token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  refreshToken: string;
+  refreshToken: string
 
   @ApiProperty({
     description: 'User information',
   })
   user: {
-    id: string;
-    email: string;
-    fullName: string | null;
-    emailVerified: boolean;
-    mfaEnabled: boolean;
-  };
+    id: string
+    email: string
+    fullName: string | null
+    emailVerified: boolean
+    mfaEnabled: boolean
+  }
 
   @ApiProperty({
     description: 'Whether 2FA verification is required',
     example: false,
     required: false,
   })
-  requires2FA?: boolean;
+  requires2FA?: boolean
 }
 
 export class RefreshTokenResponseDto {
@@ -67,13 +67,13 @@ export class RefreshTokenResponseDto {
     description: 'New JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  accessToken: string;
+  accessToken: string
 
   @ApiProperty({
     description: 'New JWT refresh token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  refreshToken: string;
+  refreshToken: string
 }
 
 export class SuccessResponseDto {
@@ -81,7 +81,7 @@ export class SuccessResponseDto {
     description: 'Operation success status',
     example: true,
   })
-  success: boolean;
+  success: boolean
 }
 
 export class UserResponseDto {
@@ -89,71 +89,71 @@ export class UserResponseDto {
     description: 'User ID',
     example: 'clx1234567890',
   })
-  id: string;
+  id: string
 
   @ApiProperty({
     description: 'User email',
     example: 'user@example.com',
   })
-  email: string;
+  email: string
 
   @ApiProperty({
     description: 'User full name',
     example: 'John Doe',
     nullable: true,
   })
-  fullName: string | null;
+  fullName: string | null
 
   @ApiProperty({
     description: 'User phone number',
     example: '+84123456789',
     nullable: true,
   })
-  phone: string | null;
+  phone: string | null
 
   @ApiProperty({
     description: 'User avatar URL',
     example: 'https://example.com/avatar.jpg',
     nullable: true,
   })
-  avatar: string | null;
+  avatar: string | null
 
   @ApiProperty({
     description: 'User role',
     example: 'CUSTOMER',
     enum: ['ADMIN', 'CUSTOMER'],
   })
-  role: string;
+  role: string
 
   @ApiProperty({
     description: 'Email verification status',
     example: true,
   })
-  emailVerified: boolean;
+  emailVerified: boolean
 
   @ApiProperty({
     description: 'Phone verification status',
     example: false,
   })
-  phoneVerified: boolean;
+  phoneVerified: boolean
 
   @ApiProperty({
     description: '2FA enabled status',
     example: false,
   })
-  mfaEnabled: boolean;
+  mfaEnabled: boolean
 
   @ApiProperty({
     description: 'Account creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  createdAt: Date;
+  createdAt: Date
 
   @ApiProperty({
     description: 'Last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  updatedAt: Date;
+  updatedAt: Date
 }
 
 export class SessionResponseDto {
@@ -161,51 +161,51 @@ export class SessionResponseDto {
     description: 'Session ID',
     example: 'clx1234567890',
   })
-  id: string;
+  id: string
 
   @ApiProperty({
     description: 'Device information',
     nullable: true,
   })
   device: {
-    id: string;
-    name: string | null;
-    type: string;
-    lastSeenAt: Date;
-  } | null;
+    id: string
+    name: string | null
+    type: string
+    lastSeenAt: Date
+  } | null
 
   @ApiProperty({
     description: 'IP address',
     example: '192.168.1.1',
     nullable: true,
   })
-  ipAddress: string | null;
+  ipAddress: string | null
 
   @ApiProperty({
     description: 'User agent',
     example: 'Mozilla/5.0...',
     nullable: true,
   })
-  userAgent: string | null;
+  userAgent: string | null
 
   @ApiProperty({
     description: 'Session status',
     example: 'ACTIVE',
     enum: ['ACTIVE', 'EXPIRED', 'REVOKED'],
   })
-  status: string;
+  status: string
 
   @ApiProperty({
     description: 'Session creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  createdAt: Date;
+  createdAt: Date
 
   @ApiProperty({
     description: 'Session expiration date',
     example: '2024-01-08T00:00:00.000Z',
   })
-  expiresAt: Date;
+  expiresAt: Date
 }
 
 export class Enable2FAResponseDto {
@@ -213,20 +213,20 @@ export class Enable2FAResponseDto {
     description: 'QR code data URL for authenticator app',
     example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...',
   })
-  qrCode: string;
+  qrCode: string
 
   @ApiProperty({
     description: 'TOTP secret (user should save this)',
     example: 'JBSWY3DPEHPK3PXP',
   })
-  secret: string;
+  secret: string
 
   @ApiProperty({
     description: 'Backup codes (user should save these)',
     example: ['12345678', '87654321', '11223344'],
     type: [String],
   })
-  backupCodes: string[];
+  backupCodes: string[]
 }
 
 export class Verify2FAResponseDto {
@@ -235,33 +235,33 @@ export class Verify2FAResponseDto {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     required: false,
   })
-  accessToken?: string;
+  accessToken?: string
 
   @ApiProperty({
     description: 'JWT refresh token (if login flow)',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     required: false,
   })
-  refreshToken?: string;
+  refreshToken?: string
 
   @ApiProperty({
     description: 'User information (if login flow)',
     required: false,
   })
   user?: {
-    id: string;
-    email: string;
-    fullName: string | null;
-    emailVerified: boolean;
-    mfaEnabled: boolean;
-  };
+    id: string
+    email: string
+    fullName: string | null
+    emailVerified: boolean
+    mfaEnabled: boolean
+  }
 
   @ApiProperty({
     description: 'Verification status (if setup flow)',
     example: true,
     required: false,
   })
-  verified?: boolean;
+  verified?: boolean
 }
 
 export class OAuthCallbackResponseDto {
@@ -269,21 +269,21 @@ export class OAuthCallbackResponseDto {
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  accessToken: string;
+  accessToken: string
 
   @ApiProperty({
     description: 'JWT refresh token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  refreshToken: string;
+  refreshToken: string
 
   @ApiProperty({
     description: 'User information',
   })
   user: {
-    id: string;
-    email: string;
-    fullName: string | null;
-    emailVerified: boolean;
-  };
+    id: string
+    email: string
+    fullName: string | null
+    emailVerified: boolean
+  }
 }

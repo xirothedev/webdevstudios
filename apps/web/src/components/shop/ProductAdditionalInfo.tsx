@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { motion } from 'motion/react';
+import { motion } from 'motion/react'
 
-import { ProductInfo } from '@/types/product';
+import { ProductInfo } from '@/types/product'
 
 interface ProductAdditionalInfoProps {
-  info: ProductInfo;
-  title?: string;
-  delay?: number;
+  info: ProductInfo
+  title?: string
+  delay?: number
 }
 
 export function ProductAdditionalInfo({
@@ -37,7 +37,7 @@ export function ProductAdditionalInfo({
   title = 'Thông tin sản phẩm',
   delay = 0.3,
 }: ProductAdditionalInfoProps) {
-  const entries = Object.entries(info).filter(([_, value]) => value);
+  const entries = Object.entries(info).filter(([_, value]) => value)
 
   return (
     <motion.section
@@ -60,5 +60,5 @@ export function ProductAdditionalInfo({
         </div>
       </div>
     </motion.section>
-  );
+  )
 }

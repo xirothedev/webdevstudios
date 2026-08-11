@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'docker-containerization-guide',
@@ -87,4 +87,4 @@ Docker makes deployment easier and more consistent. Start containerizing today!`
   metaDescription:
     'Learn how to containerize applications with Docker, including best practices, optimization techniques, and deployment strategies.',
   isPublished: true,
-};
+}

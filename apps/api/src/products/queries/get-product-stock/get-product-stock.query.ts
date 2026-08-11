@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize, ProductSlug } from '@generated/prisma';
+import { ProductSize, ProductSlug } from '@generated/prisma'
 
 export class GetProductStockQuery {
   constructor(
     public readonly slug: ProductSlug,
-    public readonly size?: ProductSize
+    public readonly size?: ProductSize,
   ) {}
 }

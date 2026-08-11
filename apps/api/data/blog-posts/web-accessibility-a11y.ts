@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'web-accessibility-a11y',
@@ -112,4 +112,4 @@ Accessibility is not optional. Build for everyone!`,
   metaDescription:
     'Learn how to build accessible web applications with ARIA attributes, keyboard navigation, and screen reader support.',
   isPublished: true,
-};
+}

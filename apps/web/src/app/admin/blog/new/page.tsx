@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { BlogEditor } from '@/components/admin/BlogEditor';
+import { AdminHeader } from '@/components/admin/AdminHeader'
+import { BlogEditor } from '@/components/admin/BlogEditor'
 
 export const metadata = {
   title: 'Tạo bài viết mới - Admin',
   description: 'Tạo bài viết blog mới',
-};
+}
 
 export default function AdminBlogNewPage() {
   return (
@@ -40,5 +40,5 @@ export default function AdminBlogNewPage() {
         <BlogEditor />
       </div>
     </div>
-  );
+  )
 }

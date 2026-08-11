@@ -20,38 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { AddToCartCommand } from './commands/add-to-cart/add-to-cart.command';
-import { ClearCartCommand } from './commands/clear-cart/clear-cart.command';
-import { RemoveFromCartCommand } from './commands/remove-from-cart/remove-from-cart.command';
-import { UpdateCartItemCommand } from './commands/update-cart-item/update-cart-item.command';
-import { AddToCartDto, CartDto, UpdateCartItemDto } from './dtos/cart.dto';
-import { GetCartQuery } from './queries/get-cart/get-cart.query';
+import { CurrentUser } from '../auth/decorators/current-user.decorator'
+import { AddToCartCommand } from './commands/add-to-cart'
+import { ClearCartCommand } from './commands/clear-cart'
+import { RemoveFromCartCommand } from './commands/remove-from-cart'
+import { UpdateCartItemCommand } from './commands/update-cart-item'
+import { AddToCartDto, CartDto, UpdateCartItemDto } from './dtos/cart.dto'
+import { GetCartQuery } from './queries/get-cart'
 
 @ApiTags('Cart')
 @Controller('cart')
 export class CartController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get()
@@ -67,7 +53,7 @@ export class CartController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getCart(@CurrentUser() user: { id: string }): Promise<CartDto> {
-    return this.queryBus.execute(new GetCartQuery(user.id));
+    return this.queryBus.execute(new GetCartQuery(user.id))
   }
 
   @Post('items')
@@ -87,16 +73,11 @@ export class CartController {
   @ApiResponse({ status: 409, description: 'Conflict - Insufficient stock' })
   async addToCart(
     @CurrentUser() user: { id: string },
-    @Body() dto: AddToCartDto
+    @Body() dto: AddToCartDto,
   ): Promise<CartDto> {
     return this.commandBus.execute(
-      new AddToCartCommand(
-        user.id,
-        dto.productId,
-        dto.size || null,
-        dto.quantity
-      )
-    );
+      new AddToCartCommand(user.id, dto.productId, dto.size || null, dto.quantity),
+    )
   }
 
   @Patch('items/:id')
@@ -123,11 +104,9 @@ export class CartController {
   async updateCartItem(
     @CurrentUser() user: { id: string },
     @Param('id') cartItemId: string,
-    @Body() dto: UpdateCartItemDto
+    @Body() dto: UpdateCartItemDto,
   ): Promise<CartDto> {
-    return this.commandBus.execute(
-      new UpdateCartItemCommand(user.id, cartItemId, dto.quantity)
-    );
+    return this.commandBus.execute(new UpdateCartItemCommand(user.id, cartItemId, dto.quantity))
   }
 
   @Delete('items/:id')
@@ -151,11 +130,9 @@ export class CartController {
   @ApiResponse({ status: 404, description: 'Cart item not found' })
   async removeFromCart(
     @CurrentUser() user: { id: string },
-    @Param('id') cartItemId: string
+    @Param('id') cartItemId: string,
   ): Promise<CartDto> {
-    return this.commandBus.execute(
-      new RemoveFromCartCommand(user.id, cartItemId)
-    );
+    return this.commandBus.execute(new RemoveFromCartCommand(user.id, cartItemId))
   }
 
   @Delete()
@@ -171,6 +148,6 @@ export class CartController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async clearCart(@CurrentUser() user: { id: string }): Promise<CartDto> {
-    return this.commandBus.execute(new ClearCartCommand(user.id));
+    return this.commandBus.execute(new ClearCartCommand(user.id))
   }
 }

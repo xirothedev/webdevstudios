@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import * as Dialog from '@radix-ui/react-dialog';
-import CodeBlock from '@tiptap/extension-code-block';
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import { Markdown } from '@tiptap/markdown';
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import * as Dialog from '@radix-ui/react-dialog'
+import CodeBlock from '@tiptap/extension-code-block'
+import Link from '@tiptap/extension-link'
+import Placeholder from '@tiptap/extension-placeholder'
+import { Markdown } from '@tiptap/markdown'
+import { EditorContent, useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
 import {
   Bold,
   Code,
@@ -42,36 +42,35 @@ import {
   Redo,
   Undo,
   X,
-} from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
-export type MarkdownEditorTheme = 'light' | 'dark';
+export type MarkdownEditorTheme = 'light' | 'dark'
 
 interface MarkdownEditorThemeConfig {
-  container: string;
-  toolbar: string;
-  toolbarDivider: string;
+  container: string
+  toolbar: string
+  toolbarDivider: string
   toolbarButton: {
-    base: string;
-    active: string;
-    inactive: string;
-  };
+    base: string
+    active: string
+    inactive: string
+  }
   editor: {
-    container: string;
-    content: string;
-  };
-  placeholder: string;
+    container: string
+    content: string
+  }
+  placeholder: string
 }
 
 const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
   dark: {
     container: 'border-wds-accent/30 bg-wds-background rounded-lg border',
-    toolbar:
-      'border-wds-accent/30 flex flex-wrap items-center gap-1 border-b p-2',
+    toolbar: 'border-wds-accent/30 flex flex-wrap items-center gap-1 border-b p-2',
     toolbarDivider: 'mx-1 h-6 w-px bg-wds-accent/30',
     toolbarButton: {
       base: 'h-8 w-8 p-0',
@@ -88,8 +87,7 @@ const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
   },
   light: {
     container: 'border-gray-300 bg-white rounded-lg border',
-    toolbar:
-      'border-gray-300 flex flex-wrap items-center gap-1 border-b p-2 bg-gray-50',
+    toolbar: 'border-gray-300 flex flex-wrap items-center gap-1 border-b p-2 bg-gray-50',
     toolbarDivider: 'mx-1 h-6 w-px bg-gray-300',
     toolbarButton: {
       base: 'h-8 w-8 p-0',
@@ -104,16 +102,16 @@ const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
     },
     placeholder: 'text-gray-400',
   },
-};
+}
 
 export interface MarkdownEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-  placeholder?: string;
-  theme?: MarkdownEditorTheme;
-  minHeight?: string;
-  className?: string;
+  value: string
+  onChange: (value: string) => void
+  disabled?: boolean
+  placeholder?: string
+  theme?: MarkdownEditorTheme
+  minHeight?: string
+  className?: string
 }
 
 /**
@@ -139,12 +137,12 @@ export function MarkdownEditor({
   minHeight = '300px',
   className,
 }: MarkdownEditorProps) {
-  const isUpdatingFromProp = useRef(false);
-  const themeConfig = themeConfigs[theme];
-  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-  const [codeBlockDialogOpen, setCodeBlockDialogOpen] = useState(false);
-  const [codeBlockLanguage, setCodeBlockLanguage] = useState('');
+  const isUpdatingFromProp = useRef(false)
+  const themeConfig = themeConfigs[theme]
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('')
+  const [codeBlockDialogOpen, setCodeBlockDialogOpen] = useState(false)
+  const [codeBlockLanguage, setCodeBlockLanguage] = useState('')
 
   // Common programming languages
   const codeLanguages = [
@@ -173,7 +171,7 @@ export function MarkdownEditor({
     { value: 'sql', label: 'SQL' },
     { value: 'dockerfile', label: 'Dockerfile' },
     { value: 'nginx', label: 'Nginx' },
-  ];
+  ]
 
   const editor = useEditor({
     extensions: [
@@ -190,20 +188,20 @@ export function MarkdownEditor({
                 const lang =
                   element.getAttribute('data-language') ||
                   element.getAttribute('class')?.match(/language-(\w+)/)?.[1] ||
-                  null;
-                return lang;
+                  null
+                return lang
               },
               renderHTML: (attributes) => {
                 if (!attributes.language) {
-                  return {};
+                  return {}
                 }
                 return {
                   'data-language': attributes.language,
                   class: `language-${attributes.language}`,
-                };
+                }
               },
             },
-          };
+          }
         },
       }).configure({
         HTMLAttributes: {
@@ -229,11 +227,11 @@ export function MarkdownEditor({
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       if (isUpdatingFromProp.current) {
-        return;
+        return
       }
       if (editor.markdown) {
-        const markdown = editor.markdown.serialize(editor.getJSON());
-        onChange(markdown);
+        const markdown = editor.markdown.serialize(editor.getJSON())
+        onChange(markdown)
       }
     },
     editorProps: {
@@ -241,91 +239,87 @@ export function MarkdownEditor({
         class: 'prose prose-invert max-w-none focus:outline-none',
       },
     },
-  });
+  })
 
   // Update editor content when value prop changes
   useEffect(() => {
     if (editor && value !== undefined && editor.markdown) {
-      const currentMarkdown = editor.markdown.serialize(editor.getJSON());
+      const currentMarkdown = editor.markdown.serialize(editor.getJSON())
       if (currentMarkdown !== value) {
-        isUpdatingFromProp.current = true;
+        isUpdatingFromProp.current = true
         editor.commands.setContent(value || '', {
           contentType: 'markdown',
-        });
+        })
         // Reset flag after a short delay to allow update to complete
         setTimeout(() => {
-          isUpdatingFromProp.current = false;
-        }, 0);
+          isUpdatingFromProp.current = false
+        }, 0)
       }
     }
-  }, [value, editor]);
+  }, [value, editor])
 
   if (!editor) {
-    return null;
+    return null
   }
 
   const getButtonClassName = (isActive: boolean) => {
     return cn(
       themeConfig.toolbarButton.base,
-      isActive
-        ? themeConfig.toolbarButton.active
-        : themeConfig.toolbarButton.inactive
-    );
-  };
+      isActive ? themeConfig.toolbarButton.active : themeConfig.toolbarButton.inactive,
+    )
+  }
 
   const handleLinkClick = () => {
-    if (!editor) return;
+    if (!editor) return
 
-    const { from, to } = editor.state.selection;
-    const attrs = editor.getAttributes('link');
+    const { from, to } = editor.state.selection
+    const attrs = editor.getAttributes('link')
 
     if (attrs.href) {
       // Editing existing link
-      setLinkUrl(attrs.href);
+      setLinkUrl(attrs.href)
     } else {
       // Creating new link - check if there's selected text
-      const selectedText = editor.state.doc.textBetween(from, to);
-      setLinkUrl(selectedText.startsWith('http') ? selectedText : '');
+      const selectedText = editor.state.doc.textBetween(from, to)
+      setLinkUrl(selectedText.startsWith('http') ? selectedText : '')
     }
 
-    setLinkDialogOpen(true);
-  };
+    setLinkDialogOpen(true)
+  }
 
   const handleLinkSubmit = () => {
-    if (!editor || !linkUrl.trim()) return;
+    if (!editor || !linkUrl.trim()) return
 
-    const trimmedUrl = linkUrl.trim();
+    const trimmedUrl = linkUrl.trim()
     if (!trimmedUrl) {
-      setLinkDialogOpen(false);
-      return;
+      setLinkDialogOpen(false)
+      return
     }
 
     // Add protocol if missing
-    const urlWithProtocol = trimmedUrl.startsWith('http')
-      ? trimmedUrl
-      : `https://${trimmedUrl}`;
+    const urlWithProtocol = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`
 
-    editor.chain().focus().setLink({ href: urlWithProtocol }).run();
-    setLinkDialogOpen(false);
-    setLinkUrl('');
-  };
+    editor.chain().focus().setLink({ href: urlWithProtocol }).run()
+    setLinkDialogOpen(false)
+    setLinkUrl('')
+  }
 
   const handleRemoveLink = () => {
-    if (!editor) return;
-    editor.chain().focus().unsetLink().run();
-    setLinkDialogOpen(false);
-    setLinkUrl('');
-  };
+    if (!editor) return
+    editor.chain().focus().unsetLink().run()
+    setLinkDialogOpen(false)
+    setLinkUrl('')
+  }
 
   const handleLinkDialogOpenChange = (open: boolean) => {
-    setLinkDialogOpen(open);
+    setLinkDialogOpen(open)
     if (!open) {
-      setLinkUrl('');
+      setLinkUrl('')
     }
-  };
+  }
 
   const handleCodeBlockSubmit = () => {
-    if (!editor) return;
+    if (!editor) return
 
     if (editor.isActive('codeBlock')) {
       // Update existing code block language
@@ -335,7 +329,7 @@ export function MarkdownEditor({
         .updateAttributes('codeBlock', {
           language: codeBlockLanguage || null,
         })
-        .run();
+        .run()
     } else {
       // Insert new code block
       if (codeBlockLanguage) {
@@ -346,15 +340,15 @@ export function MarkdownEditor({
           .updateAttributes('codeBlock', {
             language: codeBlockLanguage,
           })
-          .run();
+          .run()
       } else {
-        editor.chain().focus().toggleCodeBlock().run();
+        editor.chain().focus().toggleCodeBlock().run()
       }
     }
 
-    setCodeBlockDialogOpen(false);
-    setCodeBlockLanguage('');
-  };
+    setCodeBlockDialogOpen(false)
+    setCodeBlockLanguage('')
+  }
 
   return (
     <div className={cn(themeConfig.container, className)}>
@@ -365,9 +359,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleBold().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleBold().run()}
           className={getButtonClassName(editor.isActive('bold'))}
           title="Bold"
         >
@@ -379,9 +371,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleItalic().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleItalic().run()}
           className={getButtonClassName(editor.isActive('italic'))}
           title="Italic"
         >
@@ -394,16 +384,9 @@ export function MarkdownEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          disabled={
-            disabled ||
-            !editor.can().chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          className={getButtonClassName(
-            editor.isActive('heading', { level: 1 })
-          )}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          disabled={disabled || !editor.can().chain().focus().toggleHeading({ level: 1 }).run()}
+          className={getButtonClassName(editor.isActive('heading', { level: 1 }))}
           title="Heading 1"
         >
           <Heading1 className="h-4 w-4" />
@@ -413,16 +396,9 @@ export function MarkdownEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          disabled={
-            disabled ||
-            !editor.can().chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          className={getButtonClassName(
-            editor.isActive('heading', { level: 2 })
-          )}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          disabled={disabled || !editor.can().chain().focus().toggleHeading({ level: 2 }).run()}
+          className={getButtonClassName(editor.isActive('heading', { level: 2 }))}
           title="Heading 2"
         >
           <Heading2 className="h-4 w-4" />
@@ -432,16 +408,9 @@ export function MarkdownEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
-          disabled={
-            disabled ||
-            !editor.can().chain().focus().toggleHeading({ level: 3 }).run()
-          }
-          className={getButtonClassName(
-            editor.isActive('heading', { level: 3 })
-          )}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          disabled={disabled || !editor.can().chain().focus().toggleHeading({ level: 3 }).run()}
+          className={getButtonClassName(editor.isActive('heading', { level: 3 }))}
           title="Heading 3"
         >
           <Heading3 className="h-4 w-4" />
@@ -454,9 +423,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleBulletList().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleBulletList().run()}
           className={getButtonClassName(editor.isActive('bulletList'))}
           title="Bullet List"
         >
@@ -468,9 +435,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleOrderedList().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleOrderedList().run()}
           className={getButtonClassName(editor.isActive('orderedList'))}
           title="Numbered List"
         >
@@ -479,10 +444,7 @@ export function MarkdownEditor({
 
         <div className={themeConfig.toolbarDivider} />
 
-        <Dialog.Root
-          open={codeBlockDialogOpen}
-          onOpenChange={setCodeBlockDialogOpen}
-        >
+        <Dialog.Root open={codeBlockDialogOpen} onOpenChange={setCodeBlockDialogOpen}>
           <Dialog.Trigger asChild>
             <Button
               type="button"
@@ -490,12 +452,12 @@ export function MarkdownEditor({
               size="sm"
               onClick={() => {
                 if (editor.isActive('codeBlock')) {
-                  const attrs = editor.getAttributes('codeBlock');
-                  setCodeBlockLanguage(attrs.language || '');
-                  setCodeBlockDialogOpen(true);
+                  const attrs = editor.getAttributes('codeBlock')
+                  setCodeBlockLanguage(attrs.language || '')
+                  setCodeBlockDialogOpen(true)
                 } else {
-                  setCodeBlockLanguage('');
-                  setCodeBlockDialogOpen(true);
+                  setCodeBlockLanguage('')
+                  setCodeBlockDialogOpen(true)
                 }
               }}
               disabled={disabled}
@@ -510,7 +472,7 @@ export function MarkdownEditor({
             <Dialog.Overlay
               className={cn(
                 'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
-                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
+                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               )}
             />
             <Dialog.Content
@@ -519,18 +481,16 @@ export function MarkdownEditor({
                 'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
                 theme === 'dark'
                   ? 'border-wds-accent/30 bg-wds-background text-wds-text'
-                  : 'border-gray-300 bg-white text-gray-900'
+                  : 'border-gray-300 bg-white text-gray-900',
               )}
             >
               <Dialog.Title
                 className={cn(
                   'mb-4 text-lg font-semibold',
-                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900'
+                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900',
                 )}
               >
-                {editor.isActive('codeBlock')
-                  ? 'Chỉnh sửa Code Block'
-                  : 'Chèn Code Block'}
+                {editor.isActive('codeBlock') ? 'Chỉnh sửa Code Block' : 'Chèn Code Block'}
               </Dialog.Title>
 
               <div className="space-y-4">
@@ -539,7 +499,7 @@ export function MarkdownEditor({
                     htmlFor="code-language"
                     className={cn(
                       'mb-2 block text-sm font-medium',
-                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700'
+                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700',
                     )}
                   >
                     Ngôn ngữ (tùy chọn)
@@ -550,18 +510,18 @@ export function MarkdownEditor({
                     onChange={(e) => setCodeBlockLanguage(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleCodeBlockSubmit();
+                        e.preventDefault()
+                        handleCodeBlockSubmit()
                       }
                       if (e.key === 'Escape') {
-                        setCodeBlockDialogOpen(false);
+                        setCodeBlockDialogOpen(false)
                       }
                     }}
                     className={cn(
                       'w-full rounded-lg border px-3 py-2 text-sm',
                       theme === 'dark'
                         ? 'border-wds-accent/30 bg-wds-background text-wds-text focus:border-wds-accent focus:ring-wds-accent/20 focus:ring-2 focus:outline-none'
-                        : 'border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none'
+                        : 'border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none',
                     )}
                   >
                     {codeLanguages.map((lang) => (
@@ -605,7 +565,7 @@ export function MarkdownEditor({
                     'absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none',
                     theme === 'dark'
                       ? 'text-wds-text/70 hover:text-wds-text focus:ring-wds-accent/20'
-                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20'
+                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20',
                   )}
                 >
                   <X className="h-4 w-4" />
@@ -618,20 +578,14 @@ export function MarkdownEditor({
 
         <div className={themeConfig.toolbarDivider} />
 
-        <Dialog.Root
-          open={linkDialogOpen}
-          onOpenChange={handleLinkDialogOpenChange}
-        >
+        <Dialog.Root open={linkDialogOpen} onOpenChange={handleLinkDialogOpenChange}>
           <Dialog.Trigger asChild>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={handleLinkClick}
-              disabled={
-                disabled ||
-                !editor.can().chain().focus().setLink({ href: '' }).run()
-              }
+              disabled={disabled || !editor.can().chain().focus().setLink({ href: '' }).run()}
               className={getButtonClassName(editor.isActive('link'))}
               title="Add/Edit Link"
             >
@@ -643,7 +597,7 @@ export function MarkdownEditor({
             <Dialog.Overlay
               className={cn(
                 'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
-                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
+                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               )}
             />
             <Dialog.Content
@@ -652,13 +606,13 @@ export function MarkdownEditor({
                 'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
                 theme === 'dark'
                   ? 'border-wds-accent/30 bg-wds-background text-wds-text'
-                  : 'border-gray-300 bg-white text-gray-900'
+                  : 'border-gray-300 bg-white text-gray-900',
               )}
             >
               <Dialog.Title
                 className={cn(
                   'mb-4 text-lg font-semibold',
-                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900'
+                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900',
                 )}
               >
                 {editor?.getAttributes('link').href ? 'Edit Link' : 'Add Link'}
@@ -670,7 +624,7 @@ export function MarkdownEditor({
                     htmlFor="link-url"
                     className={cn(
                       'mb-2 block text-sm font-medium',
-                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700'
+                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700',
                     )}
                   >
                     URL
@@ -682,11 +636,11 @@ export function MarkdownEditor({
                     onChange={(e) => setLinkUrl(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleLinkSubmit();
+                        e.preventDefault()
+                        handleLinkSubmit()
                       }
                       if (e.key === 'Escape') {
-                        setLinkDialogOpen(false);
+                        setLinkDialogOpen(false)
                       }
                     }}
                     placeholder="https://example.com"
@@ -746,7 +700,7 @@ export function MarkdownEditor({
                     'absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none',
                     theme === 'dark'
                       ? 'text-wds-text/70 hover:text-wds-text focus:ring-wds-accent/20'
-                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20'
+                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20',
                   )}
                 >
                   <X className="h-4 w-4" />
@@ -789,12 +743,9 @@ export function MarkdownEditor({
         <EditorContent
           editor={editor}
           style={{ minHeight }}
-          className={cn(
-            themeConfig.editor.content,
-            '[&_.ProseMirror]:min-h-[300px]'
-          )}
+          className={cn(themeConfig.editor.content, '[&_.ProseMirror]:min-h-[300px]')}
         />
       </div>
     </div>
-  );
+  )
 }

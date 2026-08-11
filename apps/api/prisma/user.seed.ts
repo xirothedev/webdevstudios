@@ -22,8 +22,8 @@
 
 /// <reference types="node" />
 
-import { PrismaPg } from '@prisma/adapter-pg';
-import * as argon2 from 'argon2';
+import { PrismaPg } from '@prisma/adapter-pg'
+import * as argon2 from 'argon2'
 
 import {
   Order,
@@ -33,26 +33,26 @@ import {
   ProductSize,
   ProductSlug,
   UserRole,
-} from '../generated/prisma/client';
+} from '../generated/prisma/client'
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
-});
+})
 
 async function main() {
-  console.log('Starting user seed...');
+  console.log('Starting user seed...')
 
   // Hash password
-  const hashedPassword = await argon2.hash('admin123@');
+  const hashedPassword = await argon2.hash('admin123@')
 
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({
     where: { email: 'admin@wds.org' },
-  });
+  })
 
-  let user;
+  let user
   if (existingUser) {
-    console.log('User admin@wds.org already exists, updating...');
+    console.log('User admin@wds.org already exists, updating...')
     user = await prisma.user.update({
       where: { email: 'admin@wds.org' },
       data: {
@@ -62,7 +62,7 @@ async function main() {
         role: UserRole.ADMIN,
         emailVerified: true,
       },
-    });
+    })
   } else {
     // Create user
     user = await prisma.user.create({
@@ -74,8 +74,8 @@ async function main() {
         role: UserRole.ADMIN,
         emailVerified: true,
       },
-    });
-    console.log(`Created user: ${user.email}`);
+    })
+    console.log(`Created user: ${user.email}`)
   }
 
   // Get all products
@@ -83,27 +83,25 @@ async function main() {
     include: {
       sizeStocks: true,
     },
-  });
+  })
 
   if (products.length === 0) {
-    console.log(
-      'No products found. Please run seed.ts first to create products.'
-    );
-    return;
+    console.log('No products found. Please run seed.ts first to create products.')
+    return
   }
 
-  const aoThun = products.find((p) => p.slug === ProductSlug.AO_THUN);
-  const padChuot = products.find((p) => p.slug === ProductSlug.PAD_CHUOT);
-  const dayDeo = products.find((p) => p.slug === ProductSlug.DAY_DEO);
-  const mocKhoa = products.find((p) => p.slug === ProductSlug.MOC_KHOA);
+  const aoThun = products.find((p) => p.slug === ProductSlug.AO_THUN)
+  const padChuot = products.find((p) => p.slug === ProductSlug.PAD_CHUOT)
+  const dayDeo = products.find((p) => p.slug === ProductSlug.DAY_DEO)
+  const mocKhoa = products.find((p) => p.slug === ProductSlug.MOC_KHOA)
 
   // Clean existing addresses and orders for this user
   await prisma.order.deleteMany({
     where: { userId: user.id },
-  });
+  })
   await prisma.address.deleteMany({
     where: { userId: user.id },
-  });
+  })
 
   // Create addresses
   const address1 = await prisma.address.create({
@@ -117,7 +115,7 @@ async function main() {
       ward: 'Phường Bến Nghé',
       isDefault: true,
     },
-  });
+  })
 
   const address2 = await prisma.address.create({
     data: {
@@ -130,18 +128,18 @@ async function main() {
       ward: 'Phường Hàng Bông',
       isDefault: false,
     },
-  });
+  })
 
-  console.log('Created addresses');
+  console.log('Created addresses')
 
   // Helper function to generate order code
   const generateOrderCode = (index: number): string => {
-    const num = (1000 + index).toString().padStart(4, '0');
-    return `#ORD-${num}`;
-  };
+    const num = (1000 + index).toString().padStart(4, '0')
+    return `#ORD-${num}`
+  }
 
   // Create orders with different statuses
-  const orders: Order[] = [];
+  const orders: Order[] = []
 
   // 1. PENDING order (not yet paid)
   if (aoThun) {
@@ -156,7 +154,7 @@ async function main() {
         ward: address1.ward,
         postalCode: '700000',
       },
-    });
+    })
 
     const order1 = await prisma.order.create({
       data: {
@@ -181,9 +179,9 @@ async function main() {
           ],
         },
       },
-    });
-    orders.push(order1);
-    console.log(`Created order: ${order1.code} (PENDING)`);
+    })
+    orders.push(order1)
+    console.log(`Created order: ${order1.code} (PENDING)`)
   }
 
   // 2. CONFIRMED order (confirmed, paid)
@@ -199,7 +197,7 @@ async function main() {
         ward: address1.ward,
         postalCode: '700000',
       },
-    });
+    })
 
     const order2 = await prisma.order.create({
       data: {
@@ -225,9 +223,9 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
       },
-    });
-    orders.push(order2);
-    console.log(`Created order: ${order2.code} (CONFIRMED)`);
+    })
+    orders.push(order2)
+    console.log(`Created order: ${order2.code} (CONFIRMED)`)
   }
 
   // 3. PROCESSING order (packaging)
@@ -243,7 +241,7 @@ async function main() {
         ward: address2.ward,
         postalCode: '100000',
       },
-    });
+    })
 
     const order3 = await prisma.order.create({
       data: {
@@ -277,9 +275,9 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
       },
-    });
-    orders.push(order3);
-    console.log(`Created order: ${order3.code} (PROCESSING)`);
+    })
+    orders.push(order3)
+    console.log(`Created order: ${order3.code} (PROCESSING)`)
   }
 
   // 4. SHIPPING order (shipping)
@@ -295,7 +293,7 @@ async function main() {
         ward: address1.ward,
         postalCode: '700000',
       },
-    });
+    })
 
     const order4 = await prisma.order.create({
       data: {
@@ -321,9 +319,9 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
       },
-    });
-    orders.push(order4);
-    console.log(`Created order: ${order4.code} (SHIPPING)`);
+    })
+    orders.push(order4)
+    console.log(`Created order: ${order4.code} (SHIPPING)`)
   }
 
   // 5. DELIVERED order (delivered)
@@ -339,7 +337,7 @@ async function main() {
         ward: address1.ward,
         postalCode: '700000',
       },
-    });
+    })
 
     const order5 = await prisma.order.create({
       data: {
@@ -381,9 +379,9 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
       },
-    });
-    orders.push(order5);
-    console.log(`Created order: ${order5.code} (DELIVERED)`);
+    })
+    orders.push(order5)
+    console.log(`Created order: ${order5.code} (DELIVERED)`)
   }
 
   // 6. CANCELLED order (cancelled)
@@ -399,7 +397,7 @@ async function main() {
         ward: address2.ward,
         postalCode: '100000',
       },
-    });
+    })
 
     const order6 = await prisma.order.create({
       data: {
@@ -425,9 +423,9 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
       },
-    });
-    orders.push(order6);
-    console.log(`Created order: ${order6.code} (CANCELLED)`);
+    })
+    orders.push(order6)
+    console.log(`Created order: ${order6.code} (CANCELLED)`)
   }
 
   // 7. Another DELIVERED order with multiple items
@@ -443,7 +441,7 @@ async function main() {
         ward: address1.ward,
         postalCode: '700000',
       },
-    });
+    })
 
     const order7 = await prisma.order.create({
       data: {
@@ -477,9 +475,9 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
       },
-    });
-    orders.push(order7);
-    console.log(`Created order: ${order7.code} (DELIVERED)`);
+    })
+    orders.push(order7)
+    console.log(`Created order: ${order7.code} (DELIVERED)`)
   }
 
   // 8. PENDING order with failed payment
@@ -495,7 +493,7 @@ async function main() {
         ward: address1.ward,
         postalCode: '700000',
       },
-    });
+    })
 
     const order8 = await prisma.order.create({
       data: {
@@ -529,41 +527,29 @@ async function main() {
         },
         createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
       },
-    });
-    orders.push(order8);
-    console.log(`Created order: ${order8.code} (PENDING - FAILED)`);
+    })
+    orders.push(order8)
+    console.log(`Created order: ${order8.code} (PENDING - FAILED)`)
   }
 
-  console.log('\n✅ User seed completed successfully!');
-  console.log(`\n📊 Summary:`);
-  console.log(`- User: ${user.email} (${user.role})`);
-  console.log(`- Addresses: 2`);
-  console.log(`- Orders: ${orders.length}`);
-  console.log(
-    `  - PENDING: ${orders.filter((o) => o.status === OrderStatus.PENDING).length}`
-  );
-  console.log(
-    `  - CONFIRMED: ${orders.filter((o) => o.status === OrderStatus.CONFIRMED).length}`
-  );
-  console.log(
-    `  - PROCESSING: ${orders.filter((o) => o.status === OrderStatus.PROCESSING).length}`
-  );
-  console.log(
-    `  - SHIPPING: ${orders.filter((o) => o.status === OrderStatus.SHIPPING).length}`
-  );
-  console.log(
-    `  - DELIVERED: ${orders.filter((o) => o.status === OrderStatus.DELIVERED).length}`
-  );
-  console.log(
-    `  - CANCELLED: ${orders.filter((o) => o.status === OrderStatus.CANCELLED).length}`
-  );
+  console.log('\n✅ User seed completed successfully!')
+  console.log(`\n📊 Summary:`)
+  console.log(`- User: ${user.email} (${user.role})`)
+  console.log(`- Addresses: 2`)
+  console.log(`- Orders: ${orders.length}`)
+  console.log(`  - PENDING: ${orders.filter((o) => o.status === OrderStatus.PENDING).length}`)
+  console.log(`  - CONFIRMED: ${orders.filter((o) => o.status === OrderStatus.CONFIRMED).length}`)
+  console.log(`  - PROCESSING: ${orders.filter((o) => o.status === OrderStatus.PROCESSING).length}`)
+  console.log(`  - SHIPPING: ${orders.filter((o) => o.status === OrderStatus.SHIPPING).length}`)
+  console.log(`  - DELIVERED: ${orders.filter((o) => o.status === OrderStatus.DELIVERED).length}`)
+  console.log(`  - CANCELLED: ${orders.filter((o) => o.status === OrderStatus.CANCELLED).length}`)
 }
 
 main()
   .catch((e) => {
-    console.error('Error during user seed:', e);
-    process.exit(1);
+    console.error('Error during user seed:', e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })

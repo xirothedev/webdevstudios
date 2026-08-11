@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'typescript-advanced-patterns',
@@ -84,4 +84,4 @@ Mastering these advanced TypeScript patterns will make you a more effective deve
   metaDescription:
     'Learn advanced TypeScript patterns including conditional types, mapped types, and utility types to write more robust code.',
   isPublished: true,
-};
+}

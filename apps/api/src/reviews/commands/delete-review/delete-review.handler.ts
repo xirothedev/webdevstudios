@@ -20,43 +20,39 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { ProductRepository } from '../../../products/infrastructure/product.repository';
-import { ReviewRepository } from '../../infrastructure/review.repository';
-import { DeleteReviewCommand } from './delete-review.command';
+import { ProductRepository } from '../../../products/infrastructure/product.repository'
+import { ReviewRepository } from '../../infrastructure/review.repository'
+import { DeleteReviewCommand } from './delete-review.command'
 
 @CommandHandler(DeleteReviewCommand)
 export class DeleteReviewHandler implements ICommandHandler<DeleteReviewCommand> {
   constructor(
     private readonly reviewRepository: ReviewRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async execute(command: DeleteReviewCommand): Promise<{ success: boolean }> {
-    const { reviewId } = command;
+    const { reviewId } = command
 
     // Get review
-    const review = await this.reviewRepository.findById(reviewId);
+    const review = await this.reviewRepository.findById(reviewId)
     if (!review) {
-      throw new NotFoundException(`Review with id ${reviewId} not found`);
+      throw new NotFoundException(`Review with id ${reviewId} not found`)
     }
 
-    const productId = review.productId;
+    const productId = review.productId
 
     // Delete review
-    await this.reviewRepository.delete(reviewId);
+    await this.reviewRepository.delete(reviewId)
 
     // Update product rating
     const { ratingValue, ratingCount } =
-      await this.reviewRepository.calculateProductRating(productId);
-    await this.productRepository.updateRating(
-      productId,
-      ratingValue,
-      ratingCount
-    );
+      await this.reviewRepository.calculateProductRating(productId)
+    await this.productRepository.updateRating(productId, ratingValue, ratingCount)
 
-    return { success: true };
+    return { success: true }
   }
 }

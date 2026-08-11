@@ -20,101 +20,88 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { StorageService } from '@/storage/storage.service';
+import { StorageService } from '@/storage/storage.service'
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto } from '../../dtos/blog-post.dto';
-import { BlogRepository } from '../../infrastructure/blog.repository';
-import { UpdateBlogPostCommand } from './update-post.command';
+import { BlogPostWithRelations } from '../../blog.types'
+import { BlogPostDto } from '../../dtos'
+import { BlogRepository } from '../../infrastructure/blog.repository'
+import { UpdateBlogPostCommand } from './update-post.command'
 
 @CommandHandler(UpdateBlogPostCommand)
 @Injectable()
 export class UpdateBlogPostHandler implements ICommandHandler<UpdateBlogPostCommand> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async execute(command: UpdateBlogPostCommand): Promise<BlogPostDto> {
-    const {
-      postId,
-      title,
-      content,
-      excerpt,
-      coverImage,
-      isPublished,
-      metaTitle,
-      metaDescription,
-    } = command;
+    const { postId, title, content, excerpt, coverImage, isPublished, metaTitle, metaDescription } =
+      command
 
-    const post = await this.blogRepository.findById(postId);
+    const post = await this.blogRepository.findById(postId)
     if (!post) {
-      throw new NotFoundException(`Blog post with id ${postId} not found`);
+      throw new NotFoundException(`Blog post with id ${postId} not found`)
     }
 
     const updateData: {
-      title?: string;
-      contentUrl?: string;
-      contentSize?: number | null;
-      excerpt?: string | null;
-      coverImage?: string | null;
-      isPublished?: boolean;
-      publishedAt?: Date | null;
-      metaTitle?: string | null;
-      metaDescription?: string | null;
-    } = {};
+      title?: string
+      contentUrl?: string
+      contentSize?: number | null
+      excerpt?: string | null
+      coverImage?: string | null
+      isPublished?: boolean
+      publishedAt?: Date | null
+      metaTitle?: string | null
+      metaDescription?: string | null
+    } = {}
 
-    if (title !== undefined) updateData.title = title;
-    if (coverImage !== undefined) updateData.coverImage = coverImage;
+    if (title !== undefined) updateData.title = title
+    if (coverImage !== undefined) updateData.coverImage = coverImage
     if (isPublished !== undefined) {
-      updateData.isPublished = isPublished;
+      updateData.isPublished = isPublished
       // Set publishedAt if publishing for the first time
       if (isPublished && !post.isPublished) {
-        updateData.publishedAt = new Date();
+        updateData.publishedAt = new Date()
       }
     }
-    if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
-    if (metaDescription !== undefined)
-      updateData.metaDescription = metaDescription;
+    if (metaTitle !== undefined) updateData.metaTitle = metaTitle
+    if (metaDescription !== undefined) updateData.metaDescription = metaDescription
 
     // Handle content update
     if (content !== undefined) {
-      const newContentUrl = await this.storageService.uploadBlogContent(
-        postId,
-        content
-      );
-      const contentSize = Buffer.from(content, 'utf-8').length;
-      updateData.contentUrl = newContentUrl;
-      updateData.contentSize = contentSize;
+      const newContentUrl = await this.storageService.uploadBlogContent(postId, content)
+      const contentSize = Buffer.from(content, 'utf-8').length
+      updateData.contentUrl = newContentUrl
+      updateData.contentSize = contentSize
 
       // Delete old content file if URL changed
       if (post.contentUrl !== newContentUrl) {
         try {
-          await this.storageService.deleteBlogContent(post.contentUrl);
+          await this.storageService.deleteBlogContent(post.contentUrl)
         } catch (error) {
           // Log error but don't fail the update
-          console.error('Failed to delete old content file:', error);
+          console.error('Failed to delete old content file:', error)
         }
       }
 
       // Update excerpt if content changed
-      updateData.excerpt =
-        excerpt !== undefined ? excerpt : this.extractExcerpt(content);
+      updateData.excerpt = excerpt !== undefined ? excerpt : this.extractExcerpt(content)
     } else if (excerpt !== undefined) {
-      updateData.excerpt = excerpt;
+      updateData.excerpt = excerpt
     }
 
-    await this.blogRepository.update(postId, updateData);
+    await this.blogRepository.update(postId, updateData)
 
-    const updatedPost = await this.blogRepository.findById(postId);
+    const updatedPost = await this.blogRepository.findById(postId)
     if (!updatedPost) {
-      throw new NotFoundException('Blog post not found after update');
+      throw new NotFoundException('Blog post not found after update')
     }
 
-    return this.mapToDto(updatedPost);
+    return this.mapToDto(updatedPost)
   }
 
   private extractExcerpt(content: string, maxLength = 500): string {
@@ -126,13 +113,13 @@ export class UpdateBlogPostHandler implements ICommandHandler<UpdateBlogPostComm
       .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links
       .replace(/!\[([^\]]*)\]\([^)]+\)/g, '') // Remove images
       .replace(/\n+/g, ' ') // Replace newlines with spaces
-      .trim();
+      .trim()
 
     if (plainText.length <= maxLength) {
-      return plainText;
+      return plainText
     }
 
-    return `${plainText.substring(0, maxLength - 3)}...`;
+    return `${plainText.substring(0, maxLength - 3)}...`
   }
 
   private mapToDto(post: BlogPostWithRelations): BlogPostDto {
@@ -156,6 +143,6 @@ export class UpdateBlogPostHandler implements ICommandHandler<UpdateBlogPostComm
       metaDescription: post.metaDescription,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    };
+    }
   }
 }

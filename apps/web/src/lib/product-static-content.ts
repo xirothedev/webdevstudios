@@ -20,22 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSlug } from '@/lib/api/products';
+import { ProductSlug } from '@/lib/api/products'
 
 export interface ProductImages {
-  src: string;
-  alt: string;
+  src: string
+  alt: string
 }
 
 export interface ProductStaticContent {
-  images: ProductImages[];
-  features: string[];
-  additionalInfo: Record<string, string>;
+  images: ProductImages[]
+  features: string[]
+  additionalInfo: Record<string, string>
 }
 
-export const getProductStaticContent = (
-  slug: ProductSlug
-): ProductStaticContent => {
+export const getProductStaticContent = (slug: ProductSlug): ProductStaticContent => {
   const contentMap: Record<ProductSlug, ProductStaticContent> = {
     AO_THUN: {
       images: [
@@ -133,7 +131,7 @@ export const getProductStaticContent = (
         size: 'Kích thước 5cm x 3cm',
       },
     },
-  };
+  }
 
-  return contentMap[slug];
-};
+  return contentMap[slug]
+}

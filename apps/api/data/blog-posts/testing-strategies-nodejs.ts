@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'testing-strategies-nodejs',
@@ -94,4 +94,4 @@ Good testing practices lead to more maintainable code.`,
   metaDescription:
     'Learn comprehensive testing strategies for Node.js applications including unit, integration, and E2E testing.',
   isPublished: true,
-};
+}

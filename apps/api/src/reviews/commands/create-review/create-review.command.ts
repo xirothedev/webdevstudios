@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSlug } from '@generated/prisma';
+import { ProductSlug } from '@generated/prisma'
 
 export class CreateReviewCommand {
   constructor(
     public readonly userId: string,
     public readonly productSlug: ProductSlug,
     public readonly rating: number,
-    public readonly comment?: string | null
+    public readonly comment?: string | null,
   ) {}
 }

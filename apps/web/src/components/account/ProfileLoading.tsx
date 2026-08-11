@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { PageLoading } from '@/components/common/PageLoading';
+import { PageLoading } from '@/components/common/PageLoading'
 
 export function ProfileLoading() {
-  return <PageLoading variant="light" message="Đang tải thông tin..." />;
+  return <PageLoading variant="light" message="Đang tải thông tin..." />
 }

@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { EventType } from '@generated/prisma';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { EventType } from '@generated/prisma'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsDateString,
   IsEnum,
@@ -31,7 +31,7 @@ import {
   IsUrl,
   MaxLength,
   Min,
-} from 'class-validator';
+} from 'class-validator'
 
 export class CreateEventDto {
   @ApiProperty({
@@ -40,32 +40,32 @@ export class CreateEventDto {
   })
   @IsString()
   @MaxLength(255)
-  title: string;
+  title: string
 
   @ApiPropertyOptional({ description: 'Mô tả sự kiện' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 
   @ApiProperty({
     description: 'Ngày giờ bắt đầu',
     example: '2025-01-15T10:00:00Z',
   })
   @IsDateString()
-  startDate: string;
+  startDate: string
 
   @ApiProperty({
     description: 'Ngày giờ kết thúc',
     example: '2025-01-15T13:00:00Z',
   })
   @IsDateString()
-  endDate: string;
+  endDate: string
 
   @ApiPropertyOptional({ description: 'Địa điểm', example: 'Phòng lab CNTT' })
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  location?: string;
+  location?: string
 
   @ApiProperty({
     description: 'Loại sự kiện',
@@ -73,7 +73,7 @@ export class CreateEventDto {
     example: EventType.WORKSHOP,
   })
   @IsEnum(EventType)
-  type: EventType;
+  type: EventType
 
   @ApiPropertyOptional({
     description: 'Người tổ chức',
@@ -82,13 +82,13 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  organizer?: string;
+  organizer?: string
 
   @ApiPropertyOptional({ description: 'Số người tham gia', example: 45 })
   @IsInt()
   @Min(0)
   @IsOptional()
-  attendees?: number;
+  attendees?: number
 
   @ApiPropertyOptional({
     description: 'Link khảo sát (Google Form) - chỉ dùng cho SURVEY type',
@@ -96,5 +96,5 @@ export class CreateEventDto {
   })
   @IsUrl()
   @IsOptional()
-  surveyLink?: string;
+  surveyLink?: string
 }

@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
 
-import { StorageConfig } from './storage.config';
-import { StorageService } from './storage.service';
+import { StorageConfig } from './storage.config'
+import { StorageService } from './storage.service'
 
 @Module({
   imports: [ConfigModule],

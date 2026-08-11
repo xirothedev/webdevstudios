@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import axios from 'axios';
+import axios from 'axios'
 
-import { API_URL } from '@/lib/constants';
+import { API_URL } from '@/lib/constants'
 
-let csrfToken: string | null = null;
-let tokenPromise: Promise<string> | null = null;
+let csrfToken: string | null = null
+let tokenPromise: Promise<string> | null = null
 
 /**
  * Fetch CSRF token from API
@@ -34,12 +34,12 @@ let tokenPromise: Promise<string> | null = null;
 export async function getCsrfToken(): Promise<string> {
   // Return cached token if available
   if (csrfToken) {
-    return csrfToken;
+    return csrfToken
   }
 
   // If already fetching, return the existing promise
   if (tokenPromise) {
-    return tokenPromise;
+    return tokenPromise
   }
 
   // Fetch new token
@@ -48,17 +48,17 @@ export async function getCsrfToken(): Promise<string> {
       withCredentials: true, // Include cookies for session
     })
     .then((response) => {
-      csrfToken = response.data.csrfToken;
-      return csrfToken;
+      csrfToken = response.data.csrfToken
+      return csrfToken
     })
     .catch(() => {
-      throw new Error('Failed to fetch CSRF token');
+      throw new Error('Failed to fetch CSRF token')
     })
     .finally(() => {
-      tokenPromise = null;
-    });
+      tokenPromise = null
+    })
 
-  return tokenPromise;
+  return tokenPromise
 }
 
 /**
@@ -66,8 +66,8 @@ export async function getCsrfToken(): Promise<string> {
  * Useful when session changes or token expires
  */
 export function clearCsrfToken(): void {
-  csrfToken = null;
-  tokenPromise = null;
+  csrfToken = null
+  tokenPromise = null
 }
 
 /**
@@ -75,5 +75,5 @@ export function clearCsrfToken(): void {
  * Returns null if token hasn't been fetched yet
  */
 export function getCurrentCsrfToken(): string | null {
-  return csrfToken;
+  return csrfToken
 }

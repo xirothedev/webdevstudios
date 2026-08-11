@@ -20,36 +20,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { AuthLayout } from '@/components/auth/AuthLayout';
-import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useRegister } from '@/lib/api/hooks/use-auth';
+import { AuthLayout } from '@/components/auth/AuthLayout'
+import { OAuthRedirectHandler } from '@/components/auth/OAuthRedirectHandler'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useRegister } from '@/lib/api/hooks/use-auth'
 
 // Validation schema with Zod
 const signupSchema = z
   .object({
     fullName: z.string().min(1, 'Vui lòng nhập họ và tên'),
     email: z.email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
-    password: z
-      .string()
-      .min(1, 'Mật khẩu là bắt buộc')
-      .min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+    password: z.string().min(1, 'Mật khẩu là bắt buộc').min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
     confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
     phone: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Mật khẩu xác nhận không khớp',
     path: ['confirmPassword'],
-  });
+  })
 
-type SignupFormData = z.infer<typeof signupSchema>;
+type SignupFormData = z.infer<typeof signupSchema>
 
 export default function SignupPage() {
   const {
@@ -61,20 +58,20 @@ export default function SignupPage() {
     defaultValues: {
       phone: '',
     },
-  });
+  })
 
-  const registerMutation = useRegister();
+  const registerMutation = useRegister()
 
   const onSubmit = (data: SignupFormData) => {
     // Remove confirmPassword before sending to API
-    const { confirmPassword, ...registerData } = data;
+    const { confirmPassword: _confirmPassword, ...registerData } = data
     registerMutation.mutate({
       ...registerData,
       phone: registerData.phone?.trim() || undefined,
-    });
-  };
+    })
+  }
 
-  const isLoading = isSubmitting || registerMutation.isPending;
+  const isLoading = isSubmitting || registerMutation.isPending
 
   return (
     <AuthLayout variant="signup">
@@ -82,10 +79,7 @@ export default function SignupPage() {
       <div className="glass-card">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="fullName" className="block text-sm font-medium text-white/90">
               Họ và tên
             </label>
             <Input
@@ -96,16 +90,11 @@ export default function SignupPage() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.fullName && (
-              <p className="text-sm text-red-400">{errors.fullName.message}</p>
-            )}
+            {errors.fullName && <p className="text-sm text-red-400">{errors.fullName.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-white/90">
               Email
             </label>
             <Input
@@ -116,16 +105,11 @@ export default function SignupPage() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.email && (
-              <p className="text-sm text-red-400">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-sm text-red-400">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-white/90">
               Mật khẩu
             </label>
             <Input
@@ -136,16 +120,11 @@ export default function SignupPage() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.password && (
-              <p className="text-sm text-red-400">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-400">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/90">
               Xác nhận mật khẩu
             </label>
             <Input
@@ -157,17 +136,12 @@ export default function SignupPage() {
               className="glass-input"
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-red-400">
-                {errors.confirmPassword.message}
-              </p>
+              <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="phone" className="block text-sm font-medium text-white/90">
               Số điện thoại <span className="text-white/50">(tùy chọn)</span>
             </label>
             <Input
@@ -178,9 +152,7 @@ export default function SignupPage() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.phone && (
-              <p className="text-sm text-red-400">{errors.phone.message}</p>
-            )}
+            {errors.phone && <p className="text-sm text-red-400">{errors.phone.message}</p>}
           </div>
 
           <Button
@@ -193,5 +165,5 @@ export default function SignupPage() {
         </form>
       </div>
     </AuthLayout>
-  );
+  )
 }

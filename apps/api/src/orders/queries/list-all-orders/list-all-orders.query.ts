@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus } from '@generated/prisma';
+import { OrderStatus } from '@generated/prisma'
 
 export class ListAllOrdersQuery {
   constructor(
     public readonly page: number,
     public readonly limit: number,
-    public readonly status?: OrderStatus
+    public readonly status?: OrderStatus,
   ) {}
 }

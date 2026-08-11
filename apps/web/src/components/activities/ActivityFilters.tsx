@@ -20,20 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Search } from 'lucide-react';
+import { Search } from 'lucide-react'
 
-import type { Category } from '@/data/activities';
+import type { Category } from '@/data/activities'
 
-import { FilterButton } from './FilterButton';
+import { FilterButton } from './FilterButton'
 
 interface ActivityFiltersProps {
-  activeCategory: string;
-  setActiveCategory: (category: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  categories: Category[];
+  activeCategory: string
+  setActiveCategory: (category: string) => void
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+  categories: Category[]
 }
 
 export function ActivityFilters({
@@ -61,10 +61,7 @@ export function ActivityFilters({
 
       {/* Search */}
       <div className="relative w-full lg:w-72">
-        <Search
-          className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500"
-          size={18}
-        />
+        <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500" size={18} />
         <input
           type="text"
           placeholder="Tìm kiếm sự kiện..."
@@ -74,5 +71,5 @@ export function ActivityFilters({
         />
       </div>
     </div>
-  );
+  )
 }

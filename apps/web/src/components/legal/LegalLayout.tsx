@@ -20,73 +20,68 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 type TocItem = {
-  id: string;
-  label: string;
-};
+  id: string
+  label: string
+}
 
 interface LegalLayoutProps {
-  title: string;
-  toc: TocItem[];
-  children: React.ReactNode;
+  title: string
+  toc: TocItem[]
+  children: React.ReactNode
 }
 
 export function LegalLayout({ title, toc, children }: LegalLayoutProps) {
-  const [activeId, setActiveId] = useState<string | null>(toc[0]?.id ?? null);
+  const [activeId, setActiveId] = useState<string | null>(toc[0]?.id ?? null)
 
   useEffect(() => {
-    if (!toc.length || typeof window === 'undefined') return;
+    if (!toc.length || typeof window === 'undefined') return
 
     const headings = toc
       .map((item) => document.getElementById(item.id))
-      .filter((el): el is HTMLElement => !!el);
+      .filter((el): el is HTMLElement => !!el)
 
-    if (!headings.length) return;
+    if (!headings.length) return
 
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
           .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              (a.target as HTMLElement).offsetTop -
-              (b.target as HTMLElement).offsetTop
-          );
+          .sort((a, b) => (a.target as HTMLElement).offsetTop - (b.target as HTMLElement).offsetTop)
 
         if (visible[0]?.target) {
-          setActiveId(visible[0].target.id);
+          setActiveId(visible[0].target.id)
         }
       },
       {
         root: null,
         rootMargin: '-40% 0px -50% 0px',
         threshold: 0.1,
-      }
-    );
+      },
+    )
 
-    headings.forEach((heading) => observer.observe(heading));
+    headings.forEach((heading) => observer.observe(heading))
 
     return () => {
-      observer.disconnect();
-    };
-  }, [toc]);
+      observer.disconnect()
+    }
+  }, [toc])
 
-  const handleClickToc =
-    (id: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      const el = document.getElementById(id);
-      if (!el) return;
+  const handleClickToc = (id: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    const el = document.getElementById(id)
+    if (!el) return
 
-      const y = el.getBoundingClientRect().top + window.scrollY - 96;
+    const y = el.getBoundingClientRect().top + window.scrollY - 96
 
-      window.history.replaceState(null, '', `#${id}`);
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    };
+    window.history.replaceState(null, '', `#${id}`)
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
 
   return (
     <section className="mx-auto flex max-w-5xl gap-10 px-4 sm:px-6 lg:px-8">
@@ -96,12 +91,9 @@ export function LegalLayout({ title, toc, children }: LegalLayoutProps) {
             <p className="text-wds-accent/80 text-[11px] font-semibold tracking-[0.25em] uppercase">
               Chính sách &amp; pháp lý
             </p>
-            <h1 className="text-wds-text mt-3 text-2xl font-semibold">
-              {title}
-            </h1>
+            <h1 className="text-wds-text mt-3 text-2xl font-semibold">{title}</h1>
             <p className="mt-2 text-xs text-neutral-400">
-              Vui lòng đọc kỹ các điều khoản sau trước khi tiếp tục sử dụng WDS
-              Shop.
+              Vui lòng đọc kỹ các điều khoản sau trước khi tiếp tục sử dụng WDS Shop.
             </p>
           </div>
 
@@ -114,9 +106,7 @@ export function LegalLayout({ title, toc, children }: LegalLayoutProps) {
           </Link>
         </header>
 
-        <div className="space-y-5 text-sm leading-relaxed text-neutral-200">
-          {children}
-        </div>
+        <div className="space-y-5 text-sm leading-relaxed text-neutral-200">{children}</div>
       </article>
 
       <aside className="hidden w-60 shrink-0 lg:block">
@@ -144,5 +134,5 @@ export function LegalLayout({ title, toc, children }: LegalLayoutProps) {
         </div>
       </aside>
     </section>
-  );
+  )
 }

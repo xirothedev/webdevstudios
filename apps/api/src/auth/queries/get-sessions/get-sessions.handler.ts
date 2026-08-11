@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { Injectable } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
-import { SessionRepository } from '../../infrastructure/session.repository';
-import { GetSessionsQuery } from './get-sessions.query';
+import { SessionRepository } from '../../infrastructure'
+import { GetSessionsQuery } from './get-sessions.query'
 
 @Injectable()
 @QueryHandler(GetSessionsQuery)
@@ -32,9 +32,9 @@ export class GetSessionsHandler implements IQueryHandler<GetSessionsQuery> {
   constructor(private readonly sessionRepository: SessionRepository) {}
 
   async execute(query: GetSessionsQuery) {
-    const { userId } = query;
+    const { userId } = query
 
-    const sessions = await this.sessionRepository.findByUserId(userId);
+    const sessions = await this.sessionRepository.findByUserId(userId)
 
     return sessions.map((session) => ({
       id: session.id,
@@ -51,6 +51,6 @@ export class GetSessionsHandler implements IQueryHandler<GetSessionsQuery> {
       status: session.status,
       createdAt: session.createdAt,
       expiresAt: session.expiresAt,
-    }));
+    }))
   }
 }

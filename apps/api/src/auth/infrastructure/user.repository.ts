@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { User, UserRole } from '@generated/prisma';
-import { Injectable } from '@nestjs/common';
+import { User, UserRole } from '@generated/prisma'
+import { Injectable } from '@nestjs/common'
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma'
 
 @Injectable()
 export class UserRepository {
@@ -47,21 +47,21 @@ export class UserRepository {
         createdAt: true,
         updatedAt: true,
       },
-    });
+    })
   }
 
   async findById(id: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { id },
-    });
+    })
   }
 
   async create(data: {
-    email: string;
-    password?: string;
-    fullName?: string;
-    phone?: string;
-    emailVerified?: boolean;
+    email: string
+    password?: string
+    fullName?: string
+    phone?: string
+    emailVerified?: boolean
   }): Promise<User> {
     return this.prisma.user.create({
       data: {
@@ -71,33 +71,86 @@ export class UserRepository {
         phone: data.phone,
         emailVerified: data.emailVerified ?? false,
       },
-    });
+    })
   }
 
   async update(
     id: string,
     data: Partial<{
-      password: string;
-      fullName: string;
-      phone: string;
-      emailVerified: boolean;
-      phoneVerified: boolean;
-      mfaEnabled: boolean;
-      mfaSecret: string;
-      avatar: string;
-      role: UserRole;
-    }>
+      password: string
+      fullName: string
+      phone: string
+      emailVerified: boolean
+      phoneVerified: boolean
+      mfaEnabled: boolean
+      mfaSecret: string
+      avatar: string
+      role: UserRole
+    }>,
   ): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data,
-    });
+    })
   }
 
   async verifyEmail(id: string): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data: { emailVerified: true },
-    });
+    })
+  }
+
+  async searchByKeyword(
+    keyword: string,
+    page: number,
+    limit: number,
+    includeEmail: boolean,
+  ): Promise<{ users: User[]; total: number }> {
+    const where = includeEmail
+      ? {
+          OR: [
+            { email: { contains: keyword, mode: 'insensitive' as const } },
+            { fullName: { contains: keyword, mode: 'insensitive' as const } },
+          ],
+        }
+      : { fullName: { contains: keyword, mode: 'insensitive' as const } }
+
+    const skip = (page - 1) * limit
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ])
+    return { users, total }
+  }
+
+  async list(
+    page: number,
+    limit: number,
+    role?: UserRole,
+  ): Promise<{ users: User[]; total: number }> {
+    const where = role ? { role } : {}
+    const skip = (page - 1) * limit
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ])
+    return { users, total }
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.prisma.user.delete({
+      where: { id },
+    })
   }
 }

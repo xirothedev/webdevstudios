@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Zap } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Zap } from 'lucide-react'
+import { motion } from 'motion/react'
 
 export function ActivityHero() {
   return (
@@ -58,11 +58,11 @@ export function ActivityHero() {
             transition={{ delay: 0.2 }}
             className="max-w-sm text-sm text-pretty text-gray-400 sm:text-base md:text-right"
           >
-            Hơn 50+ sự kiện mỗi năm. Từ workshop chuyên sâu, hackathon kịch tính
-            đến những chuyến đi gắn kết không thể nào quên.
+            Hơn 50+ sự kiện mỗi năm. Từ workshop chuyên sâu, hackathon kịch tính đến những chuyến đi
+            gắn kết không thể nào quên.
           </motion.p>
         </div>
       </div>
     </section>
-  );
+  )
 }

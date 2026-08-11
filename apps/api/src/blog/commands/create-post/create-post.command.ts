@@ -30,6 +30,6 @@ export class CreateBlogPostCommand {
     public readonly coverImage: string | null,
     public readonly isPublished: boolean,
     public readonly metaTitle: string | null,
-    public readonly metaDescription: string | null
+    public readonly metaDescription: string | null,
   ) {}
 }

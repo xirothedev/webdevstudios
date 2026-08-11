@@ -20,14 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
 
 export class CreateBlogPostDto {
   @ApiProperty({
@@ -36,7 +30,7 @@ export class CreateBlogPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  slug: string;
+  slug: string
 
   @ApiProperty({
     description: 'Blog post title',
@@ -45,7 +39,7 @@ export class CreateBlogPostDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  title: string;
+  title: string
 
   @ApiProperty({
     description: 'Markdown content',
@@ -53,7 +47,7 @@ export class CreateBlogPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  content: string;
+  content: string
 
   @ApiPropertyOptional({
     description: 'Blog post excerpt (auto-generated if not provided)',
@@ -63,17 +57,16 @@ export class CreateBlogPostDto {
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  excerpt?: string | null;
+  excerpt?: string | null
 
   @ApiPropertyOptional({
     description: 'Cover image URL',
-    example:
-      'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
+    example: 'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
     nullable: true,
   })
   @IsString()
   @IsOptional()
-  coverImage?: string | null;
+  coverImage?: string | null
 
   @ApiPropertyOptional({
     description: 'Whether post is published',
@@ -82,7 +75,7 @@ export class CreateBlogPostDto {
   })
   @IsBoolean()
   @IsOptional()
-  isPublished?: boolean;
+  isPublished?: boolean
 
   @ApiPropertyOptional({
     description: 'SEO meta title',
@@ -92,16 +85,15 @@ export class CreateBlogPostDto {
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  metaTitle?: string | null;
+  metaTitle?: string | null
 
   @ApiPropertyOptional({
     description: 'SEO meta description',
-    example:
-      'Learn how to get started with Next.js in this comprehensive guide.',
+    example: 'Learn how to get started with Next.js in this comprehensive guide.',
     nullable: true,
   })
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  metaDescription?: string | null;
+  metaDescription?: string | null
 }

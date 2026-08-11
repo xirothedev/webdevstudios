@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next';
+import type { Metadata } from 'next'
 
-import { createPageMetadata } from '@/lib/metadata';
+import { createPageMetadata } from '@/lib/metadata'
 
 export function createAdminPageMetadata({
   title,
   description,
   path,
 }: {
-  title: string;
-  description: string;
-  path: string;
+  title: string
+  description: string
+  path: string
 }): Metadata {
   const baseMetadata = createPageMetadata({
     title,
     description,
     path,
-  });
+  })
 
   return {
     ...baseMetadata,
@@ -49,5 +49,5 @@ export function createAdminPageMetadata({
         follow: false,
       },
     },
-  };
+  }
 }

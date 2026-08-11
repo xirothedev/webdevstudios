@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator'
 
 export class Verify2FADto {
   @ApiProperty({
@@ -32,7 +32,7 @@ export class Verify2FADto {
   @IsString()
   @IsNotEmpty()
   @Matches(/^\d{6}$/, { message: 'Code must be 6 digits' })
-  code: string;
+  code: string
 
   @ApiPropertyOptional({
     description: 'Session ID for login flow (optional)',
@@ -40,5 +40,5 @@ export class Verify2FADto {
   })
   @IsString()
   @IsOptional()
-  sessionId?: string;
+  sessionId?: string
 }

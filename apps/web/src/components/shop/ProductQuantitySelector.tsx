@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { QuantitySelector } from './QuantitySelector';
+import { QuantitySelector } from './QuantitySelector'
 
 interface ProductQuantitySelectorProps {
-  quantity: number;
-  onIncrease: () => void;
-  onDecrease: () => void;
-  max?: number;
-  stock?: number;
+  quantity: number
+  onIncrease: () => void
+  onDecrease: () => void
+  max?: number
+  stock?: number
 }
 
 export function ProductQuantitySelector({
@@ -41,9 +41,7 @@ export function ProductQuantitySelector({
 }: ProductQuantitySelectorProps) {
   return (
     <div className="mb-8">
-      <label className="mb-3 block text-sm font-semibold text-white/90">
-        Số lượng
-      </label>
+      <label className="mb-3 block text-sm font-semibold text-white/90">Số lượng</label>
       <QuantitySelector
         quantity={quantity}
         onIncrease={onIncrease}
@@ -54,5 +52,5 @@ export function ProductQuantitySelector({
         showIcons={true}
       />
     </div>
-  );
+  )
 }

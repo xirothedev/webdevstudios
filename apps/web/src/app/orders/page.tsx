@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Suspense } from 'react';
+import { Suspense } from 'react'
 
-import { Footer } from '@/components/Footer';
-import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer'
+import { Navbar } from '@/components/Navbar'
 
-import { OrdersContent } from './OrdersContent';
-import { OrdersLoading } from './OrdersLoading';
+import { OrdersContent } from './OrdersContent'
+import { OrdersLoading } from './OrdersLoading'
 
 export default function OrdersPage() {
   return (
@@ -41,5 +41,5 @@ export default function OrdersPage() {
       </main>
       <Footer />
     </div>
-  );
+  )
 }

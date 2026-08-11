@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { EventType } from '@generated/prisma';
+import { EventType } from '@generated/prisma'
 
 export class CreateEventCommand {
   constructor(
@@ -33,6 +33,6 @@ export class CreateEventCommand {
     public readonly organizer?: string,
     public readonly attendees?: number,
     public readonly surveyLink?: string,
-    public readonly createdBy?: string
+    public readonly createdBy?: string,
   ) {}
 }

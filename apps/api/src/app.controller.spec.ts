@@ -20,15 +20,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { beforeEach, describe, expect, it, jest } from 'bun:test';
+import { Test, TestingModule } from '@nestjs/testing'
+import { beforeEach, describe, expect, it, jest } from 'bun:test'
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CsrfService } from './common/services/csrf.service';
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { CsrfService } from './common/services/csrf.service'
 
 describe('AppController', () => {
-  let appController: AppController;
+  let appController: AppController
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -42,14 +42,14 @@ describe('AppController', () => {
           },
         },
       ],
-    }).compile();
+    }).compile()
 
-    appController = app.get<AppController>(AppController);
-  });
+    appController = app.get<AppController>(AppController)
+  })
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
-  });
-});
+      expect(appController.getHello()).toBe('Hello World!')
+    })
+  })
+})

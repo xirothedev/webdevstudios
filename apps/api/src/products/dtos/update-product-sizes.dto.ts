@@ -20,15 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize } from '@generated/prisma';
-import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNumber,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { ProductSize } from '@generated/prisma'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsArray, IsNumber, IsString, Min, ValidateNested } from 'class-validator'
 
 export class ProductSizeStockInputDto {
   @ApiProperty({
@@ -37,7 +31,7 @@ export class ProductSizeStockInputDto {
     example: ProductSize.M,
   })
   @IsString()
-  size: ProductSize;
+  size: ProductSize
 
   @ApiProperty({
     description: 'Stock quantity for this size',
@@ -46,7 +40,7 @@ export class ProductSizeStockInputDto {
   })
   @IsNumber()
   @Min(0)
-  stock: number;
+  stock: number
 }
 
 export class UpdateProductSizesDto {
@@ -56,5 +50,5 @@ export class UpdateProductSizesDto {
   })
   @IsArray()
   @ValidateNested({ each: true })
-  sizeStocks: ProductSizeStockInputDto[];
+  sizeStocks: ProductSizeStockInputDto[]
 }

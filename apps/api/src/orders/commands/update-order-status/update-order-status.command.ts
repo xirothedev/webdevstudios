@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus } from '@generated/prisma';
+import { OrderStatus } from '@generated/prisma'
 
 export class UpdateOrderStatusCommand {
   constructor(
     public readonly orderId: string,
     public readonly status: OrderStatus,
-    public readonly requesterRole: string
+    public readonly requesterRole: string,
   ) {}
 }

@@ -20,33 +20,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { UserRole } from '@generated/prisma'
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
-import { OrderDto } from '../../dtos/order.dto';
-import { OrderRepository } from '../../infrastructure/order.repository';
-import { OrderWithItems } from '../../types/order.types';
-import { GetOrderByIdQuery } from './get-order-by-id.query';
+import { OrderDto } from '../../dtos/order.dto'
+import { OrderRepository } from '../../infrastructure/order.repository'
+import { OrderWithItems } from '../../order.types'
+import { GetOrderByIdQuery } from './get-order-by-id.query'
 
 @QueryHandler(GetOrderByIdQuery)
 export class GetOrderByIdHandler implements IQueryHandler<GetOrderByIdQuery> {
   constructor(private readonly orderRepository: OrderRepository) {}
 
   async execute(query: GetOrderByIdQuery): Promise<OrderDto> {
-    const { orderId, userId, requesterRole } = query;
+    const { orderId, userId, requesterRole } = query
 
-    const order = await this.orderRepository.findById(orderId);
+    const order = await this.orderRepository.findById(orderId)
     if (!order) {
-      throw new NotFoundException(`Order with id ${orderId} not found`);
+      throw new NotFoundException(`Order with id ${orderId} not found`)
     }
 
     // Only owner or admin can view order
     if (order.userId !== userId && requesterRole !== UserRole.ADMIN) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException('Access denied')
     }
 
-    return this.mapToDto(order);
+    return this.mapToDto(order)
   }
 
   private mapToDto(order: OrderWithItems): OrderDto {
@@ -80,6 +80,6 @@ export class GetOrderByIdHandler implements IQueryHandler<GetOrderByIdQuery> {
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    };
+    }
   }
 }

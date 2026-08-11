@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Footer } from '@/components/Footer';
-import { LastUpdatedProvider } from '@/components/legal/last-updated-provider';
-import { LegalLayout } from '@/components/legal/LegalLayout';
-import { Navbar } from '@/components/Navbar';
-import { getFileCommitDate } from '@/lib/git-utils';
+import { Footer } from '@/components/Footer'
+import { LastUpdatedProvider } from '@/components/legal/last-updated-provider'
+import { LegalLayout } from '@/components/legal/LegalLayout'
+import { Navbar } from '@/components/Navbar'
+import { getFileCommitDate } from '@/lib/git-utils'
 
-import Content from './content.mdx';
+import Content from './content.mdx'
 
 const TOC_ITEMS = [
   {
@@ -47,12 +47,10 @@ const TOC_ITEMS = [
   { id: '9-lien-he', label: '9. Liên hệ' },
   { id: '10-thay-doi-chinh-sach', label: '10. Thay đổi chính sách' },
   { id: '11-dong-y', label: '11. Đồng ý' },
-];
+]
 
 export default function RefundPage() {
-  const commitDate = getFileCommitDate(
-    'apps/web/src/app/(legal)/refund/content.mdx'
-  );
+  const commitDate = getFileCommitDate('apps/web/src/app/(legal)/refund/content.mdx')
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">
@@ -68,5 +66,5 @@ export default function RefundPage() {
 
       <Footer />
     </div>
-  );
+  )
 }

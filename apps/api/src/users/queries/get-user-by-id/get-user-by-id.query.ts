@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
+import { UserRole } from '@generated/prisma'
 
 export class GetUserByIdQuery {
   constructor(
     public readonly userId: string,
     public readonly requesterId?: string,
-    public readonly requesterRole?: UserRole
+    public readonly requesterRole?: UserRole,
   ) {}
 }

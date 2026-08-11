@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize, ProductSlug } from '@generated/prisma';
+import { ProductSize, ProductSlug } from '@generated/prisma'
 
-import { ShippingAddressDto } from '../../dtos/order.dto';
+import { ShippingAddressDto } from '../../dtos/order.dto'
 
 export enum OrderType {
   FROM_CART = 'FROM_CART',
@@ -38,6 +38,6 @@ export class CreateOrderCommand {
     public readonly productId?: string,
     public readonly productSlug?: ProductSlug,
     public readonly size?: ProductSize,
-    public readonly quantity?: number
+    public readonly quantity?: number,
   ) {}
 }

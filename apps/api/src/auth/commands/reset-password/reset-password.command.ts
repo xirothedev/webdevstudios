@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ICommand } from '@nestjs/cqrs';
+import { ICommand } from '@nestjs/cqrs'
 
 export class ResetPasswordCommand implements ICommand {
   constructor(
     public readonly token: string,
-    public readonly newPassword: string
+    public readonly newPassword: string,
   ) {}
 }

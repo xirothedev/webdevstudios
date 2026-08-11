@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { ArrowRight, Crown } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Crown } from 'lucide-react'
+import Link from 'next/link'
 
-import { AchievementHero } from '@/components/achievements/AchievementHero';
-import { AchievementSection } from '@/components/achievements/AchievementSection';
-import { TimelineYear } from '@/components/achievements/TimelineYear';
-import { Footer } from '@/components/Footer';
-import { Navbar } from '@/components/Navbar';
-import { AWARDS } from '@/data/achievements';
+import { AchievementHero } from '@/components/achievements/AchievementHero'
+import { AchievementSection } from '@/components/achievements/AchievementSection'
+import { TimelineYear } from '@/components/achievements/TimelineYear'
+import { Footer } from '@/components/Footer'
+import { Navbar } from '@/components/Navbar'
+import { AWARDS } from '@/data/achievements'
 
 export default function AchievementsPage() {
   return (
@@ -45,10 +45,8 @@ export default function AchievementsPage() {
           style={{
             backgroundImage: `linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)`,
             backgroundSize: '40px 40px',
-            maskImage:
-              'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
           }}
         />
 
@@ -62,10 +60,7 @@ export default function AchievementsPage() {
 
         {/* --- AWARDS TIMELINE --- */}
         <section className="mx-auto mb-32 max-w-6xl px-6">
-          <AchievementSection
-            label="Chặng đường phát triển"
-            title="Dấu Ấn Rực Rỡ"
-          />
+          <AchievementSection label="Chặng đường phát triển" title="Dấu Ấn Rực Rỡ" />
 
           <div className="relative">
             {AWARDS.map((yearGroup, index) => (
@@ -95,9 +90,8 @@ export default function AchievementsPage() {
                   Viết tiếp câu chuyện thành công
                 </h2>
                 <p className="mx-auto mb-8 max-w-2xl text-lg text-pretty text-gray-400">
-                  Mỗi giải thưởng là một cột mốc, nhưng con người mới là di sản
-                  lớn nhất. Bạn đã sẵn sàng để cùng WDS chinh phục những đỉnh
-                  cao tiếp theo?
+                  Mỗi giải thưởng là một cột mốc, nhưng con người mới là di sản lớn nhất. Bạn đã sẵn
+                  sàng để cùng WDS chinh phục những đỉnh cao tiếp theo?
                 </p>
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <Link
@@ -119,5 +113,5 @@ export default function AchievementsPage() {
 
       <Footer variant="dark" />
     </div>
-  );
+  )
 }

@@ -20,22 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { ColumnVisibilityToggle } from '@/components/admin/ColumnVisibilityToggle';
-import { DataTable } from '@/components/admin/DataTable';
-import { TableActions } from '@/components/admin/TableActions';
-import { TableFilters } from '@/components/admin/TableFilters';
-import { adminApi } from '@/lib/api/admin';
-import type { OrderStatus } from '@/lib/api/orders';
-import { ordersApi } from '@/lib/api/orders';
-import { formatPrice } from '@/lib/utils';
+import { AdminHeader } from '@/components/admin/AdminHeader'
+import { ColumnVisibilityToggle } from '@/components/admin/ColumnVisibilityToggle'
+import { DataTable } from '@/components/admin/DataTable'
+import { TableActions } from '@/components/admin/TableActions'
+import { TableFilters } from '@/components/admin/TableFilters'
+import { adminApi } from '@/lib/api/admin'
+import { ordersApi, type OrderStatus } from '@/lib/api/orders'
+import { formatPrice } from '@/lib/utils'
 
 const columns = [
   { id: 'code', label: 'Order Code' },
@@ -45,38 +44,31 @@ const columns = [
   { id: 'paymentStatus', label: 'Payment Status' },
   { id: 'createdAt', label: 'Created At' },
   { id: 'actions', label: 'Actions' },
-];
+]
 
 export default function OrdersPage() {
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>();
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    columns.map((c) => c.id)
-  );
-  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>()
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id))
+  const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'orders', page, limit, statusFilter],
     queryFn: () => adminApi.listOrders(page, limit, statusFilter),
-  });
+  })
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({
-      orderId,
-      status,
-    }: {
-      orderId: string;
-      status: OrderStatus;
-    }) => ordersApi.updateOrderStatus(orderId, status),
+    mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
+      ordersApi.updateOrderStatus(orderId, status),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
-      toast.success('Order status updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] })
+      toast.success('Order status updated successfully')
     },
     onError: () => {
-      toast.error('Failed to update order status');
+      toast.error('Failed to update order status')
     },
-  });
+  })
 
   const tableData =
     data?.orders.map((order) => ({
@@ -117,27 +109,24 @@ export default function OrdersPage() {
               label: 'Update Status',
               onClick: () => {
                 const newStatus = prompt(
-                  'Enter new status (PENDING, CONFIRMED, PROCESSING, SHIPPING, DELIVERED, CANCELLED, RETURNED):'
-                );
+                  'Enter new status (PENDING, CONFIRMED, PROCESSING, SHIPPING, DELIVERED, CANCELLED, RETURNED):',
+                )
                 if (newStatus) {
                   updateStatusMutation.mutate({
                     orderId: order.id,
                     status: newStatus as OrderStatus,
-                  });
+                  })
                 }
               },
             },
           ]}
         />
       ),
-    })) || [];
+    })) || []
 
   return (
     <div className="flex h-full flex-col">
-      <AdminHeader
-        title="Orders Management"
-        description="Quản lý đơn hàng trong hệ thống"
-      />
+      <AdminHeader title="Orders Management" description="Quản lý đơn hàng trong hệ thống" />
       <div className="flex-1 space-y-4 p-6">
         <div className="flex items-center justify-between">
           <TableFilters
@@ -157,8 +146,7 @@ export default function OrdersPage() {
                   { value: 'RETURNED', label: 'Returned' },
                 ],
                 value: statusFilter || '',
-                onChange: (value) =>
-                  setStatusFilter(value ? (value as OrderStatus) : undefined),
+                onChange: (value) => setStatusFilter(value ? (value as OrderStatus) : undefined),
               },
             ]}
             onClear={() => setStatusFilter(undefined)}
@@ -179,8 +167,8 @@ export default function OrdersPage() {
         {data && (
           <div className="text-wds-text/70 flex items-center justify-between text-sm">
             <div>
-              Showing {(page - 1) * limit + 1} to{' '}
-              {Math.min(page * limit, data.total)} of {data.total} orders
+              Showing {(page - 1) * limit + 1} to {Math.min(page * limit, data.total)} of{' '}
+              {data.total} orders
             </div>
             <div className="flex gap-2">
               <button
@@ -202,5 +190,5 @@ export default function OrdersPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

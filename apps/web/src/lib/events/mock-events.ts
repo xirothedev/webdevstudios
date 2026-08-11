@@ -20,19 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  addDays,
-  addHours,
-  addMonths,
-  addWeeks,
-  subDays,
-  subWeeks,
-} from 'date-fns';
+import { addDays, addHours, addMonths, addWeeks, subDays, subWeeks } from 'date-fns'
 
-import { Event, EventType } from './types';
+import { Event, EventType } from './types'
 
-const now = new Date();
-const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const now = new Date()
+const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
 export const mockEvents: Event[] = [
   // Past events
@@ -123,8 +116,7 @@ export const mockEvents: Event[] = [
   {
     id: '8',
     title: 'Cuộc họp Ban Chủ nhiệm tháng hiện tại',
-    description:
-      'Cuộc họp định kỳ để đánh giá tiến độ các dự án và hoạt động đang diễn ra.',
+    description: 'Cuộc họp định kỳ để đánh giá tiến độ các dự án và hoạt động đang diễn ra.',
     start: addDays(today, 3),
     end: addHours(addDays(today, 3), 2),
     location: 'Phòng họp A1.1',
@@ -182,8 +174,7 @@ export const mockEvents: Event[] = [
   {
     id: '13',
     title: 'Khảo sát: Lựa chọn chủ đề workshop tiếp theo',
-    description:
-      'Khảo sát để thành viên vote cho chủ đề workshop mà họ muốn học trong tháng tới.',
+    description: 'Khảo sát để thành viên vote cho chủ đề workshop mà họ muốn học trong tháng tới.',
     start: addDays(today, 10),
     end: addDays(today, 14),
     type: EventType.SURVEY,
@@ -216,8 +207,7 @@ export const mockEvents: Event[] = [
   {
     id: '16',
     title: 'Workshop: Testing với Jest & React Testing Library',
-    description:
-      'Workshop về testing trong React: Unit tests, Integration tests, và E2E testing.',
+    description: 'Workshop về testing trong React: Unit tests, Integration tests, và E2E testing.',
     start: addWeeks(today, 5),
     end: addHours(addWeeks(today, 5), 3),
     location: 'Phòng lab CNTT',
@@ -228,8 +218,7 @@ export const mockEvents: Event[] = [
   {
     id: '17',
     title: 'Social: Movie Night - Tech Documentaries',
-    description:
-      'Cùng nhau xem các bộ phim tài liệu về công nghệ và lập trình, sau đó thảo luận.',
+    description: 'Cùng nhau xem các bộ phim tài liệu về công nghệ và lập trình, sau đó thảo luận.',
     start: addWeeks(today, 6),
     end: addHours(addWeeks(today, 6), 3),
     location: 'Phòng sinh hoạt chung',
@@ -240,8 +229,7 @@ export const mockEvents: Event[] = [
   {
     id: '18',
     title: 'Khảo sát: Đánh giá hoạt động câu lạc bộ Q2',
-    description:
-      'Khảo sát tổng kết quý 2, thu thập ý kiến để cải thiện hoạt động trong quý 3.',
+    description: 'Khảo sát tổng kết quý 2, thu thập ý kiến để cải thiện hoạt động trong quý 3.',
     start: addMonths(today, 2),
     end: addDays(addMonths(today, 2), 7),
     type: EventType.SURVEY,
@@ -272,4 +260,4 @@ export const mockEvents: Event[] = [
     organizer: 'Ban Tổ chức',
     attendees: 0,
   },
-];
+]

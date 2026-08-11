@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { ArrowRight } from 'lucide-react';
-import { motion } from 'motion/react';
-import Link from 'next/link';
+import { ArrowRight } from 'lucide-react'
+import { motion } from 'motion/react'
+import Link from 'next/link'
 
 export function PartnerHero() {
   return (
@@ -60,9 +60,8 @@ export function PartnerHero() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="mx-auto mb-10 max-w-2xl text-lg text-pretty text-gray-400"
         >
-          Chúng tôi tự hào được hợp tác với các doanh nghiệp công nghệ hàng đầu
-          và các tổ chức uy tín để mang lại giá trị thực tiễn cho cộng đồng sinh
-          viên IT.
+          Chúng tôi tự hào được hợp tác với các doanh nghiệp công nghệ hàng đầu và các tổ chức uy
+          tín để mang lại giá trị thực tiễn cho cộng đồng sinh viên IT.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -82,5 +81,5 @@ export function PartnerHero() {
         </motion.div>
       </div>
     </section>
-  );
+  )
 }

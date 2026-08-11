@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from 'next'
 
-import { siteUrl } from '@/lib/metadata';
+import { siteUrl } from '@/lib/metadata'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -34,5 +34,5 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
-  };
+  }
 }

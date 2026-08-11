@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from 'next/image'
+import Link from 'next/link'
 
 export function AuthHeader() {
   return (
@@ -37,5 +37,5 @@ export function AuthHeader() {
         />
       </Link>
     </header>
-  );
+  )
 }

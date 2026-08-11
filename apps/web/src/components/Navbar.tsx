@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useSyncExternalStore, useState } from 'react'
 
 import {
   NavigationMenu,
@@ -35,25 +35,25 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
-import { UserAvatar } from '@/components/wds/UserAvatar';
-import { useCurrentUser } from '@/lib/api/hooks/use-auth';
-import { cn } from '@/lib/utils';
+} from '@/components/ui/navigation-menu'
+import { UserAvatar } from '@/components/wds/UserAvatar'
+import { useCurrentUser } from '@/lib/api/hooks/use-auth'
+import { cn } from '@/lib/utils'
 
 interface NavbarProps {
-  variant?: 'dark' | 'light';
+  variant?: 'dark' | 'light'
 }
 
 export function Navbar({ variant = 'dark' }: NavbarProps) {
-  const pathname = usePathname();
-  const isDark = variant === 'dark';
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { data: user } = useCurrentUser();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const pathname = usePathname()
+  const isDark = variant === 'dark'
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
+  const { data: user } = useCurrentUser()
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
@@ -66,15 +66,13 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
     { label: 'Lịch sự kiện', href: '/calendar' },
     { label: 'Thế hệ', href: '/generation' },
     { label: 'FAQ', href: '/faq' },
-  ];
+  ]
 
   return (
     <nav
       className={cn(
         'fixed top-0 right-0 left-0 z-50',
-        isDark
-          ? 'glass border-b border-white/5'
-          : 'sticky border-b border-gray-200 bg-white'
+        isDark ? 'glass border-b border-white/5' : 'sticky border-b border-gray-200 bg-white',
       )}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 md:h-16">
@@ -92,7 +90,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           <span
             className={cn(
               'hidden text-sm font-semibold tracking-tight lg:inline',
-              isDark ? 'text-white' : 'text-black'
+              isDark ? 'text-white' : 'text-black',
             )}
           >
             WebDev Studios
@@ -103,7 +101,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
           <NavigationMenuList className="gap-2">
             {/* Main navigation items */}
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href
               return (
                 <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink
@@ -119,14 +117,14 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                             'bg-transparent',
                             isActive
                               ? 'border-wds-accent rounded-none border-b-2 pb-1 text-black'
-                              : 'text-gray-600 hover:text-black'
-                          )
+                              : 'text-gray-600 hover:text-black',
+                          ),
                     )}
                   >
                     <Link href={item.href}>{item.label}</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
-              );
+              )
             })}
           </NavigationMenuList>
         </NavigationMenu>
@@ -141,7 +139,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                 'hidden rounded-lg px-4 py-2 text-xs font-medium transition-colors sm:block',
                 isDark
                   ? 'hover:text-wds-accent text-white/70 hover:bg-white/5'
-                  : 'bg-wds-accent hover:bg-wds-accent/90 text-black'
+                  : 'bg-wds-accent hover:bg-wds-accent/90 text-black',
               )}
             >
               Đăng nhập
@@ -155,7 +153,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
               'flex h-10 w-10 items-center justify-center rounded-lg transition-colors md:hidden',
               isDark
                 ? 'text-white/70 hover:bg-white/5 hover:text-white'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-black'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-black',
             )}
             aria-label="Toggle menu"
           >
@@ -210,7 +208,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                 'fixed top-0 right-0 z-9999 h-full w-80 max-w-[85vw] overflow-y-auto shadow-2xl md:hidden',
                 isDark
                   ? 'glass border-l border-white/10 bg-black/98 backdrop-blur-xl'
-                  : 'border-l border-gray-200 bg-white'
+                  : 'border-l border-gray-200 bg-white',
               )}
             >
               <div className="flex flex-col p-6">
@@ -227,7 +225,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                   <span
                     className={cn(
                       'text-sm font-semibold tracking-tight',
-                      isDark ? 'text-white' : 'text-black'
+                      isDark ? 'text-white' : 'text-black',
                     )}
                   >
                     WebDev Studios
@@ -237,7 +235,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                 {/* Navigation Items */}
                 <nav className="flex flex-col gap-2">
                   {navItems.map((item, index) => {
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href
                     return (
                       <motion.div
                         key={item.href}
@@ -260,13 +258,13 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                                 : 'bg-wds-accent/10 text-wds-accent'
                               : isDark
                                 ? 'text-white/70 hover:bg-white/5 hover:text-white'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-black'
+                                : 'text-gray-600 hover:bg-gray-100 hover:text-black',
                           )}
                         >
                           {item.label}
                         </Link>
                       </motion.div>
-                    );
+                    )
                   })}
                 </nav>
 
@@ -299,7 +297,7 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
                           'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
-                          'bg-wds-accent hover:bg-wds-accent/90 text-black'
+                          'bg-wds-accent hover:bg-wds-accent/90 text-black',
                         )}
                       >
                         Đăng nhập
@@ -313,5 +311,5 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
         )}
       </AnimatePresence>
     </nav>
-  );
+  )
 }

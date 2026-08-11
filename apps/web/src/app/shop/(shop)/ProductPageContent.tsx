@@ -20,120 +20,114 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { toast } from 'sonner'
 
-import { ProductActions } from '@/components/shop/ProductActions';
-import { ProductAdditionalInfo } from '@/components/shop/ProductAdditionalInfo';
-import { ProductFeatures } from '@/components/shop/ProductFeatures';
-import { ProductImageGallery } from '@/components/shop/ProductImageGallery';
-import { ProductInfo } from '@/components/shop/ProductInfo';
-import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector';
-import { ProductReviews } from '@/components/shop/ProductReviews';
-import { ProductSizeGuide } from '@/components/shop/ProductSizeGuide';
-import { ProductSizeSelector } from '@/components/shop/ProductSizeSelector';
-import { ReviewForm } from '@/components/shop/ReviewForm';
-import { useAuth } from '@/hooks/use-auth';
-import { useAddToCart } from '@/lib/api/hooks/use-cart';
-import { useSuspenseProduct } from '@/lib/api/hooks/use-products';
-import { getBackendSlug } from '@/lib/product-slug-mapping';
-import { getProductStaticContent } from '@/lib/product-static-content';
-import { ProductSize } from '@/types/product';
+import { ProductActions } from '@/components/shop/ProductActions'
+import { ProductAdditionalInfo } from '@/components/shop/ProductAdditionalInfo'
+import { ProductFeatures } from '@/components/shop/ProductFeatures'
+import { ProductImageGallery } from '@/components/shop/ProductImageGallery'
+import { ProductInfo } from '@/components/shop/ProductInfo'
+import { ProductQuantitySelector } from '@/components/shop/ProductQuantitySelector'
+import { ProductReviews } from '@/components/shop/ProductReviews'
+import { ProductSizeGuide } from '@/components/shop/ProductSizeGuide'
+import { ProductSizeSelector } from '@/components/shop/ProductSizeSelector'
+import { ReviewForm } from '@/components/shop/ReviewForm'
+import { useAuth } from '@/hooks/use-auth'
+import { useAddToCart } from '@/lib/api/hooks/use-cart'
+import { useSuspenseProduct } from '@/lib/api/hooks/use-products'
+import { getBackendSlug } from '@/lib/product-slug-mapping'
+import { getProductStaticContent } from '@/lib/product-static-content'
+import { ProductSize } from '@/types/product'
 
 interface ProductPageContentProps {
-  productSlug: 'ao-thun' | 'pad-chuot' | 'day-deo' | 'moc-khoa';
-  productName: string;
+  productSlug: 'ao-thun' | 'pad-chuot' | 'day-deo' | 'moc-khoa'
+  productName: string
 }
 
-function ProductContentInner({
-  productSlug,
-  productName,
-}: ProductPageContentProps) {
-  const [selectedSize, setSelectedSize] = useState<ProductSize>('M');
-  const [quantity, setQuantity] = useState(1);
+function ProductContentInner({ productSlug, productName }: ProductPageContentProps) {
+  const [selectedSize, setSelectedSize] = useState<ProductSize>('M')
+  const [quantity, setQuantity] = useState(1)
 
-  const router = useRouter();
-  const BACKEND_SLUG = getBackendSlug(productSlug);
-  const { user, isAuthenticated } = useAuth();
+  const router = useRouter()
+  const BACKEND_SLUG = getBackendSlug(productSlug)
+  const { user, isAuthenticated } = useAuth()
 
   // Fetch product data using Suspense Query
-  const { data: product } = useSuspenseProduct(BACKEND_SLUG);
+  const { data: product } = useSuspenseProduct(BACKEND_SLUG)
 
   // Get static content (images, features, additionalInfo)
-  const staticContent = getProductStaticContent(BACKEND_SLUG);
+  const staticContent = getProductStaticContent(BACKEND_SLUG)
 
   // Add to cart mutation
-  const addToCartMutation = useAddToCart();
+  const addToCartMutation = useAddToCart()
 
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product) return
 
     // For products with sizes (ao-thun)
     if (product.hasSizes) {
       // Validation: ensure size is selected
       if (!selectedSize) {
-        toast.error('Vui lòng chọn size');
-        return;
+        toast.error('Vui lòng chọn size')
+        return
       }
 
       // Calculate stock for selected size
       const stockBySize = product.sizeStocks?.reduce(
         (acc, ss) => {
-          acc[ss.size] = ss.stock;
-          return acc;
+          acc[ss.size] = ss.stock
+          return acc
         },
-        {} as Record<ProductSize, number>
-      );
-      const selectedSizeStock =
-        stockBySize?.[selectedSize] ?? product.stock ?? 0;
+        {} as Record<ProductSize, number>,
+      )
+      const selectedSizeStock = stockBySize?.[selectedSize] ?? product.stock ?? 0
 
       // Validation: quantity must be valid
       if (quantity <= 0 || quantity > selectedSizeStock) {
-        toast.error('Số lượng không hợp lệ');
-        return;
+        toast.error('Số lượng không hợp lệ')
+        return
       }
 
       addToCartMutation.mutate({
         productId: product.id,
         size: selectedSize,
         quantity,
-      });
+      })
     } else {
       // For products without sizes
       // Validation: quantity must be valid
       if (quantity <= 0 || quantity > product.stock) {
-        toast.error('Số lượng không hợp lệ');
-        return;
+        toast.error('Số lượng không hợp lệ')
+        return
       }
 
       addToCartMutation.mutate({
         productId: product.id,
         quantity,
-      });
+      })
     }
-  };
+  }
 
   const handleBuyNow = async () => {
     if (!product || !isAuthenticated) {
-      toast.error('Vui lòng đăng nhập để mua hàng');
-      router.push('/auth/login');
-      return;
+      toast.error('Vui lòng đăng nhập để mua hàng')
+      router.push('/auth/login')
+      return
     }
 
     // Check stock
     const availableStock = product.hasSizes
       ? product.sizeStocks?.find((ss) => ss.size === selectedSize)?.stock || 0
-      : product.stock || 0;
+      : product.stock || 0
 
     if (quantity > availableStock) {
-      toast.error(
-        `Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock}`
-      );
-      return;
+      toast.error(`Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock}`)
+      return
     }
 
     // For Buy Now, we need shipping address
@@ -141,52 +135,51 @@ function ProductContentInner({
     // Or we can show a modal to collect shipping address
     // For simplicity, redirect to checkout with product info in query params
     router.push(
-      `/checkout?buyNow=true&productId=${product.id}&productSlug=${BACKEND_SLUG}&size=${selectedSize}&quantity=${quantity}`
-    );
-  };
+      `/checkout?buyNow=true&productId=${product.id}&productSlug=${BACKEND_SLUG}&size=${selectedSize}&quantity=${quantity}`,
+    )
+  }
 
   // Calculate stock for selected size (before early returns to maintain hook order)
   const stockBySize = product?.sizeStocks?.reduce(
     (acc, ss) => {
-      acc[ss.size] = ss.stock;
-      return acc;
+      acc[ss.size] = ss.stock
+      return acc
     },
-    {} as Record<ProductSize, number>
-  );
-  const selectedSizeStock = stockBySize?.[selectedSize] ?? product?.stock ?? 0;
+    {} as Record<ProductSize, number>,
+  )
+  const selectedSizeStock = stockBySize?.[selectedSize] ?? product?.stock ?? 0
 
   // Reset quantity when size changes if current quantity exceeds new stock
-  useEffect(() => {
-    if (product && product.hasSizes && quantity > selectedSizeStock) {
-      setQuantity(selectedSizeStock > 0 ? selectedSizeStock : 1);
-    }
-  }, [selectedSize, selectedSizeStock, quantity, product]);
+  // (render-phase adjustment — React re-renders before committing)
+  if (product && product.hasSizes && quantity > selectedSizeStock) {
+    setQuantity(selectedSizeStock > 0 ? selectedSizeStock : 1)
+  }
 
   const increaseQuantity = () => {
     if (product?.hasSizes) {
-      setQuantity((prev) => Math.min(prev + 1, selectedSizeStock ?? 10));
+      setQuantity((prev) => Math.min(prev + 1, selectedSizeStock ?? 10))
     } else {
-      setQuantity((prev) => Math.min(prev + 1, product?.stock ?? 10));
+      setQuantity((prev) => Math.min(prev + 1, product?.stock ?? 10))
     }
-  };
+  }
 
   const decreaseQuantity = () => {
-    setQuantity((prev) => Math.max(prev - 1, 1));
-  };
+    setQuantity((prev) => Math.max(prev - 1, 1))
+  }
 
   // Map backend ProductDto to component props
   const price = {
     current: product.priceCurrent,
     original: product.priceOriginal ?? undefined,
     discount: product.priceDiscount ?? undefined,
-  };
+  }
 
   const rating = {
     value: product.ratingValue,
     count: product.ratingCount,
-  };
+  }
 
-  const sizes = product.sizeStocks?.map((ss) => ss.size) || [];
+  const sizes = product.sizeStocks?.map((ss) => ss.size) || []
 
   return (
     <>
@@ -202,10 +195,7 @@ function ProductContentInner({
       {/* Product Section */}
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
         {/* Left: Product Image */}
-        <ProductImageGallery
-          images={staticContent.images}
-          badge={product.badge || undefined}
-        />
+        <ProductImageGallery images={staticContent.images} badge={product.badge || undefined} />
 
         {/* Right: Product Info */}
         <div className="flex flex-col justify-center">
@@ -233,9 +223,7 @@ function ProductContentInner({
             onIncrease={increaseQuantity}
             onDecrease={decreaseQuantity}
             stock={product.hasSizes ? selectedSizeStock : product.stock}
-            max={
-              product.hasSizes ? (selectedSizeStock ?? 0) : (product.stock ?? 0)
-            }
+            max={product.hasSizes ? (selectedSizeStock ?? 0) : (product.stock ?? 0)}
           />
 
           {/* Add to Cart Button */}
@@ -258,9 +246,7 @@ function ProductContentInner({
 
       {/* Reviews Section */}
       <section className="mt-16">
-        <h2 className="mb-8 text-3xl font-bold text-white">
-          Đánh giá sản phẩm
-        </h2>
+        <h2 className="mb-8 text-3xl font-bold text-white">Đánh giá sản phẩm</h2>
 
         {/* Review Form - Only for authenticated users */}
         {isAuthenticated ? (
@@ -269,9 +255,7 @@ function ProductContentInner({
           </div>
         ) : (
           <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-6">
-            <p className="text-white/60">
-              Đăng nhập để viết đánh giá về sản phẩm này.
-            </p>
+            <p className="text-white/60">Đăng nhập để viết đánh giá về sản phẩm này.</p>
           </div>
         )}
 
@@ -283,7 +267,7 @@ function ProductContentInner({
         />
       </section>
     </>
-  );
+  )
 }
 
 function ProductLoading() {
@@ -299,10 +283,7 @@ function ProductLoading() {
           <div className="aspect-square w-full animate-pulse rounded-xl bg-white/10" />
           <div className="grid grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="aspect-square animate-pulse rounded-lg bg-white/10"
-              />
+              <div key={i} className="aspect-square animate-pulse rounded-lg bg-white/10" />
             ))}
           </div>
         </div>
@@ -319,19 +300,13 @@ function ProductLoading() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export function ProductPageContent({
-  productSlug,
-  productName,
-}: ProductPageContentProps) {
+export function ProductPageContent({ productSlug, productName }: ProductPageContentProps) {
   return (
     <Suspense fallback={<ProductLoading />}>
-      <ProductContentInner
-        productSlug={productSlug}
-        productName={productName}
-      />
+      <ProductContentInner productSlug={productSlug} productName={productName} />
     </Suspense>
-  );
+  )
 }

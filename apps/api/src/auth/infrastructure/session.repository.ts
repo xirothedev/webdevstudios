@@ -20,32 +20,32 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Device, Session, SessionStatus, User } from '@generated/prisma';
-import { Injectable } from '@nestjs/common';
+import { Device, Session, SessionStatus, User } from '@generated/prisma'
+import { Injectable } from '@nestjs/common'
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma'
 
 type SessionWithDevice = Session & {
-  device: Device | null;
-};
+  device: Device | null
+}
 
 type SessionWithRelations = Session & {
-  user: User;
-  device: Device | null;
-};
+  user: User
+  device: Device | null
+}
 
 @Injectable()
 export class SessionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
-    userId: string;
-    token: string;
-    refreshToken?: string;
-    deviceId?: string;
-    ipAddress?: string;
-    userAgent?: string;
-    expiresAt: Date;
+    userId: string
+    token: string
+    refreshToken?: string
+    deviceId?: string
+    ipAddress?: string
+    userAgent?: string
+    expiresAt: Date
   }): Promise<Session> {
     return this.prisma.session.create({
       data: {
@@ -58,7 +58,7 @@ export class SessionRepository {
         expiresAt: data.expiresAt,
         status: SessionStatus.ACTIVE,
       },
-    });
+    })
   }
 
   async findByToken(token: string): Promise<SessionWithRelations | null> {
@@ -68,19 +68,17 @@ export class SessionRepository {
         user: true,
         device: true,
       },
-    });
+    })
   }
 
-  async findByRefreshToken(
-    refreshToken: string
-  ): Promise<SessionWithRelations | null> {
+  async findByRefreshToken(refreshToken: string): Promise<SessionWithRelations | null> {
     return this.prisma.session.findFirst({
       where: { refreshToken },
       include: {
         user: true,
         device: true,
       },
-    });
+    })
   }
 
   async findByUserId(userId: string): Promise<SessionWithDevice[]> {
@@ -98,7 +96,7 @@ export class SessionRepository {
       orderBy: {
         createdAt: 'desc',
       },
-    });
+    })
   }
 
   async revoke(id: string): Promise<Session> {
@@ -108,7 +106,7 @@ export class SessionRepository {
         status: SessionStatus.REVOKED,
         revokedAt: new Date(),
       },
-    });
+    })
   }
 
   async revokeAllByUserId(userId: string): Promise<void> {
@@ -121,14 +119,14 @@ export class SessionRepository {
         status: SessionStatus.REVOKED,
         revokedAt: new Date(),
       },
-    });
+    })
   }
 
   async updateRefreshToken(id: string, refreshToken: string): Promise<Session> {
     return this.prisma.session.update({
       where: { id },
       data: { refreshToken },
-    });
+    })
   }
 
   async cleanupExpired(): Promise<number> {
@@ -142,7 +140,7 @@ export class SessionRepository {
       data: {
         status: SessionStatus.EXPIRED,
       },
-    });
-    return result.count;
+    })
+    return result.count
   }
 }

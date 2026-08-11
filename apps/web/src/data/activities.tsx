@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Code, Users, Zap } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { Code, Users, Zap } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 export interface Category {
-  id: string;
-  label: string;
-  icon?: ReactNode;
+  id: string
+  label: string
+  icon?: ReactNode
 }
 
 export interface Activity {
-  id: number;
-  title: string;
-  category: 'academic' | 'community' | 'event';
-  date: string;
-  location: string;
-  image: string;
-  description: string;
-  attendees: number;
+  id: number
+  title: string
+  category: 'academic' | 'community' | 'event'
+  date: string
+  location: string
+  image: string
+  description: string
+  attendees: number
 }
 
 export const CATEGORIES: Category[] = [
@@ -49,7 +49,7 @@ export const CATEGORIES: Category[] = [
     label: 'Sự kiện & Teambuilding',
     icon: <Zap size={16} />,
   },
-];
+]
 
 export const ACTIVITIES: Activity[] = [
   {
@@ -72,8 +72,7 @@ export const ACTIVITIES: Activity[] = [
     location: 'Online (Google Meet)',
     image:
       'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop',
-    description:
-      'Chia sẻ kiến thức về tư duy thiết kế dành cho lập trình viên, diễn giả từ VNG.',
+    description: 'Chia sẻ kiến thức về tư duy thiết kế dành cho lập trình viên, diễn giả từ VNG.',
     attendees: 250,
   },
   {
@@ -108,8 +107,7 @@ export const ACTIVITIES: Activity[] = [
     location: 'Hội trường E',
     image:
       'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop',
-    description:
-      'Cập nhật những tính năng mới nhất của Next.js 14 và Server Actions.',
+    description: 'Cập nhật những tính năng mới nhất của Next.js 14 và Server Actions.',
     attendees: 150,
   },
   {
@@ -120,8 +118,7 @@ export const ACTIVITIES: Activity[] = [
     location: 'Highlands Coffee',
     image:
       'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop',
-    description:
-      'Buổi gặp mặt thân mật, chia sẻ chuyện nghề, chuyện đời của các cựu thành viên.',
+    description: 'Buổi gặp mặt thân mật, chia sẻ chuyện nghề, chuyện đời của các cựu thành viên.',
     attendees: 40,
   },
-];
+]

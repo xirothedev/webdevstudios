@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize } from '@generated/prisma';
+import { ProductSize } from '@generated/prisma'
 
 export class AddToCartCommand {
   constructor(
     public readonly userId: string,
     public readonly productId: string,
     public readonly size: ProductSize | null,
-    public readonly quantity: number
+    public readonly quantity: number,
   ) {}
 }

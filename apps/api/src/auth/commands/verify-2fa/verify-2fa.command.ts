@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ICommand } from '@nestjs/cqrs';
+import { ICommand } from '@nestjs/cqrs'
 
 export class Verify2FACommand implements ICommand {
   constructor(
@@ -28,6 +28,6 @@ export class Verify2FACommand implements ICommand {
     public readonly code: string,
     public readonly sessionId?: string,
     public readonly ipAddress?: string,
-    public readonly userAgent?: string
+    public readonly userAgent?: string,
   ) {}
 }

@@ -21,116 +21,116 @@
  */
 
 export interface LoginRequest {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
+  email: string
+  password: string
+  rememberMe?: boolean
 }
 
 export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
+  accessToken: string
+  refreshToken: string
   user: {
-    id: string;
-    email: string;
-    fullName: string | null;
-    emailVerified: boolean;
-    mfaEnabled: boolean;
-  };
-  requires2FA?: boolean;
+    id: string
+    email: string
+    fullName: string | null
+    emailVerified: boolean
+    mfaEnabled: boolean
+  }
+  requires2FA?: boolean
 }
 
 export interface RegisterRequest {
-  email: string;
-  password: string;
-  fullName: string;
-  phone?: string;
+  email: string
+  password: string
+  fullName: string
+  phone?: string
 }
 
 export interface RegisterResponse {
-  userId: string;
+  userId: string
 }
 
 export interface VerifyEmailResponse {
-  success: boolean;
+  success: boolean
 }
 
 export interface User {
-  id: string;
-  email: string;
-  fullName: string | null;
-  phone: string | null;
-  avatar: string | null;
-  role: string;
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  mfaEnabled: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  id: string
+  email: string
+  fullName: string | null
+  phone: string | null
+  avatar: string | null
+  role: string
+  emailVerified: boolean
+  phoneVerified: boolean
+  mfaEnabled: boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
-export type OAuthProvider = 'google' | 'github';
+export type OAuthProvider = 'google' | 'github'
 
 export interface RefreshTokenRequest {
-  refreshToken?: string;
+  refreshToken?: string
 }
 
 export interface RefreshTokenResponse {
-  accessToken: string;
-  refreshToken: string;
+  accessToken: string
+  refreshToken: string
 }
 
 export interface RequestPasswordResetRequest {
-  email: string;
+  email: string
 }
 
 export interface RequestPasswordResetResponse {
-  success: boolean;
+  success: boolean
 }
 
 export interface ResetPasswordRequest {
-  token: string;
-  newPassword: string;
+  token: string
+  newPassword: string
 }
 
 export interface ResetPasswordResponse {
-  success: boolean;
+  success: boolean
 }
 
 export interface Verify2FARequest {
-  code: string;
-  sessionId?: string;
+  code: string
+  sessionId?: string
 }
 
 export interface Verify2FAResponse {
-  accessToken?: string;
-  refreshToken?: string;
+  accessToken?: string
+  refreshToken?: string
   user?: {
-    id: string;
-    email: string;
-    fullName: string | null;
-    emailVerified: boolean;
-    mfaEnabled: boolean;
-  };
-  verified?: boolean;
+    id: string
+    email: string
+    fullName: string | null
+    emailVerified: boolean
+    mfaEnabled: boolean
+  }
+  verified?: boolean
 }
 
 export interface Enable2FAResponse {
-  qrCode: string;
-  secret: string;
-  backupCodes: string[];
+  qrCode: string
+  secret: string
+  backupCodes: string[]
 }
 
 export interface Session {
-  id: string;
+  id: string
   device: {
-    id: string;
-    name: string | null;
-    type: string;
-    lastSeenAt: Date;
-  } | null;
-  ipAddress: string | null;
-  userAgent: string | null;
-  status: 'ACTIVE' | 'EXPIRED' | 'REVOKED';
-  createdAt: Date;
-  expiresAt: Date;
+    id: string
+    name: string | null
+    type: string
+    lastSeenAt: Date
+  } | null
+  ipAddress: string | null
+  userAgent: string | null
+  status: 'ACTIVE' | 'EXPIRED' | 'REVOKED'
+  createdAt: Date
+  expiresAt: Date
 }

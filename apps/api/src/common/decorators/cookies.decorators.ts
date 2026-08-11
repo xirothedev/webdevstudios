@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import type { Request } from 'express';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common'
+import type { Request } from 'express'
 
-type CookieMap = Record<string, string | undefined>;
+type CookieMap = Record<string, string | undefined>
 
 /**
  * Retrieve cookies from the incoming request.
@@ -31,13 +31,10 @@ type CookieMap = Record<string, string | undefined>;
  * - `@Cookies('name')` returns the value of the named cookie.
  */
 export const Cookies = createParamDecorator(
-  (
-    name: string | undefined,
-    ctx: ExecutionContext
-  ): string | CookieMap | undefined => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    const cookies = (request.cookies || {}) as CookieMap;
-    if (!name) return cookies;
-    return cookies?.[name];
-  }
-);
+  (name: string | undefined, ctx: ExecutionContext): string | CookieMap | undefined => {
+    const request = ctx.switchToHttp().getRequest<Request>()
+    const cookies = (request.cookies || {}) as CookieMap
+    if (!name) return cookies
+    return cookies?.[name]
+  },
+)

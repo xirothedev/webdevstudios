@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { PaymentTransactionStatus } from '@generated/prisma';
-import { Injectable } from '@nestjs/common';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { PaymentTransactionStatus } from '@generated/prisma'
+import { Injectable } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma'
 
-import { ListTransactionsQuery } from './list-transactions.query';
+import { ListTransactionsQuery } from './list-transactions.query'
 
 @Injectable()
 @QueryHandler(ListTransactionsQuery)
@@ -34,16 +34,16 @@ export class ListTransactionsHandler implements IQueryHandler<ListTransactionsQu
   constructor(private readonly prisma: PrismaService) {}
 
   async execute(query: ListTransactionsQuery) {
-    const { page, limit, status } = query;
+    const { page, limit, status } = query
 
-    const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit
 
     const where: {
-      status?: PaymentTransactionStatus;
-    } = {};
+      status?: PaymentTransactionStatus
+    } = {}
 
     if (status) {
-      where.status = status;
+      where.status = status
     }
 
     const [transactions, total] = await Promise.all([
@@ -66,9 +66,9 @@ export class ListTransactionsHandler implements IQueryHandler<ListTransactionsQu
         },
       }),
       this.prisma.paymentTransaction.count({ where }),
-    ]);
+    ])
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / limit)
 
     return {
       transactions: transactions.map((transaction) => ({
@@ -93,6 +93,6 @@ export class ListTransactionsHandler implements IQueryHandler<ListTransactionsQu
         total,
         totalPages,
       },
-    };
+    }
   }
 }

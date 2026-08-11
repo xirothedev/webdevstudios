@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Footer } from '@/components/Footer';
-import { LastUpdatedProvider } from '@/components/legal/last-updated-provider';
-import { LegalLayout } from '@/components/legal/LegalLayout';
-import { Navbar } from '@/components/Navbar';
-import { getFileCommitDate } from '@/lib/git-utils';
+import { Footer } from '@/components/Footer'
+import { LastUpdatedProvider } from '@/components/legal/last-updated-provider'
+import { LegalLayout } from '@/components/legal/LegalLayout'
+import { Navbar } from '@/components/Navbar'
+import { getFileCommitDate } from '@/lib/git-utils'
 
-import Content from './content.mdx';
+import Content from './content.mdx'
 
 const TOC_ITEMS = [
   { id: 'dieu-khoan-su-dung', label: 'Điều khoản sử dụng' },
@@ -44,12 +44,10 @@ const TOC_ITEMS = [
   { id: '12-thay-doi-dieu-khoan', label: '12. Thay đổi điều khoản' },
   { id: '13-luat-ap-dung', label: '13. Luật áp dụng' },
   { id: '14-lien-he', label: '14. Liên hệ' },
-];
+]
 
 export default function TermsPage() {
-  const commitDate = getFileCommitDate(
-    'apps/web/src/app/(legal)/terms/content.mdx'
-  );
+  const commitDate = getFileCommitDate('apps/web/src/app/(legal)/terms/content.mdx')
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">
@@ -65,5 +63,5 @@ export default function TermsPage() {
 
       <Footer />
     </div>
-  );
+  )
 }

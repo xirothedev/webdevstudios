@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { EventRepository } from '../../infrastructure/event.repository';
-import { CreateEventCommand } from './create-event.command';
+import { EventRepository } from '../../infrastructure/event.repository'
+import { CreateEventCommand } from './create-event.command'
 
 @CommandHandler(CreateEventCommand)
 export class CreateEventHandler implements ICommandHandler<CreateEventCommand> {
@@ -41,6 +41,6 @@ export class CreateEventHandler implements ICommandHandler<CreateEventCommand> {
       attendees: command.attendees,
       surveyLink: command.surveyLink,
       createdBy: command.createdBy,
-    });
+    })
   }
 }

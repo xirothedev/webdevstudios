@@ -20,27 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class BlogPostAuthorDto {
   @ApiProperty({
     description: 'Author ID',
     example: 'clx1234567890',
   })
-  id: string;
+  id: string
 
   @ApiProperty({
     description: 'Author full name',
     example: 'John Doe',
   })
-  fullName: string | null;
+  fullName: string | null
 
   @ApiPropertyOptional({
     description: 'Author avatar URL',
     example: 'https://example.com/avatar.jpg',
     nullable: true,
   })
-  avatar: string | null;
+  avatar: string | null
 }
 
 export class BlogPostDto {
@@ -48,99 +48,97 @@ export class BlogPostDto {
     description: 'Blog post ID',
     example: 'clx1234567890',
   })
-  id: string;
+  id: string
 
   @ApiProperty({
     description: 'Blog post slug',
     example: 'getting-started-with-nextjs',
   })
-  slug: string;
+  slug: string
 
   @ApiProperty({
     description: 'Blog post title',
     example: 'Getting Started with Next.js',
   })
-  title: string;
+  title: string
 
   @ApiProperty({
     description: 'R2 URL to markdown content',
     example: 'https://r2.example.com/blog/posts/clx1234567890/content.md',
   })
-  contentUrl: string;
+  contentUrl: string
 
   @ApiPropertyOptional({
     description: 'Content size in bytes',
     example: 1024,
     nullable: true,
   })
-  contentSize: number | null;
+  contentSize: number | null
 
   @ApiPropertyOptional({
     description: 'Blog post excerpt',
     example: 'Learn how to get started with Next.js...',
     nullable: true,
   })
-  excerpt: string | null;
+  excerpt: string | null
 
   @ApiPropertyOptional({
     description: 'Cover image URL',
-    example:
-      'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
+    example: 'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
     nullable: true,
   })
-  coverImage: string | null;
+  coverImage: string | null
 
   @ApiProperty({
     description: 'Author information',
     type: BlogPostAuthorDto,
   })
-  author: BlogPostAuthorDto;
+  author: BlogPostAuthorDto
 
   @ApiProperty({
     description: 'Whether post is published',
     example: true,
   })
-  isPublished: boolean;
+  isPublished: boolean
 
   @ApiPropertyOptional({
     description: 'Publication date',
     example: '2024-01-01T00:00:00.000Z',
     nullable: true,
   })
-  publishedAt: Date | null;
+  publishedAt: Date | null
 
   @ApiProperty({
     description: 'View count',
     example: 100,
   })
-  viewCount: number;
+  viewCount: number
 
   @ApiPropertyOptional({
     description: 'SEO meta title',
     example: 'Getting Started with Next.js - WebDev Studios',
     nullable: true,
   })
-  metaTitle: string | null;
+  metaTitle: string | null
 
   @ApiPropertyOptional({
     description: 'SEO meta description',
-    example:
-      'Learn how to get started with Next.js in this comprehensive guide.',
+    example: 'Learn how to get started with Next.js in this comprehensive guide.',
     nullable: true,
   })
-  metaDescription: string | null;
+  metaDescription: string | null
 
   @ApiProperty({
     description: 'Creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  createdAt: Date;
+  createdAt: Date
 
   @ApiProperty({
     description: 'Last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  updatedAt: Date;
+  updatedAt: Date
 }
 
 export class BlogPostWithContentDto extends BlogPostDto {
@@ -148,7 +146,7 @@ export class BlogPostWithContentDto extends BlogPostDto {
     description: 'Markdown content',
     example: '# Getting Started\n\nThis is the content...',
   })
-  content: string;
+  content: string
 }
 
 export class BlogPostListResponseDto {
@@ -156,23 +154,23 @@ export class BlogPostListResponseDto {
     description: 'List of blog posts',
     type: [BlogPostDto],
   })
-  posts: BlogPostDto[];
+  posts: BlogPostDto[]
 
   @ApiProperty({
     description: 'Total number of posts',
     example: 10,
   })
-  total: number;
+  total: number
 
   @ApiProperty({
     description: 'Current page',
     example: 1,
   })
-  page: number;
+  page: number
 
   @ApiProperty({
     description: 'Page size',
     example: 10,
   })
-  pageSize: number;
+  pageSize: number
 }

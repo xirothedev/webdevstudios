@@ -20,15 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import { IsBoolean, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
 
 export class UpdateProductDto {
   @ApiPropertyOptional({
@@ -41,7 +34,7 @@ export class UpdateProductDto {
   @IsString()
   @MinLength(1)
   @MaxLength(255)
-  name?: string;
+  name?: string
 
   @ApiPropertyOptional({
     description: 'Product description',
@@ -49,7 +42,7 @@ export class UpdateProductDto {
   })
   @IsOptional()
   @IsString()
-  description?: string;
+  description?: string
 
   @ApiPropertyOptional({
     description: 'Current price',
@@ -58,7 +51,7 @@ export class UpdateProductDto {
   })
   @IsOptional()
   @IsNumber()
-  priceCurrent?: number;
+  priceCurrent?: number
 
   @ApiPropertyOptional({
     description: 'Original price (if discounted)',
@@ -68,7 +61,7 @@ export class UpdateProductDto {
   })
   @IsOptional()
   @IsNumber()
-  priceOriginal?: number | null;
+  priceOriginal?: number | null
 
   @ApiPropertyOptional({
     description: 'Product badge',
@@ -79,7 +72,7 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   @MaxLength(50)
-  badge?: string | null;
+  badge?: string | null
 
   @ApiPropertyOptional({
     description: 'Published status',
@@ -87,5 +80,5 @@ export class UpdateProductDto {
   })
   @IsOptional()
   @IsBoolean()
-  isPublished?: boolean;
+  isPublished?: boolean
 }

@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Building2, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
-import { m } from 'motion/react';
-import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { Building2, Clock, Mail, MessageCircle, Phone } from 'lucide-react'
+import { m } from 'motion/react'
+import Image from 'next/image'
+import { useRef, useState } from 'react'
 
-import { AnimatedBeam } from '@/components/ui/animated-beam';
-import { BentoCard, BentoGrid } from '@/components/ui/bento-grid';
-import { Button } from '@/components/ui/button';
+import { AnimatedBeam } from '@/components/ui/animated-beam'
+import { BentoCard, BentoGrid } from '@/components/ui/bento-grid'
+import { Button } from '@/components/ui/button'
 
 function Circle({
   className,
@@ -37,10 +37,10 @@ function Circle({
   style,
   ref,
 }: {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  ref?: React.Ref<HTMLDivElement>;
+  className?: string
+  children?: React.ReactNode
+  style?: React.CSSProperties
+  ref?: React.Ref<HTMLDivElement>
 }) {
   return (
     <div
@@ -50,17 +50,17 @@ function Circle({
     >
       {children}
     </div>
-  );
+  )
 }
-Circle.displayName = 'Circle';
+Circle.displayName = 'Circle'
 
 function OnlineBeamBackground() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const centerRef = useRef<HTMLDivElement>(null);
-  const mailRef = useRef<HTMLDivElement>(null);
-  const fbRef = useRef<HTMLDivElement>(null);
-  const msgRef = useRef<HTMLDivElement>(null);
-  const phoneRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null)
+  const centerRef = useRef<HTMLDivElement>(null)
+  const mailRef = useRef<HTMLDivElement>(null)
+  const fbRef = useRef<HTMLDivElement>(null)
+  const msgRef = useRef<HTMLDivElement>(null)
+  const phoneRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -69,44 +69,17 @@ function OnlineBeamBackground() {
         className="relative flex size-full items-center justify-center overflow-hidden bg-white/60"
       >
         {/* Absolute positioning to keep arcs aligned like mock */}
-        <Circle
-          ref={mailRef}
-          style={{ position: 'absolute', top: '18%', left: '26%' }}
-        >
+        <Circle ref={mailRef} style={{ position: 'absolute', top: '18%', left: '26%' }}>
           <Image src="/icons/gmail.webp" alt="Email" width={20} height={20} />
         </Circle>
-        <Circle
-          ref={fbRef}
-          style={{ position: 'absolute', top: '18%', right: '22%' }}
-        >
-          <Image
-            src="/icons/facebook.webp"
-            alt="Facebook"
-            width={20}
-            height={20}
-          />
+        <Circle ref={fbRef} style={{ position: 'absolute', top: '18%', right: '22%' }}>
+          <Image src="/icons/facebook.webp" alt="Facebook" width={20} height={20} />
         </Circle>
-        <Circle
-          ref={phoneRef}
-          style={{ position: 'absolute', top: '72%', left: '24%' }}
-        >
-          <Image
-            src="/icons/telephone.webp"
-            alt="Phone"
-            width={20}
-            height={20}
-          />
+        <Circle ref={phoneRef} style={{ position: 'absolute', top: '72%', left: '24%' }}>
+          <Image src="/icons/telephone.webp" alt="Phone" width={20} height={20} />
         </Circle>
-        <Circle
-          ref={msgRef}
-          style={{ position: 'absolute', top: '72%', right: '18%' }}
-        >
-          <Image
-            src="/icons/messenger.webp"
-            alt="Messenger"
-            width={20}
-            height={20}
-          />
+        <Circle ref={msgRef} style={{ position: 'absolute', top: '72%', right: '18%' }}>
+          <Image src="/icons/messenger.webp" alt="Messenger" width={20} height={20} />
         </Circle>
         <Circle
           ref={centerRef}
@@ -166,11 +139,11 @@ function OnlineBeamBackground() {
         />
       </div>
     </div>
-  );
+  )
 }
 
 export function WDSContactGrid() {
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false)
 
   const contacts = [
     {
@@ -224,7 +197,7 @@ export function WDSContactGrid() {
       onClick: () => setDialogOpen(true),
       background: <OnlineBeamBackground />,
     },
-  ];
+  ]
 
   return (
     <section className="relative flex snap-start items-center overflow-hidden bg-linear-to-b from-white to-gray-50 py-16 md:py-24">
@@ -248,8 +221,8 @@ export function WDSContactGrid() {
           </h2>
           <div className="from-wds-accent to-wds-accent/50 mx-auto mt-4 h-1 w-20 bg-linear-to-r"></div>
           <p className="mx-auto mt-6 max-w-2xl text-base text-gray-600 sm:text-lg">
-            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với
-            chúng tôi qua các kênh sau:
+            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các kênh
+            sau:
           </p>
         </m.div>
 
@@ -277,9 +250,7 @@ export function WDSContactGrid() {
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-xl font-semibold text-neutral-900">
-                  Chọn kênh liên hệ
-                </h3>
+                <h3 className="text-xl font-semibold text-neutral-900">Chọn kênh liên hệ</h3>
                 <p className="text-sm text-neutral-600">
                   Kết nối nhanh qua Fanpage, Email hoặc Messenger.
                 </p>
@@ -301,13 +272,9 @@ export function WDSContactGrid() {
               >
                 <div className="flex items-center gap-2">
                   <MessageCircle className="text-wds-accent size-5" />
-                  <span className="text-sm font-semibold text-neutral-800">
-                    Fanpage
-                  </span>
+                  <span className="text-sm font-semibold text-neutral-800">Fanpage</span>
                 </div>
-                <p className="text-xs text-neutral-600">
-                  Cập nhật sự kiện và tin mới nhất.
-                </p>
+                <p className="text-xs text-neutral-600">Cập nhật sự kiện và tin mới nhất.</p>
               </a>
 
               <a
@@ -316,13 +283,9 @@ export function WDSContactGrid() {
               >
                 <div className="flex items-center gap-2">
                   <Mail className="text-wds-accent size-5" />
-                  <span className="text-sm font-semibold text-neutral-800">
-                    Email
-                  </span>
+                  <span className="text-sm font-semibold text-neutral-800">Email</span>
                 </div>
-                <p className="text-xs text-neutral-600">
-                  Gửi mail để được phản hồi chi tiết.
-                </p>
+                <p className="text-xs text-neutral-600">Gửi mail để được phản hồi chi tiết.</p>
               </a>
 
               <a
@@ -331,18 +294,14 @@ export function WDSContactGrid() {
               >
                 <div className="flex items-center gap-2">
                   <MessageCircle className="text-wds-accent size-5" />
-                  <span className="text-sm font-semibold text-neutral-800">
-                    Messenger
-                  </span>
+                  <span className="text-sm font-semibold text-neutral-800">Messenger</span>
                 </div>
-                <p className="text-xs text-neutral-600">
-                  Chat nhanh với đội ngũ hỗ trợ.
-                </p>
+                <p className="text-xs text-neutral-600">Chat nhanh với đội ngũ hỗ trợ.</p>
               </a>
             </div>
           </m.div>
         </div>
       ) : null}
     </section>
-  );
+  )
 }

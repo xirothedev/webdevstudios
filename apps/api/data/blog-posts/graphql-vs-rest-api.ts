@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'graphql-vs-rest-api',
@@ -107,4 +107,4 @@ Choose based on your specific needs. Both are valid options!`,
   metaDescription:
     'Compare GraphQL and REST APIs to understand when to use each architecture and their respective strengths.',
   isPublished: true,
-};
+}

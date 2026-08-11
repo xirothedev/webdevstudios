@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'react-server-components-deep-dive',
@@ -87,4 +87,4 @@ Server Components are a game-changer for React applications. Start using them to
   metaDescription:
     'Learn about React Server Components, how they work, and how they can improve your application performance.',
   isPublished: true,
-};
+}

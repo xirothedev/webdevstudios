@@ -20,21 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { type LucideIcon } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react'
 
 interface AccountHeroProps {
-  icon: LucideIcon;
-  label: string;
-  title: string;
-  description: string;
+  icon: LucideIcon
+  label: string
+  title: string
+  description: string
 }
 
-export function AccountHero({
-  icon: Icon,
-  label,
-  title,
-  description,
-}: AccountHeroProps) {
+export function AccountHero({ icon: Icon, label, title, description }: AccountHeroProps) {
   return (
     <section className="relative overflow-hidden py-16 sm:py-20">
       {/* Background gradient */}
@@ -58,5 +53,5 @@ export function AccountHero({
         </div>
       </div>
     </section>
-  );
+  )
 }

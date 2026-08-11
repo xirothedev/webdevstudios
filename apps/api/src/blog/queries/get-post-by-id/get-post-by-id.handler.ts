@@ -20,46 +20,44 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
-import { StorageService } from '@/storage/storage.service';
+import { StorageService } from '@/storage/storage.service'
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto, BlogPostWithContentDto } from '../../dtos/blog-post.dto';
-import { BlogRepository } from '../../infrastructure/blog.repository';
-import { GetBlogPostByIdQuery } from './get-post-by-id.query';
+import { BlogPostWithRelations } from '../../blog.types'
+import { BlogPostDto, BlogPostWithContentDto } from '../../dtos'
+import { BlogRepository } from '../../infrastructure/blog.repository'
+import { GetBlogPostByIdQuery } from './get-post-by-id.query'
 
 @QueryHandler(GetBlogPostByIdQuery)
 export class GetBlogPostByIdHandler implements IQueryHandler<GetBlogPostByIdQuery> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
-  async execute(
-    query: GetBlogPostByIdQuery
-  ): Promise<BlogPostDto | BlogPostWithContentDto> {
-    const { postId, includeContent = false } = query;
+  async execute(query: GetBlogPostByIdQuery): Promise<BlogPostDto | BlogPostWithContentDto> {
+    const { postId, includeContent = false } = query
 
-    const post = await this.blogRepository.findById(postId);
+    const post = await this.blogRepository.findById(postId)
     if (!post) {
-      throw new NotFoundException(`Blog post with id ${postId} not found`);
+      throw new NotFoundException(`Blog post with id ${postId} not found`)
     }
 
-    const baseDto = this.mapToDto(post);
+    const baseDto = this.mapToDto(post)
 
     if (includeContent) {
       // Fetch content from R2
-      const content = await this.storageService.getBlogContent(post.contentUrl);
+      const content = await this.storageService.getBlogContent(post.contentUrl)
 
       return {
         ...baseDto,
         content,
-      };
+      }
     }
 
-    return baseDto;
+    return baseDto
   }
 
   private mapToDto(post: BlogPostWithRelations): BlogPostDto {
@@ -83,6 +81,6 @@ export class GetBlogPostByIdHandler implements IQueryHandler<GetBlogPostByIdQuer
       metaDescription: post.metaDescription,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    };
+    }
   }
 }

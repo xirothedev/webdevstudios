@@ -2,8 +2,8 @@
   "include": ["src"],
   "compilerOptions": {
     "types": ["bun", "node", "multer"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
     "isolatedModules": true,

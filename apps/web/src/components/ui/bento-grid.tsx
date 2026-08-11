@@ -20,46 +20,36 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ArrowRightIcon } from '@radix-ui/react-icons';
-import Link from 'next/link';
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { ArrowRightIcon } from '@radix-ui/react-icons'
+import Link from 'next/link'
+import { ComponentPropsWithoutRef, ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface BentoGridProps extends ComponentPropsWithoutRef<'div'> {
-  children: ReactNode;
-  className?: string;
+  children: ReactNode
+  className?: string
 }
 
 interface BentoCardProps extends ComponentPropsWithoutRef<'div'> {
-  name: string;
-  className: string;
-  background: ReactNode;
-  Icon: React.ElementType;
-  description: string;
-  href?: string;
-  cta?: string;
-  onClick?: () => void;
+  name: string
+  className: string
+  background: ReactNode
+  Icon: React.ElementType
+  description: string
+  href?: string
+  cta?: string
+  onClick?: () => void
 }
 
-export const BentoGrid = ({
-  children,
-  className,
-  ...props
-}: BentoGridProps) => {
+export const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
   return (
-    <div
-      className={cn(
-        'grid w-full auto-rows-[22rem] grid-cols-3 gap-4',
-        className
-      )}
-      {...props}
-    >
+    <div className={cn('grid w-full auto-rows-[22rem] grid-cols-3 gap-4', className)} {...props}>
       {children}
     </div>
-  );
-};
+  )
+}
 
 export const BentoCard = ({
   name,
@@ -79,7 +69,7 @@ export const BentoCard = ({
       // Force light card for readability
       'bg-white text-neutral-900 [box-shadow:0_0_0_1px_rgba(0,0,0,.04),0_2px_6px_rgba(0,0,0,.05),0_16px_32px_rgba(0,0,0,.06)]',
       'transform-gpu',
-      className
+      className,
     )}
     {...props}
   >
@@ -95,27 +85,17 @@ export const BentoCard = ({
 
       <div
         className={cn(
-          'pointer-events-none flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden'
+          'pointer-events-none flex w-full translate-y-0 transform-gpu flex-row items-center transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:hidden',
         )}
       >
         {cta ? (
           onClick ? (
-            <Button
-              variant="link"
-              size="sm"
-              className="pointer-events-auto p-0"
-              onClick={onClick}
-            >
+            <Button variant="link" size="sm" className="pointer-events-auto p-0" onClick={onClick}>
               {cta}
               <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
             </Button>
           ) : (
-            <Button
-              variant="link"
-              asChild
-              size="sm"
-              className="pointer-events-auto p-0"
-            >
+            <Button variant="link" asChild size="sm" className="pointer-events-auto p-0">
               <Link href={href!}>
                 {cta}
                 <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
@@ -128,27 +108,17 @@ export const BentoCard = ({
 
     <div
       className={cn(
-        'pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex'
+        'pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex',
       )}
     >
       {cta ? (
         onClick ? (
-          <Button
-            variant="link"
-            size="sm"
-            className="pointer-events-auto p-0"
-            onClick={onClick}
-          >
+          <Button variant="link" size="sm" className="pointer-events-auto p-0" onClick={onClick}>
             {cta}
             <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
           </Button>
         ) : (
-          <Button
-            variant="link"
-            asChild
-            size="sm"
-            className="pointer-events-auto p-0"
-          >
+          <Button variant="link" asChild size="sm" className="pointer-events-auto p-0">
             <Link href={href!}>
               {cta}
               <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
@@ -160,4 +130,4 @@ export const BentoCard = ({
 
     <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/3" />
   </div>
-);
+)

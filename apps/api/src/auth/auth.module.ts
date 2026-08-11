@@ -20,46 +20,42 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CqrsModule } from '@nestjs/cqrs';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { StringValue } from 'ms';
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { CqrsModule } from '@nestjs/cqrs'
+import { JwtModule } from '@nestjs/jwt'
+import { PassportModule } from '@nestjs/passport'
+import { StringValue } from 'ms'
 
-import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../mail/mail.module'
 // Controller
-import { AuthController } from './auth.controller';
+import { AuthController } from './auth.controller'
 // Commands
-import { Enable2FAHandler } from './commands/enable-2fa/enable-2fa.handler';
-import { LoginHandler } from './commands/login/login.handler';
-import { LogoutHandler } from './commands/logout/logout.handler';
-import { RefreshTokenHandler } from './commands/refresh-token/refresh-token.handler';
-import { RegisterHandler } from './commands/register/register.handler';
-import { RequestPasswordResetHandler } from './commands/request-password-reset/request-password-reset.handler';
-import { ResetPasswordHandler } from './commands/reset-password/reset-password.handler';
-import { Verify2FAHandler } from './commands/verify-2fa/verify-2fa.handler';
-import { VerifyEmailHandler } from './commands/verify-email/verify-email.handler';
+import { Enable2FAHandler } from './commands/enable-2fa'
+import { LoginHandler } from './commands/login'
+import { LogoutHandler } from './commands/logout'
+import { RefreshTokenHandler } from './commands/refresh-token'
+import { RegisterHandler } from './commands/register'
+import { RequestPasswordResetHandler } from './commands/request-password-reset'
+import { ResetPasswordHandler } from './commands/reset-password'
+import { Verify2FAHandler } from './commands/verify-2fa'
+import { VerifyEmailHandler } from './commands/verify-email'
 // Guards
-import { GitHubOAuthGuard } from './guards/github-oauth.guard';
-import { GoogleOAuthGuard } from './guards/google-oauth.guard';
-import { MfaGuard } from './guards/mfa.guard';
-import { SessionRepository } from './infrastructure/session.repository';
-import { TokenService } from './infrastructure/token.service';
-import { TokenStorageService } from './infrastructure/token-storage.service';
-import { TotpService } from './infrastructure/totp.service';
-// Infrastructure
-import { UserRepository } from './infrastructure/user.repository';
+import { GitHubOAuthGuard, GoogleOAuthGuard, MfaGuard } from './guards'
+import {
+  SessionRepository,
+  TokenService,
+  TokenStorageService,
+  TotpService,
+  UserRepository,
+} from './infrastructure'
 // Queries
-import { GetCurrentUserHandler } from './queries/get-current-user/get-current-user.handler';
-import { GetSessionsHandler } from './queries/get-sessions/get-sessions.handler';
-import { OAuthService } from './services/oauth.service';
+import { GetCurrentUserHandler } from './queries/get-current-user'
+import { GetSessionsHandler } from './queries/get-sessions'
+import { OAuthService, OAuthRedirectService } from './services'
 // Services
-import { OAuthRedirectService } from './services/oauth-redirect.service';
 // Strategies
-import { GitHubStrategy } from './strategies/github.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { GitHubStrategy, GoogleStrategy, JwtStrategy } from './strategies'
 
 const CommandHandlers = [
   RegisterHandler,
@@ -71,9 +67,9 @@ const CommandHandlers = [
   ResetPasswordHandler,
   RefreshTokenHandler,
   LogoutHandler,
-];
+]
 
-const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
+const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler]
 
 @Module({
   imports: [
@@ -85,10 +81,7 @@ const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
       useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('JWT_SECRET_KEY'),
         signOptions: {
-          expiresIn: configService.get<StringValue>(
-            'JWT_ACCESS_TOKEN_EXPIRES_IN',
-            '3600'
-          ),
+          expiresIn: configService.get<StringValue>('JWT_ACCESS_TOKEN_EXPIRES_IN', '3600'),
         },
       }),
     }),

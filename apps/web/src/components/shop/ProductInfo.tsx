@@ -20,39 +20,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Star } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Star } from 'lucide-react'
+import { motion } from 'motion/react'
 
-import { ProductDescription } from '@/components/shop/ProductDescription';
-import { formatPrice } from '@/lib/utils';
+import { ProductDescription } from '@/components/shop/ProductDescription'
+import { formatPrice } from '@/lib/utils'
 
 interface ProductInfoProps {
-  name: string;
+  name: string
   rating: {
-    value: number;
-    count: number;
-  };
+    value: number
+    count: number
+  }
   price: {
-    current: number;
-    original?: number;
-    discount?: number;
-  };
-  description: string;
-  priceNote?: string;
+    current: number
+    original?: number
+    discount?: number
+  }
+  description: string
+  priceNote?: string
 }
 
-export function ProductInfo({
-  name,
-  rating,
-  price,
-  description,
-  priceNote,
-}: ProductInfoProps) {
+export function ProductInfo({ name, rating, price, description, priceNote }: ProductInfoProps) {
   const discountPercentage = price.discount
     ? Math.round((price.discount / (price.original || price.current)) * 100)
-    : null;
+    : null
 
   return (
     <motion.div
@@ -63,16 +57,11 @@ export function ProductInfo({
     >
       {/* Product Title */}
       <div className="mb-6">
-        <h1 className="mb-3 text-4xl font-bold tracking-tight text-white md:text-5xl">
-          {name}
-        </h1>
+        <h1 className="mb-3 text-4xl font-bold tracking-tight text-white md:text-5xl">{name}</h1>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((i) => (
-              <Star
-                key={i}
-                className="fill-wds-accent text-wds-accent h-4 w-4"
-              />
+              <Star key={i} className="fill-wds-accent text-wds-accent h-4 w-4" />
             ))}
           </div>
           <span className="text-sm text-white/60">
@@ -84,9 +73,7 @@ export function ProductInfo({
       {/* Price */}
       <div className="mb-6">
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-white">
-            {formatPrice(price.current)}₫
-          </span>
+          <span className="text-3xl font-bold text-white">{formatPrice(price.current)}₫</span>
           {price.original && (
             <span className="text-lg text-white/60 line-through">
               {formatPrice(price.original)}₫
@@ -106,5 +93,5 @@ export function ProductInfo({
         <ProductDescription markdown={description} />
       </div>
     </motion.div>
-  );
+  )
 }

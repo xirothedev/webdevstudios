@@ -21,8 +21,8 @@
  */
 
 export interface FAQItem {
-  question: string;
-  answer: string;
+  question: string
+  answer: string
 }
 
 export const faqItems: FAQItem[] = [
@@ -65,4 +65,4 @@ export const faqItems: FAQItem[] = [
     question: 'Slogan của WebDev là gì?',
     answer: 'Khởi nguồn - Sáng tạo - Nắm bắt.',
   },
-];
+]

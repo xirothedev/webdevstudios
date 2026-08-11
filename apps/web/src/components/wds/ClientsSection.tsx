@@ -20,23 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { motion } from 'motion/react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { motion } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const fadeInLeft = {
   initial: { opacity: 0, x: -30 },
   animate: { opacity: 1, x: 0 },
   transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] },
-};
+}
 
 const fadeInRight = {
   initial: { opacity: 0, x: 30 },
   animate: { opacity: 1, x: 0 },
   transition: { duration: 0.6, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] },
-};
+}
 
 export function WDSClientsSection() {
   return (
@@ -64,9 +64,9 @@ export function WDSClientsSection() {
             </div>
 
             <p className="text-base leading-relaxed text-gray-700 sm:text-lg md:text-xl">
-              WebDev Studios từng vinh dự được hợp tác và nhận sự tin tưởng từ
-              các đối tác uy tín. Chúng tôi tự hào về những dự án đã hoàn thành
-              và mối quan hệ hợp tác bền chặt với khách hàng.
+              WebDev Studios từng vinh dự được hợp tác và nhận sự tin tưởng từ các đối tác uy tín.
+              Chúng tôi tự hào về những dự án đã hoàn thành và mối quan hệ hợp tác bền chặt với
+              khách hàng.
             </p>
 
             <Link
@@ -110,5 +110,5 @@ export function WDSClientsSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }

@@ -20,34 +20,34 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
-import { PrivateUserDto } from '../../dtos/responses.dto';
-import { UpdateProfileCommand } from './update-profile.command';
+import { UserRepository } from '@/auth/infrastructure'
+import { PrivateUserDto } from '../../dtos'
+import { UpdateProfileCommand } from './update-profile.command'
 
 @CommandHandler(UpdateProfileCommand)
 export class UpdateProfileHandler implements ICommandHandler<UpdateProfileCommand> {
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(command: UpdateProfileCommand): Promise<PrivateUserDto> {
-    const { userId, fullName, phone } = command;
+    const { userId, fullName, phone } = command
 
-    const user = await this.userRepository.findById(userId);
+    const user = await this.userRepository.findById(userId)
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found')
     }
 
-    const updateData: { fullName?: string; phone?: string } = {};
+    const updateData: { fullName?: string; phone?: string } = {}
     if (fullName !== undefined) {
-      updateData.fullName = fullName;
+      updateData.fullName = fullName
     }
     if (phone !== undefined) {
-      updateData.phone = phone;
+      updateData.phone = phone
     }
 
-    const updatedUser = await this.userRepository.update(userId, updateData);
+    const updatedUser = await this.userRepository.update(userId, updateData)
 
     return {
       id: updatedUser.id,
@@ -61,6 +61,6 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfileComman
       mfaEnabled: updatedUser.mfaEnabled,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
-    };
+    }
   }
 }

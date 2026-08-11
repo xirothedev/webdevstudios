@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common'
 
 export class ImageProcessingException extends InternalServerErrorException {
   constructor(message?: string) {
-    super(message || 'Failed to process image');
+    super(message || 'Failed to process image')
   }
 }

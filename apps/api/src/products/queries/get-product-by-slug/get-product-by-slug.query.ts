@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSlug } from '@generated/prisma';
+import { ProductSlug } from '@generated/prisma'
 
 export class GetProductBySlugQuery {
   constructor(public readonly slug: ProductSlug) {}

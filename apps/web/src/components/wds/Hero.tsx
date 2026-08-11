@@ -20,23 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { motion } from 'motion/react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { motion } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] },
-};
+}
 
 const scaleIn = {
   initial: { opacity: 0, scale: 0.9 },
   animate: { opacity: 1, scale: 1 },
   transition: { duration: 0.8, delay: 0.3, ease: [0.6, -0.05, 0.01, 0.99] },
-};
+}
 
 export function WDSHero() {
   return (
@@ -69,9 +69,9 @@ export function WDSHero() {
               className="text-base leading-relaxed text-gray-700 sm:text-lg md:text-xl"
               variants={fadeInUp}
             >
-              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với
-              Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để
-              các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.
+              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm
+              tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng
+              và phát triển bản thân.
             </motion.p>
 
             <motion.div variants={fadeInUp}>
@@ -149,5 +149,5 @@ export function WDSHero() {
         </div>
       </div>
     </section>
-  );
+  )
 }

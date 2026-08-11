@@ -20,72 +20,58 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus } from '@generated/prisma';
-import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { OrderStatus } from '@generated/prisma'
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { ProductRepository } from '../../../products/infrastructure/product.repository';
-import { OrderDto } from '../../dtos/order.dto';
-import { OrderRepository } from '../../infrastructure/order.repository';
-import { OrderWithItems } from '../../types/order.types';
-import { CancelOrderCommand } from './cancel-order.command';
+import { ProductRepository } from '../../../products/infrastructure/product.repository'
+import { OrderDto } from '../../dtos/order.dto'
+import { OrderRepository } from '../../infrastructure/order.repository'
+import { OrderWithItems } from '../../order.types'
+import { CancelOrderCommand } from './cancel-order.command'
 
 @CommandHandler(CancelOrderCommand)
 export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async execute(command: CancelOrderCommand): Promise<OrderDto> {
-    const { orderId, userId } = command;
+    const { orderId, userId } = command
 
-    const order = await this.orderRepository.findById(orderId);
+    const order = await this.orderRepository.findById(orderId)
     if (!order) {
-      throw new NotFoundException(`Order with id ${orderId} not found`);
+      throw new NotFoundException(`Order with id ${orderId} not found`)
     }
 
     // Verify order belongs to user
     if (order.userId !== userId) {
-      throw new ForbiddenException('Order does not belong to user');
+      throw new ForbiddenException('Order does not belong to user')
     }
 
     // Only allow cancellation if order is PENDING
     if (order.status !== OrderStatus.PENDING) {
       throw new BadRequestException(
-        `Cannot cancel order with status ${order.status}. Only PENDING orders can be cancelled.`
-      );
+        `Cannot cancel order with status ${order.status}. Only PENDING orders can be cancelled.`,
+      )
     }
 
     // Restore stock
     for (const item of order.items) {
       if (item.productId) {
         if (item.size) {
-          await this.productRepository.incrementSizeStock(
-            item.productId,
-            item.size,
-            item.quantity
-          );
+          await this.productRepository.incrementSizeStock(item.productId, item.size, item.quantity)
         } else {
-          await this.productRepository.incrementStock(
-            item.productId,
-            item.quantity
-          );
+          await this.productRepository.incrementStock(item.productId, item.quantity)
         }
       }
     }
 
     // Update order status to CANCELLED
-    const updatedOrder = await this.orderRepository.updateStatus(
-      orderId,
-      OrderStatus.CANCELLED
-    );
+    const updatedOrder = await this.orderRepository.updateStatus(orderId, OrderStatus.CANCELLED)
 
-    return this.mapToDto(updatedOrder);
+    return this.mapToDto(updatedOrder)
   }
 
   private mapToDto(order: OrderWithItems): OrderDto {
@@ -119,6 +105,6 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
       })),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    };
+    }
   }
 }

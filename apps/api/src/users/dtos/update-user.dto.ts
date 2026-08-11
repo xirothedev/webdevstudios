@@ -20,15 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { UserRole } from '@generated/prisma'
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
 
 export class UpdateUserDto {
   @ApiPropertyOptional({
@@ -41,7 +35,7 @@ export class UpdateUserDto {
   @IsString()
   @MinLength(1)
   @MaxLength(100)
-  fullName?: string;
+  fullName?: string
 
   @ApiPropertyOptional({
     description: 'User phone number',
@@ -51,7 +45,7 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   @MaxLength(15)
-  phone?: string;
+  phone?: string
 
   @ApiPropertyOptional({
     description: 'Avatar URL',
@@ -59,7 +53,7 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsString()
-  avatar?: string;
+  avatar?: string
 
   @ApiPropertyOptional({
     description: 'User role',
@@ -68,5 +62,5 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsEnum(UserRole)
-  role?: UserRole;
+  role?: UserRole
 }

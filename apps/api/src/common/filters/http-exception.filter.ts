@@ -27,28 +27,25 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { Request, Response } from 'express'
 
 /**
  * Sanitize error message to prevent information disclosure
  */
-function sanitizeErrorMessage(
-  message: string | string[],
-  isProduction: boolean
-): string {
+function sanitizeErrorMessage(message: string | string[], isProduction: boolean): string {
   if (Array.isArray(message)) {
-    return message.join(', ');
+    return message.join(', ')
   }
 
-  const errorMessage = String(message);
+  const errorMessage = String(message)
 
   // In production, sanitize sensitive information
   if (isProduction) {
     // Remove stack traces
     if (errorMessage.includes('at ') || errorMessage.includes('Error:')) {
-      return 'An error occurred. Please try again later.';
+      return 'An error occurred. Please try again later.'
     }
 
     // Remove database error details
@@ -58,12 +55,12 @@ function sanitizeErrorMessage(
       errorMessage.toLowerCase().includes('sql') ||
       errorMessage.toLowerCase().includes('connection')
     ) {
-      return 'Database error occurred. Please try again later.';
+      return 'Database error occurred. Please try again later.'
     }
 
     // Remove file system paths
     if (errorMessage.includes('/') || errorMessage.includes('\\')) {
-      return 'An error occurred. Please try again later.';
+      return 'An error occurred. Please try again later.'
     }
 
     // Remove sensitive patterns (tokens, keys, etc.)
@@ -73,18 +70,18 @@ function sanitizeErrorMessage(
       /secret[=:]\s*[\w-]+/gi,
       /password[=:]\s*[\w-]+/gi,
       /authorization[=:]\s*[\w-]+/gi,
-    ];
+    ]
 
-    let sanitized = errorMessage;
+    let sanitized = errorMessage
     for (const pattern of sensitivePatterns) {
-      sanitized = sanitized.replace(pattern, '[REDACTED]');
+      sanitized = sanitized.replace(pattern, '[REDACTED]')
     }
 
-    return sanitized;
+    return sanitized
   }
 
   // In development, return original message for debugging
-  return errorMessage;
+  return errorMessage
 }
 
 /**
@@ -105,9 +102,9 @@ function containsSensitiveInfo(message: string): boolean {
     /connection/i,
     /\/[\w/.-]+/i, // File paths
     /\\[\w\\.-]+/i, // Windows paths
-  ];
+  ]
 
-  return sensitivePatterns.some((pattern) => pattern.test(message));
+  return sensitivePatterns.some((pattern) => pattern.test(message))
 }
 
 /**
@@ -116,76 +113,64 @@ function containsSensitiveInfo(message: string): boolean {
 function getSafeErrorMessage(
   status: number,
   sanitizedMessage: string,
-  isProduction: boolean
+  isProduction: boolean,
 ): string {
   // If not production, return original message
   if (!isProduction) {
-    return sanitizedMessage;
+    return sanitizedMessage
   }
 
   // If sanitized message doesn't contain sensitive info, use it
   // This allows custom business logic messages to be displayed
   if (!containsSensitiveInfo(sanitizedMessage)) {
-    return sanitizedMessage;
+    return sanitizedMessage
   }
 
   // Otherwise, use generic safe messages based on status code
   const safeMessages: Record<number, string> = {
     [HttpStatus.BAD_REQUEST]: 'Invalid request. Please check your input.',
     [HttpStatus.UNAUTHORIZED]: 'Authentication required.',
-    [HttpStatus.FORBIDDEN]:
-      'You do not have permission to perform this action.',
+    [HttpStatus.FORBIDDEN]: 'You do not have permission to perform this action.',
     [HttpStatus.NOT_FOUND]: 'The requested resource was not found.',
     [HttpStatus.CONFLICT]: 'A conflict occurred. Please try again.',
-    [HttpStatus.UNPROCESSABLE_ENTITY]:
-      'Validation failed. Please check your input.',
-    [HttpStatus.TOO_MANY_REQUESTS]:
-      'Too many requests. Please try again later.',
-    [HttpStatus.INTERNAL_SERVER_ERROR]:
-      'An internal error occurred. Please try again later.',
-    [HttpStatus.SERVICE_UNAVAILABLE]:
-      'Service temporarily unavailable. Please try again later.',
-  };
+    [HttpStatus.UNPROCESSABLE_ENTITY]: 'Validation failed. Please check your input.',
+    [HttpStatus.TOO_MANY_REQUESTS]: 'Too many requests. Please try again later.',
+    [HttpStatus.INTERNAL_SERVER_ERROR]: 'An internal error occurred. Please try again later.',
+    [HttpStatus.SERVICE_UNAVAILABLE]: 'Service temporarily unavailable. Please try again later.',
+  }
 
-  return safeMessages[status] || 'An error occurred. Please try again later.';
+  return safeMessages[status] || 'An error occurred. Please try again later.'
 }
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
-  private readonly isProduction: boolean;
+  private readonly logger = new Logger(HttpExceptionFilter.name)
+  private readonly isProduction: boolean
 
   constructor(private readonly configService?: ConfigService) {
-    this.isProduction = process.env.NODE_ENV === 'production';
+    this.isProduction = process.env.NODE_ENV === 'production'
   }
 
   catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-    const status = exception.getStatus();
-    const exceptionResponse = exception.getResponse();
+    const ctx = host.switchToHttp()
+    const response = ctx.getResponse<Response>()
+    const request = ctx.getRequest<Request>()
+    const status = exception.getStatus()
+    const exceptionResponse = exception.getResponse()
 
     // Extract original message
     const originalMessage =
       typeof exceptionResponse === 'string'
         ? exceptionResponse
-        : (exceptionResponse as any).message ||
+        : (exceptionResponse as { message?: string }).message ||
           exception.message ||
-          'An error occurred';
+          'An error occurred'
 
     // Sanitize message for production
-    const sanitizedMessage = sanitizeErrorMessage(
-      originalMessage,
-      this.isProduction
-    );
+    const sanitizedMessage = sanitizeErrorMessage(originalMessage, this.isProduction)
 
     // Get safe error message based on status code
-    const safeMessage = getSafeErrorMessage(
-      status,
-      sanitizedMessage,
-      this.isProduction
-    );
+    const safeMessage = getSafeErrorMessage(status, sanitizedMessage, this.isProduction)
 
     // Log detailed error (server-side only)
     if (this.isProduction) {
@@ -194,14 +179,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         method: request.method,
         ip: request.ip,
         userAgent: request.headers['user-agent'],
-        userId: (request as any).user?.id,
-      });
+        userId: (request as { user?: { id: string } }).user?.id,
+      })
     } else {
       // In development, log full details
-      this.logger.debug(
-        `[${status}] ${exception.name}: ${originalMessage}`,
-        exception.stack
-      );
+      this.logger.debug(`[${status}] ${exception.name}: ${originalMessage}`, exception.stack)
     }
 
     const errorResponse = {
@@ -219,8 +201,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
             details: originalMessage,
             stack: exception.stack,
           }),
-    };
+    }
 
-    response.status(status).json(errorResponse);
+    response.status(status).json(errorResponse)
   }
 }

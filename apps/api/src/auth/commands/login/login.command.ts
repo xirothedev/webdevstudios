@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ICommand } from '@nestjs/cqrs';
+import { ICommand } from '@nestjs/cqrs'
 
 export class LoginCommand implements ICommand {
   constructor(
@@ -28,6 +28,6 @@ export class LoginCommand implements ICommand {
     public readonly password: string,
     public readonly rememberMe?: boolean,
     public readonly ipAddress?: string,
-    public readonly userAgent?: string
+    public readonly userAgent?: string,
   ) {}
 }

@@ -21,7 +21,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
+'use client'
 
 import {
   Table,
@@ -30,18 +30,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 
 interface DataTableProps {
   columns: Array<{
-    id: string;
-    label: string;
-    accessor?: string | ((row: any) => React.ReactNode);
-  }>;
-  data: any[];
-  visibleColumns: string[];
-  isLoading?: boolean;
-  emptyMessage?: string;
+    id: string
+    label: string
+    accessor?: string | ((row: any) => React.ReactNode)
+  }>
+  data: any[]
+  visibleColumns: string[]
+  isLoading?: boolean
+  emptyMessage?: string
 }
 
 export function DataTable({
@@ -51,16 +51,14 @@ export function DataTable({
   isLoading = false,
   emptyMessage = 'No data available',
 }: DataTableProps) {
-  const visibleColumnsData = columns.filter((col) =>
-    visibleColumns.includes(col.id)
-  );
+  const visibleColumnsData = columns.filter((col) => visibleColumns.includes(col.id))
 
   if (isLoading) {
     return (
       <div className="border-wds-accent/30 bg-wds-background rounded-2xl border p-8 text-center">
         <div className="text-wds-text/70">Đang tải...</div>
       </div>
-    );
+    )
   }
 
   if (data.length === 0) {
@@ -68,7 +66,7 @@ export function DataTable({
       <div className="border-wds-accent/30 bg-wds-background rounded-2xl border p-8 text-center">
         <div className="text-wds-text/70">{emptyMessage}</div>
       </div>
-    );
+    )
   }
 
   return (
@@ -77,10 +75,7 @@ export function DataTable({
         <TableHeader>
           <TableRow className="border-wds-accent/20 hover:bg-wds-accent/5">
             {visibleColumnsData.map((column) => (
-              <TableHead
-                key={column.id}
-                className="text-wds-text font-semibold"
-              >
+              <TableHead key={column.id} className="text-wds-text font-semibold">
                 {column.label}
               </TableHead>
             ))}
@@ -106,5 +101,5 @@ export function DataTable({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

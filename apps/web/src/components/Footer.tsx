@@ -20,19 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from 'next/image'
+import Link from 'next/link'
 
-import { contactInfo, footerSections } from '@/data/footer';
+import { contactInfo, footerSections } from '@/data/footer'
 
 interface FooterProps {
-  variant?: 'dark' | 'light';
+  variant?: 'dark' | 'light'
 }
 
 export function Footer({ variant = 'dark' }: FooterProps) {
-  const isDark = variant === 'dark';
+  const isDark = variant === 'dark'
 
   return (
     <footer
@@ -50,31 +50,23 @@ export function Footer({ variant = 'dark' }: FooterProps) {
                   className="object-contain"
                 />
               </div>
-              <span
-                className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
-              >
+              <span className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
                 WebDev Studios
               </span>
             </div>
-            <p
-              className={`text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
-            >
-              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với
-              Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để
-              các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.
+            <p className={`text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
+              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm
+              tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng
+              và phát triển bản thân.
             </p>
           </div>
 
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h3
-                className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
-              >
+              <h3 className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
                 {section.title}
               </h3>
-              <ul
-                className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
-              >
+              <ul className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -92,14 +84,10 @@ export function Footer({ variant = 'dark' }: FooterProps) {
           ))}
 
           <div>
-            <h3
-              className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}
-            >
+            <h3 className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
               LIÊN HỆ
             </h3>
-            <ul
-              className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}
-            >
+            <ul className={`space-y-2 text-xs ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
               {contactInfo.map((item, index) => (
                 <li key={index}>
                   {item.href ? (
@@ -116,8 +104,7 @@ export function Footer({ variant = 'dark' }: FooterProps) {
                     </>
                   ) : (
                     <>
-                      <span className="font-medium">{item.label}</span>{' '}
-                      {item.content}
+                      <span className="font-medium">{item.label}</span> {item.content}
                     </>
                   )}
                 </li>
@@ -148,5 +135,5 @@ export function Footer({ variant = 'dark' }: FooterProps) {
         </div>
       </div>
     </footer>
-  );
+  )
 }

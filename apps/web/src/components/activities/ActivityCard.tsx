@@ -20,44 +20,44 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { ArrowRight, Calendar, Code, MapPin, Users, Zap } from 'lucide-react';
-import { motion } from 'motion/react';
-import Image from 'next/image';
+import { ArrowRight, Calendar, Code, MapPin, Users, Zap } from 'lucide-react'
+import { motion } from 'motion/react'
+import Image from 'next/image'
 
-import type { Activity } from '@/data/activities';
+import type { Activity } from '@/data/activities'
 
 interface ActivityCardProps {
-  activity: Activity;
-  index?: number;
+  activity: Activity
+  index?: number
 }
 
 const getCategoryIcon = (category: Activity['category']) => {
   switch (category) {
     case 'academic':
-      return <Code size={12} className="text-blue-400" />;
+      return <Code size={12} className="text-blue-400" />
     case 'community':
-      return <Users size={12} className="text-green-400" />;
+      return <Users size={12} className="text-green-400" />
     case 'event':
-      return <Zap size={12} className="text-wds-accent" />;
+      return <Zap size={12} className="text-wds-accent" />
     default:
-      return null;
+      return null
   }
-};
+}
 
 const getCategoryLabel = (category: Activity['category']) => {
   switch (category) {
     case 'academic':
-      return 'Học thuật';
+      return 'Học thuật'
     case 'community':
-      return 'Cộng đồng';
+      return 'Cộng đồng'
     case 'event':
-      return 'Sự kiện';
+      return 'Sự kiện'
     default:
-      return category;
+      return category
   }
-};
+}
 
 export function ActivityCard({ activity }: ActivityCardProps) {
   return (
@@ -107,20 +107,15 @@ export function ActivityCard({ activity }: ActivityCardProps) {
           <Users size={12} /> {activity.attendees} tham gia
         </div>
 
-        <p className="mb-4 line-clamp-3 text-sm text-gray-400">
-          {activity.description}
-        </p>
+        <p className="mb-4 line-clamp-3 text-sm text-gray-400">{activity.description}</p>
 
         <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-4">
           <button className="group-hover:text-wds-accent flex items-center gap-2 text-sm font-medium text-white transition-colors">
             Xem chi tiết{' '}
-            <ArrowRight
-              size={14}
-              className="transition-transform group-hover:translate-x-1"
-            />
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </button>
         </div>
       </div>
     </motion.div>
-  );
+  )
 }

@@ -20,26 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
-import { NotFoundException } from '@nestjs/common';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { UserRole } from '@generated/prisma'
+import { NotFoundException } from '@nestjs/common'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
-import { PrivateUserDto, PublicUserDto } from '../../dtos/user.dto';
-import { GetUserByIdQuery } from './get-user-by-id.query';
+import { UserRepository } from '@/auth/infrastructure'
+import { PrivateUserDto, PublicUserDto } from '../../dtos'
+import { GetUserByIdQuery } from './get-user-by-id.query'
 
 @QueryHandler(GetUserByIdQuery)
 export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(
-    query: GetUserByIdQuery
-  ): Promise<PublicUserDto | PrivateUserDto> {
-    const { userId, requesterId, requesterRole } = query;
+  async execute(query: GetUserByIdQuery): Promise<PublicUserDto | PrivateUserDto> {
+    const { userId, requesterId, requesterRole } = query
 
-    const user = await this.userRepository.findById(userId);
+    const user = await this.userRepository.findById(userId)
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found')
     }
 
     // Privacy Logic:
@@ -59,13 +57,13 @@ export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
         mfaEnabled: user.mfaEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      };
+      }
     }
 
     return {
       id: user.id,
       fullName: user.fullName,
       avatar: user.avatar,
-    };
+    }
   }
 }

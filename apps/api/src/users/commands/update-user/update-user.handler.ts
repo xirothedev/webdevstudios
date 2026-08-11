@@ -20,50 +20,47 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
-import { NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UserRole } from '@generated/prisma'
+import { NotFoundException } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
-import { PrivateUserDto } from '../../dtos/responses.dto';
-import { UpdateUserCommand } from './update-user.command';
+import { UserRepository } from '@/auth/infrastructure'
+import { PrivateUserDto } from '../../dtos'
+import { UpdateUserCommand } from './update-user.command'
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(command: UpdateUserCommand): Promise<PrivateUserDto> {
-    const { targetUserId, fullName, phone, avatar, role } = command;
+    const { targetUserId, fullName, phone, avatar, role } = command
 
-    const user = await this.userRepository.findById(targetUserId);
+    const user = await this.userRepository.findById(targetUserId)
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found')
     }
 
     const updateData: {
-      fullName?: string;
-      phone?: string;
-      avatar?: string;
-      role?: UserRole;
-    } = {};
+      fullName?: string
+      phone?: string
+      avatar?: string
+      role?: UserRole
+    } = {}
 
     if (fullName !== undefined) {
-      updateData.fullName = fullName;
+      updateData.fullName = fullName
     }
     if (phone !== undefined) {
-      updateData.phone = phone;
+      updateData.phone = phone
     }
     if (avatar !== undefined) {
-      updateData.avatar = avatar;
+      updateData.avatar = avatar
     }
     if (role !== undefined) {
-      updateData.role = role;
+      updateData.role = role
     }
 
-    const updatedUser = await this.userRepository.update(
-      targetUserId,
-      updateData
-    );
+    const updatedUser = await this.userRepository.update(targetUserId, updateData)
 
     return {
       id: updatedUser.id,
@@ -77,6 +74,6 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       mfaEnabled: updatedUser.mfaEnabled,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
-    };
+    }
   }
 }

@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize } from '@generated/prisma';
-import { Injectable } from '@nestjs/common';
+import { ProductSize } from '@generated/prisma'
+import { Injectable } from '@nestjs/common'
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { CartWithItems } from '../types/cart.types';
+import { PrismaService } from '@/prisma'
+import { CartWithItems } from '../cart.types'
 
 @Injectable()
 export class CartRepository {
@@ -45,7 +45,7 @@ export class CartRepository {
           orderBy: { id: 'desc' },
         },
       },
-    });
+    })
 
     if (!cart) {
       cart = await this.prisma.cart.create({
@@ -64,32 +64,23 @@ export class CartRepository {
             orderBy: { id: 'desc' },
           },
         },
-      });
+      })
     }
 
-    return cart;
+    return cart
   }
 
-  async findCartItem(
-    cartId: string,
-    productId: string,
-    size: ProductSize | null
-  ) {
+  async findCartItem(cartId: string, productId: string, size: ProductSize | null) {
     return this.prisma.cartItem.findFirst({
       where: {
         cartId,
         productId,
         size,
       },
-    });
+    })
   }
 
-  async addItem(
-    cartId: string,
-    productId: string,
-    size: ProductSize | null,
-    quantity: number
-  ) {
+  async addItem(cartId: string, productId: string, size: ProductSize | null, quantity: number) {
     // Find existing item first
     const existingItem = await this.prisma.cartItem.findFirst({
       where: {
@@ -97,7 +88,7 @@ export class CartRepository {
         productId,
         size,
       },
-    });
+    })
 
     if (existingItem) {
       return this.prisma.cartItem.update({
@@ -107,7 +98,7 @@ export class CartRepository {
             increment: quantity,
           },
         },
-      });
+      })
     }
 
     return this.prisma.cartItem.create({
@@ -117,31 +108,29 @@ export class CartRepository {
         size,
         quantity,
       },
-    });
+    })
   }
 
   async updateItemQuantity(cartItemId: string, quantity: number) {
     return this.prisma.cartItem.update({
       where: { id: cartItemId },
       data: { quantity },
-    });
+    })
   }
 
   async removeItem(cartItemId: string) {
     return this.prisma.cartItem.delete({
       where: { id: cartItemId },
-    });
+    })
   }
 
   async clearCart(cartId: string) {
     return this.prisma.cartItem.deleteMany({
       where: { cartId },
-    });
+    })
   }
 
-  async getCartItemById(
-    cartItemId: string
-  ): Promise<CartWithItems['items'][0] | null> {
+  async getCartItemById(cartItemId: string): Promise<CartWithItems['items'][0] | null> {
     return this.prisma.cartItem.findUnique({
       where: { id: cartItemId },
       include: {
@@ -151,6 +140,6 @@ export class CartRepository {
           },
         },
       },
-    });
+    })
   }
 }

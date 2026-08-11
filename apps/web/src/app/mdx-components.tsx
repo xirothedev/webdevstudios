@@ -20,14 +20,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { MDXComponents } from 'mdx/types';
-import Image from 'next/image';
+import type { MDXComponents } from 'mdx/types'
+import Image from 'next/image'
 
 /**
  * MDX components for blog posts
  * Custom styling for markdown elements
  */
-export function useMDXComponents(components: MDXComponents): MDXComponents {
+export function getMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // Headings
     h1: ({ className, ...props }) => (
@@ -76,9 +76,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    li: ({ className, ...props }) => (
-      <li className={`${className ?? ''}`.trim()} {...props} />
-    ),
+    li: ({ className, ...props }) => <li className={`${className ?? ''}`.trim()} {...props} />,
 
     // Links
     a: ({ className, ...props }) => (
@@ -97,10 +95,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     code: ({ className, ...props }) => {
       // Check if this is inline code or code block
-      const isCodeBlock = className?.includes('language-');
+      const isCodeBlock = className?.includes('language-')
       if (isCodeBlock) {
         // Code block - Shiki will handle styling
-        return <code className={className} {...props} />;
+        return <code className={className} {...props} />
       }
       // Inline code
       return (
@@ -108,7 +106,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
           className={`text-wds-text rounded px-1.5 py-0.5 text-sm ${className ?? ''}`.trim()}
           {...props}
         />
-      );
+      )
     },
 
     // Blockquote
@@ -121,7 +119,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
     // Images
     img: ({ src, alt, ...props }) => {
-      if (!src) return null;
+      if (!src) return null
       // If it's a relative path or external URL, use Next.js Image
       if (src.startsWith('http') || src.startsWith('/')) {
         return (
@@ -133,18 +131,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             className="my-4 rounded-lg"
             {...props}
           />
-        );
+        )
       }
       // Fallback to regular img tag
-      return <img src={src} alt={alt} className="my-4 rounded-lg" {...props} />;
+      return <img src={src} alt={alt} className="my-4 rounded-lg" {...props} />
     },
 
     // Horizontal rule
     hr: ({ className, ...props }) => (
-      <hr
-        className={`border-wds-accent/30 my-8 ${className ?? ''}`.trim()}
-        {...props}
-      />
+      <hr className={`border-wds-accent/30 my-8 ${className ?? ''}`.trim()} {...props} />
     ),
 
     // Tables
@@ -155,19 +150,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       />
     ),
     thead: ({ className, ...props }) => (
-      <thead
-        className={`bg-wds-accent/10 ${className ?? ''}`.trim()}
-        {...props}
-      />
+      <thead className={`bg-wds-accent/10 ${className ?? ''}`.trim()} {...props} />
     ),
-    tbody: ({ className, ...props }) => (
-      <tbody className={className} {...props} />
-    ),
+    tbody: ({ className, ...props }) => <tbody className={className} {...props} />,
     tr: ({ className, ...props }) => (
-      <tr
-        className={`border-wds-accent/30 border-b ${className ?? ''}`.trim()}
-        {...props}
-      />
+      <tr className={`border-wds-accent/30 border-b ${className ?? ''}`.trim()} {...props} />
     ),
     th: ({ className, ...props }) => (
       <th
@@ -184,10 +171,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
     // Strong and emphasis
     strong: ({ className, ...props }) => (
-      <strong
-        className={`text-wds-text font-semibold ${className ?? ''}`.trim()}
-        {...props}
-      />
+      <strong className={`text-wds-text font-semibold ${className ?? ''}`.trim()} {...props} />
     ),
     em: ({ className, ...props }) => (
       <em className={`italic ${className ?? ''}`.trim()} {...props} />
@@ -195,5 +179,5 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
     // Spread any other components
     ...components,
-  };
+  }
 }

@@ -20,10 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { ProductPageContent } from '../ProductPageContent';
+import { ProductPageContent } from '../ProductPageContent'
 
 export default function DayDeoPage() {
-  return <ProductPageContent productSlug="day-deo" productName="Dây đeo" />;
+  return <ProductPageContent productSlug="day-deo" productName="Dây đeo" />
 }

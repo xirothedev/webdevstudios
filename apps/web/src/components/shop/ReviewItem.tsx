@@ -20,52 +20,48 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Edit2, Star, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Edit2, Star, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { useDeleteReview } from '@/lib/api/hooks/use-reviews';
-import { Review } from '@/lib/api/reviews';
+import { Button } from '@/components/ui/button'
+import { useDeleteReview } from '@/lib/api/hooks/use-reviews'
+import { Review } from '@/lib/api/reviews'
 
-import { DeleteReviewDialog } from './DeleteReviewDialog';
-import { ReviewEditForm } from './ReviewEditForm';
+import { DeleteReviewDialog } from './DeleteReviewDialog'
+import { ReviewEditForm } from './ReviewEditForm'
 
 interface ReviewItemProps {
-  review: Review;
-  currentUserId?: string;
-  currentUserRole?: string;
+  review: Review
+  currentUserId?: string
+  currentUserRole?: string
 }
 
-export function ReviewItem({
-  review,
-  currentUserId,
-  currentUserRole,
-}: ReviewItemProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const deleteReviewMutation = useDeleteReview();
+export function ReviewItem({ review, currentUserId, currentUserRole }: ReviewItemProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const deleteReviewMutation = useDeleteReview()
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
     return date.toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
-  };
+    })
+  }
 
-  const canEdit = currentUserId === review.userId;
-  const canDelete = currentUserRole === 'ADMIN';
+  const canEdit = currentUserId === review.userId
+  const canDelete = currentUserRole === 'ADMIN'
 
   const handleEditSuccess = () => {
-    setIsEditing(false);
-  };
+    setIsEditing(false)
+  }
 
   const handleDelete = () => {
-    setShowDeleteDialog(true);
-  };
+    setShowDeleteDialog(true)
+  }
 
   if (isEditing) {
     return (
@@ -74,7 +70,7 @@ export function ReviewItem({
         onCancel={() => setIsEditing(false)}
         onSuccess={handleEditSuccess}
       />
-    );
+    )
   }
 
   return (
@@ -97,25 +93,19 @@ export function ReviewItem({
           <div className="flex-1">
             <div className="mb-2 flex items-start justify-between">
               <div>
-                <p className="mb-1 font-semibold text-white">
-                  {review.userFullName}
-                </p>
+                <p className="mb-1 font-semibold text-white">{review.userFullName}</p>
                 <div className="mb-2 flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <Star
                         key={i}
                         className={`h-4 w-4 ${
-                          i <= review.rating
-                            ? 'fill-wds-accent text-wds-accent'
-                            : 'text-white/20'
+                          i <= review.rating ? 'fill-wds-accent text-wds-accent' : 'text-white/20'
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-white/60">
-                    {formatDate(review.createdAt)}
-                  </span>
+                  <span className="text-sm text-white/60">{formatDate(review.createdAt)}</span>
                 </div>
               </div>
               {(canEdit || canDelete) && (
@@ -144,9 +134,7 @@ export function ReviewItem({
                 </div>
               )}
             </div>
-            {review.comment && (
-              <p className="text-white/80">{review.comment}</p>
-            )}
+            {review.comment && <p className="text-white/80">{review.comment}</p>}
           </div>
         </div>
       </div>
@@ -158,13 +146,13 @@ export function ReviewItem({
           onConfirm={() => {
             deleteReviewMutation.mutate(review.id, {
               onSuccess: () => {
-                setShowDeleteDialog(false);
+                setShowDeleteDialog(false)
               },
-            });
+            })
           }}
           isDeleting={deleteReviewMutation.isPending}
         />
       )}
     </>
-  );
+  )
 }

@@ -20,13 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Footer } from '@/components/Footer';
-import { LastUpdatedProvider } from '@/components/legal/last-updated-provider';
-import { LegalLayout } from '@/components/legal/LegalLayout';
-import { Navbar } from '@/components/Navbar';
-import { getFileCommitDate } from '@/lib/git-utils';
+import { Footer } from '@/components/Footer'
+import { LastUpdatedProvider } from '@/components/legal/last-updated-provider'
+import { LegalLayout } from '@/components/legal/LegalLayout'
+import { Navbar } from '@/components/Navbar'
+import { getFileCommitDate } from '@/lib/git-utils'
 
-import Content from './content.mdx';
+import Content from './content.mdx'
 
 const TOC_ITEMS = [
   { id: 'chinh-sach-quyen-rieng-tu', label: 'Chính sách quyền riêng tư' },
@@ -51,12 +51,10 @@ const TOC_ITEMS = [
   { id: '10-thay-doi-chinh-sach', label: '10. Thay đổi chính sách' },
   { id: '11-lien-he', label: '11. Liên hệ' },
   { id: '12-dong-y', label: '12. Đồng ý' },
-];
+]
 
 export default function PrivacyPage() {
-  const commitDate = getFileCommitDate(
-    'apps/web/src/app/(legal)/privacy/content.mdx'
-  );
+  const commitDate = getFileCommitDate('apps/web/src/app/(legal)/privacy/content.mdx')
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">
@@ -72,5 +70,5 @@ export default function PrivacyPage() {
 
       <Footer />
     </div>
-  );
+  )
 }

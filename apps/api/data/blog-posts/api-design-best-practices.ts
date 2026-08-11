@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'api-design-best-practices',
@@ -129,4 +129,4 @@ Good API design makes integration easier. Follow these practices!`,
   metaDescription:
     'Learn best practices for designing RESTful APIs including endpoint naming, status codes, and versioning.',
   isPublished: true,
-};
+}

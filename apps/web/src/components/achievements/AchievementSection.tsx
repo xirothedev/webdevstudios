@@ -20,22 +20,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Sparkles } from 'lucide-react'
+import { motion } from 'motion/react'
 
 interface AchievementSectionProps {
-  label?: string;
-  title?: string;
-  subtitle?: string;
+  label?: string
+  title?: string
+  subtitle?: string
 }
 
-export function AchievementSection({
-  label,
-  title,
-  subtitle,
-}: AchievementSectionProps) {
+export function AchievementSection({ label, title, subtitle }: AchievementSectionProps) {
   return (
     <div className="mb-16 flex flex-col gap-3 text-center">
       {label && (
@@ -73,5 +69,5 @@ export function AchievementSection({
         </motion.p>
       )}
     </div>
-  );
+  )
 }

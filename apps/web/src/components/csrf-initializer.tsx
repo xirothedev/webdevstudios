@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 
-import { getCsrfToken } from '@/lib/csrf';
+import { getCsrfToken } from '@/lib/csrf'
 
 /**
  * CSRF Token Initializer
@@ -36,9 +36,9 @@ export function CsrfInitializer() {
     // This ensures token is available before first state-changing request
     getCsrfToken().catch((error) => {
       // Silently fail - token will be fetched on-demand if needed
-      console.warn('Failed to prefetch CSRF token:', error);
-    });
-  }, []);
+      console.warn('Failed to prefetch CSRF token:', error)
+    })
+  }, [])
 
-  return null; // This component doesn't render anything
+  return null // This component doesn't render anything
 }

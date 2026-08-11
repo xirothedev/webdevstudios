@@ -29,10 +29,7 @@ export function OrdersLoading() {
       {/* Orders List Skeleton */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="rounded-xl border border-white/10 bg-white/5 p-6"
-          >
+          <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-6">
             {/* Header Skeleton */}
             <div className="mb-4 flex items-start justify-between">
               <div className="flex-1 space-y-2">
@@ -67,5 +64,5 @@ export function OrdersLoading() {
         ))}
       </div>
     </div>
-  );
+  )
 }

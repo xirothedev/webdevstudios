@@ -20,23 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { motion } from 'motion/react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { motion } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const fadeInLeft = {
   initial: { opacity: 0, x: -30 },
   animate: { opacity: 1, x: 0 },
   transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] },
-};
+}
 
 const fadeInRight = {
   initial: { opacity: 0, x: 30 },
   animate: { opacity: 1, x: 0 },
   transition: { duration: 0.6, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] },
-};
+}
 
 export function WDSMissionSection() {
   return (
@@ -83,9 +83,8 @@ export function WDSMissionSection() {
 
             <div className="space-y-4">
               <p className="text-base leading-relaxed text-gray-700 sm:text-lg md:text-xl">
-                Các thành viên tuân thủ quy định của Hội sinh viên và Câu lạc
-                bộ. Tiếp thu, học hỏi kiến thức, nắm bắt xu hướng và công nghệ
-                mới. Tôn trọng, chia sẻ và có trách nhiệm.
+                Các thành viên tuân thủ quy định của Hội sinh viên và Câu lạc bộ. Tiếp thu, học hỏi
+                kiến thức, nắm bắt xu hướng và công nghệ mới. Tôn trọng, chia sẻ và có trách nhiệm.
               </p>
             </div>
 
@@ -107,5 +106,5 @@ export function WDSMissionSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }

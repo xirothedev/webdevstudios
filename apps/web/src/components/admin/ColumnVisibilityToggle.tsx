@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Columns3 } from 'lucide-react';
-import { useState } from 'react';
+import { Columns3 } from 'lucide-react'
+import { useState } from 'react'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -33,17 +33,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 
 interface Column {
-  id: string;
-  label: string;
+  id: string
+  label: string
 }
 
 interface ColumnVisibilityToggleProps {
-  columns: Column[];
-  visibleColumns: string[];
-  onVisibilityChange: (visibleColumns: string[]) => void;
+  columns: Column[]
+  visibleColumns: string[]
+  onVisibilityChange: (visibleColumns: string[]) => void
 }
 
 export function ColumnVisibilityToggle({
@@ -51,15 +51,15 @@ export function ColumnVisibilityToggle({
   visibleColumns,
   onVisibilityChange,
 }: ColumnVisibilityToggleProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   const toggleColumn = (columnId: string) => {
     if (visibleColumns.includes(columnId)) {
-      onVisibilityChange(visibleColumns.filter((id) => id !== columnId));
+      onVisibilityChange(visibleColumns.filter((id) => id !== columnId))
     } else {
-      onVisibilityChange([...visibleColumns, columnId]);
+      onVisibilityChange([...visibleColumns, columnId])
     }
-  };
+  }
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -90,5 +90,5 @@ export function ColumnVisibilityToggle({
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

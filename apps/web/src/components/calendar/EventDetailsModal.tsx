@@ -20,50 +20,39 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import {
-  Calendar as CalendarIcon,
-  ExternalLink,
-  MapPin,
-  Users,
-  X,
-} from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { Calendar as CalendarIcon, ExternalLink, MapPin, Users, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 
-import { Button } from '@/components/ui/button';
-import { Event, EventType } from '@/lib/events/types';
+import { Button } from '@/components/ui/button'
+import { Event, EventType } from '@/lib/events/types'
 import {
   formatEventTime,
   getEventTypeColor,
   getEventTypeLabel,
   getRelativeTime,
-} from '@/lib/events/utils';
+} from '@/lib/events/utils'
 
 interface EventDetailsModalProps {
-  event: Event | null;
-  isOpen: boolean;
-  onClose: () => void;
+  event: Event | null
+  isOpen: boolean
+  onClose: () => void
 }
 
-export function EventDetailsModal({
-  event,
-  isOpen,
-  onClose,
-}: EventDetailsModalProps) {
-  const [mounted, setMounted] = useState(false);
+export function EventDetailsModal({ event, isOpen, onClose }: EventDetailsModalProps) {
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
 
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+  if (!event || !mounted) return null
 
-  if (!event || !mounted) return null;
-
-  const eventColor = getEventTypeColor(event.type);
-  const eventTypeLabel = getEventTypeLabel(event.type);
+  const eventColor = getEventTypeColor(event.type)
+  const eventTypeLabel = getEventTypeLabel(event.type)
 
   const modalContent = (
     <AnimatePresence>
@@ -106,17 +95,10 @@ export function EventDetailsModal({
             <div className="mb-4 flex items-start justify-between">
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: eventColor }}
-                  />
-                  <span className="text-sm font-medium text-gray-600">
-                    {eventTypeLabel}
-                  </span>
+                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: eventColor }} />
+                  <span className="text-sm font-medium text-gray-600">{eventTypeLabel}</span>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
-                  {event.title}
-                </h2>
+                <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">{event.title}</h2>
               </div>
               <button
                 onClick={onClose}
@@ -133,12 +115,8 @@ export function EventDetailsModal({
               <div className="flex items-start gap-3">
                 <CalendarIcon className="mt-0.5 h-5 w-5 text-gray-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {formatEventTime(event)}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {getRelativeTime(event)}
-                  </p>
+                  <p className="text-sm font-medium text-gray-900">{formatEventTime(event)}</p>
+                  <p className="text-xs text-gray-500">{getRelativeTime(event)}</p>
                 </div>
               </div>
 
@@ -156,13 +134,10 @@ export function EventDetailsModal({
                   <Users className="mt-0.5 h-5 w-5 text-gray-400" />
                   <div>
                     <p className="text-sm text-gray-700">
-                      <span className="font-medium">Tổ chức bởi:</span>{' '}
-                      {event.organizer}
+                      <span className="font-medium">Tổ chức bởi:</span> {event.organizer}
                     </p>
                     {event.attendees !== undefined && event.attendees > 0 && (
-                      <p className="text-xs text-gray-500">
-                        {event.attendees} người tham gia
-                      </p>
+                      <p className="text-xs text-gray-500">{event.attendees} người tham gia</p>
                     )}
                   </div>
                 </div>
@@ -208,7 +183,7 @@ export function EventDetailsModal({
         </>
       )}
     </AnimatePresence>
-  );
+  )
 
-  return createPortal(modalContent, document.body);
+  return createPortal(modalContent, document.body)
 }

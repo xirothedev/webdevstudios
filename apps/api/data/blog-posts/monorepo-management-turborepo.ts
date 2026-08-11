@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'monorepo-management-turborepo',
@@ -104,4 +104,4 @@ Turborepo simplifies monorepo management significantly.`,
   metaDescription:
     'Learn how to manage monorepos effectively using Turborepo including build optimization and caching.',
   isPublished: true,
-};
+}

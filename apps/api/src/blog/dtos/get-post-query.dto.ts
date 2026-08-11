@@ -20,9 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsBoolean, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
+import { IsBoolean, IsOptional } from 'class-validator'
 
 export class GetBlogPostQueryDto {
   @ApiPropertyOptional({
@@ -33,5 +33,5 @@ export class GetBlogPostQueryDto {
   @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
-  includeContent?: boolean = false;
+  includeContent?: boolean = false
 }

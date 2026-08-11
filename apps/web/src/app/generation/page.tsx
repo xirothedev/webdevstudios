@@ -20,32 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import {
-  Award,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Crown,
-  Sparkles,
-  Star,
-  Users,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Award, Calendar, ChevronDown, ChevronUp, Crown, Sparkles, Star, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-import { Footer } from '@/components/Footer';
-import { GenerationMemberAvatar } from '@/components/generation/GenerationMemberAvatar';
-import { Navbar } from '@/components/Navbar';
-import { type Generation, generations } from '@/data/generations';
+import { Footer } from '@/components/Footer'
+import { GenerationMemberAvatar } from '@/components/generation/GenerationMemberAvatar'
+import { Navbar } from '@/components/Navbar'
+import { type Generation, generations } from '@/data/generations'
 
 // Expandable Generation Section for Mobile
-function ExpandableGenerationSection({
-  generation,
-}: {
-  generation: Generation;
-}) {
-  const [isExpanded, setIsExpanded] = useState(true);
+function ExpandableGenerationSection({ generation }: { generation: Generation }) {
+  const [isExpanded, setIsExpanded] = useState(true)
 
   return (
     <section className="relative">
@@ -67,16 +54,12 @@ function ExpandableGenerationSection({
             </div>
             <div className="text-left">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black sm:text-xl">
-                  Generation {generation.gen}
-                </h2>
+                <h2 className="text-lg font-black sm:text-xl">Generation {generation.gen}</h2>
                 <span className="hidden rounded-full bg-black/20 px-3 py-1 text-xs font-bold uppercase sm:inline-block">
                   {generation.period}
                 </span>
               </div>
-              <p className="mt-1 text-xs font-semibold opacity-80 sm:hidden">
-                {generation.period}
-              </p>
+              <p className="mt-1 text-xs font-semibold opacity-80 sm:hidden">{generation.period}</p>
             </div>
           </div>
 
@@ -162,12 +145,12 @@ function ExpandableGenerationSection({
           ))}
       </div>
     </section>
-  );
+  )
 }
 
 // Desktop Bento Grid (original layout for larger screens)
 function DesktopBentoGrid({ generation }: { generation: Generation }) {
-  const [leader1, leader2, leader3, ...members] = generation.members;
+  const [leader1, leader2, leader3, ...members] = generation.members
 
   return (
     <section className="hidden lg:block">
@@ -209,9 +192,7 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
             {/* Bottom decoration */}
             <div className="relative z-10 flex items-center gap-2 text-black/70">
               <Award className="h-5 w-5" />
-              <span className="text-xs font-semibold tracking-wide uppercase">
-                Leader team
-              </span>
+              <span className="text-xs font-semibold tracking-wide uppercase">Leader team</span>
             </div>
           </div>
         </div>
@@ -322,18 +303,18 @@ function DesktopBentoGrid({ generation }: { generation: Generation }) {
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent" />
       </div>
     </section>
-  );
+  )
 }
 
 export default function GenerationPage() {
   const [starPositions, setStarPositions] = useState<
     Array<{
-      left: number;
-      top: number;
-      delay: number;
-      duration: number;
+      left: number
+      top: number
+      delay: number
+      duration: number
     }>
-  >([]);
+  >([])
 
   useEffect(() => {
     // Generate random positions only on client side
@@ -343,9 +324,9 @@ export default function GenerationPage() {
         top: Math.random() * 100,
         delay: Math.random() * 3,
         duration: 4 + Math.random() * 4,
-      }))
-    );
-  }, []);
+      })),
+    )
+  }, [])
 
   return (
     <div className="min-h-screen bg-white">
@@ -412,8 +393,8 @@ export default function GenerationPage() {
               </span>
             </h1>
             <p className="mx-auto max-w-2xl px-4 text-sm text-pretty text-gray-600 sm:text-base">
-              Khám phá hành trình của WebDev Studios qua các thế hệ lãnh đạo tận
-              tụy đã kiến tạo cộng đồng của chúng tôi.
+              Khám phá hành trình của WebDev Studios qua các thế hệ lãnh đạo tận tụy đã kiến tạo
+              cộng đồng của chúng tôi.
             </p>
           </div>
         </div>
@@ -457,21 +438,9 @@ export default function GenerationPage() {
         .retro-grid {
           background-size: 40px 40px;
           background-image:
-            linear-gradient(
-              to right,
-              rgba(247, 147, 30, 0.05) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              to bottom,
-              rgba(247, 147, 30, 0.05) 1px,
-              transparent 1px
-            );
-          mask-image: radial-gradient(
-            ellipse 60% 50% at 50% 0%,
-            #000 70%,
-            transparent 100%
-          );
+            linear-gradient(to right, rgba(247, 147, 30, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(247, 147, 30, 0.05) 1px, transparent 1px);
+          mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%);
           -webkit-mask-image: radial-gradient(
             ellipse 60% 50% at 50% 0%,
             #000 70%,
@@ -480,5 +449,5 @@ export default function GenerationPage() {
         }
       `}</style>
     </div>
-  );
+  )
 }

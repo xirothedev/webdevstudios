@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'aws-cloudflare-deployment',
@@ -117,4 +117,4 @@ Choose deployment platform based on your needs. Both AWS and Cloudflare are exce
   metaDescription:
     'Learn how to deploy applications to AWS and Cloudflare including setup, configuration, and best practices.',
   isPublished: true,
-};
+}

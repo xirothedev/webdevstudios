@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Award } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Award } from 'lucide-react'
+import { motion } from 'motion/react'
 
-import { STATS } from '@/data/achievements';
+import { STATS } from '@/data/achievements'
 
 export function AchievementHero() {
   return (
@@ -55,12 +55,7 @@ export function AchievementHero() {
               viewBox="0 0 100 10"
               preserveAspectRatio="none"
             >
-              <path
-                d="M0 5 Q 50 10 100 5"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-              />
+              <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
             </svg>
           </span>
         </motion.h1>
@@ -71,8 +66,8 @@ export function AchievementHero() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="mx-auto mb-12 max-w-2xl text-lg text-pretty text-gray-400"
         >
-          Những cột mốc đáng nhớ và giải thưởng danh giá đánh dấu sự nỗ lực
-          không ngừng nghỉ của các thế hệ thành viên WebDev Studios.
+          Những cột mốc đáng nhớ và giải thưởng danh giá đánh dấu sự nỗ lực không ngừng nghỉ của các
+          thế hệ thành viên WebDev Studios.
         </motion.p>
 
         {/* Stats Counter */}
@@ -97,5 +92,5 @@ export function AchievementHero() {
         </motion.div>
       </div>
     </section>
-  );
+  )
 }

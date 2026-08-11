@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
+import { UserRole } from '@generated/prisma'
 import {
   Body,
   Controller,
@@ -32,9 +32,9 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
-} from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { FileInterceptor } from '@nestjs/platform-express';
+} from '@nestjs/common'
+import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { FileInterceptor } from '@nestjs/platform-express'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -44,43 +44,41 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger';
+} from '@nestjs/swagger'
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Public } from '../common/decorators/public.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { FileValidationPipe } from '../storage/pipes/file-validation.pipe';
-import { DeleteUserCommand } from './commands/delete-user/delete-user.command';
-import { UpdateAvatarCommand } from './commands/update-avatar/update-avatar.command';
-import { UpdateProfileCommand } from './commands/update-profile/update-profile.command';
-import { UpdateUserCommand } from './commands/update-user/update-user.command';
+import { CurrentUser } from '../auth/decorators/current-user.decorator'
+import { Public, Roles } from '@/common/decorators'
+import { RolesGuard } from '@/common/guards'
+import { FileValidationPipe } from '../storage/pipes/file-validation.pipe'
+import { DeleteUserCommand } from './commands/delete-user'
+import { UpdateAvatarCommand } from './commands/update-avatar'
+import { UpdateProfileCommand } from './commands/update-profile'
+import { UpdateUserCommand } from './commands/update-user'
 import {
   PrivateUserDto,
   PublicUserDto,
   SearchUsersResponseDto,
   UserListResponseDto,
-} from './dtos/responses.dto';
-import { UpdateProfileDto } from './dtos/update-profile.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
-import { GetUserByIdQuery } from './queries/get-user-by-id/get-user-by-id.query';
-import { ListUsersQuery } from './queries/list-users/list-users.query';
-import { SearchUsersQuery } from './queries/search-users/search-users.query';
+  UpdateProfileDto,
+  UpdateUserDto,
+} from './dtos'
+import { GetUserByIdQuery } from './queries/get-user-by-id'
+import { ListUsersQuery } from './queries/list-users'
+import { SearchUsersQuery } from './queries/search-users'
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Patch('profile')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update own profile',
-    description:
-      'Update the authenticated user profile information (fullName, phone)',
+    description: 'Update the authenticated user profile information (fullName, phone)',
   })
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({
@@ -92,11 +90,9 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateProfile(
     @CurrentUser() user: { id: string },
-    @Body() dto: UpdateProfileDto
+    @Body() dto: UpdateProfileDto,
   ): Promise<PrivateUserDto> {
-    return this.commandBus.execute(
-      new UpdateProfileCommand(user.id, dto.fullName, dto.phone)
-    );
+    return this.commandBus.execute(new UpdateProfileCommand(user.id, dto.fullName, dto.phone))
   }
 
   @Patch('avatar')
@@ -121,9 +117,9 @@ export class UsersController {
   async updateAvatar(
     @CurrentUser() user: { id: string },
     @UploadedFile(new FileValidationPipe())
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<PrivateUserDto> {
-    return this.commandBus.execute(new UpdateAvatarCommand(user.id, file));
+    return this.commandBus.execute(new UpdateAvatarCommand(user.id, file))
   }
 
   @Get('me')
@@ -139,11 +135,9 @@ export class UsersController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getMe(
-    @CurrentUser() user: { id: string; email: string; role: UserRole }
+    @CurrentUser() user: { id: string; email: string; role: UserRole },
   ): Promise<PrivateUserDto> {
-    return this.queryBus.execute(
-      new GetUserByIdQuery(user.id, user.id, user.role)
-    );
+    return this.queryBus.execute(new GetUserByIdQuery(user.id, user.id, user.role))
   }
 
   @Get(':id')
@@ -167,11 +161,9 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async getUserById(
     @Param('id') id: string,
-    @CurrentUser() user?: { id: string; role: UserRole }
+    @CurrentUser() user?: { id: string; role: UserRole },
   ): Promise<PublicUserDto | PrivateUserDto> {
-    return this.queryBus.execute(
-      new GetUserByIdQuery(id, user?.id, user?.role)
-    );
+    return this.queryBus.execute(new GetUserByIdQuery(id, user?.id, user?.role))
   }
 
   @Get()
@@ -212,15 +204,11 @@ export class UsersController {
   async listUsers(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @Query('role') role?: UserRole
+    @Query('role') role?: UserRole,
   ): Promise<UserListResponseDto> {
     return this.queryBus.execute(
-      new ListUsersQuery(
-        page ? parseInt(page, 10) : 1,
-        limit ? parseInt(limit, 10) : 10,
-        role
-      )
-    );
+      new ListUsersQuery(page ? parseInt(page, 10) : 1, limit ? parseInt(limit, 10) : 10, role),
+    )
   }
 
   @Get('search')
@@ -260,7 +248,7 @@ export class UsersController {
     @Query('q') query: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @CurrentUser() user?: { id: string; role: UserRole }
+    @CurrentUser() user?: { id: string; role: UserRole },
   ): Promise<SearchUsersResponseDto> {
     return this.queryBus.execute(
       new SearchUsersQuery(
@@ -268,9 +256,9 @@ export class UsersController {
         page ? parseInt(page, 10) : 1,
         limit ? parseInt(limit, 10) : 10,
         user?.id,
-        user?.role
-      )
-    );
+        user?.role,
+      ),
+    )
   }
 
   @Patch(':id')
@@ -296,13 +284,10 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async updateUser(
-    @Param('id') id: string,
-    @Body() dto: UpdateUserDto
-  ): Promise<PrivateUserDto> {
+  async updateUser(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<PrivateUserDto> {
     return this.commandBus.execute(
-      new UpdateUserCommand(id, dto.fullName, dto.phone, dto.avatar, dto.role)
-    );
+      new UpdateUserCommand(id, dto.fullName, dto.phone, dto.avatar, dto.role),
+    )
   }
 
   @Delete(':id')
@@ -332,6 +317,6 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async deleteUser(@Param('id') id: string): Promise<{ success: boolean }> {
-    return this.commandBus.execute(new DeleteUserCommand(id));
+    return this.commandBus.execute(new DeleteUserCommand(id))
   }
 }

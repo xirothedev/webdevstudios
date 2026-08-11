@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPostSeedData } from './types';
+import { BlogPostSeedData } from './types'
 
 export const blogPost: BlogPostSeedData = {
   slug: 'prisma-best-practices',
@@ -110,4 +110,4 @@ Following these best practices will help you build robust applications with Pris
   metaDescription:
     'Learn Prisma best practices including query optimization, migration strategies, and performance tips for production applications.',
   isPublished: true,
-};
+}

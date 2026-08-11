@@ -20,24 +20,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/components/ui/chart';
+} from '@/components/ui/chart'
 
 interface AdminChartProps {
-  title: string;
-  description?: string;
-  data: Array<Record<string, string | number>>;
-  dataKey: string;
-  type?: 'area' | 'bar';
-  className?: string;
+  title: string
+  description?: string
+  data: Array<Record<string, string | number>>
+  dataKey: string
+  type?: 'area' | 'bar'
+  className?: string
 }
 
 export function AdminChart({
@@ -53,7 +53,7 @@ export function AdminChart({
       label: title,
       color: '#F7931E', // WDS orange accent
     },
-  } satisfies ChartConfig;
+  } satisfies ChartConfig
 
   return (
     <div
@@ -61,9 +61,7 @@ export function AdminChart({
     >
       <div className="mb-4">
         <h3 className="text-wds-text text-lg font-semibold">{title}</h3>
-        {description && (
-          <p className="text-wds-text/70 mt-1 text-sm">{description}</p>
-        )}
+        {description && <p className="text-wds-text/70 mt-1 text-sm">{description}</p>}
       </div>
       <ChartContainer config={chartConfig} className="h-[300px] w-full">
         {type === 'area' ? (
@@ -73,13 +71,7 @@ export function AdminChart({
             margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
           >
             <defs>
-              <linearGradient
-                id={`fill-${dataKey}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
+              <linearGradient id={`fill-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#F7931E" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="#F7931E" stopOpacity={0} />
               </linearGradient>
@@ -106,12 +98,12 @@ export function AdminChart({
                         return new Intl.NumberFormat('vi-VN', {
                           style: 'currency',
                           currency: 'VND',
-                        }).format(value);
+                        }).format(value)
                       }
                       // Format other numbers
-                      return value.toLocaleString('vi-VN');
+                      return value.toLocaleString('vi-VN')
                     }
-                    return value;
+                    return value
                   }}
                 />
               }
@@ -152,12 +144,12 @@ export function AdminChart({
                         return new Intl.NumberFormat('vi-VN', {
                           style: 'currency',
                           currency: 'VND',
-                        }).format(value);
+                        }).format(value)
                       }
                       // Format other numbers
-                      return value.toLocaleString('vi-VN');
+                      return value.toLocaleString('vi-VN')
                     }
-                    return value;
+                    return value
                   }}
                 />
               }
@@ -167,5 +159,5 @@ export function AdminChart({
         )}
       </ChartContainer>
     </div>
-  );
+  )
 }

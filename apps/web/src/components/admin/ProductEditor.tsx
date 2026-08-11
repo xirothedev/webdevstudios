@@ -20,53 +20,45 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
-import { adminApi } from '@/lib/api/admin';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
+import { adminApi } from '@/lib/api/admin'
 
 // Validation schema with Zod
 const productFormSchema = z.object({
   name: z.string().min(1, 'Tên sản phẩm là bắt buộc'),
   description: z.string().min(1, 'Mô tả sản phẩm là bắt buộc'),
   priceCurrent: z.number().min(0, 'Giá phải lớn hơn hoặc bằng 0').optional(),
-  priceOriginal: z
-    .number()
-    .min(0, 'Giá gốc phải lớn hơn hoặc bằng 0')
-    .nullable()
-    .optional(),
-});
+  priceOriginal: z.number().min(0, 'Giá gốc phải lớn hơn hoặc bằng 0').nullable().optional(),
+})
 
-type ProductFormData = z.infer<typeof productFormSchema>;
+type ProductFormData = z.infer<typeof productFormSchema>
 
 interface ProductEditorProps {
-  productId: string;
-  onSave?: () => void;
-  onCancel?: () => void;
+  productId: string
+  onSave?: () => void
+  onCancel?: () => void
 }
 
-export function ProductEditor({
-  productId,
-  onSave,
-  onCancel,
-}: ProductEditorProps) {
-  const queryClient = useQueryClient();
+export function ProductEditor({ productId, onSave, onCancel }: ProductEditorProps) {
+  const queryClient = useQueryClient()
 
   const { data: products } = useQuery({
     queryKey: ['admin', 'products'],
     queryFn: () => adminApi.listProducts(),
-  });
+  })
 
-  const product = products?.products.find((p) => p.id === productId);
+  const product = products?.products.find((p) => p.id === productId)
 
   const {
     register,
@@ -83,10 +75,10 @@ export function ProductEditor({
       priceCurrent: undefined,
       priceOriginal: undefined,
     },
-  });
+  })
 
   // Watch name for dynamic header
-  const watchedName = watch('name');
+  const watchedName = watch('name')
 
   // Reset form when product data is loaded
   useEffect(() => {
@@ -96,64 +88,55 @@ export function ProductEditor({
         description: product.description,
         priceCurrent: product.priceCurrent,
         priceOriginal: product.priceOriginal ?? undefined,
-      });
+      })
     }
-  }, [product, reset]);
+  }, [product, reset])
 
   const updateMutation = useMutation({
     mutationFn: (data: {
-      name?: string;
-      description?: string;
-      priceCurrent?: number;
-      priceOriginal?: number | null;
-      badge?: string | null;
-      isPublished?: boolean;
+      name?: string
+      description?: string
+      priceCurrent?: number
+      priceOriginal?: number | null
+      badge?: string | null
+      isPublished?: boolean
     }) => adminApi.updateProduct(productId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-      toast.success('Product updated successfully');
-      onSave?.();
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
+      toast.success('Product updated successfully')
+      onSave?.()
     },
     onError: () => {
-      toast.error('Failed to update product');
+      toast.error('Failed to update product')
     },
-  });
+  })
 
   if (!product) {
-    return <div className="text-wds-text/70">Product not found</div>;
+    return <div className="text-wds-text/70">Product not found</div>
   }
 
   const onSubmit = (data: ProductFormData) => {
-    console.log(data);
+    console.log(data)
 
     updateMutation.mutate({
       name: data.name.trim(),
       description: data.description || '',
       priceCurrent: data.priceCurrent,
       priceOriginal: data.priceOriginal ?? null,
-    });
-  };
+    })
+  }
 
-  const isLoading = isSubmitting || updateMutation.isPending;
+  const isLoading = isSubmitting || updateMutation.isPending
 
   return (
     <div className="border-wds-accent/30 bg-wds-background space-y-4 rounded-2xl border p-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-wds-text text-xl font-bold">
-          Edit: {watchedName || product.name}
-        </h2>
+        <h2 className="text-wds-text text-xl font-bold">Edit: {watchedName || product.name}</h2>
       </div>
 
-      <form
-        id="product-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      <form id="product-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label
-            htmlFor="name"
-            className="text-wds-text mb-2 block text-sm font-medium"
-          >
+          <label htmlFor="name" className="text-wds-text mb-2 block text-sm font-medium">
             Product Name
           </label>
           <Input
@@ -164,18 +147,11 @@ export function ProductEditor({
             {...register('name')}
             className="border-wds-accent/30 bg-wds-background text-wds-text placeholder:text-wds-text/50 focus:border-wds-accent focus:ring-wds-accent/20"
           />
-          {errors.name && (
-            <p className="text-wds-accent mt-1 text-sm">
-              {errors.name.message}
-            </p>
-          )}
+          {errors.name && <p className="text-wds-accent mt-1 text-sm">{errors.name.message}</p>}
         </div>
 
         <div>
-          <label
-            htmlFor="description"
-            className="text-wds-text mb-2 block text-sm font-medium"
-          >
+          <label htmlFor="description" className="text-wds-text mb-2 block text-sm font-medium">
             Description
           </label>
           <Controller
@@ -192,18 +168,13 @@ export function ProductEditor({
             )}
           />
           {errors.description && (
-            <p className="text-wds-accent mt-1 text-sm">
-              {errors.description.message}
-            </p>
+            <p className="text-wds-accent mt-1 text-sm">{errors.description.message}</p>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label
-              htmlFor="priceCurrent"
-              className="text-wds-text mb-2 block text-sm font-medium"
-            >
+            <label htmlFor="priceCurrent" className="text-wds-text mb-2 block text-sm font-medium">
               Current Price
             </label>
             <Input
@@ -219,16 +190,11 @@ export function ProductEditor({
               className="border-wds-accent/30 bg-wds-background text-wds-text"
             />
             {errors.priceCurrent && (
-              <p className="text-wds-accent mt-1 text-sm">
-                {errors.priceCurrent.message}
-              </p>
+              <p className="text-wds-accent mt-1 text-sm">{errors.priceCurrent.message}</p>
             )}
           </div>
           <div>
-            <label
-              htmlFor="priceOriginal"
-              className="text-wds-text mb-2 block text-sm font-medium"
-            >
+            <label htmlFor="priceOriginal" className="text-wds-text mb-2 block text-sm font-medium">
               Original Price
             </label>
             <Input
@@ -240,15 +206,12 @@ export function ProductEditor({
               placeholder="Enter original price (optional)..."
               {...register('priceOriginal', {
                 valueAsNumber: true,
-                setValueAs: (v) =>
-                  v === '' || v === null ? undefined : Number(v),
+                setValueAs: (v) => (v === '' || v === null ? undefined : Number(v)),
               })}
               className="border-wds-accent/30 bg-wds-background text-wds-text"
             />
             {errors.priceOriginal && (
-              <p className="text-wds-accent mt-1 text-sm">
-                {errors.priceOriginal.message}
-              </p>
+              <p className="text-wds-accent mt-1 text-sm">{errors.priceOriginal.message}</p>
             )}
           </div>
         </div>
@@ -273,5 +236,5 @@ export function ProductEditor({
         </div>
       </form>
     </div>
-  );
+  )
 }

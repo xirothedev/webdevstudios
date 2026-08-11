@@ -20,16 +20,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
+import { IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator'
 
 export class SearchBlogPostsQueryDto {
   @ApiProperty({
@@ -38,7 +31,7 @@ export class SearchBlogPostsQueryDto {
   })
   @IsString()
   @IsNotEmpty()
-  q: string;
+  q: string
 
   @ApiPropertyOptional({
     description: 'Page number',
@@ -50,7 +43,7 @@ export class SearchBlogPostsQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  page?: number = 1;
+  page?: number = 1
 
   @ApiPropertyOptional({
     description: 'Number of items per page',
@@ -64,5 +57,5 @@ export class SearchBlogPostsQueryDto {
   @IsInt()
   @Min(1)
   @Max(100)
-  pageSize?: number = 10;
+  pageSize?: number = 10
 }

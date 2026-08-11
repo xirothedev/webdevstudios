@@ -20,23 +20,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 import {
   createPaymentLink,
   type CreatePaymentLinkRequest,
   type CreatePaymentLinkResponse,
   verifyPayment,
-} from '../payments';
+} from '../payments'
 
 export function useCreatePaymentLink() {
-  return useMutation<
-    CreatePaymentLinkResponse,
-    Error,
-    CreatePaymentLinkRequest
-  >({
+  return useMutation<CreatePaymentLinkResponse, Error, CreatePaymentLinkRequest>({
     mutationFn: createPaymentLink,
-  });
+  })
 }
 
 export function useVerifyPayment(transactionCode: string | null) {
@@ -45,5 +41,5 @@ export function useVerifyPayment(transactionCode: string | null) {
     queryFn: () => verifyPayment(transactionCode!),
     enabled: !!transactionCode,
     refetchInterval: 5000, // Poll every 5 seconds
-  });
+  })
 }

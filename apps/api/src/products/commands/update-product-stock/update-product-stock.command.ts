@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize } from '@generated/prisma';
+import { ProductSize } from '@generated/prisma'
 
 export class UpdateProductStockCommand {
   constructor(
     public readonly productId: string,
     public readonly stock: number,
-    public readonly size?: ProductSize
+    public readonly size?: ProductSize,
   ) {}
 }

@@ -20,16 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react'
 
-import { Footer } from '@/components/Footer';
-import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer'
+import { Navbar } from '@/components/Navbar'
 
 interface PageLoadingProps {
-  variant?: 'light' | 'dark';
-  message?: string;
-  showNavbar?: boolean;
-  showFooter?: boolean;
+  variant?: 'light' | 'dark'
+  message?: string
+  showNavbar?: boolean
+  showFooter?: boolean
 }
 
 export function PageLoading({
@@ -38,15 +38,11 @@ export function PageLoading({
   showNavbar = true,
   showFooter = true,
 }: PageLoadingProps) {
-  const isLight = variant === 'light';
+  const isLight = variant === 'light'
 
   return (
     <div
-      className={
-        isLight
-          ? 'min-h-screen bg-white'
-          : 'bg-wds-background text-wds-text min-h-screen'
-      }
+      className={isLight ? 'min-h-screen bg-white' : 'bg-wds-background text-wds-text min-h-screen'}
     >
       {showNavbar && <Navbar variant={isLight ? 'light' : 'dark'} />}
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -56,16 +52,10 @@ export function PageLoading({
               isLight ? 'text-wds-accent' : 'text-wds-accent'
             }`}
           />
-          <p
-            className={
-              isLight ? 'text-sm text-gray-600' : 'text-sm text-white/80'
-            }
-          >
-            {message}
-          </p>
+          <p className={isLight ? 'text-sm text-gray-600' : 'text-sm text-white/80'}>{message}</p>
         </div>
       </div>
       {showFooter && <Footer variant={isLight ? 'light' : 'dark'} />}
     </div>
-  );
+  )
 }

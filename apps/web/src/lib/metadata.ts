@@ -20,12 +20,12 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import type { Metadata } from 'next';
+import type { Metadata } from 'next'
 
-import { SITE_URL } from './constants';
+import { SITE_URL } from './constants'
 
-export const siteUrl = SITE_URL;
-const siteName = 'WebDev Studios';
+export const siteUrl = SITE_URL
+const siteName = 'WebDev Studios'
 
 // SEO Images mapping: route path → SEO image path
 export const SEO_IMAGES: Record<string, string> = {
@@ -42,9 +42,9 @@ export const SEO_IMAGES: Record<string, string> = {
   '/terms': '/seo/legal/terms.webp',
   '/privacy': '/seo/legal/privacy.webp',
   '/refund': '/seo/legal/refund.webp',
-};
+}
 const siteDescription =
-  'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.';
+  'WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.'
 const siteKeywords = [
   'WebDev Studios',
   'Câu lạc bộ lập trình web',
@@ -61,7 +61,7 @@ const siteKeywords = [
   'TypeScript',
   'Cộng đồng lập trình',
   'Học lập trình',
-];
+]
 
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -123,7 +123,7 @@ export const defaultMetadata: Metadata = {
     canonical: siteUrl,
   },
   category: 'Education',
-};
+}
 
 export function createPageMetadata({
   title,
@@ -132,14 +132,14 @@ export function createPageMetadata({
   image,
   keywords,
 }: {
-  title: string;
-  description: string;
-  path: string;
-  image?: string;
-  keywords?: string[];
+  title: string
+  description: string
+  path: string
+  image?: string
+  keywords?: string[]
 }): Metadata {
-  const url = `${siteUrl}${path}`;
-  const fullTitle = `${title} | ${siteName}`;
+  const url = `${siteUrl}${path}`
+  const fullTitle = `${title} | ${siteName}`
 
   return {
     title: fullTitle,
@@ -169,5 +169,5 @@ export function createPageMetadata({
       description,
       images: image ? [image] : ['/icon-512x512.png'],
     },
-  };
+  }
 }

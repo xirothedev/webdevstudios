@@ -20,31 +20,31 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { Search, X } from 'lucide-react';
-import { useState } from 'react';
+import { Search, X } from 'lucide-react'
+import { useState } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface FilterOption {
-  value: string;
-  label: string;
+  value: string
+  label: string
 }
 
 interface TableFiltersProps {
-  searchPlaceholder?: string;
-  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string
+  onSearchChange?: (value: string) => void
   filters?: Array<{
-    id: string;
-    label: string;
-    type: 'select' | 'text';
-    options?: FilterOption[];
-    value?: string;
-    onChange?: (value: string) => void;
-  }>;
-  onClear?: () => void;
+    id: string
+    label: string
+    type: 'select' | 'text'
+    options?: FilterOption[]
+    value?: string
+    onChange?: (value: string) => void
+  }>
+  onClear?: () => void
 }
 
 export function TableFilters({
@@ -53,14 +53,14 @@ export function TableFilters({
   filters = [],
   onClear,
 }: TableFiltersProps) {
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState('')
 
   const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-    onSearchChange?.(value);
-  };
+    setSearchValue(value)
+    onSearchChange?.(value)
+  }
 
-  const hasActiveFilters = searchValue || filters.some((f) => f.value);
+  const hasActiveFilters = searchValue || filters.some((f) => f.value)
 
   return (
     <div className="border-wds-accent/30 bg-wds-background flex flex-wrap items-center gap-4 rounded-2xl border p-4">
@@ -106,8 +106,8 @@ export function TableFilters({
         <Button
           variant="outline"
           onClick={() => {
-            setSearchValue('');
-            onClear();
+            setSearchValue('')
+            onClear()
           }}
           className="border-wds-accent/30 bg-wds-background text-wds-text hover:bg-wds-accent/10"
         >
@@ -116,5 +116,5 @@ export function TableFilters({
         </Button>
       )}
     </div>
-  );
+  )
 }

@@ -20,11 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { FeaturesGrid } from '@/components/FeaturesGrid';
-import { Footer } from '@/components/Footer';
-import { Hero } from '@/components/Hero';
-import { Navbar } from '@/components/Navbar';
-import { TrustSection } from '@/components/TrustSection';
+import { FeaturesGrid } from '@/components/FeaturesGrid'
+import { Footer } from '@/components/Footer'
+import { Hero } from '@/components/Hero'
+import { Navbar } from '@/components/Navbar'
+import { TrustSection } from '@/components/TrustSection'
 
 export default function ShopPage() {
   return (
@@ -35,5 +35,5 @@ export default function ShopPage() {
       <FeaturesGrid />
       <Footer />
     </div>
-  );
+  )
 }

@@ -20,64 +20,59 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { MailerService } from '@nestjs-modules/mailer';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { MailerService } from '@nestjs-modules/mailer'
+import { readFileSync } from 'fs'
+import { join } from 'path'
+import { format } from 'date-fns'
 
 @Injectable()
 export class MailService {
-  readonly templatePath: string;
+  readonly templatePath: string
 
   constructor(
     private readonly mailer: MailerService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
   ) {
-    this.templatePath = join(__dirname, 'templates', 'verification-email.html');
+    this.templatePath = join(__dirname, 'templates', 'verification-email.html')
   }
 
-  private loadTemplate(
-    templateName: string = 'verification-email.html'
-  ): string {
-    const templatePath = join(__dirname, 'templates', templateName);
+  private loadTemplate(templateName: string = 'verification-email.html'): string {
+    const templatePath = join(__dirname, 'templates', templateName)
     try {
-      return readFileSync(templatePath, 'utf-8');
+      return readFileSync(templatePath, 'utf-8')
     } catch (error) {
-      throw new Error(
-        `Failed to load email template: ${templatePath}. Error: ${error}`,
-        { cause: error }
-      );
+      throw new Error(`Failed to load email template: ${templatePath}. Error: ${error}`, {
+        cause: error,
+      })
     }
   }
 
-  private replaceTemplateVariables(
-    template: string,
-    variables: Record<string, string>
-  ): string {
-    let html = template;
+  private replaceTemplateVariables(template: string, variables: Record<string, string>): string {
+    let html = template
     for (const [key, value] of Object.entries(variables)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      html = html.replace(regex, value);
+      const regex = new RegExp(`{{${key}}}`, 'g')
+      html = html.replace(regex, value)
     }
-    return html;
+    return html
   }
 
   async sendVerificationEmail(email: string, token: string): Promise<void> {
     const frontendUrl =
       this.config.get<string>('FRONTEND_URL') ||
-      `http://localhost:${this.config.getOrThrow<string>('PORT', '3000')}`;
-    const verificationUrl = `${frontendUrl}/verify?token=${encodeURIComponent(token)}`;
-    const currentYear = new Date().getFullYear().toString();
+      `http://localhost:${this.config.getOrThrow<string>('PORT', '3000')}`
+    const verificationUrl = `${frontendUrl}/verify?token=${encodeURIComponent(token)}`
+    const currentYear = format(new Date(), 'yyyy')
 
     // Load HTML template
-    const template = this.loadTemplate('verification-email.html');
+    const template = this.loadTemplate('verification-email.html')
 
     // Replace template variables
     const html = this.replaceTemplateVariables(template, {
       verificationUrl,
       currentYear,
-    });
+    })
 
     // Create plain text version
     const text = `Welcome to Webdev Studio!
@@ -90,31 +85,31 @@ Note: This verification link will expire in 24 hours. If you didn't create an ac
 
 ---
 This email was sent by Webdev Studio
-© ${currentYear} Webdev Studio. All rights reserved.`;
+© ${currentYear} Webdev Studio. All rights reserved.`
 
     await this.mailer.sendMail({
       to: email,
       subject: 'Webdev Studio - Verify your email',
       text,
       html,
-    });
+    })
   }
 
   async sendPasswordResetEmail(email: string, token: string): Promise<void> {
     const frontendUrl =
       this.config.get<string>('FRONTEND_URL') ||
-      `http://localhost:${this.config.get<string>('PORT', '3000')}`;
-    const resetUrl = `${frontendUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
-    const currentYear = new Date().getFullYear().toString();
+      `http://localhost:${this.config.get<string>('PORT', '3000')}`
+    const resetUrl = `${frontendUrl}/auth/reset-password?token=${encodeURIComponent(token)}`
+    const currentYear = format(new Date(), 'yyyy')
 
     // Load HTML template
-    const template = this.loadTemplate('password-reset.html');
+    const template = this.loadTemplate('password-reset.html')
 
     // Replace template variables
     const html = this.replaceTemplateVariables(template, {
       resetUrl,
       currentYear,
-    });
+    })
 
     // Create plain text version
     const text = `Password Reset Request
@@ -129,13 +124,13 @@ Security Notice: This link will expire in 1 hour. For your security, please do n
 
 ---
 This email was sent by Webdev Studio
-© ${currentYear} Webdev Studio. All rights reserved.`;
+© ${currentYear} Webdev Studio. All rights reserved.`
 
     await this.mailer.sendMail({
       to: email,
       subject: 'Webdev Studio - Reset Your Password',
       text,
       html,
-    });
+    })
   }
 }

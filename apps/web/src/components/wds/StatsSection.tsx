@@ -20,17 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { BriefcaseBusiness, Layers3, Timer, Users } from 'lucide-react';
-import { motion } from 'motion/react';
+import { BriefcaseBusiness, Layers3, Timer, Users } from 'lucide-react'
+import { motion } from 'motion/react'
 
-import { NumberTicker } from '@/components/ui/number-ticker';
+import { NumberTicker } from '@/components/ui/number-ticker'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
   animate: { opacity: 1, y: 0 },
-};
+}
 
 export function WDSStatsSection() {
   return (
@@ -58,9 +58,9 @@ export function WDSStatsSection() {
             }}
             className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-gray-700 sm:text-lg"
           >
-            Được thành lập năm 2018 với hơn 20 thành viên, WebDev Studios đã
-            phát triển thành một trong những câu lạc bộ phát triển mạnh mẽ tại
-            trường Đại học Công nghệ Thông tin – ĐHQG TP.HCM.
+            Được thành lập năm 2018 với hơn 20 thành viên, WebDev Studios đã phát triển thành một
+            trong những câu lạc bộ phát triển mạnh mẽ tại trường Đại học Công nghệ Thông tin – ĐHQG
+            TP.HCM.
           </motion.p>
         </motion.div>
 
@@ -70,54 +70,25 @@ export function WDSStatsSection() {
           whileInView="animate"
           viewport={{ once: true, margin: '-80px' }}
         >
-          <StatItem
-            icon={Layers3}
-            label="Hơn 10 dự án lớn"
-            value={10}
-            suffix="+"
-            delay={0.1}
-          />
-          <StatItem
-            icon={Timer}
-            label="Hơn 2 năm kinh nghiệm"
-            value={2}
-            suffix="+"
-            delay={0.2}
-          />
-          <StatItem
-            icon={Users}
-            label="Hơn 45 thành viên"
-            value={45}
-            suffix="+"
-            delay={0.3}
-          />
-          <StatItem
-            icon={BriefcaseBusiness}
-            label="4 vị trí để ứng tuyển"
-            value={4}
-            delay={0.4}
-          />
+          <StatItem icon={Layers3} label="Hơn 10 dự án lớn" value={10} suffix="+" delay={0.1} />
+          <StatItem icon={Timer} label="Hơn 2 năm kinh nghiệm" value={2} suffix="+" delay={0.2} />
+          <StatItem icon={Users} label="Hơn 45 thành viên" value={45} suffix="+" delay={0.3} />
+          <StatItem icon={BriefcaseBusiness} label="4 vị trí để ứng tuyển" value={4} delay={0.4} />
         </motion.div>
       </div>
     </section>
-  );
+  )
 }
 
 interface StatItemProps {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  label: string;
-  value: number;
-  suffix?: string;
-  delay?: number;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  label: string
+  value: number
+  suffix?: string
+  delay?: number
 }
 
-function StatItem({
-  icon: Icon,
-  label,
-  value,
-  suffix,
-  delay = 0,
-}: StatItemProps) {
+function StatItem({ icon: Icon, label, value, suffix, delay = 0 }: StatItemProps) {
   return (
     <motion.div
       variants={fadeInUp}
@@ -133,9 +104,7 @@ function StatItem({
           </div>
         </div>
       </div>
-      <p className="max-w-xs text-sm font-medium text-gray-800 sm:text-base">
-        {label}
-      </p>
+      <p className="max-w-xs text-sm font-medium text-gray-800 sm:text-base">{label}</p>
     </motion.div>
-  );
+  )
 }

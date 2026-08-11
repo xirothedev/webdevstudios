@@ -20,22 +20,22 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ConflictException, Injectable } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { ConflictException, Injectable } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 
-import { StorageService } from '@/storage/storage.service';
+import { StorageService } from '@/storage/storage.service'
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto } from '../../dtos/blog-post.dto';
-import { BlogRepository } from '../../infrastructure/blog.repository';
-import { CreateBlogPostCommand } from './create-post.command';
+import { BlogPostWithRelations } from '../../blog.types'
+import { BlogPostDto } from '../../dtos'
+import { BlogRepository } from '../../infrastructure/blog.repository'
+import { CreateBlogPostCommand } from './create-post.command'
 
 @CommandHandler(CreateBlogPostCommand)
 @Injectable()
 export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostCommand> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async execute(command: CreateBlogPostCommand): Promise<BlogPostDto> {
@@ -49,22 +49,17 @@ export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostComm
       isPublished,
       metaTitle,
       metaDescription,
-    } = command;
+    } = command
 
     // Check if slug already exists
-    const existingPost = await this.blogRepository.findBySlug(slug);
+    const existingPost = await this.blogRepository.findBySlug(slug)
     if (existingPost) {
-      throw new ConflictException(
-        `Blog post with slug "${slug}" already exists`
-      );
+      throw new ConflictException(`Blog post with slug "${slug}" already exists`)
     }
 
     // Upload content to R2 using slug (unique identifier)
-    const contentUrl = await this.storageService.uploadBlogContent(
-      slug,
-      content
-    );
-    const contentSize = Buffer.from(content, 'utf-8').length;
+    const contentUrl = await this.storageService.uploadBlogContent(slug, content)
+    const contentSize = Buffer.from(content, 'utf-8').length
 
     // Create post in database
     const post = await this.blogRepository.create({
@@ -79,18 +74,18 @@ export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostComm
       publishedAt: isPublished ? new Date() : null,
       metaTitle,
       metaDescription,
-    });
+    })
 
     // If we want to use post ID instead of slug, we can move the file here
     // For now, we'll use slug which is also unique and URL-friendly
 
     // Fetch full post with relations
-    const fullPost = await this.blogRepository.findById(post.id);
+    const fullPost = await this.blogRepository.findById(post.id)
     if (!fullPost) {
-      throw new Error('Failed to fetch created post');
+      throw new Error('Failed to fetch created post')
     }
 
-    return this.mapToDto(fullPost);
+    return this.mapToDto(fullPost)
   }
 
   private extractExcerpt(content: string, maxLength = 500): string {
@@ -102,13 +97,13 @@ export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostComm
       .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links
       .replace(/!\[([^\]]*)\]\([^)]+\)/g, '') // Remove images
       .replace(/\n+/g, ' ') // Replace newlines with spaces
-      .trim();
+      .trim()
 
     if (plainText.length <= maxLength) {
-      return plainText;
+      return plainText
     }
 
-    return `${plainText.substring(0, maxLength - 3)}...`;
+    return `${plainText.substring(0, maxLength - 3)}...`
   }
 
   private mapToDto(post: BlogPostWithRelations): BlogPostDto {
@@ -132,6 +127,6 @@ export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostComm
       metaDescription: post.metaDescription,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    };
+    }
   }
 }

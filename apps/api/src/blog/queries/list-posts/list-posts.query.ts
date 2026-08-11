@@ -25,6 +25,6 @@ export class ListBlogPostsQuery {
     public readonly page?: number,
     public readonly pageSize?: number,
     public readonly isPublished?: boolean,
-    public readonly authorId?: string
+    public readonly authorId?: string,
   ) {}
 }

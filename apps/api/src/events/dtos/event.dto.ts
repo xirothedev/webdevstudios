@@ -20,48 +20,48 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Event, EventType } from '@generated/prisma';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Event, EventType } from '@generated/prisma'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class EventDto {
   @ApiProperty({ description: 'ID sự kiện' })
-  id: string;
+  id: string
 
   @ApiProperty({ description: 'Tiêu đề sự kiện' })
-  title: string;
+  title: string
 
   @ApiPropertyOptional({ description: 'Mô tả sự kiện' })
-  description?: string;
+  description?: string
 
   @ApiProperty({ description: 'Ngày giờ bắt đầu' })
-  startDate: Date;
+  startDate: Date
 
   @ApiProperty({ description: 'Ngày giờ kết thúc' })
-  endDate: Date;
+  endDate: Date
 
   @ApiPropertyOptional({ description: 'Địa điểm' })
-  location?: string;
+  location?: string
 
   @ApiProperty({ description: 'Loại sự kiện', enum: EventType })
-  type: EventType;
+  type: EventType
 
   @ApiPropertyOptional({ description: 'Người tổ chức' })
-  organizer?: string;
+  organizer?: string
 
   @ApiPropertyOptional({ description: 'Số người tham gia' })
-  attendees?: number;
+  attendees?: number
 
   @ApiPropertyOptional({ description: 'Link khảo sát (Google Form)' })
-  surveyLink?: string;
+  surveyLink?: string
 
   @ApiPropertyOptional({ description: 'ID người tạo' })
-  createdBy?: string;
+  createdBy?: string
 
   @ApiProperty({ description: 'Ngày tạo' })
-  createdAt: Date;
+  createdAt: Date
 
   @ApiProperty({ description: 'Ngày cập nhật' })
-  updatedAt: Date;
+  updatedAt: Date
 
   static fromEntity(event: Event): EventDto {
     return {
@@ -78,6 +78,6 @@ export class EventDto {
       createdBy: event.createdBy ?? undefined,
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
-    };
+    }
   }
 }

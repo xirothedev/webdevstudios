@@ -20,46 +20,42 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import { useContext, useEffect } from 'react';
+import { useRouter } from 'next/navigation'
+import { useContext, useEffect } from 'react'
 
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { AuthContext } from '@/contexts/auth.context';
+import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AuthContext } from '@/contexts/auth.context'
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { user, isAuthenticated, isLoading } = useContext(AuthContext) ?? {};
-  const router = useRouter();
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useContext(AuthContext) ?? {}
+  const router = useRouter()
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) return
 
     if (!isAuthenticated || !user) {
-      router.push('/auth/login');
-      return;
+      router.push('/auth/login')
+      return
     }
 
     if (user.role !== 'ADMIN') {
-      router.push('/');
-      return;
+      router.push('/')
+      return
     }
-  }, [user, isAuthenticated, isLoading, router]);
+  }, [user, isAuthenticated, isLoading, router])
 
   if (isLoading) {
     return (
       <div className="bg-wds-background flex min-h-screen items-center justify-center">
         <div className="text-wds-text">Đang tải...</div>
       </div>
-    );
+    )
   }
 
   if (!isAuthenticated || !user || user.role !== 'ADMIN') {
-    return null;
+    return null
   }
 
   return (
@@ -67,5 +63,5 @@ export default function AdminLayout({
       <AdminSidebar />
       <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
-  );
+  )
 }

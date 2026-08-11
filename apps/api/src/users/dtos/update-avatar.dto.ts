@@ -20,8 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUrl } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsString, IsUrl } from 'class-validator'
 
 export class UpdateAvatarDto {
   @ApiProperty({
@@ -30,5 +30,5 @@ export class UpdateAvatarDto {
   })
   @IsString()
   @IsUrl()
-  avatar: string;
+  avatar: string
 }

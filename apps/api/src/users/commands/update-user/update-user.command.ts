@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
+import { UserRole } from '@generated/prisma'
 
 export class UpdateUserCommand {
   constructor(
@@ -28,6 +28,6 @@ export class UpdateUserCommand {
     public readonly fullName?: string,
     public readonly phone?: string,
     public readonly avatar?: string,
-    public readonly role?: UserRole
+    public readonly role?: UserRole,
   ) {}
 }

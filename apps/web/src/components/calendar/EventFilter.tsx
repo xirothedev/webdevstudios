@@ -20,31 +20,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { EventType } from '@/lib/events/types';
-import { getEventTypeColor, getEventTypeLabel } from '@/lib/events/utils';
-import { cn } from '@/lib/utils';
+import { EventType } from '@/lib/events/types'
+import { getEventTypeColor, getEventTypeLabel } from '@/lib/events/utils'
+import { cn } from '@/lib/utils'
 
 interface EventFilterProps {
-  selectedTypes: EventType[];
-  onToggleType: (type: EventType) => void;
-  eventCounts: Record<EventType, number>;
+  selectedTypes: EventType[]
+  onToggleType: (type: EventType) => void
+  eventCounts: Record<EventType, number>
 }
 
-export function EventFilter({
-  selectedTypes,
-  onToggleType,
-  eventCounts,
-}: EventFilterProps) {
-  const allTypes = Object.values(EventType);
+export function EventFilter({ selectedTypes, onToggleType, eventCounts }: EventFilterProps) {
+  const allTypes = Object.values(EventType)
 
   return (
     <div className="flex flex-wrap gap-2">
       {allTypes.map((type) => {
-        const isSelected = selectedTypes.includes(type);
-        const count = eventCounts[type] || 0;
-        const color = getEventTypeColor(type);
+        const isSelected = selectedTypes.includes(type)
+        const count = eventCounts[type] || 0
+        const color = getEventTypeColor(type)
 
         return (
           <button
@@ -54,7 +50,7 @@ export function EventFilter({
               'inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-medium transition-all sm:gap-2 sm:px-3 sm:py-1.5 sm:text-sm',
               isSelected
                 ? 'border-gray-900 bg-gray-900 text-white'
-                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50',
             )}
             style={
               isSelected
@@ -74,15 +70,15 @@ export function EventFilter({
               <span
                 className={cn(
                   'rounded-full px-1 py-0.5 text-[10px] sm:px-1.5 sm:text-xs',
-                  isSelected ? 'bg-white/20' : 'bg-gray-100'
+                  isSelected ? 'bg-white/20' : 'bg-gray-100',
                 )}
               >
                 {count}
               </span>
             )}
           </button>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

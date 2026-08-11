@@ -20,59 +20,56 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+'use client'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useMemo } from 'react'
 
-import { OrderCard } from '@/components/orders/OrderCard';
-import { OrdersEmpty } from '@/components/orders/OrdersEmpty';
-import { Button } from '@/components/ui/button';
-import { useCancelOrder, useSuspenseOrders } from '@/lib/api/hooks/use-orders';
+import { OrderCard } from '@/components/orders/OrderCard'
+import { OrdersEmpty } from '@/components/orders/OrdersEmpty'
+import { Button } from '@/components/ui/button'
+import { useCancelOrder, useSuspenseOrders } from '@/lib/api/hooks/use-orders'
 
 export function OrdersContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const page = useMemo(
-    () => parseInt(searchParams.get('page') || '1', 10),
-    [searchParams]
-  );
-  const limit = 10;
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const page = useMemo(() => parseInt(searchParams.get('page') || '1', 10), [searchParams])
+  const limit = 10
 
   // Fetch orders using Suspense Query
-  const { data: ordersData } = useSuspenseOrders(page, limit);
-  const { orders, total } = ordersData;
+  const { data: ordersData } = useSuspenseOrders(page, limit)
+  const { orders, total } = ordersData
 
   // Cancel order mutation
-  const cancelOrderMutation = useCancelOrder();
+  const cancelOrderMutation = useCancelOrder()
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(total / limit)
 
   const handlePageChange = useCallback(
     (newPage: number) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams.toString())
       if (newPage === 1) {
-        params.delete('page');
+        params.delete('page')
       } else {
-        params.set('page', newPage.toString());
+        params.set('page', newPage.toString())
       }
-      router.push(`/orders?${params.toString()}`);
+      router.push(`/orders?${params.toString()}`)
     },
-    [router, searchParams]
-  );
+    [router, searchParams],
+  )
 
   const handleCancel = useCallback(
     (orderId: string) => {
-      if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return;
-      cancelOrderMutation.mutate(orderId);
+      if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return
+      cancelOrderMutation.mutate(orderId)
     },
-    [cancelOrderMutation]
-  );
+    [cancelOrderMutation],
+  )
 
   // Empty state
   if (orders.length === 0) {
-    return <OrdersEmpty />;
+    return <OrdersEmpty />
   }
 
   return (
@@ -91,8 +88,7 @@ export function OrdersContent() {
             order={order}
             onCancel={handleCancel}
             isCancelling={
-              cancelOrderMutation.isPending &&
-              cancelOrderMutation.variables === order.id
+              cancelOrderMutation.isPending && cancelOrderMutation.variables === order.id
             }
           />
         ))}
@@ -116,20 +112,18 @@ export function OrdersContent() {
             {Array.from({ length: totalPages }, (_, i) => i + 1)
               .filter((p) => {
                 // Show first page, last page, current page, and pages around current
-                if (p === 1 || p === totalPages) return true;
-                if (Math.abs(p - page) <= 1) return true;
-                return false;
+                if (p === 1 || p === totalPages) return true
+                if (Math.abs(p - page) <= 1) return true
+                return false
               })
               .map((p, idx, arr) => {
                 // Add ellipsis
-                const prev = arr[idx - 1];
-                const showEllipsis = prev && p - prev > 1;
+                const prev = arr[idx - 1]
+                const showEllipsis = prev && p - prev > 1
 
                 return (
                   <div key={p} className="flex items-center gap-1">
-                    {showEllipsis && (
-                      <span className="px-2 text-white/60">...</span>
-                    )}
+                    {showEllipsis && <span className="px-2 text-white/60">...</span>}
                     <Button
                       onClick={() => handlePageChange(p)}
                       variant={p === page ? 'default' : 'outline'}
@@ -143,7 +137,7 @@ export function OrdersContent() {
                       {p}
                     </Button>
                   </div>
-                );
+                )
               })}
           </div>
 
@@ -160,5 +154,5 @@ export function OrdersContent() {
         </div>
       )}
     </div>
-  );
+  )
 }
