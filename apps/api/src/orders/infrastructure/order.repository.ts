@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma';
+import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 import { subMinutes } from 'date-fns';

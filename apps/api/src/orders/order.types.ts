@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Order, OrderItem, Product, ShippingAddress } from '@generated/prisma';
+import { Order, OrderItem, Product, ShippingAddress } from '@prisma/client';
 
 export type OrderItemWithProduct = OrderItem & {
   product: Product | null;

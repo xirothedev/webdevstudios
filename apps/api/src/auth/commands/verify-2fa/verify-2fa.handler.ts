@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType, MFAMethod } from '@generated/prisma';
+import { DeviceType, MFAMethod } from '@prisma/client';
 import {
   BadRequestException,
   Injectable,

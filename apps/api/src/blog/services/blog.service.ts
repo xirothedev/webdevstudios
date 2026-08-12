@@ -1,8 +1,10 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+
 import { StorageService } from '@/storage/storage.service';
-import { BlogRepository } from '../infrastructure/blog.repository';
+
 import { BlogPostWithRelations } from '../blog.types';
 import { BlogPostDto } from '../dtos';
+import { BlogRepository } from '../infrastructure/blog.repository';
 
 @Injectable()
 export class BlogService {
@@ -62,6 +64,77 @@ export class BlogService {
     }
 
     return this.mapToDto(fullPost);
+  }
+
+  async updatePost(params: {
+    postId: string;
+    title?: string;
+    content?: string;
+    excerpt?: string | null;
+    coverImage?: string | null;
+    isPublished?: boolean;
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  }): Promise<BlogPostDto> {
+    const { postId, title, content, excerpt, coverImage, isPublished, metaTitle, metaDescription } =
+      params;
+
+    const post = await this.blogRepository.findById(postId);
+    if (!post) {
+      throw new NotFoundException(`Blog post with id ${postId} not found`);
+    }
+
+    const updateData: {
+      title?: string;
+      contentUrl?: string;
+      contentSize?: number | null;
+      excerpt?: string | null;
+      coverImage?: string | null;
+      isPublished?: boolean;
+      publishedAt?: Date | null;
+      metaTitle?: string | null;
+      metaDescription?: string | null;
+    } = {};
+
+    if (title !== undefined) updateData.title = title;
+    if (coverImage !== undefined) updateData.coverImage = coverImage;
+    if (isPublished !== undefined) {
+      updateData.isPublished = isPublished;
+      if (isPublished && !post.isPublished) {
+        updateData.publishedAt = new Date();
+      }
+    }
+    if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
+    if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
+
+    if (content !== undefined) {
+      const newContentUrl = await this.storageService.uploadBlogContent(postId, content);
+      const contentSize = Buffer.from(content, 'utf-8').length;
+      updateData.contentUrl = newContentUrl;
+      updateData.contentSize = contentSize;
+
+      if (post.contentUrl !== newContentUrl) {
+        try {
+          await this.storageService.deleteBlogContent(post.contentUrl);
+        } catch (error) {
+          // Log error but don't fail the update
+          console.error('Failed to delete old content file:', error);
+        }
+      }
+
+      updateData.excerpt = excerpt !== undefined ? excerpt : this.extractExcerpt(content);
+    } else if (excerpt !== undefined) {
+      updateData.excerpt = excerpt;
+    }
+
+    await this.blogRepository.update(postId, updateData);
+
+    const updatedPost = await this.blogRepository.findById(postId);
+    if (!updatedPost) {
+      throw new NotFoundException('Blog post not found after update');
+    }
+
+    return this.mapToDto(updatedPost);
   }
 
   private extractExcerpt(content: string, maxLength = 500): string {

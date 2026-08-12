@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OrderStatus, PaymentStatus, PaymentTransactionStatus } from '@generated/prisma';
+import { OrderStatus, PaymentStatus, PaymentTransactionStatus } from '@prisma/client';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 

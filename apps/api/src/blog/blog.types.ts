@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPost, BlogTag } from '@generated/prisma';
+import { BlogPost, BlogTag } from '@prisma/client';
 
 export type BlogPostWithRelations = BlogPost & {
   author: {

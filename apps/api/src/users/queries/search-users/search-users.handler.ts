@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
+import { UserRole } from '@prisma/client';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { UserRepository } from '@/auth/infrastructure';

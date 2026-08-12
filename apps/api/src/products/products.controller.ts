@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSize, ProductSlug, UserRole } from '@generated/prisma';
+import { ProductSize, ProductSlug, UserRole } from '@prisma/client';
 import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {

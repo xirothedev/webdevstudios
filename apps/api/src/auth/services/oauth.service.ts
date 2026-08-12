@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType, OAuthProvider } from '@generated/prisma';
+import { DeviceType, OAuthProvider } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import * as UAParser from 'ua-parser-js';
 

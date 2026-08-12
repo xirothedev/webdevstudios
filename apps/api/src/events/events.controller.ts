@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { EventType, UserRole } from '@generated/prisma';
+import { EventType, UserRole } from '@prisma/client';
 import {
   Body,
   Controller,

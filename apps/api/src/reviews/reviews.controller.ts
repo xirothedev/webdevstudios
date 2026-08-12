@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ProductSlug, UserRole } from '@generated/prisma';
+import { ProductSlug, UserRole } from '@prisma/client';
 import {
   Body,
   Controller,

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { EventType } from '@generated/prisma';
+import { EventType } from '@prisma/client';
 
 export class UpdateEventCommand {
   constructor(
