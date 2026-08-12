@@ -30,11 +30,7 @@ import {
 } from '../payments';
 
 export function useCreatePaymentLink() {
-  return useMutation<
-    CreatePaymentLinkResponse,
-    Error,
-    CreatePaymentLinkRequest
-  >({
+  return useMutation<CreatePaymentLinkResponse, Error, CreatePaymentLinkRequest>({
     mutationFn: createPaymentLink,
   });
 }

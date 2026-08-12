@@ -20,15 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  OrderStatus,
-  PaymentStatus,
-  PaymentTransactionStatus,
-} from '@generated/prisma';
+import { OrderStatus, PaymentStatus, PaymentTransactionStatus } from '@generated/prisma';
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { SecurityLoggerService } from '@/common/services/security-logger.service';
+import { SecurityLoggerService } from '@/common/services';
 import { OrderRepository } from '@/orders/infrastructure/order.repository';
 import { ProductRepository } from '@/products/infrastructure/product.repository';
 
@@ -45,7 +41,7 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
     private readonly orderRepository: OrderRepository,
     private readonly productRepository: ProductRepository,
     private readonly payOSService: PayOSService,
-    private readonly securityLogger: SecurityLoggerService
+    private readonly securityLogger: SecurityLoggerService,
   ) {}
 
   async execute(command: ProcessPaymentWebhookCommand): Promise<void> {
@@ -59,22 +55,17 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
       // For test webhooks during URL verification, PayOS might send invalid signatures
       // Check if this looks like a test webhook
       const paymentLinkId = webhookData.data?.paymentLinkId;
-      if (
-        !paymentLinkId ||
-        paymentLinkId === 'test' ||
-        paymentLinkId.includes('test')
-      ) {
+      if (!paymentLinkId || paymentLinkId === 'test' || paymentLinkId.includes('test')) {
         this.logger.log('Test webhook received - URL verification successful');
         return; // Return success for test webhooks
       }
 
       // Log webhook signature failure for security monitoring (A08: Data Integrity)
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.warn(`Invalid webhook signature: ${errorMessage}`);
       await this.securityLogger.logWebhookSignatureFailure(
         '/v1/payments/webhook',
-        undefined // IP address not available in handler context
+        undefined, // IP address not available in handler context
       );
 
       throw new BadRequestException('Invalid webhook signature');
@@ -95,16 +86,15 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
     };
 
     // Find payment transaction by paymentLinkId (PayOS transaction identifier)
-    const paymentTransaction =
-      await this.paymentRepository.findByTransactionCode(
-        paymentData.paymentLinkId
-      );
+    const paymentTransaction = await this.paymentRepository.findByTransactionCode(
+      paymentData.paymentLinkId,
+    );
 
     if (!paymentTransaction) {
       // This might be a test webhook from PayOS for URL verification
       // Log but don't throw error - let controller handle gracefully
       this.logger.warn(
-        `Payment transaction not found: ${paymentData.paymentLinkId}. This might be a test webhook.`
+        `Payment transaction not found: ${paymentData.paymentLinkId}. This might be a test webhook.`,
       );
       // For test webhooks, we should still return success to verify URL
       // Check if this looks like a test webhook (no real orderCode match)
@@ -135,31 +125,25 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
       await this.paymentRepository.updateStatus(
         paymentTransaction.id,
         PaymentTransactionStatus.PAID,
-        verifiedData
+        verifiedData,
       );
 
-      await this.orderRepository.updatePaymentStatus(
-        order.id,
-        PaymentStatus.PAID
-      );
+      await this.orderRepository.updatePaymentStatus(order.id, PaymentStatus.PAID);
 
       await this.orderRepository.updateStatus(order.id, OrderStatus.CONFIRMED);
 
       this.logger.log(
-        `Payment successful for order ${order.code}, orderCode ${paymentData.orderCode}`
+        `Payment successful for order ${order.code}, orderCode ${paymentData.orderCode}`,
       );
     } else {
       // Payment failed or cancelled
       await this.paymentRepository.updateStatus(
         paymentTransaction.id,
         PaymentTransactionStatus.FAILED,
-        verifiedData
+        verifiedData,
       );
 
-      await this.orderRepository.updatePaymentStatus(
-        order.id,
-        PaymentStatus.FAILED
-      );
+      await this.orderRepository.updatePaymentStatus(order.id, PaymentStatus.FAILED);
 
       await this.orderRepository.updateStatus(order.id, OrderStatus.CANCELLED);
 
@@ -170,19 +154,16 @@ export class ProcessPaymentWebhookHandler implements ICommandHandler<ProcessPaym
             await this.productRepository.incrementSizeStock(
               item.productId,
               item.size,
-              item.quantity
+              item.quantity,
             );
           } else {
-            await this.productRepository.incrementStock(
-              item.productId,
-              item.quantity
-            );
+            await this.productRepository.incrementStock(item.productId, item.quantity);
           }
         }
       }
 
       this.logger.log(
-        `Payment failed for order ${order.code}, orderCode ${paymentData.orderCode}. Stock restored.`
+        `Payment failed for order ${order.code}, orderCode ${paymentData.orderCode}. Stock restored.`,
       );
     }
   }

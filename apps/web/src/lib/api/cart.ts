@@ -74,14 +74,8 @@ export const cartApi = {
   /**
    * Update cart item quantity
    */
-  async updateCartItem(
-    cartItemId: string,
-    data: UpdateCartItemRequest
-  ): Promise<Cart> {
-    const response = await apiClient.patch<{ data: Cart }>(
-      `/cart/items/${cartItemId}`,
-      data
-    );
+  async updateCartItem(cartItemId: string, data: UpdateCartItemRequest): Promise<Cart> {
+    const response = await apiClient.patch<{ data: Cart }>(`/cart/items/${cartItemId}`, data);
     return response.data.data;
   },
 
@@ -89,9 +83,7 @@ export const cartApi = {
    * Remove item from cart
    */
   async removeFromCart(cartItemId: string): Promise<Cart> {
-    const response = await apiClient.delete<{ data: Cart }>(
-      `/cart/items/${cartItemId}`
-    );
+    const response = await apiClient.delete<{ data: Cart }>(`/cart/items/${cartItemId}`);
     return response.data.data;
   },
 

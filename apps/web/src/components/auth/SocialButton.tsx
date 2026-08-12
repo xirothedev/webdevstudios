@@ -63,12 +63,7 @@ const platformIcons: Record<SocialPlatform, React.ReactElement> = {
   ),
 };
 
-export function SocialButton({
-  platform,
-  label,
-  onClick,
-  disabled,
-}: SocialButtonProps) {
+export function SocialButton({ platform, label, onClick, disabled }: SocialButtonProps) {
   return (
     <Button
       type="button"

@@ -35,9 +35,5 @@ export function LastUpdated() {
     return <strong>{context?.date || ''}</strong>;
   }
 
-  return (
-    <strong>
-      {format(dateToFormat, "'ngày' d 'tháng' M 'năm' yyyy", { locale: vi })}
-    </strong>
-  );
+  return <strong>{format(dateToFormat, "'ngày' d 'tháng' M 'năm' yyyy", { locale: vi })}</strong>;
 }

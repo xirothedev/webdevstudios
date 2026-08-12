@@ -69,9 +69,9 @@ export function WDSHero() {
               className="text-base leading-relaxed text-gray-700 sm:text-lg md:text-xl"
               variants={fadeInUp}
             >
-              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với
-              Lập trình Web nhằm tạo ra một môi trường học tập và giải trí để
-              các bạn có thể học hỏi, trau dồi kỹ năng và phát triển bản thân.
+              WebDev Studios là nơi tập hợp các bạn sinh viên có niềm đam mê với Lập trình Web nhằm
+              tạo ra một môi trường học tập và giải trí để các bạn có thể học hỏi, trau dồi kỹ năng
+              và phát triển bản thân.
             </motion.p>
 
             <motion.div variants={fadeInUp}>

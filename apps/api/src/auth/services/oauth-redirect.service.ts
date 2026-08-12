@@ -43,20 +43,13 @@ export class OAuthRedirectService {
    * Get frontend URL from config
    */
   private getFrontendUrl(): string {
-    return this.configService.get<string>(
-      'FRONTEND_URL',
-      'http://localhost:3000'
-    );
+    return this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000');
   }
 
   /**
    * Set authentication cookies
    */
-  setAuthCookies(
-    res: Response,
-    accessToken: string,
-    refreshToken: string
-  ): void {
+  setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
     const isProduction = process.env.NODE_ENV === 'production';
 
     res.cookie('access_token', accessToken, {
@@ -93,11 +86,7 @@ export class OAuthRedirectService {
   /**
    * Build error callback URL
    */
-  buildErrorCallbackUrl(
-    error: string,
-    errorDescription: string,
-    redirectUrl?: string
-  ): string {
+  buildErrorCallbackUrl(error: string, errorDescription: string, redirectUrl?: string): string {
     const frontendUrl = this.getFrontendUrl();
     const callbackUrl = new URL('/auth/oauth/callback', frontendUrl);
 
@@ -115,11 +104,7 @@ export class OAuthRedirectService {
    * Handle successful OAuth callback
    * Sets cookies and redirects to frontend
    */
-  handleSuccess(
-    res: Response,
-    result: OAuthCallbackResult,
-    redirectUrl?: string
-  ): void {
+  handleSuccess(res: Response, result: OAuthCallbackResult, redirectUrl?: string): void {
     // Set cookies
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
 
@@ -132,19 +117,10 @@ export class OAuthRedirectService {
    * Handle failed OAuth callback
    * Redirects to frontend with error information
    */
-  handleError(
-    res: Response,
-    error: Error | unknown,
-    redirectUrl?: string
-  ): void {
-    const errorMessage =
-      error instanceof Error ? error.message : 'OAuth authentication failed';
+  handleError(res: Response, error: Error | unknown, redirectUrl?: string): void {
+    const errorMessage = error instanceof Error ? error.message : 'OAuth authentication failed';
 
-    const callbackUrl = this.buildErrorCallbackUrl(
-      'oauth_failed',
-      errorMessage,
-      redirectUrl
-    );
+    const callbackUrl = this.buildErrorCallbackUrl('oauth_failed', errorMessage, redirectUrl);
 
     res.redirect(callbackUrl);
   }

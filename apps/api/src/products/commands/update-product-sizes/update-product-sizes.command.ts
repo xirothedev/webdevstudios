@@ -30,6 +30,6 @@ export interface SizeStockInput {
 export class UpdateProductSizesCommand {
   constructor(
     public readonly productId: string,
-    public readonly sizeStocks: SizeStockInput[]
+    public readonly sizeStocks: SizeStockInput[],
   ) {}
 }

@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { useMDXComponents } from '@/app/mdx-components';
+import { getMDXComponents } from '@/app/mdx-components';
 import { compileMarkdownToMDX } from '@/lib/mdx-compile';
 
 interface BlogPostContentMDXProps {
@@ -38,14 +38,11 @@ export async function BlogPostContentMDX({ content }: BlogPostContentMDXProps) {
     return null;
   }
 
-  try {
-    console.log(
-      'BlogPostContentMDX: Compiling content, length:',
-      content.length
-    );
+  // Get MDX components before the try block (render-scope, not error path)
+  const components = getMDXComponents({});
 
-    // Get MDX components first
-    const components = useMDXComponents({});
+  try {
+    console.log('BlogPostContentMDX: Compiling content, length:', content.length);
 
     // Compile markdown to MDX content (RSC) with components
     const mdxContent = await compileMarkdownToMDX(content, components);

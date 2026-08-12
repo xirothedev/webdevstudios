@@ -50,9 +50,7 @@ const TOC_ITEMS = [
 ];
 
 export default function RefundPage() {
-  const commitDate = getFileCommitDate(
-    'apps/web/src/app/(legal)/refund/content.mdx'
-  );
+  const commitDate = getFileCommitDate('apps/web/src/app/(legal)/refund/content.mdx');
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">

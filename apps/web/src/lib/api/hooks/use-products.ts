@@ -65,11 +65,7 @@ export function useSuspenseProduct(slug: ProductSlug) {
 }
 
 // Query: Get product stock
-export function useProductStock(
-  slug: ProductSlug,
-  size?: ProductSize,
-  enabled: boolean = true
-) {
+export function useProductStock(slug: ProductSlug, size?: ProductSize, enabled: boolean = true) {
   return useQuery({
     queryKey: productKeys.stock(slug, size),
     queryFn: () => productsApi.getProductStock(slug, size),

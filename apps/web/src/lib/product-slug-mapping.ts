@@ -32,7 +32,7 @@ export const URL_SLUG_TO_BACKEND_SLUG: Record<
 };
 
 export const getBackendSlug = (
-  urlSlug: string
+  urlSlug: string,
 ): 'AO_THUN' | 'PAD_CHUOT' | 'DAY_DEO' | 'MOC_KHOA' => {
   const backendSlug = URL_SLUG_TO_BACKEND_SLUG[urlSlug];
   if (!backendSlug) {

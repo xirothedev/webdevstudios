@@ -20,10 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-export function getAvatarInitials(
-  fullName: string | null,
-  email: string
-): string {
+export function getAvatarInitials(fullName: string | null, email: string): string {
   if (fullName) {
     const parts = fullName.trim().split(/\s+/);
     if (parts.length >= 2) {

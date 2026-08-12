@@ -52,12 +52,8 @@ function VerifyEmailContent() {
     return (
       <AuthLayout variant="login">
         <div className="space-y-4 text-center">
-          <h2 className="text-2xl font-semibold text-white">
-            Token không hợp lệ
-          </h2>
-          <p className="text-white/60">
-            Link xác thực email không hợp lệ hoặc đã hết hạn.
-          </p>
+          <h2 className="text-2xl font-semibold text-white">Token không hợp lệ</h2>
+          <p className="text-white/60">Link xác thực email không hợp lệ hoặc đã hết hạn.</p>
           <Button
             onClick={() => router.push('/auth/login')}
             className="h-12 w-full rounded-lg bg-white text-black hover:bg-white/90"
@@ -73,12 +69,9 @@ function VerifyEmailContent() {
     return (
       <AuthLayout variant="login">
         <div className="space-y-4 text-center">
-          <h2 className="text-2xl font-semibold text-white">
-            Xác thực thành công!
-          </h2>
+          <h2 className="text-2xl font-semibold text-white">Xác thực thành công!</h2>
           <p className="text-white/60">
-            Email của bạn đã được xác thực. Đang chuyển hướng đến trang đăng
-            nhập...
+            Email của bạn đã được xác thực. Đang chuyển hướng đến trang đăng nhập...
           </p>
         </div>
       </AuthLayout>
@@ -94,9 +87,7 @@ function VerifyEmailContent() {
     return (
       <AuthLayout variant="login">
         <div className="space-y-4 text-center">
-          <h2 className="text-2xl font-semibold text-white">
-            Xác thực thất bại
-          </h2>
+          <h2 className="text-2xl font-semibold text-white">Xác thực thất bại</h2>
           <p className="text-white/60">{errorMessage}</p>
           <Button
             onClick={() => router.push('/auth/login')}
@@ -112,12 +103,8 @@ function VerifyEmailContent() {
   return (
     <AuthLayout variant="login">
       <div className="space-y-4 text-center">
-        <h2 className="text-2xl font-semibold text-white">
-          Đang xác thực email...
-        </h2>
-        <p className="text-white/60">
-          Vui lòng đợi trong khi chúng tôi xác thực email của bạn.
-        </p>
+        <h2 className="text-2xl font-semibold text-white">Đang xác thực email...</h2>
+        <p className="text-white/60">Vui lòng đợi trong khi chúng tôi xác thực email của bạn.</p>
         {verifyEmailMutation.isPending && (
           <div className="flex justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-white/20 border-t-white"></div>

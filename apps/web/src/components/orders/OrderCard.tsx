@@ -94,8 +94,7 @@ const getPaymentStatusConfig = (status: PaymentStatus) => {
 export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
   const statusConfig = getStatusConfig(order.status);
   const paymentStatusConfig = getPaymentStatusConfig(order.paymentStatus);
-  const canCancel =
-    order.status === 'PENDING' && order.paymentStatus !== 'PAID';
+  const canCancel = order.status === 'PENDING' && order.paymentStatus !== 'PAID';
   const displayedItems = order.items.slice(0, 3);
   const hasMoreItems = order.items.length > 3;
 
@@ -128,15 +127,11 @@ export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
           </div>
           <div className="flex flex-wrap items-center gap-4 text-sm text-white/60">
             <span>Ngày đặt: {formatDate(order.createdAt)}</span>
-            <span className={paymentStatusConfig.className}>
-              {paymentStatusConfig.text}
-            </span>
+            <span className={paymentStatusConfig.className}>{paymentStatusConfig.text}</span>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-wds-accent text-lg font-bold">
-            {formatPrice(order.totalAmount)}₫
-          </p>
+          <p className="text-wds-accent text-lg font-bold">{formatPrice(order.totalAmount)}₫</p>
           <p className="text-xs text-white/60">{order.items.length} sản phẩm</p>
         </div>
       </div>
@@ -149,17 +144,13 @@ export function OrderCard({ order, onCancel, isCancelling }: OrderCardProps) {
             className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2"
           >
             <div className="flex-1">
-              <p className="text-sm font-medium text-white">
-                {item.productName}
-              </p>
+              <p className="text-sm font-medium text-white">{item.productName}</p>
               <div className="mt-0.5 flex items-center gap-2 text-xs text-white/60">
                 {item.size && <span>Size: {item.size}</span>}
                 <span>× {item.quantity}</span>
               </div>
             </div>
-            <p className="text-sm font-semibold text-white">
-              {formatPrice(item.subtotal)}₫
-            </p>
+            <p className="text-sm font-semibold text-white">{formatPrice(item.subtotal)}₫</p>
           </div>
         ))}
         {hasMoreItems && (

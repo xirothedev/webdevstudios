@@ -75,9 +75,7 @@ export const productsApi = {
    * Get all products
    */
   async listProducts(): Promise<ProductListResponse> {
-    const response = await apiClient.get<{ data: ProductListResponse }>(
-      '/products'
-    );
+    const response = await apiClient.get<{ data: ProductListResponse }>('/products');
     return response.data.data;
   },
 
@@ -85,26 +83,18 @@ export const productsApi = {
    * Get product by slug
    */
   async getProductBySlug(slug: ProductSlug): Promise<Product> {
-    const response = await apiClient.get<{ data: Product }>(
-      `/products/${slug}`
-    );
+    const response = await apiClient.get<{ data: Product }>(`/products/${slug}`);
     return response.data.data;
   },
 
   /**
    * Get product stock information
    */
-  async getProductStock(
-    slug: ProductSlug,
-    size?: ProductSize
-  ): Promise<StockInfo> {
+  async getProductStock(slug: ProductSlug, size?: ProductSize): Promise<StockInfo> {
     const params = size ? { size } : {};
-    const response = await apiClient.get<{ data: StockInfo }>(
-      `/products/${slug}/stock`,
-      {
-        params,
-      }
-    );
+    const response = await apiClient.get<{ data: StockInfo }>(`/products/${slug}/stock`, {
+      params,
+    });
     return response.data.data;
   },
 };

@@ -27,6 +27,6 @@ export class RegisterCommand implements ICommand {
     public readonly email: string,
     public readonly password: string,
     public readonly fullName: string,
-    public readonly phone?: string
+    public readonly phone?: string,
   ) {}
 }

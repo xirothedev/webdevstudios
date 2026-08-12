@@ -94,9 +94,7 @@ async function main() {
   console.log(`\n📊 Summary:`);
   console.log(`- Author: ${adminUser.email}`);
   console.log(`- Total posts: ${createdPosts.length}`);
-  console.log(
-    `- Published: ${createdPosts.filter((p) => p.isPublished).length}`
-  );
+  console.log(`- Published: ${createdPosts.filter((p) => p.isPublished).length}`);
   console.log(`- Drafts: ${createdPosts.filter((p) => !p.isPublished).length}`);
 }
 

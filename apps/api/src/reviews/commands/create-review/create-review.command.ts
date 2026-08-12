@@ -27,6 +27,6 @@ export class CreateReviewCommand {
     public readonly userId: string,
     public readonly productSlug: ProductSlug,
     public readonly rating: number,
-    public readonly comment?: string | null
+    public readonly comment?: string | null,
   ) {}
 }

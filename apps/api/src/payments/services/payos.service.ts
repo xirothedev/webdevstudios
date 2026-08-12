@@ -34,8 +34,7 @@ export class PayOSService {
   constructor(private readonly configService: ConfigService) {
     const clientId = this.configService.getOrThrow<string>('PAYOS_CLIENT_ID');
     const apiKey = this.configService.getOrThrow<string>('PAYOS_API_KEY');
-    const checksumKey =
-      this.configService.getOrThrow<string>('PAYOS_CHECKSUM_KEY');
+    const checksumKey = this.configService.getOrThrow<string>('PAYOS_CHECKSUM_KEY');
 
     this.payOS = new PayOS({
       clientId,
@@ -66,12 +65,9 @@ export class PayOSService {
 
       // PayOS returns paymentLinkId, not transactionCode
       // Use paymentLinkId as transactionCode for our system
-      const transactionCode =
-        response.paymentLinkId || String(response.orderCode);
+      const transactionCode = response.paymentLinkId || String(response.orderCode);
 
-      this.logger.log(
-        `Payment link created: ${transactionCode} for order ${data.orderCode}`
-      );
+      this.logger.log(`Payment link created: ${transactionCode} for order ${data.orderCode}`);
 
       return {
         paymentUrl: response.checkoutUrl,
@@ -79,7 +75,7 @@ export class PayOSService {
       };
     } catch (error) {
       this.logger.error(
-        `Failed to create payment link: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to create payment link: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw error;
     }
@@ -107,12 +103,14 @@ export class PayOSService {
     try {
       // PayOS webhook verification using webhooks.verify()
       // This will throw an error if signature is invalid
-      // Cast to any to work around type issues - PayOS SDK will validate signature
-      const verifiedData = await this.payOS.webhooks.verify(webhookData as any);
+      // Cast to the SDK's expected shape - PayOS SDK will validate signature
+      const verifiedData = await this.payOS.webhooks.verify(
+        webhookData as unknown as Parameters<typeof this.payOS.webhooks.verify>[0],
+      );
       return verifiedData;
     } catch (error) {
       this.logger.error(
-        `Webhook verification failed: ${error instanceof Error ? error.message : String(error)}`
+        `Webhook verification failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw error;
     }
@@ -123,14 +121,12 @@ export class PayOSService {
       // Get payment link information by order code
       // PayOS API accepts either number (orderCode) or string (paymentLinkId)
       const orderCodeNum =
-        typeof orderCode === 'string'
-          ? parseInt(orderCode.replace('#', ''), 10)
-          : orderCode;
+        typeof orderCode === 'string' ? parseInt(orderCode.replace('#', ''), 10) : orderCode;
       const paymentInfo = await this.payOS.paymentRequests.get(orderCodeNum);
       return paymentInfo;
     } catch (error) {
       this.logger.error(
-        `Failed to get payment info: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to get payment info: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw error;
     }

@@ -33,6 +33,6 @@ export class UpdateEventCommand {
     public readonly type?: EventType,
     public readonly organizer?: string,
     public readonly attendees?: number,
-    public readonly surveyLink?: string
+    public readonly surveyLink?: string,
   ) {}
 }

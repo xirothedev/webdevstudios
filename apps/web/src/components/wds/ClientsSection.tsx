@@ -64,9 +64,9 @@ export function WDSClientsSection() {
             </div>
 
             <p className="text-base leading-relaxed text-gray-700 sm:text-lg md:text-xl">
-              WebDev Studios từng vinh dự được hợp tác và nhận sự tin tưởng từ
-              các đối tác uy tín. Chúng tôi tự hào về những dự án đã hoàn thành
-              và mối quan hệ hợp tác bền chặt với khách hàng.
+              WebDev Studios từng vinh dự được hợp tác và nhận sự tin tưởng từ các đối tác uy tín.
+              Chúng tôi tự hào về những dự án đã hoàn thành và mối quan hệ hợp tác bền chặt với
+              khách hàng.
             </p>
 
             <Link

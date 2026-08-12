@@ -22,12 +22,7 @@
 
 'use client';
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { CreateOrderRequest, ordersApi, OrderStatus } from '@/lib/api/orders';
@@ -36,8 +31,7 @@ import { CreateOrderRequest, ordersApi, OrderStatus } from '@/lib/api/orders';
 const orderKeys = {
   all: ['orders'] as const,
   lists: () => [...orderKeys.all, 'list'] as const,
-  list: (page?: number, limit?: number) =>
-    [...orderKeys.lists(), page, limit] as const,
+  list: (page?: number, limit?: number) => [...orderKeys.lists(), page, limit] as const,
   details: () => [...orderKeys.all, 'detail'] as const,
   detail: (id: string) => [...orderKeys.details(), id] as const,
 };
@@ -84,9 +78,7 @@ export function useCreateOrder() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể tạo đơn hàng. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể tạo đơn hàng. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -106,9 +98,7 @@ export function useCancelOrder() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể hủy đơn hàng. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể hủy đơn hàng. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -119,13 +109,8 @@ export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      orderId,
-      status,
-    }: {
-      orderId: string;
-      status: OrderStatus;
-    }) => ordersApi.updateOrderStatus(orderId, status),
+    mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
+      ordersApi.updateOrderStatus(orderId, status),
     onSuccess: (_, variables) => {
       // Invalidate order detail and orders list
       queryClient.invalidateQueries({

@@ -25,8 +25,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { StorageService } from '@/storage/storage.service';
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto } from '../../dtos/blog-post.dto';
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto } from '../../dtos';
 import { BlogRepository } from '../../infrastructure/blog.repository';
 import { UpdateBlogPostCommand } from './update-post.command';
 
@@ -35,20 +35,12 @@ import { UpdateBlogPostCommand } from './update-post.command';
 export class UpdateBlogPostHandler implements ICommandHandler<UpdateBlogPostCommand> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async execute(command: UpdateBlogPostCommand): Promise<BlogPostDto> {
-    const {
-      postId,
-      title,
-      content,
-      excerpt,
-      coverImage,
-      isPublished,
-      metaTitle,
-      metaDescription,
-    } = command;
+    const { postId, title, content, excerpt, coverImage, isPublished, metaTitle, metaDescription } =
+      command;
 
     const post = await this.blogRepository.findById(postId);
     if (!post) {
@@ -77,15 +69,11 @@ export class UpdateBlogPostHandler implements ICommandHandler<UpdateBlogPostComm
       }
     }
     if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
-    if (metaDescription !== undefined)
-      updateData.metaDescription = metaDescription;
+    if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
 
     // Handle content update
     if (content !== undefined) {
-      const newContentUrl = await this.storageService.uploadBlogContent(
-        postId,
-        content
-      );
+      const newContentUrl = await this.storageService.uploadBlogContent(postId, content);
       const contentSize = Buffer.from(content, 'utf-8').length;
       updateData.contentUrl = newContentUrl;
       updateData.contentSize = contentSize;
@@ -101,8 +89,7 @@ export class UpdateBlogPostHandler implements ICommandHandler<UpdateBlogPostComm
       }
 
       // Update excerpt if content changed
-      updateData.excerpt =
-        excerpt !== undefined ? excerpt : this.extractExcerpt(content);
+      updateData.excerpt = excerpt !== undefined ? excerpt : this.extractExcerpt(content);
     } else if (excerpt !== undefined) {
       updateData.excerpt = excerpt;
     }

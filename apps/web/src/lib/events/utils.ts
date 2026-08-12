@@ -25,19 +25,12 @@ import { vi } from 'date-fns/locale';
 
 import { Event, EventType } from './types';
 
-export function filterEventsByType(
-  events: Event[],
-  types: EventType[]
-): Event[] {
+export function filterEventsByType(events: Event[], types: EventType[]): Event[] {
   if (types.length === 0) return events;
   return events.filter((event) => types.includes(event.type));
 }
 
-export function getEventsByDateRange(
-  events: Event[],
-  start: Date,
-  end: Date
-): Event[] {
+export function getEventsByDateRange(events: Event[], start: Date, end: Date): Event[] {
   return events.filter((event) => {
     return event.start >= start && event.end <= end;
   });

@@ -24,7 +24,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ProductActions } from '@/components/shop/ProductActions';
@@ -49,10 +49,7 @@ interface ProductPageContentProps {
   productName: string;
 }
 
-function ProductContentInner({
-  productSlug,
-  productName,
-}: ProductPageContentProps) {
+function ProductContentInner({ productSlug, productName }: ProductPageContentProps) {
   const [selectedSize, setSelectedSize] = useState<ProductSize>('M');
   const [quantity, setQuantity] = useState(1);
 
@@ -86,10 +83,9 @@ function ProductContentInner({
           acc[ss.size] = ss.stock;
           return acc;
         },
-        {} as Record<ProductSize, number>
+        {} as Record<ProductSize, number>,
       );
-      const selectedSizeStock =
-        stockBySize?.[selectedSize] ?? product.stock ?? 0;
+      const selectedSizeStock = stockBySize?.[selectedSize] ?? product.stock ?? 0;
 
       // Validation: quantity must be valid
       if (quantity <= 0 || quantity > selectedSizeStock) {
@@ -130,9 +126,7 @@ function ProductContentInner({
       : product.stock || 0;
 
     if (quantity > availableStock) {
-      toast.error(
-        `Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock}`
-      );
+      toast.error(`Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock}`);
       return;
     }
 
@@ -141,7 +135,7 @@ function ProductContentInner({
     // Or we can show a modal to collect shipping address
     // For simplicity, redirect to checkout with product info in query params
     router.push(
-      `/checkout?buyNow=true&productId=${product.id}&productSlug=${BACKEND_SLUG}&size=${selectedSize}&quantity=${quantity}`
+      `/checkout?buyNow=true&productId=${product.id}&productSlug=${BACKEND_SLUG}&size=${selectedSize}&quantity=${quantity}`,
     );
   };
 
@@ -151,16 +145,15 @@ function ProductContentInner({
       acc[ss.size] = ss.stock;
       return acc;
     },
-    {} as Record<ProductSize, number>
+    {} as Record<ProductSize, number>,
   );
   const selectedSizeStock = stockBySize?.[selectedSize] ?? product?.stock ?? 0;
 
   // Reset quantity when size changes if current quantity exceeds new stock
-  useEffect(() => {
-    if (product && product.hasSizes && quantity > selectedSizeStock) {
-      setQuantity(selectedSizeStock > 0 ? selectedSizeStock : 1);
-    }
-  }, [selectedSize, selectedSizeStock, quantity, product]);
+  // (render-phase adjustment — React re-renders before committing)
+  if (product && product.hasSizes && quantity > selectedSizeStock) {
+    setQuantity(selectedSizeStock > 0 ? selectedSizeStock : 1);
+  }
 
   const increaseQuantity = () => {
     if (product?.hasSizes) {
@@ -202,10 +195,7 @@ function ProductContentInner({
       {/* Product Section */}
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
         {/* Left: Product Image */}
-        <ProductImageGallery
-          images={staticContent.images}
-          badge={product.badge || undefined}
-        />
+        <ProductImageGallery images={staticContent.images} badge={product.badge || undefined} />
 
         {/* Right: Product Info */}
         <div className="flex flex-col justify-center">
@@ -233,9 +223,7 @@ function ProductContentInner({
             onIncrease={increaseQuantity}
             onDecrease={decreaseQuantity}
             stock={product.hasSizes ? selectedSizeStock : product.stock}
-            max={
-              product.hasSizes ? (selectedSizeStock ?? 0) : (product.stock ?? 0)
-            }
+            max={product.hasSizes ? (selectedSizeStock ?? 0) : (product.stock ?? 0)}
           />
 
           {/* Add to Cart Button */}
@@ -258,9 +246,7 @@ function ProductContentInner({
 
       {/* Reviews Section */}
       <section className="mt-16">
-        <h2 className="mb-8 text-3xl font-bold text-white">
-          Đánh giá sản phẩm
-        </h2>
+        <h2 className="mb-8 text-3xl font-bold text-white">Đánh giá sản phẩm</h2>
 
         {/* Review Form - Only for authenticated users */}
         {isAuthenticated ? (
@@ -269,9 +255,7 @@ function ProductContentInner({
           </div>
         ) : (
           <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-6">
-            <p className="text-white/60">
-              Đăng nhập để viết đánh giá về sản phẩm này.
-            </p>
+            <p className="text-white/60">Đăng nhập để viết đánh giá về sản phẩm này.</p>
           </div>
         )}
 
@@ -299,10 +283,7 @@ function ProductLoading() {
           <div className="aspect-square w-full animate-pulse rounded-xl bg-white/10" />
           <div className="grid grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="aspect-square animate-pulse rounded-lg bg-white/10"
-              />
+              <div key={i} className="aspect-square animate-pulse rounded-lg bg-white/10" />
             ))}
           </div>
         </div>
@@ -322,16 +303,10 @@ function ProductLoading() {
   );
 }
 
-export function ProductPageContent({
-  productSlug,
-  productName,
-}: ProductPageContentProps) {
+export function ProductPageContent({ productSlug, productName }: ProductPageContentProps) {
   return (
     <Suspense fallback={<ProductLoading />}>
-      <ProductContentInner
-        productSlug={productSlug}
-        productName={productName}
-      />
+      <ProductContentInner productSlug={productSlug} productName={productName} />
     </Suspense>
   );
 }

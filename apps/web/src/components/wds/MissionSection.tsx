@@ -83,9 +83,8 @@ export function WDSMissionSection() {
 
             <div className="space-y-4">
               <p className="text-base leading-relaxed text-gray-700 sm:text-lg md:text-xl">
-                Các thành viên tuân thủ quy định của Hội sinh viên và Câu lạc
-                bộ. Tiếp thu, học hỏi kiến thức, nắm bắt xu hướng và công nghệ
-                mới. Tôn trọng, chia sẻ và có trách nhiệm.
+                Các thành viên tuân thủ quy định của Hội sinh viên và Câu lạc bộ. Tiếp thu, học hỏi
+                kiến thức, nắm bắt xu hướng và công nghệ mới. Tôn trọng, chia sẻ và có trách nhiệm.
               </p>
             </div>
 

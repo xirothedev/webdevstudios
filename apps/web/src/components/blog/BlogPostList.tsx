@@ -33,12 +33,7 @@ interface BlogPostListProps {
   pageSize: number;
 }
 
-export function BlogPostList({
-  posts,
-  total,
-  page,
-  pageSize,
-}: BlogPostListProps) {
+export function BlogPostList({ posts, total, page, pageSize }: BlogPostListProps) {
   const totalPages = Math.ceil(total / pageSize);
 
   if (posts.length === 0) {

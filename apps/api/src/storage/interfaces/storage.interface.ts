@@ -20,11 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-export type CacheStrategy =
-  | 'immutable'
-  | 'long-lived'
-  | 'short-lived'
-  | 'no-cache';
+export type CacheStrategy = 'immutable' | 'long-lived' | 'short-lived' | 'no-cache';
 
 export interface CacheOptions {
   /**

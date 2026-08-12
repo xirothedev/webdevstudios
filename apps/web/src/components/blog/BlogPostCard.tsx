@@ -54,9 +54,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           </h2>
 
           {post.excerpt && (
-            <p className="text-wds-text/70 mb-4 line-clamp-3 text-sm">
-              {post.excerpt}
-            </p>
+            <p className="text-wds-text/70 mb-4 line-clamp-3 text-sm">{post.excerpt}</p>
           )}
         </div>
 

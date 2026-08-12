@@ -65,13 +65,17 @@ function Verify2FAContent() {
 
   const verify2FAMutation = useVerify2FA();
   const code = watch('code');
+  const { mutate: submitCode } = verify2FAMutation;
 
   // Auto-submit when code has 6 digits
   useEffect(() => {
     if (code && code.length === 6 && !verify2FAMutation.isPending) {
-      handleSubmit(onSubmit)();
+      submitCode({
+        code,
+        sessionId: sessionId || undefined,
+      });
     }
-  }, [code, verify2FAMutation.isPending]);
+  }, [code, sessionId, verify2FAMutation.isPending, submitCode]);
 
   // Auto-focus on mount
   useEffect(() => {
@@ -96,9 +100,7 @@ function Verify2FAContent() {
     <AuthLayout variant="login">
       <div className="glass-card">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-white drop-shadow-lg">
-            Xác thực 2FA
-          </h2>
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg">Xác thực 2FA</h2>
           <p className="mt-2 text-sm text-white/70">
             Nhập mã 6 chữ số từ ứng dụng xác thực của bạn
           </p>
@@ -106,10 +108,7 @@ function Verify2FAContent() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
-            <label
-              htmlFor="code"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="code" className="block text-sm font-medium text-white/90">
               Mã xác thực
             </label>
             <Input
@@ -124,9 +123,7 @@ function Verify2FAContent() {
               className="glass-input text-center text-2xl tracking-widest"
               ref={inputRef}
             />
-            {errors.code && (
-              <p className="text-sm text-red-400">{errors.code.message}</p>
-            )}
+            {errors.code && <p className="text-sm text-red-400">{errors.code.message}</p>}
           </div>
 
           {verify2FAMutation.isError && (

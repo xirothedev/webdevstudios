@@ -59,9 +59,7 @@ export function AccountLayout({
         <Navbar variant="light" />
         <div className="flex min-h-[60vh] items-center justify-center">
           <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-base font-semibold text-gray-900">
-              {error.title}
-            </p>
+            <p className="text-base font-semibold text-gray-900">{error.title}</p>
             <p className="text-sm text-gray-600">{error.message}</p>
           </div>
         </div>
@@ -73,12 +71,7 @@ export function AccountLayout({
   return (
     <div className="min-h-screen bg-white">
       <Navbar variant="light" />
-      <AccountHero
-        icon={icon}
-        label={label}
-        title={title}
-        description={description}
-      />
+      <AccountHero icon={icon} label={label} title={title} description={description} />
       <section className="relative">
         <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">

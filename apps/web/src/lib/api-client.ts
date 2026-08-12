@@ -20,11 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 import { API_URL } from '@/lib/constants';
 import { clearCsrfToken, getCsrfToken } from '@/lib/csrf';
@@ -69,10 +65,7 @@ apiClient.interceptors.request.use(
 
     // Skip CSRF token for OAuth and webhook endpoints
     const skipCsrfPaths = ['/auth/oauth', '/payments/webhook', '/csrf-token'];
-    if (
-      config.url &&
-      skipCsrfPaths.some((path) => config.url?.includes(path))
-    ) {
+    if (config.url && skipCsrfPaths.some((path) => config.url?.includes(path))) {
       return config;
     }
 
@@ -92,7 +85,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor - handle errors and refresh token
@@ -130,17 +123,11 @@ apiClient.interceptors.response.use(
       originalRequest.url === '/auth/signup';
 
     const isRefreshEndpoint =
-      originalRequest.url?.includes('/auth/refresh') ||
-      originalRequest.url === '/auth/refresh';
+      originalRequest.url?.includes('/auth/refresh') || originalRequest.url === '/auth/refresh';
 
     // Don't refresh token for auth endpoints or refresh endpoint
     // Auth endpoints return 401 when credentials are wrong, not when token expired
-    if (
-      status === 401 &&
-      !originalRequest._retry &&
-      !isAuthEndpoint &&
-      !isRefreshEndpoint
-    ) {
+    if (status === 401 && !originalRequest._retry && !isAuthEndpoint && !isRefreshEndpoint) {
       if (isRefreshing) {
         // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
@@ -167,7 +154,7 @@ apiClient.interceptors.response.use(
           {},
           {
             withCredentials: true,
-          }
+          },
         );
 
         const { accessToken } = refreshResponse.data.data;
@@ -233,8 +220,7 @@ apiClient.interceptors.response.use(
     // Handle 403 Forbidden - might be CSRF token issue
     if (status === 403 && !originalRequest._retry) {
       const isCsrfEndpoint =
-        originalRequest.url?.includes('/csrf-token') ||
-        originalRequest.url === '/csrf-token';
+        originalRequest.url?.includes('/csrf-token') || originalRequest.url === '/csrf-token';
 
       // If not CSRF endpoint, try to refresh CSRF token and retry
       if (!isCsrfEndpoint) {
@@ -300,5 +286,5 @@ apiClient.interceptors.response.use(
       status,
       data: error.response.data,
     });
-  }
+  },
 );

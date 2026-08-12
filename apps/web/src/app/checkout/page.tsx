@@ -80,7 +80,7 @@ export default function CheckoutPage() {
   // Check for pending orders
   const { data: ordersData } = useOrders(1, 1);
   const pendingOrder = ordersData?.orders.find(
-    (order) => order.status === 'PENDING' && order.paymentStatus === 'PENDING'
+    (order) => order.status === 'PENDING' && order.paymentStatus === 'PENDING',
   );
 
   // Create order mutation
@@ -129,10 +129,7 @@ export default function CheckoutPage() {
     if (!isBuyNow && (!cart || cart.items.length === 0)) return;
 
     // For DIRECT_PURCHASE mode, check if required fields are present
-    if (
-      isBuyNow &&
-      (!buyNowProductId || !buyNowProductSlug || !buyNowQuantity)
-    ) {
+    if (isBuyNow && (!buyNowProductId || !buyNowProductSlug || !buyNowQuantity)) {
       toast.error('Thông tin sản phẩm không hợp lệ');
       return;
     }
@@ -218,16 +215,11 @@ export default function CheckoutPage() {
         <div className="mx-auto max-w-7xl px-6">
           <h1 className="mb-8 text-3xl font-bold text-white">Thanh toán</h1>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-1 gap-8 lg:grid-cols-3"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Shipping Address Form */}
             <div className="lg:col-span-2">
               <div className="mb-6 rounded-xl border border-white/10 bg-white/5 p-6">
-                <h2 className="mb-6 text-xl font-bold text-white">
-                  Thông tin giao hàng
-                </h2>
+                <h2 className="mb-6 text-xl font-bold text-white">Thông tin giao hàng</h2>
                 <div className="space-y-4">
                   <div>
                     <label
@@ -245,9 +237,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.fullName && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.fullName.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.fullName.message}</p>
                     )}
                   </div>
                   <div>
@@ -266,9 +256,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.phone && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.phone.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.phone.message}</p>
                     )}
                   </div>
                   <div>
@@ -287,9 +275,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.addressLine1 && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.addressLine1.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.addressLine1.message}</p>
                     )}
                   </div>
                   <div>
@@ -308,9 +294,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.ward && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.ward.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.ward.message}</p>
                     )}
                   </div>
                   <div>
@@ -329,9 +313,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.district && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.district.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.district.message}</p>
                     )}
                   </div>
                   <div>
@@ -350,9 +332,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.city && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.city.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.city.message}</p>
                     )}
                   </div>
                   <div>
@@ -371,9 +351,7 @@ export default function CheckoutPage() {
                       className="focus:border-wds-accent w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:outline-none"
                     />
                     {errors.postalCode && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {errors.postalCode.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-400">{errors.postalCode.message}</p>
                     )}
                   </div>
                 </div>
@@ -383,25 +361,19 @@ export default function CheckoutPage() {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 rounded-xl border border-white/10 bg-white/5 p-6">
-                <h2 className="mb-4 text-xl font-bold text-white">
-                  Tóm tắt đơn hàng
-                </h2>
+                <h2 className="mb-4 text-xl font-bold text-white">Tóm tắt đơn hàng</h2>
                 <div className="mb-6 space-y-3">
                   {isBuyNow ? (
                     <div className="flex justify-between text-sm text-white/80">
                       <span>
                         Mua trực tiếp
-                        {buyNowSize && ` (${buyNowSize})`} x{' '}
-                        {buyNowQuantity || 1}
+                        {buyNowSize && ` (${buyNowSize})`} x {buyNowQuantity || 1}
                       </span>
                       <span>Đang tính...</span>
                     </div>
                   ) : (
                     cart?.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex justify-between text-sm text-white/80"
-                      >
+                      <div key={item.id} className="flex justify-between text-sm text-white/80">
                         <span>
                           {item.productName}
                           {item.size && ` (${item.size})`} x {item.quantity}
@@ -412,20 +384,11 @@ export default function CheckoutPage() {
                   )}
                   <div className="flex justify-between border-t border-white/10 pt-3 text-white/80">
                     <span>Tạm tính:</span>
-                    <span>
-                      {isBuyNow
-                        ? 'Đang tính...'
-                        : formatPrice(cart?.totalAmount || 0)}
-                      ₫
-                    </span>
+                    <span>{isBuyNow ? 'Đang tính...' : formatPrice(cart?.totalAmount || 0)}₫</span>
                   </div>
                   <div className="flex justify-between text-white/80">
                     <span>Phí vận chuyển:</span>
-                    <span>
-                      {shippingFee === 0
-                        ? 'Miễn phí'
-                        : formatPrice(shippingFee) + '₫'}
-                    </span>
+                    <span>{shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee) + '₫'}</span>
                   </div>
                   <div className="flex justify-between border-t border-white/10 pt-3 text-lg font-bold text-white">
                     <span>Tổng cộng:</span>

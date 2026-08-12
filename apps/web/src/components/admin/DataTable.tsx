@@ -51,9 +51,7 @@ export function DataTable({
   isLoading = false,
   emptyMessage = 'No data available',
 }: DataTableProps) {
-  const visibleColumnsData = columns.filter((col) =>
-    visibleColumns.includes(col.id)
-  );
+  const visibleColumnsData = columns.filter((col) => visibleColumns.includes(col.id));
 
   if (isLoading) {
     return (
@@ -77,10 +75,7 @@ export function DataTable({
         <TableHeader>
           <TableRow className="border-wds-accent/20 hover:bg-wds-accent/5">
             {visibleColumnsData.map((column) => (
-              <TableHead
-                key={column.id}
-                className="text-wds-text font-semibold"
-              >
+              <TableHead key={column.id} className="text-wds-text font-semibold">
                 {column.label}
               </TableHead>
             ))}

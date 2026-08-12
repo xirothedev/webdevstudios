@@ -30,12 +30,7 @@ export const metadata: Metadata = createPageMetadata({
     'Áo thun chất lượng cao với logo WebDev Studios, size đa dạng. Thiết kế độc đáo dành riêng cho thành viên câu lạc bộ.',
   path: '/shop/ao-thun',
   image: SEO_IMAGES['/shop/ao-thun'],
-  keywords: [
-    'Áo thun WDS',
-    'WebDev Studios',
-    'Áo thun câu lạc bộ',
-    'Merchandise UIT',
-  ],
+  keywords: ['Áo thun WDS', 'WebDev Studios', 'Áo thun câu lạc bộ', 'Merchandise UIT'],
 });
 
 export default function AoThunLayout({

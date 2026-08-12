@@ -49,9 +49,7 @@ export default function ProductsPage() {
   const [activeTab, setActiveTab] = useState<'table' | 'editor'>('table');
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    columns.map((c) => c.id)
-  );
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id));
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'products'],
@@ -62,7 +60,7 @@ export default function ProductsPage() {
     data?.products.filter(
       (product) =>
         product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.slug.toLowerCase().includes(search.toLowerCase())
+        product.slug.toLowerCase().includes(search.toLowerCase()),
     ) || [];
 
   const tableData = filteredData.map((product) => ({
@@ -84,10 +82,7 @@ export default function ProductsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <AdminHeader
-        title="Products Management"
-        description="Quản lý sản phẩm trong hệ thống"
-      />
+      <AdminHeader title="Products Management" description="Quản lý sản phẩm trong hệ thống" />
       <div className="flex-1 space-y-4 p-6">
         <div className="border-wds-accent/20 flex items-center gap-2 border-b">
           <button

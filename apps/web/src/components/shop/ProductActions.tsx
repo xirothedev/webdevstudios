@@ -52,7 +52,7 @@ export function ProductActions({
         disabled={isAddingToCart || disabled}
         className={cn(
           'group bg-wds-accent hover:bg-wds-accent/90 hover:shadow-wds-accent/30 relative h-14 flex-1 overflow-hidden rounded-full font-semibold text-black transition-all hover:shadow-lg',
-          (isAddingToCart || disabled) && 'cursor-wait opacity-50'
+          (isAddingToCart || disabled) && 'cursor-wait opacity-50',
         )}
       >
         {isAddingToCart ? (
@@ -82,7 +82,7 @@ export function ProductActions({
           variant="outline"
           className={cn(
             'border-wds-accent/30 text-wds-accent hover:bg-wds-accent/10 h-14 rounded-full border px-6 font-semibold',
-            disabled && 'cursor-not-allowed opacity-50'
+            disabled && 'cursor-not-allowed opacity-50',
           )}
         >
           {buyNowText}

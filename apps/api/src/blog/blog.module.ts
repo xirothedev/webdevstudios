@@ -28,17 +28,17 @@ import { StorageModule } from '../storage/storage.module';
 // Controller
 import { BlogController } from './blog.controller';
 // Commands
-import { CreateBlogPostHandler } from './commands/create-post/create-post.handler';
-import { DeleteBlogPostHandler } from './commands/delete-post/delete-post.handler';
-import { PublishBlogPostHandler } from './commands/publish-post/publish-post.handler';
-import { UpdateBlogPostHandler } from './commands/update-post/update-post.handler';
+import { CreateBlogPostHandler } from './commands/create-post';
+import { DeleteBlogPostHandler } from './commands/delete-post';
+import { PublishBlogPostHandler } from './commands/publish-post';
+import { UpdateBlogPostHandler } from './commands/update-post';
 // Repository
 import { BlogRepository } from './infrastructure/blog.repository';
 // Queries
-import { GetBlogPostByIdHandler } from './queries/get-post-by-id/get-post-by-id.handler';
-import { GetBlogPostBySlugHandler } from './queries/get-post-by-slug/get-post-by-slug.handler';
-import { ListBlogPostsHandler } from './queries/list-posts/list-posts.handler';
-import { SearchBlogPostsHandler } from './queries/search-posts/search-posts.handler';
+import { GetBlogPostByIdHandler } from './queries/get-post-by-id';
+import { GetBlogPostBySlugHandler } from './queries/get-post-by-slug';
+import { ListBlogPostsHandler } from './queries/list-posts';
+import { SearchBlogPostsHandler } from './queries/search-posts';
 
 const CommandHandlers = [
   CreateBlogPostHandler,

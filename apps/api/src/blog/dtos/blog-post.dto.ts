@@ -84,8 +84,7 @@ export class BlogPostDto {
 
   @ApiPropertyOptional({
     description: 'Cover image URL',
-    example:
-      'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
+    example: 'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
     nullable: true,
   })
   coverImage: string | null;
@@ -124,8 +123,7 @@ export class BlogPostDto {
 
   @ApiPropertyOptional({
     description: 'SEO meta description',
-    example:
-      'Learn how to get started with Next.js in this comprehensive guide.',
+    example: 'Learn how to get started with Next.js in this comprehensive guide.',
     nullable: true,
   })
   metaDescription: string | null;

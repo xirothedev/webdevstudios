@@ -33,10 +33,7 @@ export function AuthFooter({ variant = 'login' }: AuthFooterProps) {
         {variant === 'login' ? (
           <>
             Chưa có tài khoản?{' '}
-            <Link
-              href="/auth/signup"
-              className="text-white hover:text-white/80"
-            >
+            <Link href="/auth/signup" className="text-white hover:text-white/80">
               Đăng kí
             </Link>
           </>

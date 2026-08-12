@@ -38,10 +38,7 @@ import { useResetPassword } from '@/lib/api/hooks/use-auth';
 // Validation schema with Zod
 const resetPasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(1, 'Mật khẩu là bắt buộc')
-      .min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+    password: z.string().min(1, 'Mật khẩu là bắt buộc').min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
     confirmPassword: z.string().min(1, 'Xác nhận mật khẩu là bắt buộc'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -94,12 +91,8 @@ function ResetPasswordContent() {
       <AuthLayout variant="login">
         <div className="glass-card">
           <div className="space-y-4 text-center">
-            <h2 className="text-2xl font-bold text-white drop-shadow-lg">
-              Token không hợp lệ
-            </h2>
-            <p className="text-white/70">
-              Link reset mật khẩu không hợp lệ hoặc đã hết hạn.
-            </p>
+            <h2 className="text-2xl font-bold text-white drop-shadow-lg">Token không hợp lệ</h2>
+            <p className="text-white/70">Link reset mật khẩu không hợp lệ hoặc đã hết hạn.</p>
             <Link href="/auth/login">
               <Button className="glass-button h-12 w-full text-base font-semibold">
                 Quay lại đăng nhập
@@ -124,20 +117,13 @@ function ResetPasswordContent() {
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-white">
-                Đặt lại mật khẩu thành công!
-              </h3>
+              <h3 className="text-lg font-semibold text-white">Đặt lại mật khẩu thành công!</h3>
               <p className="text-sm text-white/70">
-                Mật khẩu của bạn đã được cập nhật. Đang chuyển hướng đến trang
-                đăng nhập...
+                Mật khẩu của bạn đã được cập nhật. Đang chuyển hướng đến trang đăng nhập...
               </p>
             </div>
           </div>
@@ -150,20 +136,13 @@ function ResetPasswordContent() {
     <AuthLayout variant="login">
       <div className="glass-card">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-white drop-shadow-lg">
-            Đặt lại mật khẩu
-          </h2>
-          <p className="mt-2 text-sm text-white/70">
-            Nhập mật khẩu mới của bạn
-          </p>
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg">Đặt lại mật khẩu</h2>
+          <p className="mt-2 text-sm text-white/70">Nhập mật khẩu mới của bạn</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-white/90">
               Mật khẩu mới
             </label>
             <Input
@@ -174,16 +153,11 @@ function ResetPasswordContent() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.password && (
-              <p className="text-sm text-red-400">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-400">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/90">
               Xác nhận mật khẩu
             </label>
             <Input
@@ -195,9 +169,7 @@ function ResetPasswordContent() {
               className="glass-input"
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-red-400">
-                {errors.confirmPassword.message}
-              </p>
+              <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
             )}
           </div>
 

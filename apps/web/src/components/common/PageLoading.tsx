@@ -42,11 +42,7 @@ export function PageLoading({
 
   return (
     <div
-      className={
-        isLight
-          ? 'min-h-screen bg-white'
-          : 'bg-wds-background text-wds-text min-h-screen'
-      }
+      className={isLight ? 'min-h-screen bg-white' : 'bg-wds-background text-wds-text min-h-screen'}
     >
       {showNavbar && <Navbar variant={isLight ? 'light' : 'dark'} />}
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -56,13 +52,7 @@ export function PageLoading({
               isLight ? 'text-wds-accent' : 'text-wds-accent'
             }`}
           />
-          <p
-            className={
-              isLight ? 'text-sm text-gray-600' : 'text-sm text-white/80'
-            }
-          >
-            {message}
-          </p>
+          <p className={isLight ? 'text-sm text-gray-600' : 'text-sm text-white/80'}>{message}</p>
         </div>
       </div>
       {showFooter && <Footer variant={isLight ? 'light' : 'dark'} />}

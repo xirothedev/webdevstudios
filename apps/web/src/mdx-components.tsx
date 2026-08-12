@@ -49,9 +49,7 @@ function createHeading(level: 1 | 2 | 3) {
     };
     const Tag = tagMap[level];
     const text =
-      typeof children === 'string'
-        ? children
-        : React.Children.toArray(children).join(' ');
+      typeof children === 'string' ? children : React.Children.toArray(children).join(' ');
     const generatedId = id ?? (typeof text === 'string' ? slugify(text) : '');
 
     const base =
@@ -62,11 +60,7 @@ function createHeading(level: 1 | 2 | 3) {
           : 'scroll-mt-28 pt-4 text-sm font-semibold tracking-wide text-neutral-200';
 
     return (
-      <Tag
-        id={generatedId || undefined}
-        className={`${base} ${className ?? ''}`.trim()}
-        {...rest}
-      >
+      <Tag id={generatedId || undefined} className={`${base} ${className ?? ''}`.trim()} {...rest}>
         {children}
       </Tag>
     );
@@ -105,19 +99,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </li>
     ),
     strong: ({ className, ...props }) => (
-      <strong
-        className={`text-wds-text font-semibold ${className ?? ''}`.trim()}
-        {...props}
-      />
+      <strong className={`text-wds-text font-semibold ${className ?? ''}`.trim()} {...props} />
     ),
     em: ({ className, ...props }) => (
       <em className={`text-neutral-300 ${className ?? ''}`.trim()} {...props} />
     ),
     hr: ({ className, ...props }) => (
-      <hr
-        className={`my-8 border-white/10 ${className ?? ''}`.trim()}
-        {...props}
-      />
+      <hr className={`my-8 border-white/10 ${className ?? ''}`.trim()} {...props} />
     ),
     ...components,
   };

@@ -23,8 +23,8 @@
 import { ProductSize } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { CartWithItems } from '../types/cart.types';
+import { PrismaService } from '@/prisma';
+import { CartWithItems } from '../cart.types';
 
 @Injectable()
 export class CartRepository {
@@ -70,11 +70,7 @@ export class CartRepository {
     return cart;
   }
 
-  async findCartItem(
-    cartId: string,
-    productId: string,
-    size: ProductSize | null
-  ) {
+  async findCartItem(cartId: string, productId: string, size: ProductSize | null) {
     return this.prisma.cartItem.findFirst({
       where: {
         cartId,
@@ -84,12 +80,7 @@ export class CartRepository {
     });
   }
 
-  async addItem(
-    cartId: string,
-    productId: string,
-    size: ProductSize | null,
-    quantity: number
-  ) {
+  async addItem(cartId: string, productId: string, size: ProductSize | null, quantity: number) {
     // Find existing item first
     const existingItem = await this.prisma.cartItem.findFirst({
       where: {
@@ -139,9 +130,7 @@ export class CartRepository {
     });
   }
 
-  async getCartItemById(
-    cartItemId: string
-  ): Promise<CartWithItems['items'][0] | null> {
+  async getCartItemById(cartItemId: string): Promise<CartWithItems['items'][0] | null> {
     return this.prisma.cartItem.findUnique({
       where: { id: cartItemId },
       include: {

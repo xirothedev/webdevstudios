@@ -41,8 +41,8 @@ export default function FAQPage() {
               Giải đáp nhanh những câu hỏi về WebDev Studios
             </h1>
             <p className="text-base text-pretty text-gray-600 sm:text-lg">
-              Tất cả thông tin về tuyển thành viên, hoạt động, cơ hội học tập và
-              dự án. Nếu bạn còn câu hỏi khác, hãy liên hệ để được hỗ trợ ngay.
+              Tất cả thông tin về tuyển thành viên, hoạt động, cơ hội học tập và dự án. Nếu bạn còn
+              câu hỏi khác, hãy liên hệ để được hỗ trợ ngay.
             </p>
 
             <div className="mx-auto flex flex-wrap items-center justify-center gap-3">
@@ -69,12 +69,8 @@ export default function FAQPage() {
                 key={item.question}
                 className="group bg-wds-accent/10 border-wds-accent/30 hover:border-wds-accent/60 shadow-wds-accent/10 hover:shadow-wds-accent/20 relative flex flex-col gap-3 rounded-2xl border px-5 py-4 transition-shadow duration-200"
               >
-                <h2 className="text-base leading-snug font-semibold text-black">
-                  {item.question}
-                </h2>
-                <p className="text-sm leading-relaxed text-gray-700">
-                  {item.answer}
-                </p>
+                <h2 className="text-base leading-snug font-semibold text-black">{item.question}</h2>
+                <p className="text-sm leading-relaxed text-gray-700">{item.answer}</p>
               </article>
             ))}
           </div>
@@ -85,11 +81,8 @@ export default function FAQPage() {
                 Cần hỗ trợ thêm? Chúng tôi luôn sẵn sàng.
               </p>
               <p className="text-sm text-gray-600">
-                Gọi trực tiếp Chủ nhiệm:{' '}
-                <span className="font-semibold">0794161275</span> hoặc email:{' '}
-                <span className="font-semibold">
-                  webdevstudios.org@gmail.com
-                </span>
+                Gọi trực tiếp Chủ nhiệm: <span className="font-semibold">0794161275</span> hoặc
+                email: <span className="font-semibold">webdevstudios.org@gmail.com</span>
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

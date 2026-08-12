@@ -25,8 +25,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import type { AuthenticatedUser } from '@/types/express';
 
-import { CsrfService } from '../services/csrf.service';
-import { SecurityLoggerService } from '../services/security-logger.service';
+import { CsrfService, SecurityLoggerService } from '../services';
 
 /**
  * CSRF Protection Middleware
@@ -34,13 +33,11 @@ import { SecurityLoggerService } from '../services/security-logger.service';
  */
 @Injectable()
 export class CsrfMiddleware implements NestMiddleware {
-  private readonly csrfProtection: ReturnType<
-    typeof CsrfService.prototype.getProtection
-  >;
+  private readonly csrfProtection: ReturnType<typeof CsrfService.prototype.getProtection>;
 
   constructor(
     readonly csrfService: CsrfService,
-    private readonly securityLogger: SecurityLoggerService
+    private readonly securityLogger: SecurityLoggerService,
   ) {
     this.csrfProtection = csrfService.getProtection();
   }
@@ -81,12 +78,7 @@ export class CsrfMiddleware implements NestMiddleware {
       if (err) {
         // Log CSRF failure
         const user = req.user as AuthenticatedUser | undefined;
-        this.securityLogger.logCsrfFailure(
-          req.path,
-          req.method,
-          req.ip,
-          user?.id
-        );
+        this.securityLogger.logCsrfFailure(req.path, req.method, req.ip, user?.id);
         return next(err);
       }
       next();

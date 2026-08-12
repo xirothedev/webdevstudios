@@ -23,9 +23,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { ProductDto } from '../../dtos/product.dto';
+import { ProductDto } from '../../dtos';
 import { ProductRepository } from '../../infrastructure/product.repository';
-import { ProductWithRelations } from '../../types/product.types';
+import { ProductWithRelations } from '../../product.types';
 import { GetProductBySlugQuery } from './get-product-by-slug.query';
 
 @QueryHandler(GetProductBySlugQuery)
@@ -52,12 +52,8 @@ export class GetProductBySlugHandler implements IQueryHandler<GetProductBySlugQu
       name: product.name,
       description: product.description,
       priceCurrent: Number(product.priceCurrent),
-      priceOriginal: product.priceOriginal
-        ? Number(product.priceOriginal)
-        : null,
-      priceDiscount: product.priceDiscount
-        ? Number(product.priceDiscount)
-        : null,
+      priceOriginal: product.priceOriginal ? Number(product.priceOriginal) : null,
+      priceDiscount: product.priceDiscount ? Number(product.priceDiscount) : null,
       stock: product.stock,
       hasSizes: product.hasSizes,
       badge: product.badge,
@@ -75,14 +71,11 @@ export class GetProductBySlugHandler implements IQueryHandler<GetProductBySlugQu
   }
 
   private calculateStockStatus(
-    product: ProductWithRelations
+    product: ProductWithRelations,
   ): 'in_stock' | 'low_stock' | 'out_of_stock' {
     if (product.hasSizes && product.sizeStocks?.length > 0) {
       // For products with sizes, check if any size has stock
-      const totalStock = product.sizeStocks.reduce(
-        (sum, ss) => sum + ss.stock,
-        0
-      );
+      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
       if (totalStock === 0) return 'out_of_stock';
       if (totalStock < 5) return 'low_stock';
       return 'in_stock';

@@ -30,12 +30,7 @@ export const metadata: Metadata = createPageMetadata({
     'Điều khoản sử dụng của WebDev Studios - Quy định và điều kiện khi sử dụng website và dịch vụ của chúng tôi.',
   path: '/terms',
   image: SEO_IMAGES['/terms'],
-  keywords: [
-    'Điều khoản sử dụng',
-    'Terms of Service',
-    'WebDev Studios',
-    'Quy định',
-  ],
+  keywords: ['Điều khoản sử dụng', 'Terms of Service', 'WebDev Studios', 'Quy định'],
 });
 
 export default function TermsLayout({

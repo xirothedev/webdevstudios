@@ -96,9 +96,7 @@ function getFileModificationDate(filePath: string): string {
     const fs = require('fs');
     const path = require('path');
     // If path is not absolute, make it relative to cwd
-    const fullPath = path.isAbsolute(filePath)
-      ? filePath
-      : path.join(process.cwd(), filePath);
+    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
     const stats = fs.statSync(fullPath);
     // Return ISO date string for formatting with locale
     return stats.mtime.toISOString();

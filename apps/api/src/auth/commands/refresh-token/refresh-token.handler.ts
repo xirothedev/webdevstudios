@@ -24,9 +24,8 @@ import { SessionStatus } from '@generated/prisma';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { SessionRepository } from '../../infrastructure/session.repository';
-import { TokenService } from '../../infrastructure/token.service';
-import { TokenStorageService } from '../../infrastructure/token-storage.service';
+import { isBefore } from 'date-fns';
+import { SessionRepository, TokenService, TokenStorageService } from '../../infrastructure';
 import { RefreshTokenCommand } from './refresh-token.command';
 
 @Injectable()
@@ -35,7 +34,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
   constructor(
     private readonly sessionRepository: SessionRepository,
     private readonly tokenService: TokenService,
-    private readonly tokenStorage: TokenStorageService
+    private readonly tokenStorage: TokenStorageService,
   ) {}
 
   async execute(command: RefreshTokenCommand): Promise<{
@@ -53,14 +52,13 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
     }
 
     // Find session by refresh token
-    const session =
-      await this.sessionRepository.findByRefreshToken(refreshToken);
+    const session = await this.sessionRepository.findByRefreshToken(refreshToken);
     if (!session || session.status !== SessionStatus.ACTIVE) {
       throw new UnauthorizedException('Invalid or expired session');
     }
 
     // Check if session is expired
-    if (session.expiresAt < new Date()) {
+    if (isBefore(session.expiresAt, new Date())) {
       throw new UnauthorizedException('Session expired');
     }
 
@@ -76,16 +74,11 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
     });
 
     // Update session with new refresh token (refresh token rotation)
-    await this.sessionRepository.updateRefreshToken(
-      session.id,
-      newRefreshToken
-    );
+    await this.sessionRepository.updateRefreshToken(session.id, newRefreshToken);
 
     // Copy MFA verification status to new session (if it exists)
     // Check if old session had MFA verified
-    const mfaVerified = await this.tokenStorage.getSessionMfaVerified(
-      session.id
-    );
+    const mfaVerified = await this.tokenStorage.getSessionMfaVerified(session.id);
     if (mfaVerified) {
       // Calculate TTL from session expiration
       const ttl = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);

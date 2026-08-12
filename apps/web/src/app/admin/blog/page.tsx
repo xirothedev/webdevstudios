@@ -87,8 +87,8 @@ export default function AdminBlogPage() {
               <div className="mt-12 flex items-center justify-between">
                 <div className="text-wds-text/70 text-sm">
                   Hiển thị {(page - 1) * pageSize + 1} đến{' '}
-                  {Math.min(page * pageSize, postsData.total)} trong tổng số{' '}
-                  {postsData.total} bài viết
+                  {Math.min(page * pageSize, postsData.total)} trong tổng số {postsData.total} bài
+                  viết
                 </div>
                 <div className="flex gap-2">
                   <button

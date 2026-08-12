@@ -34,10 +34,7 @@ import { useCancelOrder, useSuspenseOrders } from '@/lib/api/hooks/use-orders';
 export function OrdersContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = useMemo(
-    () => parseInt(searchParams.get('page') || '1', 10),
-    [searchParams]
-  );
+  const page = useMemo(() => parseInt(searchParams.get('page') || '1', 10), [searchParams]);
   const limit = 10;
 
   // Fetch orders using Suspense Query
@@ -59,7 +56,7 @@ export function OrdersContent() {
       }
       router.push(`/orders?${params.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const handleCancel = useCallback(
@@ -67,7 +64,7 @@ export function OrdersContent() {
       if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return;
       cancelOrderMutation.mutate(orderId);
     },
-    [cancelOrderMutation]
+    [cancelOrderMutation],
   );
 
   // Empty state
@@ -91,8 +88,7 @@ export function OrdersContent() {
             order={order}
             onCancel={handleCancel}
             isCancelling={
-              cancelOrderMutation.isPending &&
-              cancelOrderMutation.variables === order.id
+              cancelOrderMutation.isPending && cancelOrderMutation.variables === order.id
             }
           />
         ))}
@@ -127,9 +123,7 @@ export function OrdersContent() {
 
                 return (
                   <div key={p} className="flex items-center gap-1">
-                    {showEllipsis && (
-                      <span className="px-2 text-white/60">...</span>
-                    )}
+                    {showEllipsis && <span className="px-2 text-white/60">...</span>}
                     <Button
                       onClick={() => handlePageChange(p)}
                       variant={p === page ? 'default' : 'outline'}

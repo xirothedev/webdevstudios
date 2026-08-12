@@ -23,7 +23,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { StockInfoDto } from '../../dtos/product.dto';
+import { StockInfoDto } from '../../dtos';
 import { ProductRepository } from '../../infrastructure/product.repository';
 import { GetProductStockQuery } from './get-product-stock.query';
 
@@ -51,9 +51,7 @@ export class GetProductStockHandler implements IQueryHandler<GetProductStockQuer
       if (size) {
         const sizeStock = sizeStocks.find((ss) => ss.size === size);
         if (!sizeStock) {
-          throw new NotFoundException(
-            `Size ${size} not found for product ${slug}`
-          );
+          throw new NotFoundException(`Size ${size} not found for product ${slug}`);
         }
 
         const stockStatus = this.calculateStockStatus(sizeStock.stock);
@@ -84,9 +82,7 @@ export class GetProductStockHandler implements IQueryHandler<GetProductStockQuer
     };
   }
 
-  private calculateStockStatus(
-    stock: number
-  ): 'in_stock' | 'low_stock' | 'out_of_stock' {
+  private calculateStockStatus(stock: number): 'in_stock' | 'low_stock' | 'out_of_stock' {
     if (stock === 0) return 'out_of_stock';
     if (stock < 5) return 'low_stock';
     return 'in_stock';

@@ -28,6 +28,6 @@ export class SearchUsersQuery {
     public readonly page: number = 1,
     public readonly limit: number = 10,
     public readonly requesterId?: string,
-    public readonly requesterRole?: UserRole
+    public readonly requesterRole?: UserRole,
   ) {}
 }

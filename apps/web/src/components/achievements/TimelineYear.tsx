@@ -32,11 +32,7 @@ interface TimelineYearProps {
   isLast?: boolean;
 }
 
-export function TimelineYear({
-  year,
-  items,
-  isLast = false,
-}: TimelineYearProps) {
+export function TimelineYear({ year, items, isLast = false }: TimelineYearProps) {
   return (
     <div className={`relative mb-16 ${isLast ? 'last:mb-0' : ''}`}>
       {/* Year Marker */}

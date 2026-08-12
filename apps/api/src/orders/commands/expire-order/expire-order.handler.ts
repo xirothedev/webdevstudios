@@ -20,15 +20,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  OrderStatus,
-  PaymentStatus,
-  PaymentTransactionStatus,
-} from '@generated/prisma';
+import { OrderStatus, PaymentStatus, PaymentTransactionStatus } from '@generated/prisma';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 import { OrderRepository } from '../../infrastructure/order.repository';
 import { ExpireOrderCommand } from './expire-order.command';
@@ -39,7 +35,7 @@ export class ExpireOrderHandler implements ICommandHandler<ExpireOrderCommand> {
 
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(command: ExpireOrderCommand): Promise<void> {
@@ -52,15 +48,13 @@ export class ExpireOrderHandler implements ICommandHandler<ExpireOrderCommand> {
 
     // Check if order can be expired (idempotent check)
     if (order.status !== OrderStatus.PENDING) {
-      this.logger.log(
-        `Order ${orderId} cannot be expired - status is ${order.status}`
-      );
+      this.logger.log(`Order ${orderId} cannot be expired - status is ${order.status}`);
       return; // Already processed, skip
     }
 
     if (order.paymentStatus !== PaymentStatus.PENDING) {
       this.logger.log(
-        `Order ${orderId} cannot be expired - payment status is ${order.paymentStatus}`
+        `Order ${orderId} cannot be expired - payment status is ${order.paymentStatus}`,
       );
       return; // Already processed, skip
     }
@@ -116,8 +110,6 @@ export class ExpireOrderHandler implements ICommandHandler<ExpireOrderCommand> {
       });
     });
 
-    this.logger.log(
-      `Order ${orderId} expired and stock restored after 15 minutes`
-    );
+    this.logger.log(`Order ${orderId} expired and stock restored after 15 minutes`);
   }
 }

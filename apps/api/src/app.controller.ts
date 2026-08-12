@@ -24,14 +24,14 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
 import { AppService } from './app.service';
-import { Public } from './common/decorators/public.decorator';
-import { CsrfService } from './common/services/csrf.service';
+import { Public } from '@/common/decorators';
+import { CsrfService } from '@/common/services';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly csrfService: CsrfService
+    private readonly csrfService: CsrfService,
   ) {}
 
   @Get()

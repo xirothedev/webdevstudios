@@ -24,7 +24,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -50,25 +50,22 @@ export default function UsersPage() {
   const [limit] = useState(10);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | undefined>();
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    columns.map((c) => c.id)
-  );
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map((c) => c.id));
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin', 'users', page, limit, roleFilter],
     queryFn: () => adminApi.listUsers(page, limit, roleFilter),
   });
 
-  const filteredData = useMemo(() => {
-    if (!data?.users) return [];
-    if (!search) return data.users;
-
-    return data.users.filter(
-      (user) =>
-        user.email.toLowerCase().includes(search.toLowerCase()) ||
-        user.fullName?.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data?.users, search]);
+  const filteredData = !data?.users
+    ? []
+    : !search
+      ? data.users
+      : data.users.filter(
+          (user) =>
+            user.email.toLowerCase().includes(search.toLowerCase()) ||
+            user.fullName?.toLowerCase().includes(search.toLowerCase()),
+        );
 
   const handleDelete = async (userId: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa user này?')) return;
@@ -98,10 +95,7 @@ export default function UsersPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <AdminHeader
-        title="Users Management"
-        description="Quản lý người dùng trong hệ thống"
-      />
+      <AdminHeader title="Users Management" description="Quản lý người dùng trong hệ thống" />
       <div className="flex-1 space-y-4 p-6">
         <div className="flex items-center justify-between">
           <TableFilters
@@ -118,8 +112,7 @@ export default function UsersPage() {
                   { value: 'CUSTOMER', label: 'Customer' },
                 ],
                 value: roleFilter || '',
-                onChange: (value) =>
-                  setRoleFilter(value ? (value as UserRole) : undefined),
+                onChange: (value) => setRoleFilter(value ? (value as UserRole) : undefined),
               },
             ]}
             onClear={() => {
@@ -143,8 +136,7 @@ export default function UsersPage() {
         {data && (
           <div className="text-wds-text/70 flex items-center justify-between text-sm">
             <div>
-              Showing {(page - 1) * limit + 1} to{' '}
-              {Math.min(page * limit, data.pagination.total)} of{' '}
+              Showing {(page - 1) * limit + 1} to {Math.min(page * limit, data.pagination.total)} of{' '}
               {data.pagination.total} users
             </div>
             <div className="flex gap-2">
@@ -156,9 +148,7 @@ export default function UsersPage() {
                 Previous
               </button>
               <button
-                onClick={() =>
-                  setPage((p) => Math.min(data.pagination.totalPages, p + 1))
-                }
+                onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
                 disabled={page >= data.pagination.totalPages}
                 className="border-wds-accent/30 bg-wds-background text-wds-text hover:bg-wds-accent/10 rounded-lg border px-4 py-2 disabled:opacity-50"
               >

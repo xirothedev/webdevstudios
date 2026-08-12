@@ -40,18 +40,13 @@ export function NewsletterCTA() {
           </div>
 
           <div className="relative z-10 mx-auto max-w-2xl">
-            <h2 className="mb-4 text-3xl font-bold text-white">
-              Đừng bỏ lỡ sự kiện tiếp theo!
-            </h2>
+            <h2 className="mb-4 text-3xl font-bold text-white">Đừng bỏ lỡ sự kiện tiếp theo!</h2>
             <p className="mb-8 text-gray-400">
-              Đăng ký nhận thông báo về các Workshop, Hackathon và sự kiện tuyển
-              thành viên mới nhất từ WebDev Studios.
+              Đăng ký nhận thông báo về các Workshop, Hackathon và sự kiện tuyển thành viên mới nhất
+              từ WebDev Studios.
             </p>
 
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col gap-3 sm:flex-row"
-            >
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="email"
                 placeholder="Nhập email sinh viên của bạn..."
@@ -66,8 +61,7 @@ export function NewsletterCTA() {
             </form>
 
             <p className="mt-4 text-xs text-gray-600">
-              *Chúng tôi cam kết không spam. Bạn có thể hủy đăng ký bất cứ lúc
-              nào.
+              *Chúng tôi cam kết không spam. Bạn có thể hủy đăng ký bất cứ lúc nào.
             </p>
           </div>
         </div>

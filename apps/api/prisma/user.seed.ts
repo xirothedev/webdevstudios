@@ -86,9 +86,7 @@ async function main() {
   });
 
   if (products.length === 0) {
-    console.log(
-      'No products found. Please run seed.ts first to create products.'
-    );
+    console.log('No products found. Please run seed.ts first to create products.');
     return;
   }
 
@@ -539,24 +537,14 @@ async function main() {
   console.log(`- User: ${user.email} (${user.role})`);
   console.log(`- Addresses: 2`);
   console.log(`- Orders: ${orders.length}`);
+  console.log(`  - PENDING: ${orders.filter((o) => o.status === OrderStatus.PENDING).length}`);
+  console.log(`  - CONFIRMED: ${orders.filter((o) => o.status === OrderStatus.CONFIRMED).length}`);
   console.log(
-    `  - PENDING: ${orders.filter((o) => o.status === OrderStatus.PENDING).length}`
+    `  - PROCESSING: ${orders.filter((o) => o.status === OrderStatus.PROCESSING).length}`,
   );
-  console.log(
-    `  - CONFIRMED: ${orders.filter((o) => o.status === OrderStatus.CONFIRMED).length}`
-  );
-  console.log(
-    `  - PROCESSING: ${orders.filter((o) => o.status === OrderStatus.PROCESSING).length}`
-  );
-  console.log(
-    `  - SHIPPING: ${orders.filter((o) => o.status === OrderStatus.SHIPPING).length}`
-  );
-  console.log(
-    `  - DELIVERED: ${orders.filter((o) => o.status === OrderStatus.DELIVERED).length}`
-  );
-  console.log(
-    `  - CANCELLED: ${orders.filter((o) => o.status === OrderStatus.CANCELLED).length}`
-  );
+  console.log(`  - SHIPPING: ${orders.filter((o) => o.status === OrderStatus.SHIPPING).length}`);
+  console.log(`  - DELIVERED: ${orders.filter((o) => o.status === OrderStatus.DELIVERED).length}`);
+  console.log(`  - CANCELLED: ${orders.filter((o) => o.status === OrderStatus.CANCELLED).length}`);
 }
 
 main()

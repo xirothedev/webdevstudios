@@ -28,6 +28,6 @@ export class UpdateProductCommand {
     public readonly priceCurrent?: number,
     public readonly priceOriginal?: number | null,
     public readonly badge?: string | null,
-    public readonly isPublished?: boolean
+    public readonly isPublished?: boolean,
   ) {}
 }

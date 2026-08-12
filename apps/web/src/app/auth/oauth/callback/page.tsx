@@ -44,11 +44,10 @@ export default function OAuthCallbackPage() {
             type: 'oauth-error',
             data: {
               error,
-              errorDescription:
-                errorDescription || 'OAuth authentication failed',
+              errorDescription: errorDescription || 'OAuth authentication failed',
             },
           },
-          allowedOrigin
+          allowedOrigin,
         );
       } else {
         window.opener.postMessage(
@@ -56,7 +55,7 @@ export default function OAuthCallbackPage() {
             type: 'oauth-success',
             data: { redirectUrl: redirectUrl || '/' },
           },
-          allowedOrigin
+          allowedOrigin,
         );
       }
     }

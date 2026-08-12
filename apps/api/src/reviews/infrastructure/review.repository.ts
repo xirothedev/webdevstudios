@@ -22,8 +22,8 @@
 
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { ReviewWithRelations } from '../types/review.types';
+import { PrismaService } from '@/prisma';
+import { ReviewWithRelations } from '../review.types';
 
 @Injectable()
 export class ReviewRepository {
@@ -84,7 +84,7 @@ export class ReviewRepository {
   async findByProductId(
     productId: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<{ reviews: ReviewWithRelations[]; total: number }> {
     const skip = (page - 1) * limit;
 
@@ -129,7 +129,7 @@ export class ReviewRepository {
 
   async update(
     id: string,
-    data: { rating?: number; comment?: string | null }
+    data: { rating?: number; comment?: string | null },
   ): Promise<ReviewWithRelations> {
     return this.prisma.review.update({
       where: { id },

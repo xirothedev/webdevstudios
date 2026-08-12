@@ -31,12 +31,15 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
 import * as UAParser from 'ua-parser-js';
 
-import { PrismaService } from '../../../prisma/prisma.service';
-import { SessionRepository } from '../../infrastructure/session.repository';
-import { TokenService } from '../../infrastructure/token.service';
-import { TokenStorageService } from '../../infrastructure/token-storage.service';
-import { TotpService } from '../../infrastructure/totp.service';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { addDays } from 'date-fns';
+import { PrismaService } from '@/prisma';
+import {
+  SessionRepository,
+  TokenService,
+  TokenStorageService,
+  TotpService,
+  UserRepository,
+} from '../../infrastructure';
 import { Verify2FACommand } from './verify-2fa.command';
 
 @Injectable()
@@ -48,7 +51,7 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
     private readonly totpService: TotpService,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(command: Verify2FACommand): Promise<{
@@ -137,8 +140,8 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
     if (sessionId) {
       // This is a login flow - create session
       // Find the pending session or create a new one
-      const user = await this.userRepository.findById(userId);
-      if (!user) {
+      const sessionUser = await this.userRepository.findById(userId);
+      if (!sessionUser) {
         throw new NotFoundException('User not found');
       }
 
@@ -152,7 +155,7 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
 
         const device = await this.prisma.device.create({
           data: {
-            userId: user.id,
+            userId: sessionUser.id,
             name: deviceName,
             type: deviceType,
             userAgent,
@@ -165,9 +168,9 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
 
       // Generate tokens
       const accessToken = this.tokenService.generateAccessToken({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
+        sub: sessionUser.id,
+        email: sessionUser.email,
+        role: sessionUser.role,
       });
 
       const refreshToken = this.tokenService.generateRefreshToken({
@@ -175,9 +178,9 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
       });
 
       // Create session
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      const expiresAt = addDays(new Date(), 7); // 7 days
       const session = await this.sessionRepository.create({
-        userId: user.id,
+        userId: sessionUser.id,
         token: accessToken,
         refreshToken,
         deviceId,
@@ -194,11 +197,11 @@ export class Verify2FAHandler implements ICommandHandler<Verify2FACommand> {
         accessToken,
         refreshToken,
         user: {
-          id: user.id,
-          email: user.email,
-          fullName: user.fullName,
-          emailVerified: user.emailVerified,
-          mfaEnabled: user.mfaEnabled,
+          id: sessionUser.id,
+          email: sessionUser.email,
+          fullName: sessionUser.fullName,
+          emailVerified: sessionUser.emailVerified,
+          mfaEnabled: sessionUser.mfaEnabled,
         },
       };
     }

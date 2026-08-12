@@ -25,8 +25,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { StorageService } from '@/storage/storage.service';
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto } from '../../dtos/blog-post.dto';
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto } from '../../dtos';
 import { BlogRepository } from '../../infrastructure/blog.repository';
 import { CreateBlogPostCommand } from './create-post.command';
 
@@ -35,7 +35,7 @@ import { CreateBlogPostCommand } from './create-post.command';
 export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostCommand> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async execute(command: CreateBlogPostCommand): Promise<BlogPostDto> {
@@ -54,16 +54,11 @@ export class CreateBlogPostHandler implements ICommandHandler<CreateBlogPostComm
     // Check if slug already exists
     const existingPost = await this.blogRepository.findBySlug(slug);
     if (existingPost) {
-      throw new ConflictException(
-        `Blog post with slug "${slug}" already exists`
-      );
+      throw new ConflictException(`Blog post with slug "${slug}" already exists`);
     }
 
     // Upload content to R2 using slug (unique identifier)
-    const contentUrl = await this.storageService.uploadBlogContent(
-      slug,
-      content
-    );
+    const contentUrl = await this.storageService.uploadBlogContent(slug, content);
     const contentSize = Buffer.from(content, 'utf-8').length;
 
     // Create post in database

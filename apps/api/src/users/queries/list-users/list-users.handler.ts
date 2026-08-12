@@ -22,31 +22,18 @@
 
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { PrismaService } from '../../../prisma/prisma.service';
-import { UserListResponseDto } from '../../dtos/responses.dto';
-import { PrivateUserDto } from '../../dtos/user.dto';
+import { UserRepository } from '@/auth/infrastructure';
+import { UserListResponseDto, PrivateUserDto } from '../../dtos';
 import { ListUsersQuery } from './list-users.query';
 
 @QueryHandler(ListUsersQuery)
 export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: ListUsersQuery): Promise<UserListResponseDto> {
     const { page, limit, role } = query;
 
-    const skip = (page - 1) * limit;
-
-    const where = role ? { role } : {};
-
-    const [users, total] = await Promise.all([
-      this.prisma.user.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.user.count({ where }),
-    ]);
+    const { users, total } = await this.userRepository.list(page, limit, role);
 
     const totalPages = Math.ceil(total / limit);
 

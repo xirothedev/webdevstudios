@@ -22,11 +22,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  doubleCsrf,
-  DoubleCsrfConfigOptions,
-  DoubleCsrfUtilities,
-} from 'csrf-csrf';
+import { doubleCsrf, DoubleCsrfConfigOptions, DoubleCsrfUtilities } from 'csrf-csrf';
 import type { Request, Response } from 'express';
 
 /**

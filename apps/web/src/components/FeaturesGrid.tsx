@@ -34,11 +34,7 @@ interface GlassCardProps {
   colSpan?: string;
 }
 
-function GlassCard({
-  children,
-  className = '',
-  colSpan = 'col-span-1',
-}: GlassCardProps) {
+function GlassCard({ children, className = '', colSpan = 'col-span-1' }: GlassCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -107,8 +103,8 @@ export function FeaturesGrid() {
             Bộ sưu tập <span className="text-white/50">độc quyền.</span>
           </h2>
           <p className="max-w-lg text-white/70">
-            Khám phá các sản phẩm được thiết kế riêng cho thành viên WebDev
-            Studios với chất lượng cao và thiết kế độc đáo.
+            Khám phá các sản phẩm được thiết kế riêng cho thành viên WebDev Studios với chất lượng
+            cao và thiết kế độc đáo.
           </p>
         </div>
 
@@ -128,12 +124,9 @@ export function FeaturesGrid() {
                   <div className="border-wds-accent/30 bg-wds-accent/10 text-wds-accent shadow-wds-accent/20 mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border shadow-lg">
                     <Shirt className="h-7 w-7" />
                   </div>
-                  <h3 className="mb-2 text-2xl font-bold text-white">
-                    Áo thun WebDev Studios
-                  </h3>
+                  <h3 className="mb-2 text-2xl font-bold text-white">Áo thun WebDev Studios</h3>
                   <p className="max-w-md text-sm text-white/60">
-                    Áo thun chất lượng cao với logo WebDev Studios, size đa
-                    dạng. Thiết kế độc đáo.
+                    Áo thun chất lượng cao với logo WebDev Studios, size đa dạng. Thiết kế độc đáo.
                   </p>
                 </div>
 
@@ -173,13 +166,10 @@ export function FeaturesGrid() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-400/30 bg-purple-400/10 text-purple-400 shadow-lg shadow-purple-400/20">
                   <Circle className="h-6 w-6" />
                 </div>
-                <h3 className="mb-2 text-xl font-bold text-white">
-                  Móc khóa WebDev Studios
-                </h3>
+                <h3 className="mb-2 text-xl font-bold text-white">Móc khóa WebDev Studios</h3>
                 <p className="mb-4 flex-1 text-sm text-white/60">
-                  Móc khóa kim loại với logo WebDev Studios, thiết kế độc đáo và
-                  bền chắc. Phù hợp để treo chìa khóa, túi xách hoặc làm vật
-                  trang trí.
+                  Móc khóa kim loại với logo WebDev Studios, thiết kế độc đáo và bền chắc. Phù hợp
+                  để treo chìa khóa, túi xách hoặc làm vật trang trí.
                 </p>
 
                 <Link href="/shop/moc-khoa" className="cursor-pointer">
@@ -213,12 +203,10 @@ export function FeaturesGrid() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 shadow-lg shadow-emerald-400/20">
                   <ShoppingBag className="h-6 w-6" />
                 </div>
-                <h3 className="mb-2 text-xl font-bold text-white">
-                  Dây đeo WebDev Studios
-                </h3>
+                <h3 className="mb-2 text-xl font-bold text-white">Dây đeo WebDev Studios</h3>
                 <p className="mb-4 flex-1 text-sm text-white/60">
-                  Dây đeo (lanyard) nằm ngang với branding WebDev Studios, tiện
-                  lợi cho thẻ nhân viên, thẻ hội viên hoặc keychain.
+                  Dây đeo (lanyard) nằm ngang với branding WebDev Studios, tiện lợi cho thẻ nhân
+                  viên, thẻ hội viên hoặc keychain.
                 </p>
 
                 <Link href="/shop/day-deo" className="cursor-pointer">
@@ -281,16 +269,12 @@ export function FeaturesGrid() {
                     Pad chuột WebDev Studios Limited Edition
                   </h3>
                   <p className="text-sm text-white/60">
-                    Pad chuột cỡ lớn phiên bản giới hạn với thiết kế WebDev
-                    Studios, tối ưu cho developer và designer thường xuyên dùng
-                    chuột.
+                    Pad chuột cỡ lớn phiên bản giới hạn với thiết kế WebDev Studios, tối ưu cho
+                    developer và designer thường xuyên dùng chuột.
                   </p>
                 </div>
 
-                <Link
-                  href="/shop/pad-chuot"
-                  className="hidden cursor-pointer sm:block"
-                >
+                <Link href="/shop/pad-chuot" className="hidden cursor-pointer sm:block">
                   <motion.div
                     className="relative h-56 w-56"
                     whileHover={{ scale: 1.08, rotate: 360 }}

@@ -63,7 +63,7 @@ export default function NotFound() {
         animateX: Math.random() * 400 - 200,
         animateY: Math.random() * 400 - 200,
         duration: 3 + Math.random() * 2,
-      }))
+      })),
     );
   }, []);
 
@@ -149,13 +149,10 @@ export default function NotFound() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-12"
           >
-            <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
-              Trang không tồn tại
-            </h2>
+            <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Trang không tồn tại</h2>
             <p className="mx-auto max-w-lg text-lg text-white/70">
-              Có vẻ như trang bạn đang tìm kiếm không tồn tại hoặc đã bị di
-              chuyển. Hãy quay lại trang chủ hoặc khám phá các sản phẩm của
-              chúng tôi.
+              Có vẻ như trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển. Hãy quay lại
+              trang chủ hoặc khám phá các sản phẩm của chúng tôi.
             </p>
           </motion.div>
 

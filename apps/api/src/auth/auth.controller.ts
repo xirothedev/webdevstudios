@@ -44,51 +44,49 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 
-import { Public } from '../common/decorators/public.decorator';
 import {
+  Public,
   Throttle2FA,
   ThrottleOAuth,
   ThrottlePasswordReset,
   ThrottleRefresh,
   ThrottleStrict,
-} from '../common/decorators/throttle.decorator';
-import { JwtAuthGuard } from '../common/guards/jwt.guard';
+} from '@/common/decorators';
+import { JwtAuthGuard } from '@/common/guards';
 // Commands
-import { Enable2FACommand } from './commands/enable-2fa/enable-2fa.command';
-import { LoginCommand } from './commands/login/login.command';
-import { LogoutCommand } from './commands/logout/logout.command';
-import { RefreshTokenCommand } from './commands/refresh-token/refresh-token.command';
-import { RegisterCommand } from './commands/register/register.command';
-import { RequestPasswordResetCommand } from './commands/request-password-reset/request-password-reset.command';
-import { ResetPasswordCommand } from './commands/reset-password/reset-password.command';
-import { Verify2FACommand } from './commands/verify-2fa/verify-2fa.command';
-import { VerifyEmailCommand } from './commands/verify-email/verify-email.command';
+import { Enable2FACommand } from './commands/enable-2fa';
+import { LoginCommand } from './commands/login';
+import { LogoutCommand } from './commands/logout';
+import { RefreshTokenCommand } from './commands/refresh-token';
+import { RegisterCommand } from './commands/register';
+import { RequestPasswordResetCommand } from './commands/request-password-reset';
+import { ResetPasswordCommand } from './commands/reset-password';
+import { Verify2FACommand } from './commands/verify-2fa';
+import { VerifyEmailCommand } from './commands/verify-email';
 import { CurrentUser } from './decorators/current-user.decorator';
 // DTOs
-import { LoginDto } from './dtos/login.dto';
-import { RegisterDto } from './dtos/register.dto';
-import { RequestPasswordResetDto } from './dtos/request-password-reset.dto';
-import { ResetPasswordDto } from './dtos/reset-password.dto';
 import {
   Enable2FAResponseDto,
+  LoginDto,
   LoginResponseDto,
   OAuthCallbackResponseDto,
   RefreshTokenResponseDto,
+  RegisterDto,
   RegisterResponseDto,
+  RequestPasswordResetDto,
+  ResetPasswordDto,
   SessionResponseDto,
   SuccessResponseDto,
   UserResponseDto,
+  Verify2FADto,
   Verify2FAResponseDto,
-} from './dtos/responses.dto';
-import { Verify2FADto } from './dtos/verify-2fa.dto';
-import { VerifyEmailDto } from './dtos/verify-email.dto';
-import { GitHubOAuthGuard } from './guards/github-oauth.guard';
-import { GoogleOAuthGuard } from './guards/google-oauth.guard';
+  VerifyEmailDto,
+} from './dtos';
+import { GitHubOAuthGuard, GoogleOAuthGuard } from './guards';
 // Queries
-import { GetCurrentUserQuery } from './queries/get-current-user/get-current-user.query';
-import { GetSessionsQuery } from './queries/get-sessions/get-sessions.query';
-import { OAuthService } from './services/oauth.service';
-import { OAuthRedirectService } from './services/oauth-redirect.service';
+import { GetCurrentUserQuery } from './queries/get-current-user';
+import { GetSessionsQuery } from './queries/get-sessions';
+import { OAuthService, type OAuthUser, OAuthRedirectService } from './services';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -97,7 +95,7 @@ export class AuthController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly oauthService: OAuthService,
-    private readonly oauthRedirectService: OAuthRedirectService
+    private readonly oauthRedirectService: OAuthRedirectService,
   ) {}
 
   @Public()
@@ -120,7 +118,7 @@ export class AuthController {
   })
   async register(@Body() dto: RegisterDto) {
     return this.commandBus.execute(
-      new RegisterCommand(dto.email, dto.password, dto.fullName, dto.phone)
+      new RegisterCommand(dto.email, dto.password, dto.fullName, dto.phone),
     );
   }
 
@@ -150,27 +148,19 @@ export class AuthController {
   async login(
     @Body() dto: LoginDto,
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
 
     const result = await this.commandBus.execute(
-      new LoginCommand(
-        dto.email,
-        dto.password,
-        dto.rememberMe,
-        ipAddress,
-        userAgent
-      )
+      new LoginCommand(dto.email, dto.password, dto.rememberMe, ipAddress, userAgent),
     );
 
     // Set cookies if login successful (not 2FA required)
     if (!result.requires2FA && result.accessToken && result.refreshToken) {
       const isProduction = process.env.NODE_ENV === 'production';
-      const maxAge = dto.rememberMe
-        ? 30 * 24 * 60 * 60 * 1000
-        : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
+      const maxAge = dto.rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
 
       // Set access token cookie
       res.cookie('access_token', result.accessToken, {
@@ -257,18 +247,15 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-    @Body('refreshToken') refreshToken?: string
+    @Body('refreshToken') refreshToken?: string,
   ) {
     // Get refresh token from cookie if not provided in body
-    console.log(req.cookies);
     const token = refreshToken || req.cookies?.refresh_token;
     if (!token) {
       throw new BadRequestException('Refresh token is required');
     }
 
-    const result = await this.commandBus.execute(
-      new RefreshTokenCommand(token)
-    );
+    const result = await this.commandBus.execute(new RefreshTokenCommand(token));
 
     // Set new cookies
     const isProduction = process.env.NODE_ENV === 'production';
@@ -308,8 +295,7 @@ export class AuthController {
       properties: {
         sessionId: {
           type: 'string',
-          description:
-            'Specific session ID to revoke (optional, revokes all if not provided)',
+          description: 'Specific session ID to revoke (optional, revokes all if not provided)',
           example: 'clx1234567890',
         },
       },
@@ -329,11 +315,9 @@ export class AuthController {
     @CurrentUser() user: { id: string },
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-    @Body('sessionId') sessionId?: string
+    @Body('sessionId') sessionId?: string,
   ) {
-    const result = await this.commandBus.execute(
-      new LogoutCommand(user.id, sessionId)
-    );
+    const result = await this.commandBus.execute(new LogoutCommand(user.id, sessionId));
 
     // Clear cookies
     res.clearCookie('access_token', { path: '/' });
@@ -431,19 +415,13 @@ export class AuthController {
     @Body() dto: Verify2FADto,
     @CurrentUser() user: { id: string },
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
 
     const result = await this.commandBus.execute(
-      new Verify2FACommand(
-        user.id,
-        dto.code,
-        dto.sessionId,
-        ipAddress,
-        userAgent
-      )
+      new Verify2FACommand(user.id, dto.code, dto.sessionId, ipAddress, userAgent),
     );
 
     // Set cookies if login flow (tokens returned)
@@ -487,10 +465,7 @@ export class AuthController {
     status: 302,
     description: 'Redirect to Google OAuth',
   })
-  async initiateGoogleOAuth(
-    @Query('redirect_url') redirectUrl?: string,
-    @Req() req?: Request
-  ) {
+  async initiateGoogleOAuth(@Query('redirect_url') redirectUrl?: string, @Req() req?: Request) {
     // Store redirect_url in session to retrieve in callback
     if (redirectUrl && req?.session) {
       req.session.oauthRedirectUrl = redirectUrl;
@@ -527,20 +502,10 @@ export class AuthController {
     const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
-    const oauthUser = req.user as {
-      provider: string;
-      providerId: string;
-      email: string;
-      name?: string;
-      picture?: string;
-    };
+    const oauthUser = req.user as OAuthUser;
 
     try {
-      const result = await this.oauthService.handleOAuthCallback(
-        oauthUser as any,
-        ipAddress,
-        userAgent
-      );
+      const result = await this.oauthService.handleOAuthCallback(oauthUser, ipAddress, userAgent);
 
       // Use service to handle success redirect
       this.oauthRedirectService.handleSuccess(res, result, redirectUrl);
@@ -567,10 +532,7 @@ export class AuthController {
     status: 302,
     description: 'Redirect to GitHub OAuth',
   })
-  async initiateGitHubOAuth(
-    @Query('redirect_url') redirectUrl?: string,
-    @Req() req?: Request
-  ) {
+  async initiateGitHubOAuth(@Query('redirect_url') redirectUrl?: string, @Req() req?: Request) {
     // Store redirect_url in session to retrieve in callback
     if (redirectUrl && req?.session) {
       req.session.oauthRedirectUrl = redirectUrl;
@@ -607,20 +569,10 @@ export class AuthController {
     const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
-    const oauthUser = req.user as {
-      provider: string;
-      providerId: string;
-      email: string;
-      name?: string;
-      picture?: string;
-    };
+    const oauthUser = req.user as OAuthUser;
 
     try {
-      const result = await this.oauthService.handleOAuthCallback(
-        oauthUser as any,
-        ipAddress,
-        userAgent
-      );
+      const result = await this.oauthService.handleOAuthCallback(oauthUser, ipAddress, userAgent);
 
       // Use service to handle success redirect
       this.oauthRedirectService.handleSuccess(res, result, redirectUrl);
@@ -641,8 +593,7 @@ export class AuthController {
   @ApiBody({ type: RequestPasswordResetDto })
   @ApiResponse({
     status: 200,
-    description:
-      'Password reset email sent (always returns success for security)',
+    description: 'Password reset email sent (always returns success for security)',
     type: SuccessResponseDto,
   })
   async requestPasswordReset(@Body() dto: RequestPasswordResetDto) {
@@ -668,8 +619,6 @@ export class AuthController {
     description: 'Invalid or expired reset token',
   })
   async resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.commandBus.execute(
-      new ResetPasswordCommand(dto.token, dto.newPassword)
-    );
+    return this.commandBus.execute(new ResetPasswordCommand(dto.token, dto.newPassword));
   }
 }

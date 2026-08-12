@@ -23,8 +23,8 @@
 import { Product, ProductSize, ProductSlug } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { ProductWithRelations } from '../types/product.types';
+import { PrismaService } from '@/prisma';
+import { ProductWithRelations } from '../product.types';
 
 @Injectable()
 export class ProductRepository {
@@ -64,10 +64,7 @@ export class ProductRepository {
     });
   }
 
-  async getStockBySize(
-    productId: string,
-    size: ProductSize
-  ): Promise<number | null> {
+  async getStockBySize(productId: string, size: ProductSize): Promise<number | null> {
     const sizeStock = await this.prisma.productSizeStock.findUnique({
       where: {
         productId_size: {
@@ -87,11 +84,7 @@ export class ProductRepository {
     });
   }
 
-  async updateSizeStock(
-    productId: string,
-    size: ProductSize,
-    stock: number
-  ): Promise<void> {
+  async updateSizeStock(productId: string, size: ProductSize, stock: number): Promise<void> {
     await this.prisma.productSizeStock.upsert({
       where: {
         productId_size: {
@@ -132,11 +125,7 @@ export class ProductRepository {
     });
   }
 
-  async decrementSizeStock(
-    productId: string,
-    size: ProductSize,
-    quantity: number
-  ): Promise<void> {
+  async decrementSizeStock(productId: string, size: ProductSize, quantity: number): Promise<void> {
     await this.prisma.productSizeStock.update({
       where: {
         productId_size: {
@@ -163,11 +152,7 @@ export class ProductRepository {
     });
   }
 
-  async incrementSizeStock(
-    productId: string,
-    size: ProductSize,
-    quantity: number
-  ): Promise<void> {
+  async incrementSizeStock(productId: string, size: ProductSize, quantity: number): Promise<void> {
     await this.prisma.productSizeStock.update({
       where: {
         productId_size: {
@@ -186,7 +171,7 @@ export class ProductRepository {
   async updateRating(
     productId: string,
     ratingValue: number,
-    ratingCount: number
+    ratingCount: number,
   ): Promise<Product> {
     return this.prisma.product.update({
       where: { id: productId },
@@ -206,7 +191,7 @@ export class ProductRepository {
       priceOriginal?: number | null;
       badge?: string | null;
       isPublished?: boolean;
-    }
+    },
   ): Promise<Product> {
     const updateData: {
       name?: string;
@@ -219,15 +204,11 @@ export class ProductRepository {
     } = {};
 
     if (data.name !== undefined) updateData.name = data.name;
-    if (data.description !== undefined)
-      updateData.description = data.description;
-    if (data.priceCurrent !== undefined)
-      updateData.priceCurrent = data.priceCurrent;
-    if (data.priceOriginal !== undefined)
-      updateData.priceOriginal = data.priceOriginal;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.priceCurrent !== undefined) updateData.priceCurrent = data.priceCurrent;
+    if (data.priceOriginal !== undefined) updateData.priceOriginal = data.priceOriginal;
     if (data.badge !== undefined) updateData.badge = data.badge;
-    if (data.isPublished !== undefined)
-      updateData.isPublished = data.isPublished;
+    if (data.isPublished !== undefined) updateData.isPublished = data.isPublished;
 
     // Calculate priceDiscount if both prices are provided
     const currentPrice = data.priceCurrent;

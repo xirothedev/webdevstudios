@@ -35,7 +35,7 @@ export class DeleteBlogPostHandler implements ICommandHandler<DeleteBlogPostComm
 
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async execute(command: DeleteBlogPostCommand): Promise<void> {
@@ -57,9 +57,7 @@ export class DeleteBlogPostHandler implements ICommandHandler<DeleteBlogPostComm
     // Delete cover image from R2 if exists
     if (post.coverImage) {
       try {
-        const coverImageKey = this.storageService.extractKeyFromUrl(
-          post.coverImage
-        );
+        const coverImageKey = this.storageService.extractKeyFromUrl(post.coverImage);
         if (coverImageKey) {
           await this.storageService.deleteFile(coverImageKey);
         }

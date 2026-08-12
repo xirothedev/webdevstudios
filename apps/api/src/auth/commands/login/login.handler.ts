@@ -21,20 +21,19 @@
  */
 
 import { DeviceType } from '@generated/prisma';
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
 import * as UAParser from 'ua-parser-js';
 
-import { PrismaService } from '../../../prisma/prisma.service';
-import { SessionRepository } from '../../infrastructure/session.repository';
-import { TokenService } from '../../infrastructure/token.service';
-import { TokenStorageService } from '../../infrastructure/token-storage.service';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { addSeconds } from 'date-fns';
+import { PrismaService } from '@/prisma';
+import {
+  SessionRepository,
+  TokenService,
+  TokenStorageService,
+  UserRepository,
+} from '../../infrastructure';
 import { LoginCommand } from './login.command';
 
 @Injectable()
@@ -45,7 +44,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     private readonly sessionRepository: SessionRepository,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(command: LoginCommand): Promise<{
@@ -81,9 +80,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     // Check email verification
     if (!user.emailVerified) {
-      throw new BadRequestException(
-        'Please verify your email before logging in'
-      );
+      throw new BadRequestException('Please verify your email before logging in');
     }
 
     // Check if 2FA is enabled
@@ -137,7 +134,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     // Calculate expiration
     const expiresIn = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60; // 30 days or 7 days
-    const expiresAt = new Date(Date.now() + expiresIn * 1000);
+    const expiresAt = addSeconds(new Date(), expiresIn);
 
     // Create session
     const session = await this.sessionRepository.create({

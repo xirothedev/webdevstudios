@@ -159,8 +159,7 @@ export class UserListResponseDto {
 
 export class SearchUsersResponseDto {
   @ApiProperty({
-    description:
-      'List of users (public or private data based on requester role)',
+    description: 'List of users (public or private data based on requester role)',
     oneOf: [
       { type: 'array', items: { $ref: '#/components/schemas/PublicUserDto' } },
       { type: 'array', items: { $ref: '#/components/schemas/PrivateUserDto' } },

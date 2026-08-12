@@ -24,13 +24,16 @@ import { DeviceType, OAuthProvider } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import * as UAParser from 'ua-parser-js';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { SessionRepository } from '../infrastructure/session.repository';
-import { TokenService } from '../infrastructure/token.service';
-import { TokenStorageService } from '../infrastructure/token-storage.service';
-import { UserRepository } from '../infrastructure/user.repository';
+import { addDays } from 'date-fns';
+import { PrismaService } from '@/prisma';
+import {
+  SessionRepository,
+  TokenService,
+  TokenStorageService,
+  UserRepository,
+} from '../infrastructure';
 
-interface OAuthUser {
+export interface OAuthUser {
   provider: OAuthProvider;
   providerId: string;
   email: string;
@@ -45,13 +48,13 @@ export class OAuthService {
     private readonly sessionRepository: SessionRepository,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async handleOAuthCallback(
     oauthUser: OAuthUser,
     ipAddress?: string,
-    userAgent?: string
+    userAgent?: string,
   ): Promise<{
     accessToken: string;
     refreshToken: string;
@@ -82,6 +85,13 @@ export class OAuthService {
     if (externalAccount) {
       // User exists - login
       user = externalAccount.user;
+      // Update provider email to reflect current provider state
+      await this.prisma.externalAccount.update({
+        where: {
+          provider_providerId: { provider, providerId },
+        },
+        data: { providerEmail: email },
+      });
     } else {
       // Check if user with this email exists
       const existingUser = await this.userRepository.findByEmail(email);
@@ -102,10 +112,9 @@ export class OAuthService {
         user = await this.userRepository.create({
           email,
           fullName: name,
-          emailVerified: true, // OAuth emails are pre-verified
+          emailVerified: true,
         });
 
-        // Create external account
         await this.prisma.externalAccount.create({
           data: {
             provider,
@@ -115,11 +124,9 @@ export class OAuthService {
           },
         });
 
-        // Update avatar if available
-        if (picture) {
-          await this.userRepository.update(user.id, {
-            avatar: picture,
-          });
+        // Set avatar only on creation if user has no avatar
+        if (picture && !user.avatar) {
+          await this.userRepository.update(user.id, { avatar: picture });
         }
       }
     }
@@ -157,7 +164,7 @@ export class OAuthService {
     });
 
     // Create session
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    const expiresAt = addDays(new Date(), 30); // 30 days
     const session = await this.sessionRepository.create({
       userId: user.id,
       token: accessToken,

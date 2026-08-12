@@ -124,9 +124,7 @@ export function useLogin() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Đăng nhập thất bại. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -139,9 +137,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
     onSuccess: () => {
-      toast.success(
-        'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.'
-      );
+      toast.success('Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
 
       // Get redirect URL from query params only after successful register
       const redirectUrl = getRedirectUrlFromQuery();
@@ -151,9 +147,7 @@ export function useRegister() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Đăng ký thất bại. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Đăng ký thất bại. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -175,8 +169,7 @@ export function useLogout() {
       // Still clear CSRF token and queries even on error
       clearCsrfToken();
       queryClient.clear();
-      const errorMessage =
-        error instanceof Error ? error.message : 'Đăng xuất thất bại';
+      const errorMessage = error instanceof Error ? error.message : 'Đăng xuất thất bại';
       toast.error(errorMessage);
       window.location.reload();
     },
@@ -197,9 +190,7 @@ export function useVerifyEmail() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Token không hợp lệ hoặc đã hết hạn';
+        error instanceof Error ? error.message : 'Token không hợp lệ hoặc đã hết hạn';
       toast.error(errorMessage);
     },
   });
@@ -211,7 +202,7 @@ export function useRequestPasswordReset() {
     mutationFn: (email: string) => authApi.requestPasswordReset(email),
     onSuccess: () => {
       toast.success(
-        'Vui lòng kiểm tra email để nhận link reset mật khẩu. Nếu không thấy email, vui lòng kiểm tra thư mục spam.'
+        'Vui lòng kiểm tra email để nhận link reset mật khẩu. Nếu không thấy email, vui lòng kiểm tra thư mục spam.',
       );
     },
     onError: (error: unknown) => {
@@ -271,9 +262,7 @@ export function useVerify2FA() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Mã xác thực không hợp lệ. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Mã xác thực không hợp lệ. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -284,9 +273,7 @@ export function useOAuth() {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef<Window | null>(null);
-  const messageHandlerRef = useRef<((event: MessageEvent) => void) | null>(
-    null
-  );
+  const messageHandlerRef = useRef<((event: MessageEvent) => void) | null>(null);
 
   const initiateOAuth = (provider: OAuthProvider) => {
     if (isLoading) {
@@ -311,13 +298,11 @@ export function useOAuth() {
     const popup = window.open(
       oauthUrl,
       'oauth-popup',
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`,
     );
 
     if (!popup) {
-      toast.error(
-        'Không thể mở popup. Vui lòng cho phép popup trong trình duyệt.'
-      );
+      toast.error('Không thể mở popup. Vui lòng cho phép popup trong trình duyệt.');
       setIsLoading(false);
       return;
     }

@@ -63,14 +63,14 @@ export const reviewsApi = {
   async getProductReviews(
     productSlug: ProductSlug,
     page?: number,
-    limit?: number
+    limit?: number,
   ): Promise<ReviewListResponse> {
     const params: Record<string, string> = {};
     if (page) params.page = page.toString();
     if (limit) params.limit = limit.toString();
     const response = await apiClient.get<{ data: ReviewListResponse }>(
       `/products/${productSlug}/reviews`,
-      { params }
+      { params },
     );
     return response.data.data;
   },
@@ -78,13 +78,10 @@ export const reviewsApi = {
   /**
    * Create review
    */
-  async createReview(
-    productSlug: ProductSlug,
-    data: CreateReviewRequest
-  ): Promise<Review> {
+  async createReview(productSlug: ProductSlug, data: CreateReviewRequest): Promise<Review> {
     const response = await apiClient.post<{ data: Review }>(
       `/products/${productSlug}/reviews`,
-      data
+      data,
     );
     return response.data.data;
   },
@@ -92,14 +89,8 @@ export const reviewsApi = {
   /**
    * Update review
    */
-  async updateReview(
-    reviewId: string,
-    data: UpdateReviewRequest
-  ): Promise<Review> {
-    const response = await apiClient.patch<{ data: Review }>(
-      `/products/reviews/${reviewId}`,
-      data
-    );
+  async updateReview(reviewId: string, data: UpdateReviewRequest): Promise<Review> {
+    const response = await apiClient.patch<{ data: Review }>(`/products/reviews/${reviewId}`, data);
     return response.data.data;
   },
 
@@ -108,7 +99,7 @@ export const reviewsApi = {
    */
   async deleteReview(reviewId: string): Promise<{ success: boolean }> {
     const response = await apiClient.delete<{ data: { success: boolean } }>(
-      `/products/reviews/${reviewId}`
+      `/products/reviews/${reviewId}`,
     );
     return response.data.data;
   },

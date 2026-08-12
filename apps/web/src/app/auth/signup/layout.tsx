@@ -30,11 +30,7 @@ export const metadata: Metadata = createPageMetadata({
     'Tạo tài khoản WebDev Studios để truy cập các tính năng độc quyền, quản lý đơn hàng và tham gia cộng đồng.',
   path: '/auth/signup',
   image: SEO_IMAGES['/'],
-  keywords: [
-    'Đăng ký WDS',
-    'WebDev Studios signup',
-    'Tạo tài khoản WebDev Studios',
-  ],
+  keywords: ['Đăng ký WDS', 'WebDev Studios signup', 'Tạo tài khoản WebDev Studios'],
 });
 
 export default function SignupLayout({

@@ -37,11 +37,7 @@ export function LastUpdatedProvider({
   date: string;
   children: React.ReactNode;
 }) {
-  return (
-    <LastUpdatedContext.Provider value={{ date }}>
-      {children}
-    </LastUpdatedContext.Provider>
-  );
+  return <LastUpdatedContext.Provider value={{ date }}>{children}</LastUpdatedContext.Provider>;
 }
 
 export function useLastUpdated() {

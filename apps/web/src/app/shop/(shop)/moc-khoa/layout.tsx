@@ -30,12 +30,7 @@ export const metadata: Metadata = createPageMetadata({
     'Móc khóa kim loại với logo WebDev Studios, thiết kế độc đáo và bền chắc. Phù hợp để treo chìa khóa, túi xách hoặc làm vật trang trí.',
   path: '/shop/moc-khoa',
   image: SEO_IMAGES['/shop/moc-khoa'],
-  keywords: [
-    'Móc khóa WDS',
-    'WebDev Studios',
-    'Keychain WebDev Studios',
-    'Merchandise UIT',
-  ],
+  keywords: ['Móc khóa WDS', 'WebDev Studios', 'Keychain WebDev Studios', 'Merchandise UIT'],
 });
 
 export default function MocKhoaLayout({

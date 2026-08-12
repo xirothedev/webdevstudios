@@ -31,12 +31,7 @@ export const metadata: Metadata = createPageMetadata({
     'Khám phá nền tảng thương mại điện tử hiện đại với giao diện đẹp mắt và trải nghiệm người dùng tuyệt vời.',
   path: '/shop',
   image: SEO_IMAGES['/shop'],
-  keywords: [
-    'E-commerce',
-    'Thương mại điện tử',
-    'E-commerce platform',
-    'Mua sắm online',
-  ],
+  keywords: ['E-commerce', 'Thương mại điện tử', 'E-commerce platform', 'Mua sắm online'],
 });
 
 export default function ShopLayout({

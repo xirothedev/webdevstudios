@@ -27,12 +27,7 @@ import { useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useCartDrawer } from '@/contexts/cart-drawer.context';
-import {
-  AddToCartRequest,
-  Cart,
-  cartApi,
-  UpdateCartItemRequest,
-} from '@/lib/api/cart';
+import { AddToCartRequest, Cart, cartApi, UpdateCartItemRequest } from '@/lib/api/cart';
 import { useDebouncedCallback } from '@/lib/hooks/use-debounce';
 
 // Query Keys
@@ -66,9 +61,7 @@ export function useAddToCart() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể thêm vào giỏ hàng. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể thêm vào giỏ hàng. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -78,7 +71,7 @@ export function useAddToCart() {
 function updateCartItemQuantity(
   cart: Cart | undefined,
   cartItemId: string,
-  quantity: number
+  quantity: number,
 ): Cart | undefined {
   if (!cart) return cart;
 
@@ -94,10 +87,7 @@ function updateCartItemQuantity(
     return item;
   });
 
-  const totalAmount = updatedItems.reduce(
-    (sum, item) => sum + item.subtotal,
-    0
-  );
+  const totalAmount = updatedItems.reduce((sum, item) => sum + item.subtotal, 0);
   const totalItems = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
@@ -116,13 +106,8 @@ export function useUpdateCartItem() {
   const originalCartRef = useRef<Map<string, Cart | undefined>>(new Map());
 
   const mutation = useMutation({
-    mutationFn: ({
-      cartItemId,
-      data,
-    }: {
-      cartItemId: string;
-      data: UpdateCartItemRequest;
-    }) => cartApi.updateCartItem(cartItemId, data),
+    mutationFn: ({ cartItemId, data }: { cartItemId: string; data: UpdateCartItemRequest }) =>
+      cartApi.updateCartItem(cartItemId, data),
     onMutate: async ({ cartItemId }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: cartKeys.current() });
@@ -148,9 +133,7 @@ export function useUpdateCartItem() {
       }
 
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -160,14 +143,11 @@ export function useUpdateCartItem() {
     (variables: { cartItemId: string; data: UpdateCartItemRequest }) => {
       mutation.mutate(variables);
     },
-    500
+    500,
   );
 
   // Combined mutate function: optimistic update immediately + debounced API call
-  const mutate = (variables: {
-    cartItemId: string;
-    data: UpdateCartItemRequest;
-  }) => {
+  const mutate = (variables: { cartItemId: string; data: UpdateCartItemRequest }) => {
     // Get current cart state (may already be optimistic from previous clicks)
     const currentCart = queryClient.getQueryData<Cart>(cartKeys.current());
 
@@ -180,7 +160,7 @@ export function useUpdateCartItem() {
       const optimisticCart = updateCartItemQuantity(
         currentCart,
         variables.cartItemId,
-        variables.data.quantity
+        variables.data.quantity,
       );
       queryClient.setQueryData(cartKeys.current(), optimisticCart);
     }
@@ -196,18 +176,12 @@ export function useUpdateCartItem() {
 }
 
 // Helper function to remove cart item from cache
-function removeCartItem(
-  cart: Cart | undefined,
-  cartItemId: string
-): Cart | undefined {
+function removeCartItem(cart: Cart | undefined, cartItemId: string): Cart | undefined {
   if (!cart) return cart;
 
   const updatedItems = cart.items.filter((item) => item.id !== cartItemId);
 
-  const totalAmount = updatedItems.reduce(
-    (sum, item) => sum + item.subtotal,
-    0
-  );
+  const totalAmount = updatedItems.reduce((sum, item) => sum + item.subtotal, 0);
   const totalItems = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
@@ -252,9 +226,7 @@ export function useRemoveFromCart() {
       }
 
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể xóa khỏi giỏ hàng. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể xóa khỏi giỏ hàng. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -272,9 +244,7 @@ export function useClearCart() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể xóa giỏ hàng. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể xóa giỏ hàng. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });

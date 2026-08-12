@@ -37,10 +37,7 @@ interface ProductDescriptionProps {
  */
 const markdownComponents = {
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1
-      className={`mb-4 text-2xl font-semibold text-white ${className ?? ''}`.trim()}
-      {...props}
-    />
+    <h1 className={`mb-4 text-2xl font-semibold text-white ${className ?? ''}`.trim()} {...props} />
   ),
   h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
@@ -55,10 +52,7 @@ const markdownComponents = {
     />
   ),
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p
-      className={`mb-4 leading-relaxed text-white/80 ${className ?? ''}`.trim()}
-      {...props}
-    />
+    <p className={`mb-4 leading-relaxed text-white/80 ${className ?? ''}`.trim()} {...props} />
   ),
   ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
@@ -76,21 +70,12 @@ const markdownComponents = {
     <li className={`${className ?? ''}`.trim()} {...props} />
   ),
   strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <strong
-      className={`font-semibold text-white ${className ?? ''}`.trim()}
-      {...props}
-    />
+    <strong className={`font-semibold text-white ${className ?? ''}`.trim()} {...props} />
   ),
   em: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <em
-      className={`text-white/90 italic ${className ?? ''}`.trim()}
-      {...props}
-    />
+    <em className={`text-white/90 italic ${className ?? ''}`.trim()} {...props} />
   ),
-  a: ({
-    className,
-    ...props
-  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+  a: ({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       className={`text-wds-accent hover:text-wds-accent/80 underline transition-colors ${className ?? ''}`.trim()}
       target="_blank"
@@ -99,10 +84,7 @@ const markdownComponents = {
     />
   ),
   hr: ({ className, ...props }: React.HTMLAttributes<HTMLHRElement>) => (
-    <hr
-      className={`my-6 border-white/10 ${className ?? ''}`.trim()}
-      {...props}
-    />
+    <hr className={`my-6 border-white/10 ${className ?? ''}`.trim()} {...props} />
   ),
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <code
@@ -116,19 +98,17 @@ const markdownComponents = {
       {...props}
     />
   ),
-  blockquote: ({
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLQuoteElement>) => (
+  blockquote: ({ className, ...props }: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
       className={`border-wds-accent/50 mb-4 border-l-4 bg-white/5 pl-4 text-white/70 italic ${className ?? ''}`.trim()}
       {...props}
     />
   ),
-  img: ({ className, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  img: ({ className, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
     <img
       className={`mb-4 rounded-lg ${className ?? ''}`.trim()}
       loading="lazy"
+      alt={alt ?? ''}
       {...props}
     />
   ),
@@ -140,23 +120,14 @@ const markdownComponents = {
       />
     </div>
   ),
-  thead: ({
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+  thead: ({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => (
     <thead className={`bg-white/5 ${className ?? ''}`.trim()} {...props} />
   ),
-  tbody: ({
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+  tbody: ({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => (
     <tbody className={className} {...props} />
   ),
   tr: ({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => (
-    <tr
-      className={`border-b border-white/10 ${className ?? ''}`.trim()}
-      {...props}
-    />
+    <tr className={`border-b border-white/10 ${className ?? ''}`.trim()} {...props} />
   ),
   th: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <th

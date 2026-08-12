@@ -35,9 +35,7 @@ export function OrdersEmpty() {
       <div className="mb-6 rounded-full bg-white/5 p-6">
         <Package className="h-16 w-16 text-white/20" />
       </div>
-      <h2 className="mb-2 text-2xl font-bold text-white">
-        Bạn chưa có đơn hàng nào
-      </h2>
+      <h2 className="mb-2 text-2xl font-bold text-white">Bạn chưa có đơn hàng nào</h2>
       <p className="mb-8 text-center text-white/60">
         Hãy khám phá các sản phẩm của chúng tôi và tạo đơn hàng đầu tiên
       </p>

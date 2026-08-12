@@ -30,10 +30,6 @@ export const metadata: Metadata = createAdminPageMetadata({
   path: '/admin/users',
 });
 
-export default function UsersLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function UsersLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

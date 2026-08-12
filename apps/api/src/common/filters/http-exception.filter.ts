@@ -34,10 +34,7 @@ import { Request, Response } from 'express';
 /**
  * Sanitize error message to prevent information disclosure
  */
-function sanitizeErrorMessage(
-  message: string | string[],
-  isProduction: boolean
-): string {
+function sanitizeErrorMessage(message: string | string[], isProduction: boolean): string {
   if (Array.isArray(message)) {
     return message.join(', ');
   }
@@ -116,7 +113,7 @@ function containsSensitiveInfo(message: string): boolean {
 function getSafeErrorMessage(
   status: number,
   sanitizedMessage: string,
-  isProduction: boolean
+  isProduction: boolean,
 ): string {
   // If not production, return original message
   if (!isProduction) {
@@ -133,18 +130,13 @@ function getSafeErrorMessage(
   const safeMessages: Record<number, string> = {
     [HttpStatus.BAD_REQUEST]: 'Invalid request. Please check your input.',
     [HttpStatus.UNAUTHORIZED]: 'Authentication required.',
-    [HttpStatus.FORBIDDEN]:
-      'You do not have permission to perform this action.',
+    [HttpStatus.FORBIDDEN]: 'You do not have permission to perform this action.',
     [HttpStatus.NOT_FOUND]: 'The requested resource was not found.',
     [HttpStatus.CONFLICT]: 'A conflict occurred. Please try again.',
-    [HttpStatus.UNPROCESSABLE_ENTITY]:
-      'Validation failed. Please check your input.',
-    [HttpStatus.TOO_MANY_REQUESTS]:
-      'Too many requests. Please try again later.',
-    [HttpStatus.INTERNAL_SERVER_ERROR]:
-      'An internal error occurred. Please try again later.',
-    [HttpStatus.SERVICE_UNAVAILABLE]:
-      'Service temporarily unavailable. Please try again later.',
+    [HttpStatus.UNPROCESSABLE_ENTITY]: 'Validation failed. Please check your input.',
+    [HttpStatus.TOO_MANY_REQUESTS]: 'Too many requests. Please try again later.',
+    [HttpStatus.INTERNAL_SERVER_ERROR]: 'An internal error occurred. Please try again later.',
+    [HttpStatus.SERVICE_UNAVAILABLE]: 'Service temporarily unavailable. Please try again later.',
   };
 
   return safeMessages[status] || 'An error occurred. Please try again later.';
@@ -170,22 +162,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const originalMessage =
       typeof exceptionResponse === 'string'
         ? exceptionResponse
-        : (exceptionResponse as any).message ||
+        : (exceptionResponse as { message?: string }).message ||
           exception.message ||
           'An error occurred';
 
     // Sanitize message for production
-    const sanitizedMessage = sanitizeErrorMessage(
-      originalMessage,
-      this.isProduction
-    );
+    const sanitizedMessage = sanitizeErrorMessage(originalMessage, this.isProduction);
 
     // Get safe error message based on status code
-    const safeMessage = getSafeErrorMessage(
-      status,
-      sanitizedMessage,
-      this.isProduction
-    );
+    const safeMessage = getSafeErrorMessage(status, sanitizedMessage, this.isProduction);
 
     // Log detailed error (server-side only)
     if (this.isProduction) {
@@ -194,14 +179,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         method: request.method,
         ip: request.ip,
         userAgent: request.headers['user-agent'],
-        userId: (request as any).user?.id,
+        userId: (request as { user?: { id: string } }).user?.id,
       });
     } else {
       // In development, log full details
-      this.logger.debug(
-        `[${status}] ${exception.name}: ${originalMessage}`,
-        exception.stack
-      );
+      this.logger.debug(`[${status}] ${exception.name}: ${originalMessage}`, exception.stack);
     }
 
     const errorResponse = {

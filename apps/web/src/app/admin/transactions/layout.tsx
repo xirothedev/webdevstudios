@@ -30,10 +30,6 @@ export const metadata: Metadata = createAdminPageMetadata({
   path: '/admin/transactions',
 });
 
-export default function TransactionsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function TransactionsLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

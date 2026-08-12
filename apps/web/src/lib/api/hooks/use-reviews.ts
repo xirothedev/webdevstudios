@@ -25,11 +25,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import {
-  CreateReviewRequest,
-  ProductSlug,
-  reviewsApi,
-} from '@/lib/api/reviews';
+import { CreateReviewRequest, ProductSlug, reviewsApi } from '@/lib/api/reviews';
 
 // Query Keys
 const reviewKeys = {
@@ -40,11 +36,7 @@ const reviewKeys = {
 };
 
 // Query: Get product reviews
-export function useProductReviews(
-  productSlug: ProductSlug,
-  page: number = 1,
-  limit: number = 10
-) {
+export function useProductReviews(productSlug: ProductSlug, page: number = 1, limit: number = 10) {
   return useQuery({
     queryKey: reviewKeys.productList(productSlug, page, limit),
     queryFn: () => reviewsApi.getProductReviews(productSlug, page, limit),
@@ -57,8 +49,7 @@ export function useCreateReview(productSlug: ProductSlug) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateReviewRequest) =>
-      reviewsApi.createReview(productSlug, data),
+    mutationFn: (data: CreateReviewRequest) => reviewsApi.createReview(productSlug, data),
     onSuccess: () => {
       // Invalidate all reviews for this product to refetch
       queryClient.invalidateQueries({
@@ -68,9 +59,7 @@ export function useCreateReview(productSlug: ProductSlug) {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể gửi đánh giá. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể gửi đánh giá. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -95,9 +84,7 @@ export function useUpdateReview() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể cập nhật đánh giá. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể cập nhật đánh giá. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });
@@ -116,9 +103,7 @@ export function useDeleteReview() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Không thể xóa đánh giá. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Không thể xóa đánh giá. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });

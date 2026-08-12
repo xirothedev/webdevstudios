@@ -44,12 +44,11 @@ import {
 } from '@nestjs/swagger';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Public } from '../common/decorators/public.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { CreateReviewCommand } from './commands/create-review/create-review.command';
-import { DeleteReviewCommand } from './commands/delete-review/delete-review.command';
-import { UpdateReviewCommand } from './commands/update-review/update-review.command';
+import { Public, Roles } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CreateReviewCommand } from './commands/create-review';
+import { DeleteReviewCommand } from './commands/delete-review';
+import { UpdateReviewCommand } from './commands/update-review';
 import {
   CreateReviewDto,
   GetProductReviewsQueryDto,
@@ -57,22 +56,21 @@ import {
   ReviewListResponseDto,
   UpdateReviewDto,
 } from './dtos/review.dto';
-import { GetProductReviewsQuery } from './queries/get-product-reviews/get-product-reviews.query';
+import { GetProductReviewsQuery } from './queries/get-product-reviews';
 
 @ApiTags('Reviews')
 @Controller('products')
 export class ReviewsController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post(':slug/reviews')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create review',
-    description:
-      'Create a review for a product. User must have purchased the product.',
+    description: 'Create a review for a product. User must have purchased the product.',
   })
   @ApiParam({
     name: 'slug',
@@ -92,11 +90,9 @@ export class ReviewsController {
     @Param('slug', new ParseEnumPipe(ProductSlug))
     slug: ProductSlug,
     @CurrentUser() user: { id: string },
-    @Body() dto: CreateReviewDto
+    @Body() dto: CreateReviewDto,
   ): Promise<ReviewDto> {
-    return this.commandBus.execute(
-      new CreateReviewCommand(user.id, slug, dto.rating, dto.comment)
-    );
+    return this.commandBus.execute(new CreateReviewCommand(user.id, slug, dto.rating, dto.comment));
   }
 
   @Get(':slug/reviews')
@@ -134,10 +130,10 @@ export class ReviewsController {
   async getProductReviews(
     @Param('slug', new ParseEnumPipe(ProductSlug))
     slug: ProductSlug,
-    @Query() queryDto: GetProductReviewsQueryDto
+    @Query() queryDto: GetProductReviewsQueryDto,
   ): Promise<ReviewListResponseDto> {
     return this.queryBus.execute(
-      new GetProductReviewsQuery(slug, queryDto.page ?? 1, queryDto.limit ?? 10)
+      new GetProductReviewsQuery(slug, queryDto.page ?? 1, queryDto.limit ?? 10),
     );
   }
 
@@ -164,11 +160,9 @@ export class ReviewsController {
   async updateReview(
     @Param('id') id: string,
     @CurrentUser() user: { id: string },
-    @Body() dto: UpdateReviewDto
+    @Body() dto: UpdateReviewDto,
   ): Promise<ReviewDto> {
-    return this.commandBus.execute(
-      new UpdateReviewCommand(id, user.id, dto.rating, dto.comment)
-    );
+    return this.commandBus.execute(new UpdateReviewCommand(id, user.id, dto.rating, dto.comment));
   }
 
   @Delete('reviews/:id')

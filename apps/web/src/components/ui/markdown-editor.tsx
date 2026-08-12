@@ -70,8 +70,7 @@ interface MarkdownEditorThemeConfig {
 const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
   dark: {
     container: 'border-wds-accent/30 bg-wds-background rounded-lg border',
-    toolbar:
-      'border-wds-accent/30 flex flex-wrap items-center gap-1 border-b p-2',
+    toolbar: 'border-wds-accent/30 flex flex-wrap items-center gap-1 border-b p-2',
     toolbarDivider: 'mx-1 h-6 w-px bg-wds-accent/30',
     toolbarButton: {
       base: 'h-8 w-8 p-0',
@@ -88,8 +87,7 @@ const themeConfigs: Record<MarkdownEditorTheme, MarkdownEditorThemeConfig> = {
   },
   light: {
     container: 'border-gray-300 bg-white rounded-lg border',
-    toolbar:
-      'border-gray-300 flex flex-wrap items-center gap-1 border-b p-2 bg-gray-50',
+    toolbar: 'border-gray-300 flex flex-wrap items-center gap-1 border-b p-2 bg-gray-50',
     toolbarDivider: 'mx-1 h-6 w-px bg-gray-300',
     toolbarButton: {
       base: 'h-8 w-8 p-0',
@@ -267,9 +265,7 @@ export function MarkdownEditor({
   const getButtonClassName = (isActive: boolean) => {
     return cn(
       themeConfig.toolbarButton.base,
-      isActive
-        ? themeConfig.toolbarButton.active
-        : themeConfig.toolbarButton.inactive
+      isActive ? themeConfig.toolbarButton.active : themeConfig.toolbarButton.inactive,
     );
   };
 
@@ -301,9 +297,7 @@ export function MarkdownEditor({
     }
 
     // Add protocol if missing
-    const urlWithProtocol = trimmedUrl.startsWith('http')
-      ? trimmedUrl
-      : `https://${trimmedUrl}`;
+    const urlWithProtocol = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
 
     editor.chain().focus().setLink({ href: urlWithProtocol }).run();
     setLinkDialogOpen(false);
@@ -365,9 +359,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleBold().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleBold().run()}
           className={getButtonClassName(editor.isActive('bold'))}
           title="Bold"
         >
@@ -379,9 +371,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleItalic().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleItalic().run()}
           className={getButtonClassName(editor.isActive('italic'))}
           title="Italic"
         >
@@ -394,16 +384,9 @@ export function MarkdownEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          disabled={
-            disabled ||
-            !editor.can().chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          className={getButtonClassName(
-            editor.isActive('heading', { level: 1 })
-          )}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          disabled={disabled || !editor.can().chain().focus().toggleHeading({ level: 1 }).run()}
+          className={getButtonClassName(editor.isActive('heading', { level: 1 }))}
           title="Heading 1"
         >
           <Heading1 className="h-4 w-4" />
@@ -413,16 +396,9 @@ export function MarkdownEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          disabled={
-            disabled ||
-            !editor.can().chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          className={getButtonClassName(
-            editor.isActive('heading', { level: 2 })
-          )}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          disabled={disabled || !editor.can().chain().focus().toggleHeading({ level: 2 }).run()}
+          className={getButtonClassName(editor.isActive('heading', { level: 2 }))}
           title="Heading 2"
         >
           <Heading2 className="h-4 w-4" />
@@ -432,16 +408,9 @@ export function MarkdownEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run()
-          }
-          disabled={
-            disabled ||
-            !editor.can().chain().focus().toggleHeading({ level: 3 }).run()
-          }
-          className={getButtonClassName(
-            editor.isActive('heading', { level: 3 })
-          )}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          disabled={disabled || !editor.can().chain().focus().toggleHeading({ level: 3 }).run()}
+          className={getButtonClassName(editor.isActive('heading', { level: 3 }))}
           title="Heading 3"
         >
           <Heading3 className="h-4 w-4" />
@@ -454,9 +423,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleBulletList().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleBulletList().run()}
           className={getButtonClassName(editor.isActive('bulletList'))}
           title="Bullet List"
         >
@@ -468,9 +435,7 @@ export function MarkdownEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          disabled={
-            disabled || !editor.can().chain().focus().toggleOrderedList().run()
-          }
+          disabled={disabled || !editor.can().chain().focus().toggleOrderedList().run()}
           className={getButtonClassName(editor.isActive('orderedList'))}
           title="Numbered List"
         >
@@ -479,10 +444,7 @@ export function MarkdownEditor({
 
         <div className={themeConfig.toolbarDivider} />
 
-        <Dialog.Root
-          open={codeBlockDialogOpen}
-          onOpenChange={setCodeBlockDialogOpen}
-        >
+        <Dialog.Root open={codeBlockDialogOpen} onOpenChange={setCodeBlockDialogOpen}>
           <Dialog.Trigger asChild>
             <Button
               type="button"
@@ -510,7 +472,7 @@ export function MarkdownEditor({
             <Dialog.Overlay
               className={cn(
                 'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
-                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
+                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               )}
             />
             <Dialog.Content
@@ -519,18 +481,16 @@ export function MarkdownEditor({
                 'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
                 theme === 'dark'
                   ? 'border-wds-accent/30 bg-wds-background text-wds-text'
-                  : 'border-gray-300 bg-white text-gray-900'
+                  : 'border-gray-300 bg-white text-gray-900',
               )}
             >
               <Dialog.Title
                 className={cn(
                   'mb-4 text-lg font-semibold',
-                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900'
+                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900',
                 )}
               >
-                {editor.isActive('codeBlock')
-                  ? 'Chỉnh sửa Code Block'
-                  : 'Chèn Code Block'}
+                {editor.isActive('codeBlock') ? 'Chỉnh sửa Code Block' : 'Chèn Code Block'}
               </Dialog.Title>
 
               <div className="space-y-4">
@@ -539,7 +499,7 @@ export function MarkdownEditor({
                     htmlFor="code-language"
                     className={cn(
                       'mb-2 block text-sm font-medium',
-                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700'
+                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700',
                     )}
                   >
                     Ngôn ngữ (tùy chọn)
@@ -561,7 +521,7 @@ export function MarkdownEditor({
                       'w-full rounded-lg border px-3 py-2 text-sm',
                       theme === 'dark'
                         ? 'border-wds-accent/30 bg-wds-background text-wds-text focus:border-wds-accent focus:ring-wds-accent/20 focus:ring-2 focus:outline-none'
-                        : 'border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none'
+                        : 'border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none',
                     )}
                   >
                     {codeLanguages.map((lang) => (
@@ -605,7 +565,7 @@ export function MarkdownEditor({
                     'absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none',
                     theme === 'dark'
                       ? 'text-wds-text/70 hover:text-wds-text focus:ring-wds-accent/20'
-                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20'
+                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20',
                   )}
                 >
                   <X className="h-4 w-4" />
@@ -618,20 +578,14 @@ export function MarkdownEditor({
 
         <div className={themeConfig.toolbarDivider} />
 
-        <Dialog.Root
-          open={linkDialogOpen}
-          onOpenChange={handleLinkDialogOpenChange}
-        >
+        <Dialog.Root open={linkDialogOpen} onOpenChange={handleLinkDialogOpenChange}>
           <Dialog.Trigger asChild>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={handleLinkClick}
-              disabled={
-                disabled ||
-                !editor.can().chain().focus().setLink({ href: '' }).run()
-              }
+              disabled={disabled || !editor.can().chain().focus().setLink({ href: '' }).run()}
               className={getButtonClassName(editor.isActive('link'))}
               title="Add/Edit Link"
             >
@@ -643,7 +597,7 @@ export function MarkdownEditor({
             <Dialog.Overlay
               className={cn(
                 'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
-                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
+                'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               )}
             />
             <Dialog.Content
@@ -652,13 +606,13 @@ export function MarkdownEditor({
                 'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
                 theme === 'dark'
                   ? 'border-wds-accent/30 bg-wds-background text-wds-text'
-                  : 'border-gray-300 bg-white text-gray-900'
+                  : 'border-gray-300 bg-white text-gray-900',
               )}
             >
               <Dialog.Title
                 className={cn(
                   'mb-4 text-lg font-semibold',
-                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900'
+                  theme === 'dark' ? 'text-wds-text' : 'text-gray-900',
                 )}
               >
                 {editor?.getAttributes('link').href ? 'Edit Link' : 'Add Link'}
@@ -670,7 +624,7 @@ export function MarkdownEditor({
                     htmlFor="link-url"
                     className={cn(
                       'mb-2 block text-sm font-medium',
-                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700'
+                      theme === 'dark' ? 'text-wds-text/80' : 'text-gray-700',
                     )}
                   >
                     URL
@@ -746,7 +700,7 @@ export function MarkdownEditor({
                     'absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none',
                     theme === 'dark'
                       ? 'text-wds-text/70 hover:text-wds-text focus:ring-wds-accent/20'
-                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20'
+                      : 'text-gray-500 hover:text-gray-900 focus:ring-blue-500/20',
                   )}
                 >
                   <X className="h-4 w-4" />
@@ -789,10 +743,7 @@ export function MarkdownEditor({
         <EditorContent
           editor={editor}
           style={{ minHeight }}
-          className={cn(
-            themeConfig.editor.content,
-            '[&_.ProseMirror]:min-h-[300px]'
-          )}
+          className={cn(themeConfig.editor.content, '[&_.ProseMirror]:min-h-[300px]')}
         />
       </div>
     </div>

@@ -24,7 +24,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { CartDto } from '../../dtos/cart.dto';
 import { CartRepository } from '../../infrastructure/cart.repository';
-import { CartWithItems } from '../../types/cart.types';
+import { CartWithItems } from '../../cart.types';
 import { getProductImageUrl } from '../../utils/product-image.util';
 import { GetCartQuery } from './get-cart.query';
 
@@ -47,9 +47,7 @@ export class GetCartHandler implements IQueryHandler<GetCartQuery> {
 
       let stockAvailable: number;
       if (product.hasSizes && item.size) {
-        const sizeStock = product.sizeStocks?.find(
-          (ss) => ss.size === item.size
-        );
+        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size);
         stockAvailable = sizeStock?.stock || 0;
       } else {
         stockAvailable = product.stock;

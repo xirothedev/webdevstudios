@@ -61,10 +61,7 @@ export function ActivityFilters({
 
       {/* Search */}
       <div className="relative w-full lg:w-72">
-        <Search
-          className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500"
-          size={18}
-        />
+        <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500" size={18} />
         <input
           type="text"
           placeholder="Tìm kiếm sự kiện..."

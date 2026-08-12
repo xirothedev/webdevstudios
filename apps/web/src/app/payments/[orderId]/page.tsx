@@ -39,38 +39,28 @@ export default function PaymentPage() {
 
   const { data: order, isLoading: isLoadingOrder } = useOrder(orderId);
   const createPaymentLinkMutation = useCreatePaymentLink();
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-  const [isLoadingPayment, setIsLoadingPayment] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(`paymentUrl_${orderId}`);
+  });
+  const isLoadingPayment = createPaymentLinkMutation.isPending;
 
-  // Load payment URL from localStorage or create new one
+  // Create payment link if the order is pending and no URL was saved yet
   useEffect(() => {
-    if (!order) return;
+    if (!order || paymentUrl) return;
 
-    // Check localStorage for saved payment URL
-    const savedPaymentUrl = localStorage.getItem(`paymentUrl_${orderId}`);
-    if (savedPaymentUrl) {
-      setPaymentUrl(savedPaymentUrl);
-      return;
-    }
-
-    // Create payment link if order is pending
     if (order.paymentStatus === 'PENDING' && order.status === 'PENDING') {
-      setIsLoadingPayment(true);
       createPaymentLinkMutation.mutate(
         { orderId: order.id },
         {
           onSuccess: (data) => {
             setPaymentUrl(data.paymentUrl);
             localStorage.setItem(`paymentUrl_${orderId}`, data.paymentUrl);
-            setIsLoadingPayment(false);
           },
-          onError: () => {
-            setIsLoadingPayment(false);
-          },
-        }
+        },
       );
     }
-  }, [order, orderId, createPaymentLinkMutation]);
+  }, [order, orderId, paymentUrl, createPaymentLinkMutation]);
 
   // Redirect if order is already paid
   useEffect(() => {
@@ -106,21 +96,14 @@ export default function PaymentPage() {
       <Navbar />
       <main className="pt-24 pb-20">
         <div className="mx-auto max-w-4xl px-6">
-          <h1 className="mb-8 text-3xl font-bold text-white">
-            Thanh toán đơn hàng {order.code}
-          </h1>
+          <h1 className="mb-8 text-3xl font-bold text-white">Thanh toán đơn hàng {order.code}</h1>
 
           {/* Order Summary */}
           <div className="mb-6 rounded-xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-xl font-bold text-white">
-              Tóm tắt đơn hàng
-            </h2>
+            <h2 className="mb-4 text-xl font-bold text-white">Tóm tắt đơn hàng</h2>
             <div className="space-y-3">
               {order.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between text-sm text-white/80"
-                >
+                <div key={item.id} className="flex justify-between text-sm text-white/80">
                   <span>
                     {item.productName}
                     {item.size && ` (${item.size})`} x {item.quantity}
@@ -131,18 +114,13 @@ export default function PaymentPage() {
               <div className="flex justify-between border-t border-white/10 pt-3 text-white/80">
                 <span>Tạm tính:</span>
                 <span>
-                  {formatPrice(
-                    order.totalAmount - order.shippingFee + order.discountValue
-                  )}
-                  ₫
+                  {formatPrice(order.totalAmount - order.shippingFee + order.discountValue)}₫
                 </span>
               </div>
               <div className="flex justify-between text-white/80">
                 <span>Phí vận chuyển:</span>
                 <span>
-                  {order.shippingFee === 0
-                    ? 'Miễn phí'
-                    : formatPrice(order.shippingFee) + '₫'}
+                  {order.shippingFee === 0 ? 'Miễn phí' : formatPrice(order.shippingFee) + '₫'}
                 </span>
               </div>
               <div className="flex justify-between border-t border-white/10 pt-3 text-lg font-bold text-white">
@@ -154,14 +132,10 @@ export default function PaymentPage() {
 
           {/* Payment Options */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-xl font-bold text-white">
-              Chọn phương thức thanh toán
-            </h2>
+            <h2 className="mb-4 text-xl font-bold text-white">Chọn phương thức thanh toán</h2>
 
             {isLoadingPayment ? (
-              <div className="text-center text-white/60">
-                Đang tạo liên kết thanh toán...
-              </div>
+              <div className="text-center text-white/60">Đang tạo liên kết thanh toán...</div>
             ) : paymentUrl ? (
               <div className="space-y-4">
                 <Button

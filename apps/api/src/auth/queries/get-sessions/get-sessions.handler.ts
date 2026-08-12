@@ -23,7 +23,7 @@
 import { Injectable } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { SessionRepository } from '../../infrastructure/session.repository';
+import { SessionRepository } from '../../infrastructure';
 import { GetSessionsQuery } from './get-sessions.query';
 
 @Injectable()

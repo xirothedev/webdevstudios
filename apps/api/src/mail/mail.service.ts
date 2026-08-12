@@ -25,6 +25,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { format } from 'date-fns';
 
 @Injectable()
 export class MailService {
@@ -32,29 +33,23 @@ export class MailService {
 
   constructor(
     private readonly mailer: MailerService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
   ) {
     this.templatePath = join(__dirname, 'templates', 'verification-email.html');
   }
 
-  private loadTemplate(
-    templateName: string = 'verification-email.html'
-  ): string {
+  private loadTemplate(templateName: string = 'verification-email.html'): string {
     const templatePath = join(__dirname, 'templates', templateName);
     try {
       return readFileSync(templatePath, 'utf-8');
     } catch (error) {
-      throw new Error(
-        `Failed to load email template: ${templatePath}. Error: ${error}`,
-        { cause: error }
-      );
+      throw new Error(`Failed to load email template: ${templatePath}. Error: ${error}`, {
+        cause: error,
+      });
     }
   }
 
-  private replaceTemplateVariables(
-    template: string,
-    variables: Record<string, string>
-  ): string {
+  private replaceTemplateVariables(template: string, variables: Record<string, string>): string {
     let html = template;
     for (const [key, value] of Object.entries(variables)) {
       const regex = new RegExp(`{{${key}}}`, 'g');
@@ -68,7 +63,7 @@ export class MailService {
       this.config.get<string>('FRONTEND_URL') ||
       `http://localhost:${this.config.getOrThrow<string>('PORT', '3000')}`;
     const verificationUrl = `${frontendUrl}/verify?token=${encodeURIComponent(token)}`;
-    const currentYear = new Date().getFullYear().toString();
+    const currentYear = format(new Date(), 'yyyy');
 
     // Load HTML template
     const template = this.loadTemplate('verification-email.html');
@@ -105,7 +100,7 @@ This email was sent by Webdev Studio
       this.config.get<string>('FRONTEND_URL') ||
       `http://localhost:${this.config.get<string>('PORT', '3000')}`;
     const resetUrl = `${frontendUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
-    const currentYear = new Date().getFullYear().toString();
+    const currentYear = format(new Date(), 'yyyy');
 
     // Load HTML template
     const template = this.loadTemplate('password-reset.html');

@@ -27,21 +27,20 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CartModule } from '../cart/cart.module';
 import { ProductsModule } from '../products/products.module';
 // Commands
-import { CancelOrderHandler } from './commands/cancel-order/cancel-order.handler';
-import { CreateOrderHandler } from './commands/create-order/create-order.handler';
-import { ExpireOrderHandler } from './commands/expire-order/expire-order.handler';
-import { UpdateOrderStatusHandler } from './commands/update-order-status/update-order-status.handler';
+import { CancelOrderHandler } from './commands/cancel-order';
+import { CreateOrderHandler } from './commands/create-order';
+import { ExpireOrderHandler } from './commands/expire-order';
+import { UpdateOrderStatusHandler } from './commands/update-order-status';
 // Repository
 import { OrderRepository } from './infrastructure/order.repository';
 // Controller
 import { OrdersController } from './orders.controller';
 // Queries
-import { GetOrderByIdHandler } from './queries/get-order-by-id/get-order-by-id.handler';
-import { ListAllOrdersHandler } from './queries/list-all-orders/list-all-orders.handler';
-import { ListOrdersHandler } from './queries/list-orders/list-orders.handler';
+import { GetOrderByIdHandler } from './queries/get-order-by-id';
+import { ListAllOrdersHandler } from './queries/list-all-orders';
+import { ListOrdersHandler } from './queries/list-orders';
 // Schedulers
-import { OrderExpirationScheduler } from './schedulers/order-expiration.scheduler';
-import { OrderRecoveryScheduler } from './schedulers/order-recovery.scheduler';
+import { OrderExpirationScheduler, OrderRecoveryScheduler } from './schedulers';
 
 const CommandHandlers = [
   CreateOrderHandler,
@@ -50,11 +49,7 @@ const CommandHandlers = [
   ExpireOrderHandler,
 ];
 
-const QueryHandlers = [
-  GetOrderByIdHandler,
-  ListOrdersHandler,
-  ListAllOrdersHandler,
-];
+const QueryHandlers = [GetOrderByIdHandler, ListOrdersHandler, ListAllOrdersHandler];
 
 @Module({
   imports: [CqrsModule, ScheduleModule, CartModule, ProductsModule],

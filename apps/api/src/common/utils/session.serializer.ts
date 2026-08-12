@@ -24,7 +24,7 @@ import { User } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
@@ -32,21 +32,18 @@ export class SessionSerializer extends PassportSerializer {
     super();
   }
 
-  serializeUser(user: User, done: (err: any, user?: User) => void) {
+  serializeUser(user: User, done: (err: Error | null, user?: User) => void) {
     done(null, user);
   }
 
-  async deserializeUser(
-    user: User,
-    done: (err: any, user?: User | null) => void
-  ) {
+  async deserializeUser(user: User, done: (err: Error | null, user?: User | null) => void) {
     try {
       const data = await this.prisma.user.findUnique({
         where: { id: user.id },
       });
       done(null, data);
     } catch (error) {
-      done(error);
+      done(error instanceof Error ? error : new Error(String(error)));
     }
   }
 }

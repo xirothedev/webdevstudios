@@ -54,10 +54,7 @@ const DEFAULT_OPTIONS: ConvertOptions = {
   ],
 };
 
-async function getAllPngFiles(
-  dir: string,
-  fileList: string[] = []
-): Promise<string[]> {
+async function getAllPngFiles(dir: string, fileList: string[] = []): Promise<string[]> {
   const files = await readdir(dir);
 
   for (const file of files) {
@@ -74,10 +71,7 @@ async function getAllPngFiles(
   return fileList;
 }
 
-async function convertPngToWebp(
-  pngPath: string,
-  options: ConvertOptions
-): Promise<void> {
+async function convertPngToWebp(pngPath: string, options: ConvertOptions): Promise<void> {
   const fileName = basename(pngPath);
 
   // Skip files in skip list
@@ -103,7 +97,7 @@ async function convertPngToWebp(
     const savedPercent = ((savedBytes / originalSize) * 100).toFixed(1);
 
     console.log(
-      `✅ Converted: ${pngPath}\n   → ${webpPath}\n   📊 ${formatBytes(originalSize)} → ${formatBytes(webpSize)} (saved ${savedPercent}%)`
+      `✅ Converted: ${pngPath}\n   → ${webpPath}\n   📊 ${formatBytes(originalSize)} → ${formatBytes(webpSize)} (saved ${savedPercent}%)`,
     );
 
     // Delete original if option is set
@@ -189,12 +183,8 @@ async function main() {
   console.log(`  📦 Total WebP size: ${formatBytes(totalWebpSize)}`);
   const totalSaved = totalOriginalSize - totalWebpSize;
   const totalSavedPercent =
-    totalOriginalSize > 0
-      ? ((totalSaved / totalOriginalSize) * 100).toFixed(1)
-      : '0';
-  console.log(
-    `  💾 Total saved: ${formatBytes(totalSaved)} (${totalSavedPercent}%)`
-  );
+    totalOriginalSize > 0 ? ((totalSaved / totalOriginalSize) * 100).toFixed(1) : '0';
+  console.log(`  💾 Total saved: ${formatBytes(totalSaved)} (${totalSavedPercent}%)`);
   console.log('='.repeat(60));
 }
 

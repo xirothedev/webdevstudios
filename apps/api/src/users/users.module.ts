@@ -25,17 +25,17 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuthModule } from '../auth/auth.module';
 // Guards
-import { RolesGuard } from '../common/guards/roles.guard';
+import { RolesGuard } from '@/common/guards';
 import { StorageModule } from '../storage/storage.module';
 // Commands
-import { DeleteUserHandler } from './commands/delete-user/delete-user.handler';
-import { UpdateAvatarHandler } from './commands/update-avatar/update-avatar.handler';
-import { UpdateProfileHandler } from './commands/update-profile/update-profile.handler';
-import { UpdateUserHandler } from './commands/update-user/update-user.handler';
+import { DeleteUserHandler } from './commands/delete-user';
+import { UpdateAvatarHandler } from './commands/update-avatar';
+import { UpdateProfileHandler } from './commands/update-profile';
+import { UpdateUserHandler } from './commands/update-user';
 // Queries
-import { GetUserByIdHandler } from './queries/get-user-by-id/get-user-by-id.handler';
-import { ListUsersHandler } from './queries/list-users/list-users.handler';
-import { SearchUsersHandler } from './queries/search-users/search-users.handler';
+import { GetUserByIdHandler } from './queries/get-user-by-id';
+import { ListUsersHandler } from './queries/list-users';
+import { SearchUsersHandler } from './queries/search-users';
 // Controller
 import { UsersController } from './users.controller';
 
@@ -46,11 +46,7 @@ const CommandHandlers = [
   DeleteUserHandler,
 ];
 
-const QueryHandlers = [
-  GetUserByIdHandler,
-  ListUsersHandler,
-  SearchUsersHandler,
-];
+const QueryHandlers = [GetUserByIdHandler, ListUsersHandler, SearchUsersHandler];
 
 @Module({
   imports: [CqrsModule, AuthModule, StorageModule],

@@ -36,10 +36,7 @@ import { useLogin } from '@/lib/api/hooks/use-auth';
 // Validation schema with Zod
 const loginSchema = z.object({
   email: z.email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
-  password: z
-    .string()
-    .min(1, 'Mật khẩu là bắt buộc')
-    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+  password: z.string().min(1, 'Mật khẩu là bắt buộc').min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
   rememberMe: z.boolean(),
 });
 
@@ -74,18 +71,13 @@ export default function LoginPage() {
       <OAuthRedirectHandler />
       <div className="glass-card">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-white drop-shadow-lg">
-            Đăng nhập
-          </h2>
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg">Đăng nhập</h2>
           <p className="mt-2 text-sm text-white/70">Chào mừng bạn quay lại</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-white/90">
               Email
             </label>
             <Input
@@ -96,16 +88,11 @@ export default function LoginPage() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.email && (
-              <p className="text-sm text-red-400">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-sm text-red-400">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-white/90"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-white/90">
               Mật khẩu
             </label>
             <Input
@@ -116,9 +103,7 @@ export default function LoginPage() {
               disabled={isLoading}
               className="glass-input"
             />
-            {errors.password && (
-              <p className="text-sm text-red-400">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-400">{errors.password.message}</p>}
             <div className="flex justify-end">
               <Link
                 href="/auth/forgot-password"
@@ -144,9 +129,7 @@ export default function LoginPage() {
                 />
                 <div
                   className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-all ${
-                    rememberMe
-                      ? 'border-orange-500 bg-orange-500'
-                      : 'border-white/20 bg-white/5'
+                    rememberMe ? 'border-orange-500 bg-orange-500' : 'border-white/20 bg-white/5'
                   } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
                   <svg
@@ -158,11 +141,7 @@ export default function LoginPage() {
                     stroke="currentColor"
                     strokeWidth={3}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               </div>

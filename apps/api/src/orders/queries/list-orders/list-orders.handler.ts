@@ -24,7 +24,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { OrderDto, OrderListResponseDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';
-import { OrderWithItems } from '../../types/order.types';
+import { OrderWithItems } from '../../order.types';
 import { ListOrdersQuery } from './list-orders.query';
 
 @QueryHandler(ListOrdersQuery)
@@ -34,11 +34,7 @@ export class ListOrdersHandler implements IQueryHandler<ListOrdersQuery> {
   async execute(query: ListOrdersQuery): Promise<OrderListResponseDto> {
     const { userId, page, limit } = query;
 
-    const { orders, total } = await this.orderRepository.findByUserId(
-      userId,
-      page,
-      limit
-    );
+    const { orders, total } = await this.orderRepository.findByUserId(userId, page, limit);
 
     return {
       orders: orders.map((order) => this.mapToDto(order)),

@@ -24,16 +24,16 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
+import { UserRepository } from '@/auth/infrastructure';
 import { StorageService } from '../../../storage/storage.service';
-import { PrivateUserDto } from '../../dtos/responses.dto';
+import { PrivateUserDto } from '../../dtos';
 import { UpdateAvatarCommand } from './update-avatar.command';
 
 @CommandHandler(UpdateAvatarCommand)
 export class UpdateAvatarHandler implements ICommandHandler<UpdateAvatarCommand> {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async execute(command: UpdateAvatarCommand): Promise<PrivateUserDto> {

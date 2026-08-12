@@ -33,6 +33,6 @@ export class CreateEventCommand {
     public readonly organizer?: string,
     public readonly attendees?: number,
     public readonly surveyLink?: string,
-    public readonly createdBy?: string
+    public readonly createdBy?: string,
   ) {}
 }

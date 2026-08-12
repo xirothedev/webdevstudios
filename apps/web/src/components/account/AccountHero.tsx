@@ -29,12 +29,7 @@ interface AccountHeroProps {
   description: string;
 }
 
-export function AccountHero({
-  icon: Icon,
-  label,
-  title,
-  description,
-}: AccountHeroProps) {
+export function AccountHero({ icon: Icon, label, title, description }: AccountHeroProps) {
   return (
     <section className="relative overflow-hidden py-16 sm:py-20">
       {/* Background gradient */}

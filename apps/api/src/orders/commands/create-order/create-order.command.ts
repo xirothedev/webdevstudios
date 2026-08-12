@@ -38,6 +38,6 @@ export class CreateOrderCommand {
     public readonly productId?: string,
     public readonly productSlug?: ProductSlug,
     public readonly size?: ProductSize,
-    public readonly quantity?: number
+    public readonly quantity?: number,
   ) {}
 }

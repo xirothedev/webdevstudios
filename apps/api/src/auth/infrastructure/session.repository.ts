@@ -23,7 +23,7 @@
 import { Device, Session, SessionStatus, User } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 type SessionWithDevice = Session & {
   device: Device | null;
@@ -71,9 +71,7 @@ export class SessionRepository {
     });
   }
 
-  async findByRefreshToken(
-    refreshToken: string
-  ): Promise<SessionWithRelations | null> {
+  async findByRefreshToken(refreshToken: string): Promise<SessionWithRelations | null> {
     return this.prisma.session.findFirst({
       where: { refreshToken },
       include: {

@@ -29,11 +29,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { BlogEditor } from '@/components/admin/BlogEditor';
 import { blogApi } from '@/lib/api/blog';
 
-export function AdminBlogEditPageClient({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export function AdminBlogEditPageClient({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
 
   const {
@@ -60,14 +56,9 @@ export function AdminBlogEditPageClient({
   if (error || !post) {
     return (
       <div className="p-6">
-        <AdminHeader
-          title="Chỉnh sửa Blog"
-          description="Không tìm thấy bài viết"
-        />
+        <AdminHeader title="Chỉnh sửa Blog" description="Không tìm thấy bài viết" />
         <div className="mt-8 py-12 text-center">
-          <p className="text-wds-text/70">
-            Không tìm thấy bài viết hoặc có lỗi xảy ra.
-          </p>
+          <p className="text-wds-text/70">Không tìm thấy bài viết hoặc có lỗi xảy ra.</p>
         </div>
       </div>
     );
@@ -75,10 +66,7 @@ export function AdminBlogEditPageClient({
 
   return (
     <div className="p-6">
-      <AdminHeader
-        title="Chỉnh sửa Blog"
-        description={`Chỉnh sửa bài viết: ${post.title}`}
-      />
+      <AdminHeader title="Chỉnh sửa Blog" description={`Chỉnh sửa bài viết: ${post.title}`} />
 
       <div className="mt-8">
         <BlogEditor postId={id} />

@@ -28,6 +28,6 @@ export class UpdateUserCommand {
     public readonly fullName?: string,
     public readonly phone?: string,
     public readonly avatar?: string,
-    public readonly role?: UserRole
+    public readonly role?: UserRole,
   ) {}
 }

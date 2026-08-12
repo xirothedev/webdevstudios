@@ -65,19 +65,14 @@ export default function PaymentReturnPage() {
         <div className="mx-auto max-w-2xl px-6 text-center">
           {isChecking ? (
             <>
-              <h1 className="mb-4 text-3xl font-bold text-white">
-                Đang xác nhận thanh toán...
-              </h1>
+              <h1 className="mb-4 text-3xl font-bold text-white">Đang xác nhận thanh toán...</h1>
               <p className="text-white/60">
-                Vui lòng đợi trong giây lát, chúng tôi đang kiểm tra trạng thái
-                thanh toán của bạn.
+                Vui lòng đợi trong giây lát, chúng tôi đang kiểm tra trạng thái thanh toán của bạn.
               </p>
             </>
           ) : (
             <>
-              <h1 className="mb-4 text-3xl font-bold text-white">
-                Thanh toán thành công!
-              </h1>
+              <h1 className="mb-4 text-3xl font-bold text-white">Thanh toán thành công!</h1>
               <p className="mb-8 text-white/60">
                 Cảm ơn bạn đã thanh toán. Đơn hàng của bạn đang được xử lý.
               </p>

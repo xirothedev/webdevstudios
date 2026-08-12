@@ -23,7 +23,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '../../infrastructure/user.repository';
+import { UserRepository } from '../../infrastructure';
 import { GetCurrentUserQuery } from './get-current-user.query';
 
 @Injectable()

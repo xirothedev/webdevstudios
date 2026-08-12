@@ -28,6 +28,6 @@ export class LoginCommand implements ICommand {
     public readonly password: string,
     public readonly rememberMe?: boolean,
     public readonly ipAddress?: string,
-    public readonly userAgent?: string
+    public readonly userAgent?: string,
   ) {}
 }

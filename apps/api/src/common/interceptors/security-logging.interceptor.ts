@@ -20,29 +20,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import {
-  SecurityEventType,
-  SecurityLoggerService,
-} from '../services/security-logger.service';
+import { SecurityEventType, SecurityLoggerService } from '../services';
 
 @Injectable()
 export class SecurityLoggingInterceptor implements NestInterceptor {
   constructor(private readonly securityLogger: SecurityLoggerService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const { method, path, ip, headers } = request;
     const userAgent = headers['user-agent'];
-    const userId = (request as any).user?.id;
+    const userId = (request as { user?: { id: string } }).user?.id;
 
     return next.handle().pipe(
       tap(() => {
@@ -69,7 +61,7 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
             request.body?.email || 'unknown',
             error.message,
             ip,
-            userAgent
+            userAgent,
           );
         } else if (status === 403) {
           this.securityLogger.logEvent({
@@ -87,7 +79,7 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
         }
 
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -103,9 +95,6 @@ export class SecurityLoggingInterceptor implements NestInterceptor {
 
     const sensitiveMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
-    return (
-      sensitiveMethods.includes(method) &&
-      sensitivePaths.some((p) => path.includes(p))
-    );
+    return sensitiveMethods.includes(method) && sensitivePaths.some((p) => path.includes(p));
   }
 }

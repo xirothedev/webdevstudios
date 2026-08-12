@@ -76,12 +76,7 @@ export interface OrderListResponse {
   total: number;
 }
 
-export type PaymentTransactionStatus =
-  | 'PENDING'
-  | 'PAID'
-  | 'CANCELLED'
-  | 'EXPIRED'
-  | 'FAILED';
+export type PaymentTransactionStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'EXPIRED' | 'FAILED';
 
 export interface PaymentTransaction {
   id: string;
@@ -111,7 +106,7 @@ export const adminApi = {
   async listUsers(
     page: number = 1,
     limit: number = 10,
-    role?: UserRole
+    role?: UserRole,
   ): Promise<UserListResponse> {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -138,10 +133,7 @@ export const adminApi = {
    * Update user (Admin only)
    */
   async updateUser(id: string, data: UpdateUserRequest): Promise<AdminUser> {
-    const response = await apiClient.patch<{ data: AdminUser }>(
-      `/users/${id}`,
-      data
-    );
+    const response = await apiClient.patch<{ data: AdminUser }>(`/users/${id}`, data);
     return response.data.data;
   },
 
@@ -156,23 +148,15 @@ export const adminApi = {
    * List all products (Admin view - includes unpublished)
    */
   async listProducts(): Promise<ProductListResponse> {
-    const response = await apiClient.get<{ data: ProductListResponse }>(
-      '/products'
-    );
+    const response = await apiClient.get<{ data: ProductListResponse }>('/products');
     return response.data.data;
   },
 
   /**
    * Update product (Admin only)
    */
-  async updateProduct(
-    id: string,
-    data: UpdateProductRequest
-  ): Promise<Product> {
-    const response = await apiClient.patch<{ data: Product }>(
-      `/products/${id}`,
-      data
-    );
+  async updateProduct(id: string, data: UpdateProductRequest): Promise<Product> {
+    const response = await apiClient.patch<{ data: Product }>(`/products/${id}`, data);
     return response.data.data;
   },
 
@@ -182,7 +166,7 @@ export const adminApi = {
   async listOrders(
     page: number = 1,
     limit: number = 10,
-    status?: OrderStatus
+    status?: OrderStatus,
   ): Promise<OrderListResponse> {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -191,12 +175,9 @@ export const adminApi = {
     if (status) {
       params.status = status;
     }
-    const response = await apiClient.get<{ data: OrderListResponse }>(
-      '/orders',
-      {
-        params,
-      }
-    );
+    const response = await apiClient.get<{ data: OrderListResponse }>('/orders', {
+      params,
+    });
     return response.data.data;
   },
 
@@ -206,7 +187,7 @@ export const adminApi = {
   async listTransactions(
     page: number = 1,
     limit: number = 10,
-    status?: PaymentTransactionStatus
+    status?: PaymentTransactionStatus,
   ): Promise<TransactionListResponse> {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -219,7 +200,7 @@ export const adminApi = {
       '/payments/transactions',
       {
         params,
-      }
+      },
     );
     return response.data.data;
   },

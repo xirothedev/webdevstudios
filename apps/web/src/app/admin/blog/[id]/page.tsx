@@ -29,10 +29,6 @@ export async function generateStaticParams() {
   return [{ id: 'placeholder' }];
 }
 
-export default function AdminBlogEditPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function AdminBlogEditPage({ params }: { params: Promise<{ id: string }> }) {
   return <AdminBlogEditPageClient params={params} />;
 }

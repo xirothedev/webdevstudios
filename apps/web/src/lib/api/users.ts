@@ -56,13 +56,8 @@ export const usersApi = {
   /**
    * Update user profile (fullName, phone)
    */
-  async updateProfile(
-    data: UpdateProfileRequest
-  ): Promise<UpdateProfileResponse> {
-    const response = await apiClient.patch<{ data: UpdateProfileResponse }>(
-      '/users/profile',
-      data
-    );
+  async updateProfile(data: UpdateProfileRequest): Promise<UpdateProfileResponse> {
+    const response = await apiClient.patch<{ data: UpdateProfileResponse }>('/users/profile', data);
     return response.data.data;
   },
 
@@ -80,7 +75,7 @@ export const usersApi = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      }
+      },
     );
     return response.data.data;
   },

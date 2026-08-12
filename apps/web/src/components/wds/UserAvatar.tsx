@@ -65,19 +65,16 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
             'focus:ring-wds-accent relative flex cursor-pointer items-center gap-2 rounded-full transition-all outline-none focus:ring-2 focus:ring-offset-2',
             isDark
               ? 'hover:bg-white/5 focus:ring-offset-black'
-              : 'hover:bg-gray-100 focus:ring-offset-white'
+              : 'hover:bg-gray-100 focus:ring-offset-white',
           )}
           aria-label="User menu"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={user.avatar || undefined}
-              alt={user.fullName || user.email}
-            />
+            <AvatarImage src={user.avatar || undefined} alt={user.fullName || user.email} />
             <AvatarFallback
               className={cn(
                 'text-xs font-medium',
-                isDark ? 'bg-white/10 text-white' : 'bg-gray-200 text-gray-700'
+                isDark ? 'bg-white/10 text-white' : 'bg-gray-200 text-gray-700',
               )}
             >
               {initials}
@@ -89,27 +86,22 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
         align="end"
         className={cn(
           'w-64 p-2',
-          isDark
-            ? 'border-white/10 bg-black/98 backdrop-blur-xl'
-            : 'border-gray-200 bg-white'
+          isDark ? 'border-white/10 bg-black/98 backdrop-blur-xl' : 'border-gray-200 bg-white',
         )}
       >
         {/* User Info Section */}
         <div
           className={cn(
             'flex items-center gap-3 rounded-lg px-3 py-3',
-            isDark ? 'bg-white/5' : 'bg-gray-50'
+            isDark ? 'bg-white/5' : 'bg-gray-50',
           )}
         >
           <Avatar className="h-12 w-12">
-            <AvatarImage
-              src={user.avatar || undefined}
-              alt={user.fullName || user.email}
-            />
+            <AvatarImage src={user.avatar || undefined} alt={user.fullName || user.email} />
             <AvatarFallback
               className={cn(
                 'text-sm font-semibold',
-                isDark ? 'bg-white/10 text-white' : 'bg-gray-200 text-gray-700'
+                isDark ? 'bg-white/10 text-white' : 'bg-gray-200 text-gray-700',
               )}
             >
               {initials}
@@ -119,17 +111,12 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
             <p
               className={cn(
                 'truncate text-sm font-semibold',
-                isDark ? 'text-white' : 'text-gray-900'
+                isDark ? 'text-white' : 'text-gray-900',
               )}
             >
               {user.fullName || 'User'}
             </p>
-            <p
-              className={cn(
-                'truncate text-xs',
-                isDark ? 'text-white/60' : 'text-gray-500'
-              )}
-            >
+            <p className={cn('truncate text-xs', isDark ? 'text-white/60' : 'text-gray-500')}>
               {user.email}
             </p>
           </div>
@@ -145,7 +132,7 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
               'cursor-pointer rounded-md px-4 py-3',
               isDark
                 ? 'text-white/80 focus:bg-white/10 focus:text-white'
-                : 'text-gray-700 focus:bg-gray-100 focus:text-gray-900'
+                : 'text-gray-700 focus:bg-gray-100 focus:text-gray-900',
             )}
           >
             <Link href="/account/profile" className="flex items-center gap-3">
@@ -160,7 +147,7 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
               'cursor-pointer rounded-md px-4 py-3',
               isDark
                 ? 'text-white/80 focus:bg-white/10 focus:text-white'
-                : 'text-gray-700 focus:bg-gray-100 focus:text-gray-900'
+                : 'text-gray-700 focus:bg-gray-100 focus:text-gray-900',
             )}
           >
             <Link href="/orders" className="flex items-center gap-3">
@@ -175,7 +162,7 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
               'cursor-pointer rounded-md px-4 py-3',
               isDark
                 ? 'text-white/80 focus:bg-white/10 focus:text-white'
-                : 'text-gray-700 focus:bg-gray-100 focus:text-gray-900'
+                : 'text-gray-700 focus:bg-gray-100 focus:text-gray-900',
             )}
           >
             <Link href="/account/settings" className="flex items-center gap-3">
@@ -194,7 +181,7 @@ export function UserAvatar({ variant = 'light' }: UserAvatarProps) {
             'cursor-pointer rounded-md px-4 py-3',
             isDark
               ? 'text-red-400 focus:bg-red-500/10 focus:text-red-300'
-              : 'text-red-600 focus:bg-red-50 focus:text-red-700'
+              : 'text-red-600 focus:bg-red-50 focus:text-red-700',
           )}
         >
           <div className="flex items-center gap-3">

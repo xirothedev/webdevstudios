@@ -31,15 +31,9 @@ interface CartDrawerContextType {
   toggleDrawer: () => void;
 }
 
-const CartDrawerContext = createContext<CartDrawerContextType | undefined>(
-  undefined
-);
+const CartDrawerContext = createContext<CartDrawerContextType | undefined>(undefined);
 
-export function CartDrawerProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CartDrawerProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const openDrawer = () => setIsOpen(true);
@@ -53,11 +47,7 @@ export function CartDrawerProvider({
     toggleDrawer,
   };
 
-  return (
-    <CartDrawerContext.Provider value={value}>
-      {children}
-    </CartDrawerContext.Provider>
-  );
+  return <CartDrawerContext.Provider value={value}>{children}</CartDrawerContext.Provider>;
 }
 
 export function useCartDrawer() {

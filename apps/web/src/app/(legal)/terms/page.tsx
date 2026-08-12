@@ -47,9 +47,7 @@ const TOC_ITEMS = [
 ];
 
 export default function TermsPage() {
-  const commitDate = getFileCommitDate(
-    'apps/web/src/app/(legal)/terms/content.mdx'
-  );
+  const commitDate = getFileCommitDate('apps/web/src/app/(legal)/terms/content.mdx');
 
   return (
     <div className="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen">

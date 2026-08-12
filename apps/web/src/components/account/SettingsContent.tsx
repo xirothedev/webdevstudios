@@ -40,9 +40,7 @@ export function SettingsContent() {
   if (error || !user) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-        <p className="text-sm font-semibold text-gray-900">
-          Không thể tải thông tin cài đặt
-        </p>
+        <p className="text-sm font-semibold text-gray-900">Không thể tải thông tin cài đặt</p>
         <p className="text-xs text-gray-600">Vui lòng thử lại sau</p>
       </div>
     );

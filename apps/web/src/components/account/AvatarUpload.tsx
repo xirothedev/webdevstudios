@@ -52,9 +52,7 @@ export function AvatarUpload({ user, className }: AvatarUploadProps) {
     // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      toast.error(
-        'Định dạng file không hợp lệ. Vui lòng chọn file JPG, PNG hoặc WebP.'
-      );
+      toast.error('Định dạng file không hợp lệ. Vui lòng chọn file JPG, PNG hoặc WebP.');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

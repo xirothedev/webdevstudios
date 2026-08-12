@@ -23,8 +23,8 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
-import { PrivateUserDto } from '../../dtos/responses.dto';
+import { UserRepository } from '@/auth/infrastructure';
+import { PrivateUserDto } from '../../dtos';
 import { UpdateProfileCommand } from './update-profile.command';
 
 @CommandHandler(UpdateProfileCommand)

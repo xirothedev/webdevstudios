@@ -20,24 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { ReviewDto } from '../../dtos/review.dto';
 import { ReviewRepository } from '../../infrastructure/review.repository';
-import { ReviewWithRelations } from '../../types/review.types';
+import { ReviewWithRelations } from '../../review.types';
 import { UpdateReviewCommand } from './update-review.command';
 
 @CommandHandler(UpdateReviewCommand)
 export class UpdateReviewHandler implements ICommandHandler<UpdateReviewCommand> {
   constructor(
     private readonly reviewRepository: ReviewRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async execute(command: UpdateReviewCommand): Promise<ReviewDto> {
@@ -68,19 +64,13 @@ export class UpdateReviewHandler implements ICommandHandler<UpdateReviewCommand>
       updateData.comment = comment;
     }
 
-    const updatedReview = await this.reviewRepository.update(
-      reviewId,
-      updateData
-    );
+    const updatedReview = await this.reviewRepository.update(reviewId, updateData);
 
     // Update product rating
-    const { ratingValue, ratingCount } =
-      await this.reviewRepository.calculateProductRating(review.productId);
-    await this.productRepository.updateRating(
+    const { ratingValue, ratingCount } = await this.reviewRepository.calculateProductRating(
       review.productId,
-      ratingValue,
-      ratingCount
     );
+    await this.productRepository.updateRating(review.productId, ratingValue, ratingCount);
 
     return this.mapToDto(updatedReview);
   }

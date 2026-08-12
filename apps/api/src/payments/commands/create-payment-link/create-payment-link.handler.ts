@@ -21,11 +21,7 @@
  */
 
 import { PaymentTransactionStatus } from '@generated/prisma';
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { OrderRepository } from '@/orders/infrastructure/order.repository';
@@ -39,7 +35,7 @@ export class CreatePaymentLinkHandler implements ICommandHandler<CreatePaymentLi
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly paymentRepository: PaymentRepository,
-    private readonly payOSService: PayOSService
+    private readonly payOSService: PayOSService,
   ) {}
 
   async execute(command: CreatePaymentLinkCommand): Promise<{
@@ -60,8 +56,7 @@ export class CreatePaymentLinkHandler implements ICommandHandler<CreatePaymentLi
     }
 
     // Check if payment transaction already exists
-    const existingTransaction =
-      await this.paymentRepository.findByOrderId(orderId);
+    const existingTransaction = await this.paymentRepository.findByOrderId(orderId);
     if (existingTransaction) {
       // If transaction exists and is pending, return existing payment URL
       if (existingTransaction.status === PaymentTransactionStatus.PENDING) {
@@ -72,9 +67,7 @@ export class CreatePaymentLinkHandler implements ICommandHandler<CreatePaymentLi
           };
         }
       } else {
-        throw new ConflictException(
-          'Payment transaction already exists for this order'
-        );
+        throw new ConflictException('Payment transaction already exists for this order');
       }
     }
 
@@ -83,9 +76,7 @@ export class CreatePaymentLinkHandler implements ICommandHandler<CreatePaymentLi
     const cancelUrl = process.env.PAYOS_CANCEL_URL || '';
 
     if (!returnUrl || !cancelUrl) {
-      throw new BadRequestException(
-        'PAYOS_RETURN_URL and PAYOS_CANCEL_URL must be configured'
-      );
+      throw new BadRequestException('PAYOS_RETURN_URL and PAYOS_CANCEL_URL must be configured');
     }
 
     // Prepare payment items
@@ -101,15 +92,14 @@ export class CreatePaymentLinkHandler implements ICommandHandler<CreatePaymentLi
     const orderCodeForPayOS = this.convertOrderCodeToNumber(order.code);
 
     // Create payment link with PayOS
-    const { paymentUrl, transactionCode } =
-      await this.payOSService.createPaymentLink({
-        orderCode: orderCodeForPayOS.toString(),
-        amount: Number(order.totalAmount),
-        description: `Thanh toán đơn hàng ${order.code}`,
-        returnUrl,
-        cancelUrl,
-        items,
-      });
+    const { paymentUrl, transactionCode } = await this.payOSService.createPaymentLink({
+      orderCode: orderCodeForPayOS.toString(),
+      amount: Number(order.totalAmount),
+      description: `Thanh toán đơn hàng ${order.code}`,
+      returnUrl,
+      cancelUrl,
+      items,
+    });
 
     // Save payment transaction
     await this.paymentRepository.create({

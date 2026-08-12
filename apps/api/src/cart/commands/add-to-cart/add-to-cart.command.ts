@@ -27,6 +27,6 @@ export class AddToCartCommand {
     public readonly userId: string,
     public readonly productId: string,
     public readonly size: ProductSize | null,
-    public readonly quantity: number
+    public readonly quantity: number,
   ) {}
 }

@@ -89,16 +89,13 @@ export function NumberTicker({
           }).format(Number(latest.toFixed(decimalPlaces)));
         }
       }),
-    [springValue, decimalPlaces]
+    [springValue, decimalPlaces],
   );
 
   return (
     <span
       ref={ref}
-      className={cn(
-        'inline-block tracking-wider text-black tabular-nums',
-        className
-      )}
+      className={cn('inline-block tracking-wider text-black tabular-nums', className)}
       {...props}
     >
       {startValue}

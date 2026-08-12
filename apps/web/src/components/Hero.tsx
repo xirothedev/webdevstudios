@@ -77,8 +77,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mx-auto mb-12 max-w-xl text-lg text-white/70"
         >
-          Khám phá bộ sưu tập độc quyền áo thun, huy hiệu, dây đeo, pad chuột và
-          nhiều vật phẩm khác mang đậm dấu ấn WebDev Studios.
+          Khám phá bộ sưu tập độc quyền áo thun, huy hiệu, dây đeo, pad chuột và nhiều vật phẩm khác
+          mang đậm dấu ấn WebDev Studios.
         </motion.p>
 
         {/* 3D Mockup */}
@@ -129,9 +129,7 @@ export function Hero() {
               <div className="col-span-12 space-y-6 md:col-span-9">
                 <div className="flex items-end justify-between">
                   <div>
-                    <div className="mb-1 text-xs text-zinc-500">
-                      Sản phẩm đã bán
-                    </div>
+                    <div className="mb-1 text-xs text-zinc-500">Sản phẩm đã bán</div>
                     <div className="text-2xl font-medium tracking-tight text-white">
                       1,247 sản phẩm
                     </div>
@@ -143,20 +141,18 @@ export function Hero() {
 
                 {/* Chart Placeholder */}
                 <div className="from-wds-accent/5 relative flex h-48 w-full items-end gap-2 overflow-hidden rounded-lg border border-white/5 bg-linear-to-b to-transparent px-4 pb-2">
-                  {[40, 60, 45, 80, 55, 90, 70, 60, 50, 75, 85, 95].map(
-                    (h, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ height: 0 }}
-                        animate={{ height: `${h}%` }}
-                        transition={{
-                          duration: 1,
-                          delay: 0.5 + i * 0.05,
-                        }}
-                        className="bg-wds-accent/40 hover:bg-wds-accent/60 flex-1 rounded-t-sm transition-colors"
-                      ></motion.div>
-                    )
-                  )}
+                  {[40, 60, 45, 80, 55, 90, 70, 60, 50, 75, 85, 95].map((h, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ height: 0 }}
+                      animate={{ height: `${h}%` }}
+                      transition={{
+                        duration: 1,
+                        delay: 0.5 + i * 0.05,
+                      }}
+                      className="bg-wds-accent/40 hover:bg-wds-accent/60 flex-1 rounded-t-sm transition-colors"
+                    ></motion.div>
+                  ))}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

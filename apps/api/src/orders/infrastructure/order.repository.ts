@@ -20,17 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  OrderStatus,
-  PaymentStatus,
-  ProductSize,
-  ProductSlug,
-} from '@generated/prisma';
+import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { subMinutes } from 'date-fns';
+import { PrismaService } from '@/prisma';
 import { ShippingAddressDto } from '../dtos/order.dto';
-import { OrderWithItems } from '../types/order.types';
+import { OrderWithItems } from '../order.types';
 
 @Injectable()
 export class OrderRepository {
@@ -136,7 +132,7 @@ export class OrderRepository {
   async findByUserId(
     userId: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<{ orders: OrderWithItems[]; total: number }> {
     const skip = (page - 1) * limit;
 
@@ -180,10 +176,7 @@ export class OrderRepository {
     });
   }
 
-  async updatePaymentStatus(
-    id: string,
-    paymentStatus: PaymentStatus
-  ): Promise<OrderWithItems> {
+  async updatePaymentStatus(id: string, paymentStatus: PaymentStatus): Promise<OrderWithItems> {
     return this.prisma.order.update({
       where: { id },
       data: { paymentStatus },
@@ -238,7 +231,7 @@ export class OrderRepository {
   }
 
   async findExpiredPendingOrders(): Promise<OrderWithItems[]> {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const fifteenMinutesAgo = subMinutes(new Date(), 15);
 
     return this.prisma.order.findMany({
       where: {
@@ -263,7 +256,7 @@ export class OrderRepository {
   async findAll(
     page: number = 1,
     limit: number = 10,
-    status?: OrderStatus
+    status?: OrderStatus,
   ): Promise<OrderWithItems[]> {
     const skip = (page - 1) * limit;
 

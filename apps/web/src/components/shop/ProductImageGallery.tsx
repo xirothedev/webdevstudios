@@ -33,10 +33,7 @@ interface ProductImageGalleryProps {
   badge?: string;
 }
 
-export function ProductImageGallery({
-  images,
-  badge,
-}: ProductImageGalleryProps) {
+export function ProductImageGallery({ images, badge }: ProductImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   return (
@@ -94,15 +91,10 @@ export function ProductImageGallery({
                 'relative h-20 w-20 cursor-pointer overflow-hidden rounded-xl border-2 transition-all duration-200',
                 selectedImageIndex === index
                   ? 'border-wds-accent shadow-wds-accent/20 shadow-lg'
-                  : 'border-white/10 hover:border-white/20'
+                  : 'border-white/10 hover:border-white/20',
               )}
             >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                className="object-contain p-2"
-              />
+              <Image src={image.src} alt={image.alt} fill className="object-contain p-2" />
             </button>
           ))}
         </div>

@@ -22,8 +22,7 @@
 
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 
-import { FileTooLargeException } from '../exceptions/file-too-large.exception';
-import { InvalidFileTypeException } from '../exceptions/invalid-file-type.exception';
+import { FileTooLargeException, InvalidFileTypeException } from '../exceptions';
 
 export interface FileValidationOptions {
   maxSize?: number; // in bytes

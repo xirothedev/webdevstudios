@@ -24,7 +24,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { ExpireOrderCommand } from '../commands/expire-order/expire-order.command';
+import { ExpireOrderCommand } from '../commands/expire-order';
 import { OrderRepository } from '../infrastructure/order.repository';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class OrderRecoveryScheduler implements OnModuleInit {
 
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly commandBus: CommandBus
+    private readonly commandBus: CommandBus,
   ) {}
 
   // Run on module init (app startup)
@@ -50,8 +50,7 @@ export class OrderRecoveryScheduler implements OnModuleInit {
 
   private async recoverStuckOrders() {
     try {
-      const expiredOrders =
-        await this.orderRepository.findExpiredPendingOrders();
+      const expiredOrders = await this.orderRepository.findExpiredPendingOrders();
 
       if (expiredOrders.length === 0) {
         this.logger.debug('No stuck orders found');
@@ -67,13 +66,13 @@ export class OrderRecoveryScheduler implements OnModuleInit {
           this.logger.log(`Recovered stuck order ${order.id} (${order.code})`);
         } catch (error) {
           this.logger.error(
-            `Failed to recover order ${order.id}: ${error instanceof Error ? error.message : String(error)}`
+            `Failed to recover order ${order.id}: ${error instanceof Error ? error.message : String(error)}`,
           );
         }
       }
     } catch (error) {
       this.logger.error(
-        `Error in order recovery scheduler: ${error instanceof Error ? error.message : String(error)}`
+        `Error in order recovery scheduler: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

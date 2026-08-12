@@ -24,7 +24,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { ExpireOrderCommand } from '../commands/expire-order/expire-order.command';
+import { ExpireOrderCommand } from '../commands/expire-order';
 import { OrderRepository } from '../infrastructure/order.repository';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class OrderExpirationScheduler {
 
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly commandBus: CommandBus
+    private readonly commandBus: CommandBus,
   ) {}
 
   // Run every 5 minutes to check for expired orders
@@ -42,8 +42,7 @@ export class OrderExpirationScheduler {
     this.logger.log('Checking for expired orders...');
 
     try {
-      const expiredOrders =
-        await this.orderRepository.findExpiredPendingOrders();
+      const expiredOrders = await this.orderRepository.findExpiredPendingOrders();
 
       if (expiredOrders.length === 0) {
         this.logger.debug('No expired orders found');
@@ -59,13 +58,13 @@ export class OrderExpirationScheduler {
           this.logger.log(`Expired order ${order.id} (${order.code})`);
         } catch (error) {
           this.logger.error(
-            `Failed to expire order ${order.id}: ${error instanceof Error ? error.message : String(error)}`
+            `Failed to expire order ${order.id}: ${error instanceof Error ? error.message : String(error)}`,
           );
         }
       }
     } catch (error) {
       this.logger.error(
-        `Error in order expiration scheduler: ${error instanceof Error ? error.message : String(error)}`
+        `Error in order expiration scheduler: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

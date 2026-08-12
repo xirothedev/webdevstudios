@@ -24,9 +24,7 @@ import { Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { MailService } from '../../../mail/mail.service';
-import { TokenService } from '../../infrastructure/token.service';
-import { TokenStorageService } from '../../infrastructure/token-storage.service';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { TokenService, TokenStorageService, UserRepository } from '../../infrastructure';
 import { RequestPasswordResetCommand } from './request-password-reset.command';
 
 @Injectable()
@@ -36,12 +34,10 @@ export class RequestPasswordResetHandler implements ICommandHandler<RequestPassw
     private readonly userRepository: UserRepository,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
 
-  async execute(
-    command: RequestPasswordResetCommand
-  ): Promise<{ success: boolean }> {
+  async execute(command: RequestPasswordResetCommand): Promise<{ success: boolean }> {
     const { email } = command;
 
     // Find user

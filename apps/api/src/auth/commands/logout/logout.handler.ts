@@ -23,7 +23,7 @@
 import { Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { SessionRepository } from '../../infrastructure/session.repository';
+import { SessionRepository } from '../../infrastructure';
 import { LogoutCommand } from './logout.command';
 
 @Injectable()

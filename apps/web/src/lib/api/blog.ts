@@ -82,16 +82,10 @@ export const blogApi = {
   /**
    * List blog posts
    */
-  async listPosts(options?: {
-    page?: number;
-    pageSize?: number;
-  }): Promise<BlogPostListResponse> {
-    const response = await apiClient.get<{ data: BlogPostListResponse }>(
-      '/blog/posts',
-      {
-        params: options,
-      }
-    );
+  async listPosts(options?: { page?: number; pageSize?: number }): Promise<BlogPostListResponse> {
+    const response = await apiClient.get<{ data: BlogPostListResponse }>('/blog/posts', {
+      params: options,
+    });
     return response.data.data;
   },
 
@@ -102,12 +96,9 @@ export const blogApi = {
     page?: number;
     pageSize?: number;
   }): Promise<BlogPostListResponse> {
-    const response = await apiClient.get<{ data: BlogPostListResponse }>(
-      '/blog/posts/admin/all',
-      {
-        params: options,
-      }
-    );
+    const response = await apiClient.get<{ data: BlogPostListResponse }>('/blog/posts/admin/all', {
+      params: options,
+    });
     return response.data.data;
   },
 
@@ -119,17 +110,14 @@ export const blogApi = {
     options?: {
       page?: number;
       pageSize?: number;
-    }
+    },
   ): Promise<BlogPostListResponse> {
-    const response = await apiClient.get<{ data: BlogPostListResponse }>(
-      '/blog/posts/search',
-      {
-        params: {
-          q: query,
-          ...options,
-        },
-      }
-    );
+    const response = await apiClient.get<{ data: BlogPostListResponse }>('/blog/posts/search', {
+      params: {
+        q: query,
+        ...options,
+      },
+    });
     return response.data.data;
   },
 
@@ -138,7 +126,7 @@ export const blogApi = {
    */
   async getPostBySlug(
     slug: string,
-    includeContent = false
+    includeContent = false,
   ): Promise<BlogPost | BlogPostWithContent> {
     const response = await apiClient.get<{
       data: BlogPost | BlogPostWithContent;
@@ -153,10 +141,7 @@ export const blogApi = {
   /**
    * Get blog post by ID (Admin only)
    */
-  async getPostById(
-    id: string,
-    includeContent = true
-  ): Promise<BlogPost | BlogPostWithContent> {
+  async getPostById(id: string, includeContent = true): Promise<BlogPost | BlogPostWithContent> {
     const response = await apiClient.get<{
       data: BlogPost | BlogPostWithContent;
     }>(`/blog/posts/admin/${id}`, {
@@ -171,10 +156,7 @@ export const blogApi = {
    * Create blog post (Admin only)
    */
   async createPost(dto: CreateBlogPostDto): Promise<BlogPost> {
-    const response = await apiClient.post<{ data: BlogPost }>(
-      '/blog/posts',
-      dto
-    );
+    const response = await apiClient.post<{ data: BlogPost }>('/blog/posts', dto);
     return response.data.data;
   },
 
@@ -182,10 +164,7 @@ export const blogApi = {
    * Update blog post (Admin only)
    */
   async updatePost(id: string, dto: UpdateBlogPostDto): Promise<BlogPost> {
-    const response = await apiClient.patch<{ data: BlogPost }>(
-      `/blog/posts/${id}`,
-      dto
-    );
+    const response = await apiClient.patch<{ data: BlogPost }>(`/blog/posts/${id}`, dto);
     return response.data.data;
   },
 
@@ -200,9 +179,7 @@ export const blogApi = {
    * Publish blog post (Admin only)
    */
   async publishPost(id: string): Promise<BlogPost> {
-    const response = await apiClient.post<{ data: BlogPost }>(
-      `/blog/posts/${id}/publish`
-    );
+    const response = await apiClient.post<{ data: BlogPost }>(`/blog/posts/${id}/publish`);
     return response.data.data;
   },
 };

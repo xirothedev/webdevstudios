@@ -65,7 +65,7 @@ export function AccountSidebar() {
                   'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors',
                   isActive
                     ? 'bg-wds-accent text-black'
-                    : 'hover:bg-wds-accent/10 text-gray-700 hover:text-gray-900'
+                    : 'hover:bg-wds-accent/10 text-gray-700 hover:text-gray-900',
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />

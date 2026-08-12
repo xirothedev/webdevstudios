@@ -22,7 +22,7 @@
 
 import sharp from 'sharp';
 
-import { ImageProcessingException } from '../exceptions/image-processing.exception';
+import { ImageProcessingException } from '../exceptions';
 
 export interface ImageValidationResult {
   isValid: boolean;
@@ -40,9 +40,7 @@ export interface ResizeOptions {
 /**
  * Validate image file
  */
-export async function validateImage(
-  buffer: Buffer
-): Promise<ImageValidationResult> {
+export async function validateImage(buffer: Buffer): Promise<ImageValidationResult> {
   try {
     const metadata = await sharp(buffer).metadata();
     return {
@@ -59,10 +57,7 @@ export async function validateImage(
 /**
  * Resize image to specified dimensions
  */
-export async function resizeImage(
-  buffer: Buffer,
-  options: ResizeOptions
-): Promise<Buffer> {
+export async function resizeImage(buffer: Buffer, options: ResizeOptions): Promise<Buffer> {
   try {
     return await sharp(buffer)
       .resize(options.width, options.height, {
@@ -88,10 +83,7 @@ export async function convertToWebP(buffer: Buffer): Promise<Buffer> {
 /**
  * Process image: resize and convert to WebP
  */
-export async function processImage(
-  buffer: Buffer,
-  options: ResizeOptions
-): Promise<Buffer> {
+export async function processImage(buffer: Buffer, options: ResizeOptions): Promise<Buffer> {
   try {
     const resized = await resizeImage(buffer, options);
     return await convertToWebP(resized);
@@ -106,10 +98,7 @@ export async function processImage(
 /**
  * Generate thumbnail from image
  */
-export async function generateThumbnail(
-  buffer: Buffer,
-  size: number = 150
-): Promise<Buffer> {
+export async function generateThumbnail(buffer: Buffer, size: number = 150): Promise<Buffer> {
   try {
     return await sharp(buffer)
       .resize(size, size, { fit: 'cover' })

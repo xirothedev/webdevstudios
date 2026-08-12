@@ -28,11 +28,7 @@ import { useContext, useEffect } from 'react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AuthContext } from '@/contexts/auth.context';
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading } = useContext(AuthContext) ?? {};
   const router = useRouter();
 

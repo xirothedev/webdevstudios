@@ -28,7 +28,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 
-import { StorageException } from './exceptions/storage.exception';
+import { StorageException } from './exceptions';
 import {
   CacheOptions,
   CacheStrategy,
@@ -119,7 +119,7 @@ export class StorageService {
       };
     } catch (error) {
       throw new StorageException(
-        `Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
@@ -151,7 +151,7 @@ export class StorageService {
         throw error;
       }
       throw new StorageException(
-        `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
@@ -169,7 +169,7 @@ export class StorageService {
       await this.s3Client.send(command);
     } catch (error) {
       throw new StorageException(
-        `Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
@@ -221,10 +221,7 @@ export class StorageService {
    * @param content Markdown content
    * @returns R2 URL to the uploaded content
    */
-  async uploadBlogContent(
-    identifier: string,
-    content: string
-  ): Promise<string> {
+  async uploadBlogContent(identifier: string, content: string): Promise<string> {
     const key = `blog/posts/${identifier}/content.md`;
     const contentBuffer = Buffer.from(content, 'utf-8');
 
@@ -281,7 +278,7 @@ export class StorageService {
         throw error;
       }
       throw new StorageException(
-        `Failed to get blog content: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to get blog content: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }

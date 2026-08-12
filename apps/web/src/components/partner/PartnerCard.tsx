@@ -24,11 +24,7 @@
 
 import { motion } from 'motion/react';
 
-import type {
-  CommunityPartner,
-  MediaPartner,
-  StrategicPartner,
-} from '@/data/partners';
+import type { CommunityPartner, MediaPartner, StrategicPartner } from '@/data/partners';
 
 interface PartnerCardProps {
   partner: StrategicPartner | CommunityPartner | MediaPartner;

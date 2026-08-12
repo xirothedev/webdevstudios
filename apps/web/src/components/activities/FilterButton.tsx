@@ -31,12 +31,7 @@ interface FilterButtonProps {
   children: ReactNode;
 }
 
-export function FilterButton({
-  active,
-  onClick,
-  icon,
-  children,
-}: FilterButtonProps) {
+export function FilterButton({ active, onClick, icon, children }: FilterButtonProps) {
   return (
     <button
       onClick={onClick}

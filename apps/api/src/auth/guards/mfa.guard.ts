@@ -20,23 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { SessionRepository } from '../infrastructure/session.repository';
-import { TokenStorageService } from '../infrastructure/token-storage.service';
+import { PrismaService } from '@/prisma';
+import { SessionRepository, TokenStorageService } from '../infrastructure';
 
 @Injectable()
 export class MfaGuard implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sessionRepository: SessionRepository,
-    private readonly tokenStorage: TokenStorageService
+    private readonly tokenStorage: TokenStorageService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -71,9 +65,7 @@ export class MfaGuard implements CanActivate {
     }
 
     // Check Redis for MFA verification status
-    const mfaVerified = await this.tokenStorage.getSessionMfaVerified(
-      session.id
-    );
+    const mfaVerified = await this.tokenStorage.getSessionMfaVerified(session.id);
 
     if (!mfaVerified) {
       throw new ForbiddenException('2FA verification required');

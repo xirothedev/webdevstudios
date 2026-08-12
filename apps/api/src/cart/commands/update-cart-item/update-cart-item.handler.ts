@@ -31,7 +31,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { CartDto } from '../../dtos/cart.dto';
 import { CartRepository } from '../../infrastructure/cart.repository';
-import { CartWithItems } from '../../types/cart.types';
+import { CartWithItems } from '../../cart.types';
 import { getProductImageUrl } from '../../utils/product-image.util';
 import { UpdateCartItemCommand } from './update-cart-item.command';
 
@@ -39,7 +39,7 @@ import { UpdateCartItemCommand } from './update-cart-item.command';
 export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemCommand> {
   constructor(
     private readonly cartRepository: CartRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async execute(command: UpdateCartItemCommand): Promise<CartDto> {
@@ -66,14 +66,9 @@ export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemComm
     let availableStock: number;
 
     if (product.hasSizes && cartItem.size) {
-      const sizeStock = await this.productRepository.getStockBySize(
-        product.id,
-        cartItem.size
-      );
+      const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size);
       if (sizeStock === null) {
-        throw new NotFoundException(
-          `Size ${cartItem.size} not found for product ${product.id}`
-        );
+        throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`);
       }
       availableStock = sizeStock;
     } else {
@@ -82,7 +77,7 @@ export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemComm
 
     if (quantity > availableStock) {
       throw new ConflictException(
-        `Insufficient stock. Available: ${availableStock}, Requested: ${quantity}`
+        `Insufficient stock. Available: ${availableStock}, Requested: ${quantity}`,
       );
     }
 
@@ -102,9 +97,7 @@ export class UpdateCartItemHandler implements ICommandHandler<UpdateCartItemComm
 
       let stockAvailable: number;
       if (product.hasSizes && item.size) {
-        const sizeStock = product.sizeStocks?.find(
-          (ss) => ss.size === item.size
-        );
+        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size);
         stockAvailable = sizeStock?.stock || 0;
       } else {
         stockAvailable = product.stock;

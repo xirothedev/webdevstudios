@@ -30,15 +30,10 @@ interface ProductFeaturesProps {
   title?: string;
 }
 
-export function ProductFeatures({
-  features,
-  title = 'Đặc điểm nổi bật',
-}: ProductFeaturesProps) {
+export function ProductFeatures({ features, title = 'Đặc điểm nổi bật' }: ProductFeaturesProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-      <h3 className="mb-4 text-sm font-semibold tracking-wider text-white/90 uppercase">
-        {title}
-      </h3>
+      <h3 className="mb-4 text-sm font-semibold tracking-wider text-white/90 uppercase">{title}</h3>
       <ul className="space-y-3">
         {features.map((feature, index) => (
           <motion.li

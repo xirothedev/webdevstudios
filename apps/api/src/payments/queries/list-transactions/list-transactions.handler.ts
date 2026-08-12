@@ -24,7 +24,7 @@ import { PaymentTransactionStatus } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 import { ListTransactionsQuery } from './list-transactions.query';
 

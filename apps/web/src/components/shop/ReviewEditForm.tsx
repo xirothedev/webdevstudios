@@ -35,11 +35,7 @@ interface ReviewEditFormProps {
   onSuccess?: () => void;
 }
 
-export function ReviewEditForm({
-  review,
-  onCancel,
-  onSuccess,
-}: ReviewEditFormProps) {
+export function ReviewEditForm({ review, onCancel, onSuccess }: ReviewEditFormProps) {
   const [rating, setRating] = useState(review.rating);
   const [comment, setComment] = useState(review.comment || '');
 
@@ -62,15 +58,12 @@ export function ReviewEditForm({
             onSuccess();
           }
         },
-      }
+      },
     );
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-white/10 bg-white/5 p-6"
-    >
+    <form onSubmit={handleSubmit} className="rounded-xl border border-white/10 bg-white/5 p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-bold text-white">Chỉnh sửa đánh giá</h3>
         <Button
@@ -88,9 +81,7 @@ export function ReviewEditForm({
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
         {/* Left column: Rating */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-white/90">
-            Đánh giá *
-          </label>
+          <label className="mb-2 block text-sm font-semibold text-white/90">Đánh giá *</label>
           <div className="flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((i) => (
               <button
@@ -113,9 +104,7 @@ export function ReviewEditForm({
 
         {/* Right column: Comment */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-white/90">
-            Nhận xét
-          </label>
+          <label className="mb-2 block text-sm font-semibold text-white/90">Nhận xét</label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}

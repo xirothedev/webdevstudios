@@ -58,9 +58,7 @@ export function useUpdateProfile() {
     },
     onError: (error: unknown) => {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Cập nhật hồ sơ thất bại. Vui lòng thử lại.';
+        error instanceof Error ? error.message : 'Cập nhật hồ sơ thất bại. Vui lòng thử lại.';
       toast.error(errorMessage);
     },
   });

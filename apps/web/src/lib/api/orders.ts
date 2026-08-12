@@ -114,12 +114,9 @@ export const ordersApi = {
     const params: Record<string, string> = {};
     if (page) params.page = page.toString();
     if (limit) params.limit = limit.toString();
-    const response = await apiClient.get<{ data: OrderListResponse }>(
-      '/orders',
-      {
-        params,
-      }
-    );
+    const response = await apiClient.get<{ data: OrderListResponse }>('/orders', {
+      params,
+    });
     return response.data.data;
   },
 
@@ -127,25 +124,17 @@ export const ordersApi = {
    * Cancel order
    */
   async cancelOrder(orderId: string): Promise<Order> {
-    const response = await apiClient.patch<{ data: Order }>(
-      `/orders/${orderId}/cancel`
-    );
+    const response = await apiClient.patch<{ data: Order }>(`/orders/${orderId}/cancel`);
     return response.data.data;
   },
 
   /**
    * Update order status (Admin only)
    */
-  async updateOrderStatus(
-    orderId: string,
-    status: OrderStatus
-  ): Promise<Order> {
-    const response = await apiClient.patch<{ data: Order }>(
-      `/orders/${orderId}/status`,
-      {
-        status,
-      }
-    );
+  async updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order> {
+    const response = await apiClient.patch<{ data: Order }>(`/orders/${orderId}/status`, {
+      status,
+    });
     return response.data.data;
   },
 };

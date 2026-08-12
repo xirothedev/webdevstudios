@@ -30,11 +30,7 @@ import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useCartDrawer } from '@/contexts/cart-drawer.context';
-import {
-  useCart,
-  useRemoveFromCart,
-  useUpdateCartItem,
-} from '@/lib/api/hooks/use-cart';
+import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
 import { formatPrice } from '@/lib/utils';
 
 import { QuantitySelector } from './QuantitySelector';
@@ -65,8 +61,7 @@ export function FloatingCartButton() {
     return (
       (updateCartItemMutation.isPending &&
         updateCartItemMutation.variables?.cartItemId === itemId) ||
-      (removeFromCartMutation.isPending &&
-        removeFromCartMutation.variables === itemId)
+      (removeFromCartMutation.isPending && removeFromCartMutation.variables === itemId)
     );
   };
 
@@ -76,10 +71,7 @@ export function FloatingCartButton() {
 
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (
-        !target.closest('[data-cart-drawer]') &&
-        !target.closest('[data-cart-button]')
-      ) {
+      if (!target.closest('[data-cart-drawer]') && !target.closest('[data-cart-button]')) {
         closeDrawer();
       }
     };
@@ -163,9 +155,7 @@ export function FloatingCartButton() {
                   {!hasItems ? (
                     <div className="flex flex-col items-center justify-center py-20">
                       <ShoppingCart className="mb-6 h-24 w-24 text-white/20" />
-                      <h3 className="mb-2 text-lg font-semibold text-white">
-                        Giỏ hàng trống
-                      </h3>
+                      <h3 className="mb-2 text-lg font-semibold text-white">Giỏ hàng trống</h3>
                       <p className="mb-8 text-center text-sm text-white/60">
                         Hãy thêm sản phẩm vào giỏ hàng để tiếp tục
                       </p>
@@ -196,9 +186,7 @@ export function FloatingCartButton() {
                               {item.productName}
                             </h3>
                             {item.size && (
-                              <p className="text-xs text-white/60">
-                                Size: {item.size}
-                              </p>
+                              <p className="text-xs text-white/60">Size: {item.size}</p>
                             )}
                             <p className="text-wds-accent text-sm font-bold">
                               {formatPrice(item.productPrice)}₫
@@ -207,18 +195,8 @@ export function FloatingCartButton() {
                             <div className="flex items-center gap-2">
                               <QuantitySelector
                                 quantity={item.quantity}
-                                onIncrease={() =>
-                                  handleUpdateQuantity(
-                                    item.id,
-                                    item.quantity + 1
-                                  )
-                                }
-                                onDecrease={() =>
-                                  handleUpdateQuantity(
-                                    item.id,
-                                    item.quantity - 1
-                                  )
-                                }
+                                onIncrease={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                onDecrease={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                 max={item.stockAvailable}
                                 disabled={isItemUpdating(item.id)}
                                 variant="compact"
@@ -271,7 +249,7 @@ export function FloatingCartButton() {
                         <span>
                           {formatPrice(
                             (cart?.totalAmount ?? 0) +
-                              ((cart?.totalAmount ?? 0) >= 500000 ? 0 : 30000)
+                              ((cart?.totalAmount ?? 0) >= 500000 ? 0 : 30000),
                           )}
                           ₫
                         </span>

@@ -94,10 +94,8 @@ export function GenerationMemberAvatar({
       ? 'from-wds-accent to-wds-accent/70 shadow-wds-accent/30 flex items-center justify-center rounded-full bg-linear-to-br text-black shadow-lg font-black'
       : 'bg-wds-accent/20 text-wds-accent flex items-center justify-center rounded-full font-bold';
 
-  const imageWidth =
-    size === 'large' ? (variant === 'desktop' ? 160 : 120) : 64;
-  const imageHeight =
-    size === 'large' ? (variant === 'desktop' ? 160 : 120) : 64;
+  const imageWidth = size === 'large' ? (variant === 'desktop' ? 160 : 120) : 64;
+  const imageHeight = size === 'large' ? (variant === 'desktop' ? 160 : 120) : 64;
 
   return (
     <div className="relative">
@@ -118,16 +116,12 @@ export function GenerationMemberAvatar({
                   : '(max-width: 640px) 56px, 80px'
             }
             className={`${sizeClasses} object-cover transition-transform duration-300 ${
-              size === 'large'
-                ? 'group-hover:scale-110'
-                : 'group-hover:scale-105'
+              size === 'large' ? 'group-hover:scale-110' : 'group-hover:scale-105'
             }`}
           />
         </div>
       ) : (
-        <div className={`${fallbackClasses} ${sizeClasses} ${textSizeClasses}`}>
-          {initials}
-        </div>
+        <div className={`${fallbackClasses} ${sizeClasses} ${textSizeClasses}`}>{initials}</div>
       )}
       {isLeader && (
         <div

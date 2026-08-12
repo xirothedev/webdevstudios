@@ -39,10 +39,7 @@ export function TrustSection() {
           {brands.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div
-                key={idx}
-                className="group flex cursor-default items-center gap-3"
-              >
+              <div key={idx} className="group flex cursor-default items-center gap-3">
                 <div className="group-hover:bg-wds-accent/10 group-hover:text-wds-accent rounded-lg bg-white/5 p-2 text-white/70 transition-all duration-300">
                   <Icon className="h-5 w-5" strokeWidth={1.5} />
                 </div>

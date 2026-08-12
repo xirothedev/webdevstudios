@@ -22,8 +22,8 @@
 
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto, BlogPostListResponseDto } from '../../dtos/blog-post.dto';
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto, BlogPostListResponseDto } from '../../dtos';
 import { BlogRepository } from '../../infrastructure/blog.repository';
 import { SearchBlogPostsQuery } from './search-posts.query';
 

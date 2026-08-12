@@ -20,17 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { OrderStatus, UserRole } from '@generated/prisma';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
@@ -42,28 +33,27 @@ import {
 } from '@nestjs/swagger';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { ThrottleAPI } from '../common/decorators/throttle.decorator';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { CancelOrderCommand } from './commands/cancel-order/cancel-order.command';
-import { CreateOrderCommand } from './commands/create-order/create-order.command';
-import { UpdateOrderStatusCommand } from './commands/update-order-status/update-order-status.command';
+import { Roles, ThrottleAPI } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CancelOrderCommand } from './commands/cancel-order';
+import { CreateOrderCommand } from './commands/create-order';
+import { UpdateOrderStatusCommand } from './commands/update-order-status';
 import {
   CreateOrderDto,
   OrderDto,
   OrderListResponseDto,
   UpdateOrderStatusDto,
 } from './dtos/order.dto';
-import { GetOrderByIdQuery } from './queries/get-order-by-id/get-order-by-id.query';
-import { ListAllOrdersQuery } from './queries/list-all-orders/list-all-orders.query';
-import { ListOrdersQuery } from './queries/list-orders/list-orders.query';
+import { GetOrderByIdQuery } from './queries/get-order-by-id';
+import { ListAllOrdersQuery } from './queries/list-all-orders';
+import { ListOrdersQuery } from './queries/list-orders';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @ThrottleAPI()
@@ -84,7 +74,7 @@ export class OrdersController {
   @ApiResponse({ status: 409, description: 'Conflict - Insufficient stock' })
   async createOrder(
     @CurrentUser() user: { id: string },
-    @Body() dto: CreateOrderDto
+    @Body() dto: CreateOrderDto,
   ): Promise<OrderDto> {
     return this.commandBus.execute(
       new CreateOrderCommand(
@@ -94,8 +84,8 @@ export class OrdersController {
         dto.productId,
         dto.productSlug,
         dto.size,
-        dto.quantity
-      )
+        dto.quantity,
+      ),
     );
   }
 
@@ -128,14 +118,10 @@ export class OrdersController {
   async listOrders(
     @CurrentUser() user: { id: string },
     @Query('page') page?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
   ): Promise<OrderListResponseDto> {
     return this.queryBus.execute(
-      new ListOrdersQuery(
-        user.id,
-        page ? parseInt(page, 10) : 1,
-        limit ? parseInt(limit, 10) : 10
-      )
+      new ListOrdersQuery(user.id, page ? parseInt(page, 10) : 1, limit ? parseInt(limit, 10) : 10),
     );
   }
 
@@ -160,7 +146,7 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   async getOrderById(
     @Param('id') id: string,
-    @CurrentUser() user: { id: string; role: UserRole }
+    @CurrentUser() user: { id: string; role: UserRole },
   ): Promise<OrderDto> {
     return this.queryBus.execute(new GetOrderByIdQuery(id, user.id, user.role));
   }
@@ -190,15 +176,7 @@ export class OrdersController {
   @ApiQuery({
     name: 'status',
     description: 'Filter by order status',
-    enum: [
-      'PENDING',
-      'CONFIRMED',
-      'PROCESSING',
-      'SHIPPING',
-      'DELIVERED',
-      'CANCELLED',
-      'RETURNED',
-    ],
+    enum: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPING', 'DELIVERED', 'CANCELLED', 'RETURNED'],
     required: false,
   })
   @ApiResponse({
@@ -211,14 +189,14 @@ export class OrdersController {
   async listAllOrders(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @Query('status') status?: string
+    @Query('status') status?: string,
   ): Promise<OrderListResponseDto> {
     return this.queryBus.execute(
       new ListAllOrdersQuery(
         page ? parseInt(page, 10) : 1,
         limit ? parseInt(limit, 10) : 10,
-        status as any
-      )
+        status as OrderStatus | undefined,
+      ),
     );
   }
 
@@ -246,19 +224,16 @@ export class OrdersController {
   async updateOrderStatus(
     @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
-    @CurrentUser() user: { role: UserRole }
+    @CurrentUser() user: { role: UserRole },
   ): Promise<OrderDto> {
-    return this.commandBus.execute(
-      new UpdateOrderStatusCommand(id, dto.status, user.role)
-    );
+    return this.commandBus.execute(new UpdateOrderStatusCommand(id, dto.status, user.role));
   }
 
   @Patch(':id/cancel')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cancel order',
-    description:
-      'Cancel an order. Only PENDING orders can be cancelled. Stock will be restored.',
+    description: 'Cancel an order. Only PENDING orders can be cancelled. Stock will be restored.',
   })
   @ApiParam({
     name: 'id',
@@ -279,7 +254,7 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   async cancelOrder(
     @Param('id') id: string,
-    @CurrentUser() user: { id: string }
+    @CurrentUser() user: { id: string },
   ): Promise<OrderDto> {
     return this.commandBus.execute(new CancelOrderCommand(id, user.id));
   }

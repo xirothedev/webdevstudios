@@ -20,15 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  Code,
-  Cpu,
-  Globe,
-  Handshake,
-  Layers,
-  MessageSquare,
-  Zap,
-} from 'lucide-react';
+import { Code, Cpu, Globe, Handshake, Layers, MessageSquare, Zap } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export interface StrategicPartner {

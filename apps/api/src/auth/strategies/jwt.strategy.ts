@@ -26,7 +26,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { UserRepository } from '../infrastructure/user.repository';
+import { UserRepository } from '../infrastructure';
 
 // Custom extractor to get token from cookies or Authorization header
 const cookieExtractor = (req: Request): string | null => {
@@ -52,7 +52,7 @@ const jwtExtractor = (req: Request): string | null => {
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     readonly configService: ConfigService,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {
     super({
       jwtFromRequest: jwtExtractor,

@@ -23,7 +23,7 @@
 import { User, UserRole } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 @Injectable()
 export class UserRepository {
@@ -86,7 +86,7 @@ export class UserRepository {
       mfaSecret: string;
       avatar: string;
       role: UserRole;
-    }>
+    }>,
   ): Promise<User> {
     return this.prisma.user.update({
       where: { id },
@@ -98,6 +98,59 @@ export class UserRepository {
     return this.prisma.user.update({
       where: { id },
       data: { emailVerified: true },
+    });
+  }
+
+  async searchByKeyword(
+    keyword: string,
+    page: number,
+    limit: number,
+    includeEmail: boolean,
+  ): Promise<{ users: User[]; total: number }> {
+    const where = includeEmail
+      ? {
+          OR: [
+            { email: { contains: keyword, mode: 'insensitive' as const } },
+            { fullName: { contains: keyword, mode: 'insensitive' as const } },
+          ],
+        }
+      : { fullName: { contains: keyword, mode: 'insensitive' as const } };
+
+    const skip = (page - 1) * limit;
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+    return { users, total };
+  }
+
+  async list(
+    page: number,
+    limit: number,
+    role?: UserRole,
+  ): Promise<{ users: User[]; total: number }> {
+    const where = role ? { role } : {};
+    const skip = (page - 1) * limit;
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+    return { users, total };
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.prisma.user.delete({
+      where: { id },
     });
   }
 }

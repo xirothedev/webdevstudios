@@ -1,58 +1,43 @@
-import eslint from "@eslint/js";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import { defineConfig, globalIgnores } from 'eslint/config'
+import nextVitals from 'eslint-config-next/core-web-vitals'
+import nextTs from 'eslint-config-next/typescript'
+import tseslint from 'typescript-eslint'
+import prettier from 'eslint-config-prettier'
 
-export default tseslint.config(
+export default defineConfig([
+  tseslint.configs.recommended,
+  ...nextVitals,
+  ...nextTs,
   {
-    ignores: ['eslint.config.mjs', '.next', 'node_modules', 'next-env.d.ts'],
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
-      parserOptions: {
-        projectService: false,
-        tsconfigRootDir: import.meta.dirname,
-        ecmaVersion: 2022,
-        sourceType: 'module',
-      },
-    },
-  },
-  {
-    plugins: {
-      'simple-import-sort': simpleImportSort,
-    },
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
-          args: 'all',
           argsIgnorePattern: '^_',
-          caughtErrors: 'all',
-          caughtErrorsIgnorePattern: '^_',
-          destructuredArrayIgnorePattern: '^_',
           varsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
-      'simple-import-sort/imports': [
-        'error',
-        {
-          groups: [
-            ['^\\u0000'], // Side effects
-            ['^node:'], // Node built-ins
-            ['^@?\\w'], // External libs (React, Nest...)
-            ['^@orderly/'], // Workspace packages
-            ['^@/'], // Path aliases
-            ['^\\.'], // Relative imports
-          ],
-        },
-      ],
-      'simple-import-sort/exports': 'error',
+      'import/no-duplicates': ['error', { 'prefer-inline': true }],
     },
-  }
-);
+  },
+  {
+    // ponytail: client-only random decorations — server render must stay empty
+    // to avoid hydration mismatch; lazy useState init would change SSR output.
+    files: ['**/src/app/not-found.tsx', '**/src/app/generation/page.tsx'],
+    rules: {
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
+  {
+    // ponytail: async server components catch data-fetching errors with
+    // try/catch + notFound()/fallback (Next.js RSC pattern); error boundaries
+    // do not apply to server-component data paths.
+    files: ['**/src/app/blog/**/page.tsx', '**/src/components/blog/BlogPostContentMDX.tsx'],
+    rules: {
+      'react-hooks/error-boundaries': 'off',
+    },
+  },
+  prettier,
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+])

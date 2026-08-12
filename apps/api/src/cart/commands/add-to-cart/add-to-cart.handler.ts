@@ -20,17 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { ProductRepository } from '../../../products/infrastructure/product.repository';
 import { CartDto, CartItemDto } from '../../dtos/cart.dto';
 import { CartRepository } from '../../infrastructure/cart.repository';
-import { CartWithItems } from '../../types/cart.types';
+import { CartWithItems } from '../../cart.types';
 import { getProductImageUrl } from '../../utils/product-image.util';
 import { AddToCartCommand } from './add-to-cart.command';
 
@@ -38,7 +34,7 @@ import { AddToCartCommand } from './add-to-cart.command';
 export class AddToCartHandler implements ICommandHandler<AddToCartCommand> {
   constructor(
     private readonly cartRepository: CartRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async execute(command: AddToCartCommand): Promise<CartDto> {
@@ -66,14 +62,9 @@ export class AddToCartHandler implements ICommandHandler<AddToCartCommand> {
     // Check stock
     let availableStock: number;
     if (product.hasSizes && size) {
-      const sizeStock = await this.productRepository.getStockBySize(
-        productId,
-        size
-      );
+      const sizeStock = await this.productRepository.getStockBySize(productId, size);
       if (sizeStock === null) {
-        throw new NotFoundException(
-          `Size ${size} not found for product ${productId}`
-        );
+        throw new NotFoundException(`Size ${size} not found for product ${productId}`);
       }
       availableStock = sizeStock;
     } else {
@@ -84,17 +75,13 @@ export class AddToCartHandler implements ICommandHandler<AddToCartCommand> {
     const cart = await this.cartRepository.findOrCreateCart(userId);
 
     // Check existing quantity in cart
-    const existingItem = await this.cartRepository.findCartItem(
-      cart.id,
-      productId,
-      size
-    );
+    const existingItem = await this.cartRepository.findCartItem(cart.id, productId, size);
     const currentQuantity = existingItem?.quantity || 0;
     const newTotalQuantity = currentQuantity + quantity;
 
     if (newTotalQuantity > availableStock) {
       throw new ConflictException(
-        `Insufficient stock. Available: ${availableStock}, Requested: ${newTotalQuantity}`
+        `Insufficient stock. Available: ${availableStock}, Requested: ${newTotalQuantity}`,
       );
     }
 
@@ -115,9 +102,7 @@ export class AddToCartHandler implements ICommandHandler<AddToCartCommand> {
       // Get stock available
       let stockAvailable: number;
       if (product.hasSizes && item.size) {
-        const sizeStock = product.sizeStocks?.find(
-          (ss) => ss.size === item.size
-        );
+        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size);
         stockAvailable = sizeStock?.stock || 0;
       } else {
         stockAvailable = product.stock;

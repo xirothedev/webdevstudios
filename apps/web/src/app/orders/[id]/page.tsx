@@ -69,9 +69,7 @@ export default function OrderDetailPage() {
 
   if (orderError || !order) {
     const errorMessage =
-      orderError instanceof Error
-        ? orderError.message
-        : 'Không tìm thấy đơn hàng';
+      orderError instanceof Error ? orderError.message : 'Không tìm thấy đơn hàng';
     return (
       <div className="bg-wds-background text-wds-text flex min-h-screen items-center justify-center">
         <div className="text-white">{errorMessage}</div>
@@ -87,14 +85,10 @@ export default function OrderDetailPage() {
       <main className="pt-24 pb-20">
         <div className="mx-auto max-w-4xl px-6">
           <div className="mb-8">
-            <h1 className="mb-2 text-3xl font-bold text-white">
-              Đơn hàng {order.code}
-            </h1>
+            <h1 className="mb-2 text-3xl font-bold text-white">Đơn hàng {order.code}</h1>
             <p className="text-white/60">
               Trạng thái:{' '}
-              <span className="font-semibold text-white">
-                {getStatusText(order.status)}
-              </span>
+              <span className="font-semibold text-white">{getStatusText(order.status)}</span>
             </p>
           </div>
 
@@ -103,24 +97,13 @@ export default function OrderDetailPage() {
             <h2 className="mb-4 text-xl font-bold text-white">Sản phẩm</h2>
             <div className="space-y-4">
               {order.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between"
-                >
+                <div key={item.id} className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-white">
-                      {item.productName}
-                    </p>
-                    {item.size && (
-                      <p className="text-sm text-white/60">Size: {item.size}</p>
-                    )}
-                    <p className="text-sm text-white/60">
-                      Số lượng: {item.quantity}
-                    </p>
+                    <p className="font-semibold text-white">{item.productName}</p>
+                    {item.size && <p className="text-sm text-white/60">Size: {item.size}</p>}
+                    <p className="text-sm text-white/60">Số lượng: {item.quantity}</p>
                   </div>
-                  <p className="font-bold text-white">
-                    {formatPrice(item.subtotal)}₫
-                  </p>
+                  <p className="font-bold text-white">{formatPrice(item.subtotal)}₫</p>
                 </div>
               ))}
             </div>
@@ -128,16 +111,12 @@ export default function OrderDetailPage() {
 
           {/* Shipping Address */}
           <div className="mb-6 rounded-xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-xl font-bold text-white">
-              Địa chỉ giao hàng
-            </h2>
+            <h2 className="mb-4 text-xl font-bold text-white">Địa chỉ giao hàng</h2>
             <div className="space-y-1 text-white/80">
               <p>{order.shippingAddress.fullName}</p>
               <p>{order.shippingAddress.phone}</p>
               <p>{order.shippingAddress.addressLine1}</p>
-              {order.shippingAddress.addressLine2 && (
-                <p>{order.shippingAddress.addressLine2}</p>
-              )}
+              {order.shippingAddress.addressLine2 && <p>{order.shippingAddress.addressLine2}</p>}
               <p>
                 {order.shippingAddress.ward}, {order.shippingAddress.district},{' '}
                 {order.shippingAddress.city}
@@ -148,25 +127,18 @@ export default function OrderDetailPage() {
 
           {/* Order Summary */}
           <div className="mb-6 rounded-xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-xl font-bold text-white">
-              Tóm tắt đơn hàng
-            </h2>
+            <h2 className="mb-4 text-xl font-bold text-white">Tóm tắt đơn hàng</h2>
             <div className="space-y-3">
               <div className="flex justify-between text-white/80">
                 <span>Tạm tính:</span>
                 <span>
-                  {formatPrice(
-                    order.totalAmount - order.shippingFee + order.discountValue
-                  )}
-                  ₫
+                  {formatPrice(order.totalAmount - order.shippingFee + order.discountValue)}₫
                 </span>
               </div>
               <div className="flex justify-between text-white/80">
                 <span>Phí vận chuyển:</span>
                 <span>
-                  {order.shippingFee === 0
-                    ? 'Miễn phí'
-                    : formatPrice(order.shippingFee) + '₫'}
+                  {order.shippingFee === 0 ? 'Miễn phí' : formatPrice(order.shippingFee) + '₫'}
                 </span>
               </div>
               {order.discountValue > 0 && (

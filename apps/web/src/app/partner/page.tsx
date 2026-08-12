@@ -30,11 +30,7 @@ import { Navbar } from '@/components/Navbar';
 import { PartnerCard } from '@/components/partner/PartnerCard';
 import { PartnerHero } from '@/components/partner/PartnerHero';
 import { PartnerSection } from '@/components/partner/PartnerSection';
-import {
-  COMMUNITY_PARTNERS,
-  MEDIA_PARTNERS,
-  STRATEGIC_PARTNERS,
-} from '@/data/partners';
+import { COMMUNITY_PARTNERS, MEDIA_PARTNERS, STRATEGIC_PARTNERS } from '@/data/partners';
 
 export default function PartnerPage() {
   return (
@@ -49,10 +45,8 @@ export default function PartnerPage() {
           style={{
             backgroundImage: `linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)`,
             backgroundSize: '40px 40px',
-            maskImage:
-              'radial-gradient(circle at 50% 50%, black, transparent 80%)',
-            WebkitMaskImage:
-              'radial-gradient(circle at 50% 50%, black, transparent 80%)',
+            maskImage: 'radial-gradient(circle at 50% 50%, black, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(circle at 50% 50%, black, transparent 80%)',
           }}
         />
 
@@ -90,10 +84,7 @@ export default function PartnerPage() {
 
         {/* --- COMMUNITY PARTNERS --- */}
         <section className="mx-auto mb-24 max-w-6xl px-6">
-          <PartnerSection
-            label="Hệ sinh thái"
-            title="Đối Tác Cộng Đồng & Giáo Dục"
-          />
+          <PartnerSection label="Hệ sinh thái" title="Đối Tác Cộng Đồng & Giáo Dục" />
 
           <motion.div
             initial="hidden"
@@ -119,12 +110,10 @@ export default function PartnerPage() {
 
             <div className="relative z-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
               <div className="max-w-md">
-                <h3 className="mb-2 text-2xl font-bold">
-                  Bảo Trợ Truyền Thông
-                </h3>
+                <h3 className="mb-2 text-2xl font-bold">Bảo Trợ Truyền Thông</h3>
                 <p className="text-sm text-gray-400">
-                  Cảm ơn các đơn vị báo chí và CLB bạn đã giúp lan tỏa giá trị
-                  của WDS tới cộng đồng.
+                  Cảm ơn các đơn vị báo chí và CLB bạn đã giúp lan tỏa giá trị của WDS tới cộng
+                  đồng.
                 </p>
               </div>
 
@@ -151,8 +140,7 @@ export default function PartnerPage() {
               <div
                 className="absolute inset-0 opacity-10"
                 style={{
-                  backgroundImage:
-                    'radial-gradient(circle at 2px 2px, black 1px, transparent 0)',
+                  backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)',
                   backgroundSize: '24px 24px',
                 }}
               ></div>
@@ -164,9 +152,8 @@ export default function PartnerPage() {
                   Sẵn sàng đồng hành cùng thế hệ Web Developer tiếp theo?
                 </h2>
                 <p className="mx-auto mb-8 max-w-2xl text-lg font-medium text-pretty text-black/70">
-                  Hãy trở thành đối tác của WebDev Studios để tiếp cận nguồn
-                  nhân lực chất lượng cao và lan tỏa thương hiệu của bạn tại
-                  UIT.
+                  Hãy trở thành đối tác của WebDev Studios để tiếp cận nguồn nhân lực chất lượng cao
+                  và lan tỏa thương hiệu của bạn tại UIT.
                 </p>
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <button className="group flex h-12 items-center justify-center gap-2 rounded-full bg-black px-8 text-sm font-semibold text-white shadow-lg transition hover:bg-gray-900 hover:shadow-xl">

@@ -28,8 +28,7 @@ import './calendar.css';
 import { format, getDay, parse, startOfWeek } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useCallback, useMemo, useState } from 'react';
-import type { Event as RBCEvent } from 'react-big-calendar';
-import { Calendar, dateFnsLocalizer, View } from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, View, type Event as RBCEvent } from 'react-big-calendar';
 
 import { mockEvents } from '@/lib/events/mock-events';
 import { Event, EventType } from '@/lib/events/types';
@@ -122,7 +121,7 @@ export function CalendarContainer() {
   // Toggle event type filter
   const handleToggleType = useCallback((type: EventType) => {
     setSelectedTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   }, []);
 
@@ -142,9 +141,7 @@ export function CalendarContainer() {
     <div className="w-full space-y-4 sm:space-y-6">
       {/* Event Filter */}
       <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4">
-        <h3 className="mb-2 text-xs font-semibold text-gray-900 sm:mb-3 sm:text-sm">
-          Lọc sự kiện
-        </h3>
+        <h3 className="mb-2 text-xs font-semibold text-gray-900 sm:mb-3 sm:text-sm">Lọc sự kiện</h3>
         <EventFilter
           selectedTypes={selectedTypes}
           onToggleType={handleToggleType}

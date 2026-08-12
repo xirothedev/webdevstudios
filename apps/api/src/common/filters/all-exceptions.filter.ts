@@ -55,8 +55,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     // Extract error message
-    const originalMessage =
-      exception instanceof Error ? exception.message : String(exception);
+    const originalMessage = exception instanceof Error ? exception.message : String(exception);
 
     // Log full error details (server-side only)
     this.logger.error(
@@ -67,8 +66,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         method: request.method,
         ip: request.ip,
         userAgent: request.headers['user-agent'],
-        userId: (request as any).user?.id,
-      }
+        userId: (request as { user?: { id: string } }).user?.id,
+      },
     );
 
     // Sanitize response for production

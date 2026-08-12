@@ -45,9 +45,7 @@ export function ProductSizeSelector({
 }: ProductSizeSelectorProps) {
   return (
     <div className="mb-8">
-      <label className="mb-3 block text-sm font-semibold text-white/90">
-        Chọn size
-      </label>
+      <label className="mb-3 block text-sm font-semibold text-white/90">Chọn size</label>
       <div className="flex flex-wrap gap-3">
         {sizes.map((size) => {
           const isSelected = selectedSize === size;
@@ -63,14 +61,14 @@ export function ProductSizeSelector({
                 isOutOfStock && 'cursor-not-allowed opacity-50',
                 isSelected
                   ? 'border-wds-accent bg-wds-accent/10 shadow-wds-accent/20 shadow-lg'
-                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10',
               )}
             >
               <span
                 className={cn(
                   'text-sm font-semibold',
                   isSelected ? 'text-wds-accent' : 'text-white/70',
-                  isOutOfStock && 'line-through'
+                  isOutOfStock && 'line-through',
                 )}
               >
                 {size}
@@ -85,9 +83,7 @@ export function ProductSizeSelector({
                 </motion.div>
               )}
               {stock !== undefined && stock > 0 && (
-                <span className="mt-0.5 text-[10px] text-white/60">
-                  {stock}
-                </span>
+                <span className="mt-0.5 text-[10px] text-white/60">{stock}</span>
               )}
             </button>
           );

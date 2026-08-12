@@ -55,9 +55,7 @@ async function main() {
   console.log('Starting blog content upload to R2...');
 
   if (!BUCKET_NAME || !process.env.R2_ENDPOINT) {
-    console.error(
-      'Missing R2 configuration. Please check environment variables.'
-    );
+    console.error('Missing R2 configuration. Please check environment variables.');
     process.exit(1);
   }
 
@@ -98,7 +96,7 @@ async function main() {
           Body: contentBuffer,
           ContentType: 'text/markdown',
           CacheControl: 'public, max-age=2592000', // 30 days
-        })
+        }),
       );
 
       // Update contentUrl in database to full R2 URL

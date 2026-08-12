@@ -30,12 +30,7 @@ export const metadata: Metadata = createPageMetadata({
     'Chính sách đổi trả và hoàn tiền của WebDev Studios - Quy định và quy trình đổi trả sản phẩm.',
   path: '/refund',
   image: SEO_IMAGES['/refund'],
-  keywords: [
-    'Chính sách đổi trả',
-    'Refund Policy',
-    'WebDev Studios',
-    'Hoàn tiền',
-  ],
+  keywords: ['Chính sách đổi trả', 'Refund Policy', 'WebDev Studios', 'Hoàn tiền'],
 });
 
 export default function RefundLayout({

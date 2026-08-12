@@ -28,26 +28,23 @@ import { Minus, Plus } from 'lucide-react';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { cn } from '@/lib/utils';
 
-const quantitySelectorVariants = cva(
-  'flex items-center gap-2 rounded-lg border border-white/10',
-  {
-    variants: {
-      variant: {
-        default: 'bg-white/5 px-4 py-3',
-        compact: 'px-1',
-      },
-      size: {
-        sm: 'text-sm',
-        md: 'text-base',
-        lg: 'text-lg',
-      },
+const quantitySelectorVariants = cva('flex items-center gap-2 rounded-lg border border-white/10', {
+  variants: {
+    variant: {
+      default: 'bg-white/5 px-4 py-3',
+      compact: 'px-1',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'md',
+    size: {
+      sm: 'text-sm',
+      md: 'text-base',
+      lg: 'text-lg',
     },
-  }
-);
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'md',
+  },
+});
 
 const quantityButtonVariants = cva(
   'cursor-pointer text-white/70 transition-colors disabled:cursor-not-allowed disabled:opacity-30 hover:text-wds-accent',
@@ -67,12 +64,10 @@ const quantityButtonVariants = cva(
       variant: 'default',
       size: 'md',
     },
-  }
+  },
 );
 
-interface QuantitySelectorProps extends VariantProps<
-  typeof quantitySelectorVariants
-> {
+interface QuantitySelectorProps extends VariantProps<typeof quantitySelectorVariants> {
   quantity: number;
   onIncrease: () => void;
   onDecrease: () => void;
@@ -114,16 +109,12 @@ export function QuantitySelector({
           type="button"
           aria-label="Giảm số lượng"
         >
-          {showIcons ? (
-            <Minus className="h-4 w-4" />
-          ) : (
-            <span className="text-base">-</span>
-          )}
+          {showIcons ? <Minus className="h-4 w-4" /> : <span className="text-base">-</span>}
         </button>
         <span
           className={cn(
             'min-w-8 text-center font-semibold text-white',
-            variant === 'compact' && 'px-4 py-1'
+            variant === 'compact' && 'px-4 py-1',
           )}
         >
           {quantity}
@@ -135,27 +126,17 @@ export function QuantitySelector({
           type="button"
           aria-label="Tăng số lượng"
         >
-          {showIcons ? (
-            <Plus className="h-4 w-4" />
-          ) : (
-            <span className="text-base">+</span>
-          )}
+          {showIcons ? <Plus className="h-4 w-4" /> : <span className="text-base">+</span>}
         </button>
       </div>
       {stock !== undefined && variant === 'default' && (
         <span className="text-sm text-white/60">
           Còn lại:{' '}
           <span className="font-semibold text-white">
-            <NumberTicker
-              value={stock}
-              startValue={stock}
-              className="text-white"
-            />
+            <NumberTicker value={stock} startValue={stock} className="text-white" />
           </span>{' '}
           sản phẩm
-          {quantity >= stock && (
-            <span className="text-wds-accent ml-2">(Đã đạt tối đa)</span>
-          )}
+          {quantity >= stock && <span className="text-wds-accent ml-2">(Đã đạt tối đa)</span>}
         </span>
       )}
     </div>

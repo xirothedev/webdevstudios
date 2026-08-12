@@ -23,9 +23,9 @@
 import { BlogPost } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
-import { BlogPostWithRelations } from '../blog.interface';
+import { BlogPostWithRelations } from '../blog.types';
 
 @Injectable()
 export class BlogRepository {
@@ -113,7 +113,7 @@ export class BlogRepository {
     options?: {
       page?: number;
       pageSize?: number;
-    }
+    },
   ): Promise<{ posts: BlogPostWithRelations[]; total: number }> {
     const { page = 1, pageSize = 10 } = options || {};
     const skip = (page - 1) * pageSize;
@@ -194,7 +194,7 @@ export class BlogRepository {
       publishedAt?: Date | null;
       metaTitle?: string | null;
       metaDescription?: string | null;
-    }
+    },
   ): Promise<BlogPost> {
     return this.prisma.blogPost.update({
       where: { id },

@@ -44,12 +44,7 @@ export function ProductReviews({
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const {
-    data: reviews,
-    isLoading,
-    isError,
-    error,
-  } = useProductReviews(productSlug, page, limit);
+  const { data: reviews, isLoading, isError, error } = useProductReviews(productSlug, page, limit);
 
   if (isLoading) {
     return <div className="py-8 text-white/60">Đang tải đánh giá...</div>;
@@ -59,27 +54,19 @@ export function ProductReviews({
     return (
       <div className="py-8 text-white/60">
         <p>Không thể tải đánh giá. Vui lòng thử lại sau.</p>
-        {error instanceof Error && (
-          <p className="mt-2 text-sm text-white/40">{error.message}</p>
-        )}
+        {error instanceof Error && <p className="mt-2 text-sm text-white/40">{error.message}</p>}
       </div>
     );
   }
 
   if (!reviews || !reviews.reviews || reviews.reviews.length === 0) {
-    return (
-      <div className="py-8 text-white/60">
-        Chưa có đánh giá nào cho sản phẩm này.
-      </div>
-    );
+    return <div className="py-8 text-white/60">Chưa có đánh giá nào cho sản phẩm này.</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold text-white">
-          Đánh giá ({reviews.total})
-        </h3>
+        <h3 className="text-2xl font-bold text-white">Đánh giá ({reviews.total})</h3>
       </div>
 
       <div className="space-y-6">

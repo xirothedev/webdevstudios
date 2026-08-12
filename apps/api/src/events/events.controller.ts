@@ -43,24 +43,22 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Public } from '../common/decorators/public.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { CreateEventCommand } from './commands/create-event/create-event.command';
-import { DeleteEventCommand } from './commands/delete-event/delete-event.command';
-import { UpdateEventCommand } from './commands/update-event/update-event.command';
-import { CreateEventDto } from './dtos/create-event.dto';
-import { EventDto } from './dtos/event.dto';
-import { UpdateEventDto } from './dtos/update-event.dto';
-import { GetEventByIdQuery } from './queries/get-event-by-id/get-event-by-id.query';
-import { ListEventsQuery } from './queries/list-events/list-events.query';
+import { parseISO } from 'date-fns';
+import { Public, Roles } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CreateEventCommand } from './commands/create-event';
+import { DeleteEventCommand } from './commands/delete-event';
+import { UpdateEventCommand } from './commands/update-event';
+import { CreateEventDto, EventDto, UpdateEventDto } from './dtos';
+import { GetEventByIdQuery } from './queries/get-event-by-id';
+import { ListEventsQuery } from './queries/list-events';
 
 @ApiTags('Events')
 @Controller('events')
 export class EventsController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get()
@@ -93,16 +91,16 @@ export class EventsController {
   async listEvents(
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-    @Query('types') types?: string
+    @Query('types') types?: string,
   ) {
     const eventTypes = types ? (types.split(',') as EventType[]) : undefined;
 
     const events = await this.queryBus.execute(
       new ListEventsQuery(
-        startDate ? new Date(startDate) : undefined,
-        endDate ? new Date(endDate) : undefined,
-        eventTypes
-      )
+        startDate ? parseISO(startDate) : undefined,
+        endDate ? parseISO(endDate) : undefined,
+        eventTypes,
+      ),
     );
 
     return events.map(EventDto.fromEntity);
@@ -140,20 +138,20 @@ export class EventsController {
     type: EventDto,
   })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
-  async createEvent(@Body() dto: CreateEventDto, @Request() req: any) {
+  async createEvent(@Body() dto: CreateEventDto, @Request() req: { user?: { id: string } }) {
     const event = await this.commandBus.execute(
       new CreateEventCommand(
         dto.title,
-        new Date(dto.startDate),
-        new Date(dto.endDate),
+        parseISO(dto.startDate),
+        parseISO(dto.endDate),
         dto.type,
         dto.description,
         dto.location,
         dto.organizer,
         dto.attendees,
         dto.surveyLink,
-        req.user?.id
-      )
+        req.user?.id,
+      ),
     );
 
     return EventDto.fromEntity(event);
@@ -181,14 +179,14 @@ export class EventsController {
         id,
         dto.title,
         dto.description,
-        dto.startDate ? new Date(dto.startDate) : undefined,
-        dto.endDate ? new Date(dto.endDate) : undefined,
+        dto.startDate ? parseISO(dto.startDate) : undefined,
+        dto.endDate ? parseISO(dto.endDate) : undefined,
         dto.location,
         dto.type,
         dto.organizer,
         dto.attendees,
-        dto.surveyLink
-      )
+        dto.surveyLink,
+      ),
     );
 
     return EventDto.fromEntity(event);

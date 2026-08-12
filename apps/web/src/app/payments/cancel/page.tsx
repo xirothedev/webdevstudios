@@ -52,12 +52,10 @@ export default function PaymentCancelPage() {
       <Navbar />
       <main className="pt-24 pb-20">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h1 className="mb-4 text-3xl font-bold text-white">
-            Thanh toán đã bị hủy
-          </h1>
+          <h1 className="mb-4 text-3xl font-bold text-white">Thanh toán đã bị hủy</h1>
           <p className="mb-8 text-white/60">
-            Bạn đã hủy quá trình thanh toán. Đơn hàng của bạn vẫn được lưu và
-            bạn có thể thanh toán lại bất cứ lúc nào.
+            Bạn đã hủy quá trình thanh toán. Đơn hàng của bạn vẫn được lưu và bạn có thể thanh toán
+            lại bất cứ lúc nào.
           </p>
           <div className="flex justify-center gap-4">
             <Button

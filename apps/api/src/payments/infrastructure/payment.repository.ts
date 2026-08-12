@@ -23,7 +23,8 @@
 import { PaymentTransactionStatus } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { subMinutes } from 'date-fns';
+import { PrismaService } from '@/prisma';
 
 @Injectable()
 export class PaymentRepository {
@@ -68,11 +69,7 @@ export class PaymentRepository {
     });
   }
 
-  async updateStatus(
-    id: string,
-    status: PaymentTransactionStatus,
-    payosData?: unknown
-  ) {
+  async updateStatus(id: string, status: PaymentTransactionStatus, payosData?: unknown) {
     return this.prisma.paymentTransaction.update({
       where: { id },
       data: {
@@ -83,7 +80,7 @@ export class PaymentRepository {
   }
 
   async findExpiredPendingTransactions() {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const fifteenMinutesAgo = subMinutes(new Date(), 15);
 
     return this.prisma.paymentTransaction.findMany({
       where: {

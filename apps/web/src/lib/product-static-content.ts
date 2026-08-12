@@ -33,9 +33,7 @@ export interface ProductStaticContent {
   additionalInfo: Record<string, string>;
 }
 
-export const getProductStaticContent = (
-  slug: ProductSlug
-): ProductStaticContent => {
+export const getProductStaticContent = (slug: ProductSlug): ProductStaticContent => {
   const contentMap: Record<ProductSlug, ProductStaticContent> = {
     AO_THUN: {
       images: [

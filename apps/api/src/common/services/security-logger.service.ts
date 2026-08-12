@@ -20,12 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
+import { Prisma } from '@generated/prisma';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as winston from 'winston';
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 export enum SecurityEventType {
   AUTH_FAILURE = 'AUTH_FAILURE',
@@ -60,16 +61,10 @@ export class SecurityLoggerService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {
-    this.alertThreshold = this.configService.get<number>(
-      'SECURITY_ALERT_THRESHOLD',
-      5
-    );
-    this.logToDatabase = this.configService.get<boolean>(
-      'LOG_TO_DATABASE',
-      true
-    );
+    this.alertThreshold = this.configService.get<number>('SECURITY_ALERT_THRESHOLD', 5);
+    this.logToDatabase = this.configService.get<boolean>('LOG_TO_DATABASE', true);
 
     // Setup Winston logger
     const logDir = this.configService.get<string>('LOG_DIR', './logs');
@@ -80,15 +75,12 @@ export class SecurityLoggerService {
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
-        winston.format.json()
+        winston.format.json(),
       ),
       transports: [
         // Console transport (development)
         new winston.transports.Console({
-          format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.simple()
-          ),
+          format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
         }),
         // File transport - All logs
         new winston.transports.File({
@@ -135,10 +127,7 @@ export class SecurityLoggerService {
           error: error.message,
           event: fullEvent,
         });
-        this.nestLogger.error(
-          'Failed to store security event in database',
-          error.stack
-        );
+        this.nestLogger.error('Failed to store security event in database', error.stack);
       });
     }
 
@@ -162,7 +151,7 @@ export class SecurityLoggerService {
         userAgent: event.userAgent,
         path: event.path,
         method: event.method,
-        metadata: (event.metadata || {}) as any,
+        metadata: (event.metadata || {}) as Prisma.InputJsonValue,
         timestamp: event.timestamp,
       },
     });
@@ -181,10 +170,7 @@ export class SecurityLoggerService {
       SecurityEventType.SUSPICIOUS_ACTIVITY,
     ];
 
-    return (
-      storeSeverities.includes(event.severity) ||
-      storeTypes.includes(event.type)
-    );
+    return storeSeverities.includes(event.severity) || storeTypes.includes(event.type);
   }
 
   /**
@@ -221,13 +207,10 @@ export class SecurityLoggerService {
    */
   private async sendAlert(event: SecurityEvent): Promise<void> {
     // Log critical alert
-    this.logger.error(
-      `🚨 SECURITY ALERT: ${event.type} - ${event.message}`,
-      event
-    );
+    this.logger.error(`🚨 SECURITY ALERT: ${event.type} - ${event.message}`, event);
     this.nestLogger.error(
       `🚨 SECURITY ALERT: ${event.type} - ${event.message}`,
-      JSON.stringify(event, null, 2)
+      JSON.stringify(event, null, 2),
     );
 
     // TODO: Send email/Slack notification
@@ -241,7 +224,7 @@ export class SecurityLoggerService {
     email: string,
     reason: string,
     ipAddress?: string,
-    userAgent?: string
+    userAgent?: string,
   ): Promise<void> {
     await this.logEvent({
       type: SecurityEventType.AUTH_FAILURE,
@@ -260,7 +243,7 @@ export class SecurityLoggerService {
     path: string,
     method: string,
     ipAddress?: string,
-    userId?: string
+    userId?: string,
   ): Promise<void> {
     await this.logEvent({
       type: SecurityEventType.CSRF_FAILURE,
@@ -280,7 +263,7 @@ export class SecurityLoggerService {
     path: string,
     method: string,
     ipAddress?: string,
-    userId?: string
+    userId?: string,
   ): Promise<void> {
     await this.logEvent({
       type: SecurityEventType.RATE_LIMIT_EXCEEDED,
@@ -296,11 +279,7 @@ export class SecurityLoggerService {
   /**
    * Log data integrity failure
    */
-  async logDataIntegrityFailure(
-    type: string,
-    details: string,
-    ipAddress?: string
-  ): Promise<void> {
+  async logDataIntegrityFailure(type: string, details: string, ipAddress?: string): Promise<void> {
     await this.logEvent({
       type: SecurityEventType.DATA_INTEGRITY_FAILURE,
       severity: 'critical',
@@ -313,10 +292,7 @@ export class SecurityLoggerService {
   /**
    * Log webhook signature failure
    */
-  async logWebhookSignatureFailure(
-    path: string,
-    ipAddress?: string
-  ): Promise<void> {
+  async logWebhookSignatureFailure(path: string, ipAddress?: string): Promise<void> {
     await this.logEvent({
       type: SecurityEventType.WEBHOOK_SIGNATURE_FAILURE,
       severity: 'high',

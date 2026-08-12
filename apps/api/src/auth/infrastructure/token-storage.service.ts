@@ -45,15 +45,9 @@ export class TokenStorageService {
    * @param userId - User ID
    * @returns Promise<void>
    */
-  async storeEmailVerificationToken(
-    token: string,
-    userId: string
-  ): Promise<void> {
+  async storeEmailVerificationToken(token: string, userId: string): Promise<void> {
     const key = `${this.emailVerificationPrefix}${token}`;
-    const ttl = this.configService.get<number>(
-      'EMAIL_VERIFICATION_TOKEN_EXPIRES_IN',
-      86400
-    ); // Default 24 hours
+    const ttl = this.configService.get<number>('EMAIL_VERIFICATION_TOKEN_EXPIRES_IN', 86400); // Default 24 hours
 
     await this.client.setex(key, ttl, userId);
   }
@@ -86,10 +80,7 @@ export class TokenStorageService {
    */
   async storePasswordResetToken(token: string, userId: string): Promise<void> {
     const key = `${this.passwordResetPrefix}${token}`;
-    const ttl = this.configService.get<number>(
-      'PASSWORD_RESET_TOKEN_EXPIRES_IN',
-      3600
-    ); // Default 1 hour
+    const ttl = this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRES_IN', 3600); // Default 1 hour
 
     await this.client.setex(key, ttl, userId);
   }

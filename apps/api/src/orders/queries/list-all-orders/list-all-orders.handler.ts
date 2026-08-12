@@ -25,7 +25,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { OrderDto, OrderListResponseDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';
-import { OrderWithItems } from '../../types/order.types';
+import { OrderWithItems } from '../../order.types';
 import { ListAllOrdersQuery } from './list-all-orders.query';
 
 @QueryHandler(ListAllOrdersQuery)

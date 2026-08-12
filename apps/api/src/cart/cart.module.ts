@@ -27,14 +27,14 @@ import { ProductsModule } from '../products/products.module';
 // Controller
 import { CartController } from './cart.controller';
 // Commands
-import { AddToCartHandler } from './commands/add-to-cart/add-to-cart.handler';
-import { ClearCartHandler } from './commands/clear-cart/clear-cart.handler';
-import { RemoveFromCartHandler } from './commands/remove-from-cart/remove-from-cart.handler';
-import { UpdateCartItemHandler } from './commands/update-cart-item/update-cart-item.handler';
+import { AddToCartHandler } from './commands/add-to-cart';
+import { ClearCartHandler } from './commands/clear-cart';
+import { RemoveFromCartHandler } from './commands/remove-from-cart';
+import { UpdateCartItemHandler } from './commands/update-cart-item';
 // Repository
 import { CartRepository } from './infrastructure/cart.repository';
 // Queries
-import { GetCartHandler } from './queries/get-cart/get-cart.handler';
+import { GetCartHandler } from './queries/get-cart';
 
 const CommandHandlers = [
   AddToCartHandler,

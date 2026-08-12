@@ -33,11 +33,7 @@ import { QueryDevtools } from '@/components/ReactQueryDevtools';
 import { StructuredData } from '@/components/StructuredData';
 import { AuthProvider } from '@/contexts/auth.context';
 import { CartDrawerProvider } from '@/contexts/cart-drawer.context';
-import {
-  createPageMetadata,
-  defaultMetadata,
-  SEO_IMAGES,
-} from '@/lib/metadata';
+import { createPageMetadata, defaultMetadata, SEO_IMAGES } from '@/lib/metadata';
 import { queryClient } from '@/lib/query-client';
 
 const inter = Inter({
@@ -70,9 +66,7 @@ export const metadata: Metadata = {
       { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     other: [
       {
         rel: 'icon',

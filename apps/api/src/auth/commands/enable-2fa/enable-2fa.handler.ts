@@ -21,17 +21,12 @@
  */
 
 import { MFAMethod } from '@generated/prisma';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import * as argon2 from 'argon2';
 
-import { PrismaService } from '../../../prisma/prisma.service';
-import { TotpService } from '../../infrastructure/totp.service';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { PrismaService } from '@/prisma';
+import { TotpService, UserRepository } from '../../infrastructure';
 import { Enable2FACommand } from './enable-2fa.command';
 
 @Injectable()
@@ -40,7 +35,7 @@ export class Enable2FAHandler implements ICommandHandler<Enable2FACommand> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly totpService: TotpService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(command: Enable2FACommand): Promise<{
@@ -74,9 +69,7 @@ export class Enable2FAHandler implements ICommandHandler<Enable2FACommand> {
     const backupCodes = this.totpService.generateBackupCodes(10);
 
     // Hash backup codes before storing
-    const hashedBackupCodes = await Promise.all(
-      backupCodes.map((code) => argon2.hash(code))
-    );
+    const hashedBackupCodes = await Promise.all(backupCodes.map((code) => argon2.hash(code)));
 
     // Store MFA method (but don't activate yet - user needs to verify first)
     await this.prisma.userMFAMethod.create({
@@ -97,8 +90,8 @@ export class Enable2FAHandler implements ICommandHandler<Enable2FACommand> {
             userId,
             code: hashedCode,
           },
-        })
-      )
+        }),
+      ),
     );
 
     // Store secret in user (temporary, until verified)

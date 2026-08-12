@@ -30,11 +30,7 @@ interface PartnerSectionProps {
   subtitle?: string;
 }
 
-export function PartnerSection({
-  label,
-  title,
-  subtitle,
-}: PartnerSectionProps) {
+export function PartnerSection({ label, title, subtitle }: PartnerSectionProps) {
   return (
     <div className="mb-12 flex flex-col gap-3 text-center">
       {label && (

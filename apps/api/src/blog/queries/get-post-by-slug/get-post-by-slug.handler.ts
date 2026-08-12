@@ -25,8 +25,8 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { StorageService } from '@/storage/storage.service';
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto, BlogPostWithContentDto } from '../../dtos/blog-post.dto';
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto, BlogPostWithContentDto } from '../../dtos';
 import { BlogRepository } from '../../infrastructure/blog.repository';
 import { GetBlogPostBySlugQuery } from './get-post-by-slug.query';
 
@@ -34,12 +34,10 @@ import { GetBlogPostBySlugQuery } from './get-post-by-slug.query';
 export class GetBlogPostBySlugHandler implements IQueryHandler<GetBlogPostBySlugQuery> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
-  async execute(
-    query: GetBlogPostBySlugQuery
-  ): Promise<BlogPostDto | BlogPostWithContentDto> {
+  async execute(query: GetBlogPostBySlugQuery): Promise<BlogPostDto | BlogPostWithContentDto> {
     const { slug, includeContent = false } = query;
 
     const post = await this.blogRepository.findBySlug(slug);
@@ -56,9 +54,7 @@ export class GetBlogPostBySlugHandler implements IQueryHandler<GetBlogPostBySlug
     if (includeContent) {
       try {
         // Fetch content from R2
-        const content = await this.storageService.getBlogContent(
-          post.contentUrl
-        );
+        const content = await this.storageService.getBlogContent(post.contentUrl);
 
         return {
           ...baseDto,
@@ -68,7 +64,7 @@ export class GetBlogPostBySlugHandler implements IQueryHandler<GetBlogPostBySlug
         // If content is not found in R2 (e.g., seed data with placeholder URL),
         // throw a more descriptive error
         throw new NotFoundException(
-          `Blog post content not found. The content may not have been uploaded to storage yet.`
+          `Blog post content not found. The content may not have been uploaded to storage yet.`,
         );
       }
     }

@@ -52,11 +52,7 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const post = await blogApi.getPostBySlug(slug, false);
@@ -77,11 +73,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const post = await blogApi.getPostBySlug(slug, true);
@@ -127,9 +119,7 @@ export default async function BlogPostPage({
             )}
 
             <header className="mb-8">
-              <h1 className="text-wds-text mb-4 text-4xl font-bold md:text-5xl">
-                {post.title}
-              </h1>
+              <h1 className="text-wds-text mb-4 text-4xl font-bold md:text-5xl">{post.title}</h1>
 
               <div className="text-wds-text/70 flex flex-wrap items-center gap-4 text-sm">
                 <span>{post.author.fullName || 'Anonymous'}</span>

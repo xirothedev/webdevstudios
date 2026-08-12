@@ -23,12 +23,7 @@
 'use client';
 
 import { CheckCircle2, Info, Loader2 } from 'lucide-react';
-import {
-  type FormEvent,
-  type InputHTMLAttributes,
-  type ReactNode,
-  useState,
-} from 'react';
+import { type FormEvent, type InputHTMLAttributes, type ReactNode, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useUpdateProfile } from '@/lib/api/hooks/use-user';
@@ -41,17 +36,14 @@ interface ProfileFormProps {
 }
 
 // Light theme Input component for profile form
-function LightInput({
-  className,
-  ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
+function LightInput({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       className={cn(
         'flex h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 transition-all placeholder:text-gray-400',
         'focus:border-wds-accent focus:ring-wds-accent/20 focus:ring-2 focus:outline-none',
         'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-50',
-        className
+        className,
       )}
       {...props}
     />
@@ -71,10 +63,7 @@ function Label({
   className?: string;
 }) {
   return (
-    <label
-      htmlFor={htmlFor}
-      className={cn('text-sm font-semibold text-gray-900', className)}
-    >
+    <label htmlFor={htmlFor} className={cn('text-sm font-semibold text-gray-900', className)}>
       {children}
       {required && <span className="ml-1 text-red-500">*</span>}
     </label>
@@ -82,13 +71,7 @@ function Label({
 }
 
 // Helper text component
-function HelperText({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+function HelperText({ children, className }: { children: ReactNode; className?: string }) {
   return <p className={cn('text-xs text-gray-500', className)}>{children}</p>;
 }
 
@@ -110,13 +93,7 @@ function ErrorText({
 }
 
 // Verification badge component
-function VerificationBadge({
-  verified,
-  label,
-}: {
-  verified: boolean;
-  label: string;
-}) {
+function VerificationBadge({ verified, label }: { verified: boolean; label: string }) {
   return (
     <div className="flex items-center gap-2">
       {verified ? (
@@ -127,9 +104,7 @@ function VerificationBadge({
       ) : (
         <>
           <Info className="size-4 text-gray-400" />
-          <span className="text-xs font-medium text-gray-500">
-            Chưa {label.toLowerCase()}
-          </span>
+          <span className="text-xs font-medium text-gray-500">Chưa {label.toLowerCase()}</span>
         </>
       )}
     </div>
@@ -179,8 +154,7 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
   };
 
   const hasChanges =
-    fullName.trim() !== (user.fullName || '') ||
-    phone.trim() !== (user.phone || '');
+    fullName.trim() !== (user.fullName || '') || phone.trim() !== (user.phone || '');
 
   const isLoading = updateProfile.isPending;
 
@@ -198,10 +172,7 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
         />
         <div className="flex items-center justify-between">
           <HelperText>Email không thể thay đổi</HelperText>
-          <VerificationBadge
-            verified={user.emailVerified}
-            label="Xác thực email"
-          />
+          <VerificationBadge verified={user.emailVerified} label="Xác thực email" />
         </div>
       </div>
 
@@ -257,10 +228,7 @@ export function ProfileForm({ user, className }: ProfileFormProps) {
         ) : (
           <div className="flex items-center justify-between">
             <HelperText>Tối đa 15 ký tự</HelperText>
-            <VerificationBadge
-              verified={user.phoneVerified}
-              label="Xác thực số điện thoại"
-            />
+            <VerificationBadge verified={user.phoneVerified} label="Xác thực số điện thoại" />
           </div>
         )}
       </div>

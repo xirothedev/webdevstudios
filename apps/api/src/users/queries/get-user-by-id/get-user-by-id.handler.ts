@@ -24,17 +24,15 @@ import { UserRole } from '@generated/prisma';
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
-import { PrivateUserDto, PublicUserDto } from '../../dtos/user.dto';
+import { UserRepository } from '@/auth/infrastructure';
+import { PrivateUserDto, PublicUserDto } from '../../dtos';
 import { GetUserByIdQuery } from './get-user-by-id.query';
 
 @QueryHandler(GetUserByIdQuery)
 export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(
-    query: GetUserByIdQuery
-  ): Promise<PublicUserDto | PrivateUserDto> {
+  async execute(query: GetUserByIdQuery): Promise<PublicUserDto | PrivateUserDto> {
     const { userId, requesterId, requesterRole } = query;
 
     const user = await this.userRepository.findById(userId);

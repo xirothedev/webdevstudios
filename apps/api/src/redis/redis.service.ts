@@ -82,10 +82,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async hSet(key: string, data: VerificationDto): Promise<void> {
     const { id, tries } = data;
     await this.client.hset(key, 'id', id, 'tries', tries.toString());
-    await this.client.expire(
-      key,
-      this.config.getOrThrow<number>('REDIS_TTL', 300)
-    );
+    await this.client.expire(key, this.config.getOrThrow<number>('REDIS_TTL', 300));
   }
 
   async hGet(key: string, field: string): Promise<string | null> {
@@ -120,12 +117,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.get(key);
   }
 
-  async set(
-    key: string,
-    value: string,
-    expiryMode: 'EX' | 'PX',
-    time: number
-  ): Promise<void> {
+  async set(key: string, value: string, expiryMode: 'EX' | 'PX', time: number): Promise<void> {
     if (expiryMode === 'EX') {
       await this.client.setex(key, time, value);
     } else {

@@ -26,6 +26,6 @@ export class ListAllOrdersQuery {
   constructor(
     public readonly page: number,
     public readonly limit: number,
-    public readonly status?: OrderStatus
+    public readonly status?: OrderStatus,
   ) {}
 }

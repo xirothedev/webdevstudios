@@ -24,8 +24,8 @@ import { UserRole } from '@generated/prisma';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { UserRepository } from '../../../auth/infrastructure/user.repository';
-import { PrivateUserDto } from '../../dtos/responses.dto';
+import { UserRepository } from '@/auth/infrastructure';
+import { PrivateUserDto } from '../../dtos';
 import { UpdateUserCommand } from './update-user.command';
 
 @CommandHandler(UpdateUserCommand)
@@ -60,10 +60,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       updateData.role = role;
     }
 
-    const updatedUser = await this.userRepository.update(
-      targetUserId,
-      updateData
-    );
+    const updatedUser = await this.userRepository.update(targetUserId, updateData);
 
     return {
       id: updatedUser.id,

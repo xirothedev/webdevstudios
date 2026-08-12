@@ -23,8 +23,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto } from '../../dtos/blog-post.dto';
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto } from '../../dtos';
 import { BlogRepository } from '../../infrastructure/blog.repository';
 import { PublishBlogPostCommand } from './publish-post.command';
 

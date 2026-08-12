@@ -20,26 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  OrderStatus,
-  PaymentStatus,
-  ProductSize,
-  ProductSlug,
-} from '@generated/prisma';
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { OrderStatus, PaymentStatus, ProductSize, ProductSlug } from '@generated/prisma';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { CartRepository } from '@/cart/infrastructure/cart.repository';
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 import { ProductRepository } from '@/products/infrastructure/product.repository';
 
 import { OrderDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';
-import { OrderWithItems } from '../../types/order.types';
+import { OrderWithItems } from '../../order.types';
 import { CreateOrderCommand } from './create-order.command';
 
 @CommandHandler(CreateOrderCommand)
@@ -48,26 +39,17 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     private readonly orderRepository: OrderRepository,
     private readonly cartRepository: CartRepository,
     private readonly productRepository: ProductRepository,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<OrderDto> {
-    const {
-      userId,
-      shippingAddress,
-      orderType,
-      productId,
-      productSlug,
-      size,
-      quantity,
-    } = command;
+    const { userId, shippingAddress, orderType, productId, productSlug, size, quantity } = command;
 
     // Check for pending orders - prevent duplicate orders
-    const pendingOrders =
-      await this.orderRepository.findPendingOrdersByUserId(userId);
+    const pendingOrders = await this.orderRepository.findPendingOrdersByUserId(userId);
     if (pendingOrders.length > 0) {
       throw new ConflictException(
-        `You have a pending order. Please complete or cancel it before creating a new one. Order ID: ${pendingOrders[0].id}`
+        `You have a pending order. Please complete or cancel it before creating a new one. Order ID: ${pendingOrders[0].id}`,
       );
     }
 
@@ -92,21 +74,16 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       for (const cartItem of cart.items) {
         const product = cartItem.product;
         if (!product) {
-          throw new NotFoundException(
-            `Product ${cartItem.productId} not found`
-          );
+          throw new NotFoundException(`Product ${cartItem.productId} not found`);
         }
 
         // Check stock
         let availableStock: number;
         if (product.hasSizes && cartItem.size) {
-          const sizeStock = await this.productRepository.getStockBySize(
-            product.id,
-            cartItem.size
-          );
+          const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size);
           if (sizeStock === null) {
             throw new NotFoundException(
-              `Size ${cartItem.size} not found for product ${product.id}`
+              `Size ${cartItem.size} not found for product ${product.id}`,
             );
           }
           availableStock = sizeStock;
@@ -116,7 +93,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
 
         if (cartItem.quantity > availableStock) {
           throw new ConflictException(
-            `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`
+            `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`,
           );
         }
 
@@ -137,7 +114,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       // Direct purchase - validate required fields
       if (!productId || !productSlug || !quantity) {
         throw new BadRequestException(
-          'productId, productSlug, and quantity are required for direct purchase'
+          'productId, productSlug, and quantity are required for direct purchase',
         );
       }
 
@@ -155,14 +132,9 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       // Check stock
       let availableStock: number;
       if (product.hasSizes && size) {
-        const sizeStock = await this.productRepository.getStockBySize(
-          product.id,
-          size
-        );
+        const sizeStock = await this.productRepository.getStockBySize(product.id, size);
         if (sizeStock === null) {
-          throw new NotFoundException(
-            `Size ${size} not found for product ${product.id}`
-          );
+          throw new NotFoundException(`Size ${size} not found for product ${product.id}`);
         }
         availableStock = sizeStock;
       } else {
@@ -174,7 +146,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
 
       if (quantity > availableStock) {
         throw new ConflictException(
-          `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${availableStock}, Requested: ${quantity}`
+          `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${availableStock}, Requested: ${quantity}`,
         );
       }
 

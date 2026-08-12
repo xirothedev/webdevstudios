@@ -31,7 +31,7 @@ import { DeleteReviewCommand } from './delete-review.command';
 export class DeleteReviewHandler implements ICommandHandler<DeleteReviewCommand> {
   constructor(
     private readonly reviewRepository: ReviewRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async execute(command: DeleteReviewCommand): Promise<{ success: boolean }> {
@@ -51,11 +51,7 @@ export class DeleteReviewHandler implements ICommandHandler<DeleteReviewCommand>
     // Update product rating
     const { ratingValue, ratingCount } =
       await this.reviewRepository.calculateProductRating(productId);
-    await this.productRepository.updateRating(
-      productId,
-      ratingValue,
-      ratingCount
-    );
+    await this.productRepository.updateRating(productId, ratingValue, ratingCount);
 
     return { success: true };
   }

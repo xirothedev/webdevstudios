@@ -109,7 +109,7 @@ export function getWebSiteSchema(): WebSiteSchema {
 }
 
 export function getBreadcrumbSchema(
-  items: Array<{ name: string; url?: string }>
+  items: Array<{ name: string; url?: string }>,
 ): BreadcrumbSchema {
   return {
     '@context': 'https://schema.org',

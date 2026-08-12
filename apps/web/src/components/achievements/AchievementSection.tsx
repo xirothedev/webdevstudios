@@ -31,11 +31,7 @@ interface AchievementSectionProps {
   subtitle?: string;
 }
 
-export function AchievementSection({
-  label,
-  title,
-  subtitle,
-}: AchievementSectionProps) {
+export function AchievementSection({ label, title, subtitle }: AchievementSectionProps) {
   return (
     <div className="mb-16 flex flex-col gap-3 text-center">
       {label && (

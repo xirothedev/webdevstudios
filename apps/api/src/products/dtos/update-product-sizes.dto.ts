@@ -22,13 +22,7 @@
 
 import { ProductSize } from '@generated/prisma';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNumber,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsNumber, IsString, Min, ValidateNested } from 'class-validator';
 
 export class ProductSizeStockInputDto {
   @ApiProperty({

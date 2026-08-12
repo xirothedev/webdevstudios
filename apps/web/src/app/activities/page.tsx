@@ -39,11 +39,8 @@ export default function ActivitiesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredActivities = ACTIVITIES.filter((item) => {
-    const matchesCategory =
-      activeCategory === 'all' || item.category === activeCategory;
-    const matchesSearch = item.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -58,10 +55,8 @@ export default function ActivitiesPage() {
           style={{
             backgroundImage: `linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)`,
             backgroundSize: '60px 60px',
-            maskImage:
-              'radial-gradient(circle at top center, black 30%, transparent 80%)',
-            WebkitMaskImage:
-              'radial-gradient(circle at top center, black 30%, transparent 80%)',
+            maskImage: 'radial-gradient(circle at top center, black 30%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(circle at top center, black 30%, transparent 80%)',
           }}
         />
       </div>
@@ -86,10 +81,7 @@ export default function ActivitiesPage() {
         {/* --- GRID --- */}
         <section className="min-h-[500px] px-6">
           <div className="mx-auto max-w-7xl">
-            <motion.div
-              layout
-              className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-            >
+            <motion.div layout className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               <AnimatePresence mode="popLayout">
                 {filteredActivities.length > 0 ? (
                   filteredActivities.map((activity) => (
@@ -104,9 +96,7 @@ export default function ActivitiesPage() {
                     <div className="mb-4 inline-flex rounded-full bg-white/5 p-4 text-gray-500">
                       <Search size={32} />
                     </div>
-                    <p className="text-lg text-gray-400">
-                      Không tìm thấy hoạt động nào phù hợp.
-                    </p>
+                    <p className="text-lg text-gray-400">Không tìm thấy hoạt động nào phù hợp.</p>
                   </motion.div>
                 )}
               </AnimatePresence>

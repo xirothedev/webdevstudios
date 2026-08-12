@@ -23,9 +23,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductDto } from '../../dtos/product.dto';
+import { ProductDto } from '../../dtos';
 import { ProductRepository } from '../../infrastructure/product.repository';
-import { ProductWithRelations } from '../../types/product.types';
+import { ProductWithRelations } from '../../product.types';
 import { UpdateProductSizesCommand } from './update-product-sizes.command';
 
 @CommandHandler(UpdateProductSizesCommand)
@@ -54,18 +54,12 @@ export class UpdateProductSizesHandler implements ICommandHandler<UpdateProductS
 
     // Validate product has sizes
     if (!product.hasSizes) {
-      throw new BadRequestException(
-        'Product does not support size-specific stock'
-      );
+      throw new BadRequestException('Product does not support size-specific stock');
     }
 
     // Update all size stocks (upsert - creates if not exists, updates if exists)
     for (const sizeStock of sizeStocks) {
-      await this.productRepository.updateSizeStock(
-        productId,
-        sizeStock.size,
-        sizeStock.stock
-      );
+      await this.productRepository.updateSizeStock(productId, sizeStock.size, sizeStock.stock);
     }
 
     // Recalculate total stock from ALL sizes in database (not just updated ones)
@@ -77,10 +71,7 @@ export class UpdateProductSizesHandler implements ICommandHandler<UpdateProductS
 
     // Calculate total from all sizeStocks in database
     if (updatedProduct.sizeStocks && updatedProduct.sizeStocks.length > 0) {
-      const totalStock = updatedProduct.sizeStocks.reduce(
-        (sum, ss) => sum + ss.stock,
-        0
-      );
+      const totalStock = updatedProduct.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
       await this.productRepository.updateStock(productId, totalStock);
     } else {
       // If no size stocks exist, set total to 0
@@ -105,12 +96,8 @@ export class UpdateProductSizesHandler implements ICommandHandler<UpdateProductS
       name: product.name,
       description: product.description,
       priceCurrent: Number(product.priceCurrent),
-      priceOriginal: product.priceOriginal
-        ? Number(product.priceOriginal)
-        : null,
-      priceDiscount: product.priceDiscount
-        ? Number(product.priceDiscount)
-        : null,
+      priceOriginal: product.priceOriginal ? Number(product.priceOriginal) : null,
+      priceDiscount: product.priceDiscount ? Number(product.priceDiscount) : null,
       stock: product.stock,
       hasSizes: product.hasSizes,
       badge: product.badge,
@@ -128,13 +115,10 @@ export class UpdateProductSizesHandler implements ICommandHandler<UpdateProductS
   }
 
   private calculateStockStatus(
-    product: ProductWithRelations
+    product: ProductWithRelations,
   ): 'in_stock' | 'low_stock' | 'out_of_stock' {
     if (product.hasSizes && product.sizeStocks?.length > 0) {
-      const totalStock = product.sizeStocks.reduce(
-        (sum, ss) => sum + ss.stock,
-        0
-      );
+      const totalStock = product.sizeStocks.reduce((sum, ss) => sum + ss.stock, 0);
       if (totalStock === 0) return 'out_of_stock';
       if (totalStock < 5) return 'low_stock';
       return 'in_stock';

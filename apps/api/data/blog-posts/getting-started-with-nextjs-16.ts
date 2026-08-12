@@ -83,8 +83,7 @@ export default async function Page() {
 ## Conclusion
 
 Next.js 16 is a significant step forward for the framework. Start exploring these features today!`,
-  metaTitle:
-    'Getting Started with Next.js 16 - Complete Guide | WebDev Studios',
+  metaTitle: 'Getting Started with Next.js 16 - Complete Guide | WebDev Studios',
   metaDescription:
     'Learn how to get started with Next.js 16, including new features like Server Components, enhanced caching, and improved developer experience.',
   isPublished: true,

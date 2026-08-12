@@ -26,7 +26,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { OrderDto } from '../../dtos/order.dto';
 import { OrderRepository } from '../../infrastructure/order.repository';
-import { OrderWithItems } from '../../types/order.types';
+import { OrderWithItems } from '../../order.types';
 import { UpdateOrderStatusCommand } from './update-order-status.command';
 
 @CommandHandler(UpdateOrderStatusCommand)
@@ -46,10 +46,7 @@ export class UpdateOrderStatusHandler implements ICommandHandler<UpdateOrderStat
       throw new NotFoundException(`Order with id ${orderId} not found`);
     }
 
-    const updatedOrder = await this.orderRepository.updateStatus(
-      orderId,
-      status
-    );
+    const updatedOrder = await this.orderRepository.updateStatus(orderId, status);
 
     // If order is confirmed, update payment status to PAID
     if (status === 'CONFIRMED' && updatedOrder.paymentStatus === 'PENDING') {

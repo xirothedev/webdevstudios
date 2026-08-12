@@ -23,7 +23,7 @@
 import { Injectable } from '@nestjs/common';
 import { ThrottlerStorage } from '@nestjs/throttler';
 
-import { RedisService } from '../../redis/redis.service';
+import { RedisService } from '@/redis';
 
 /**
  * ThrottlerStorageRecord interface
@@ -54,7 +54,7 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
     ttl: number,
     limit: number,
     blockDuration: number,
-    throttlerName: string
+    throttlerName: string,
   ): Promise<ThrottlerStorageRecord> {
     // Create separate keys for tracking and blocking
     const trackingKey = `throttler:${throttlerName}:${key}`;
@@ -62,16 +62,11 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
 
     // Check if key is blocked
     const isBlocked = (await this.redisService.exists(blockKey)) > 0;
-    const timeToBlockExpire = isBlocked
-      ? (await this.redisService.ttl(blockKey)) * 1000
-      : 0;
+    const timeToBlockExpire = isBlocked ? (await this.redisService.ttl(blockKey)) * 1000 : 0;
 
     // If blocked, return blocked status
     if (isBlocked) {
-      const totalHits = parseInt(
-        (await this.redisService.get(trackingKey)) || '0',
-        10
-      );
+      const totalHits = parseInt((await this.redisService.get(trackingKey)) || '0', 10);
       return {
         totalHits,
         timeToExpire: (await this.redisService.ttl(trackingKey)) * 1000,
@@ -91,7 +86,7 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
         trackingKey,
         '1',
         'EX',
-        Math.ceil(ttl / 1000) // Convert milliseconds to seconds
+        Math.ceil(ttl / 1000), // Convert milliseconds to seconds
       );
       totalHits = 1;
     }
@@ -103,7 +98,7 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
         blockKey,
         '1',
         'EX',
-        Math.ceil(blockDuration / 1000) // Convert milliseconds to seconds
+        Math.ceil(blockDuration / 1000), // Convert milliseconds to seconds
       );
 
       return {

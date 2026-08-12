@@ -64,9 +64,7 @@ export default function ForgotPasswordPage() {
     <AuthLayout variant="login">
       <div className="glass-card">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-white drop-shadow-lg">
-            Quên mật khẩu
-          </h2>
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg">Quên mật khẩu</h2>
           <p className="mt-2 text-sm text-white/70">
             Nhập email của bạn để nhận link reset mật khẩu
           </p>
@@ -82,20 +80,14 @@ export default function ForgotPasswordPage() {
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-white">
-                Email đã được gửi!
-              </h3>
+              <h3 className="text-lg font-semibold text-white">Email đã được gửi!</h3>
               <p className="text-sm text-white/70">
-                Vui lòng kiểm tra email để nhận link reset mật khẩu. Nếu không
-                thấy email, vui lòng kiểm tra thư mục spam.
+                Vui lòng kiểm tra email để nhận link reset mật khẩu. Nếu không thấy email, vui lòng
+                kiểm tra thư mục spam.
               </p>
             </div>
             <Link href="/auth/login">
@@ -107,10 +99,7 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-white/90"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-white/90">
                 Email
               </label>
               <Input
@@ -121,9 +110,7 @@ export default function ForgotPasswordPage() {
                 disabled={isLoading}
                 className="glass-input"
               />
-              {errors.email && (
-                <p className="text-sm text-red-400">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-red-400">{errors.email.message}</p>}
             </div>
 
             <Button

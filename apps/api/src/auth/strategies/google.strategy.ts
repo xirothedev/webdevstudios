@@ -41,10 +41,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: VerifyCallback
-  ): Promise<any> {
+    done: VerifyCallback,
+  ): Promise<void> {
     const { id, emails, name, photos } = profile;
-    const email = emails?.[0]?.value || '';
+    const email = emails?.[0]?.value?.toLowerCase();
+    if (!email) {
+      return done(new Error('Google OAuth did not return email'), undefined);
+    }
     const userName =
       name?.givenName && name?.familyName
         ? `${name.givenName} ${name.familyName}`
@@ -55,8 +58,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       email,
       name: userName,
       picture: photos?.[0]?.value,
-      accessToken,
-      refreshToken,
     };
     done(null, user);
   }

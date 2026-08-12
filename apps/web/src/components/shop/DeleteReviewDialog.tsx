@@ -33,11 +33,7 @@ interface DeleteReviewDialogProps {
   isDeleting: boolean;
 }
 
-export function DeleteReviewDialog({
-  onClose,
-  onConfirm,
-  isDeleting,
-}: DeleteReviewDialogProps) {
+export function DeleteReviewDialog({ onClose, onConfirm, isDeleting }: DeleteReviewDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="mx-4 w-full max-w-md rounded-xl border border-white/10 bg-black p-6 shadow-lg">
@@ -47,9 +43,7 @@ export function DeleteReviewDialog({
           </div>
           <div>
             <h3 className="text-lg font-bold text-white">Xóa đánh giá</h3>
-            <p className="text-sm text-white/60">
-              Chỉ admin mới có thể xóa đánh giá
-            </p>
+            <p className="text-sm text-white/60">Chỉ admin mới có thể xóa đánh giá</p>
           </div>
         </div>
 

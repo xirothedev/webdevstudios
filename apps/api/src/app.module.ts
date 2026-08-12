@@ -33,21 +33,18 @@ import { AuthModule } from './auth/auth.module';
 import { BlogModule } from './blog/blog.module';
 import { CartModule } from './cart/cart.module';
 import { CommonModule } from './common/common.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { JwtAuthGuard } from './common/guards/jwt.guard';
-import { SecurityLoggingInterceptor } from './common/interceptors/security-logging.interceptor';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { CsrfService } from './common/services/csrf.service';
+import { AllExceptionsFilter, HttpExceptionFilter } from '@/common/filters';
+import { JwtAuthGuard } from '@/common/guards';
+import { SecurityLoggingInterceptor, TransformInterceptor } from '@/common/interceptors';
+import { CsrfService } from '@/common/services';
 import { ThrottlerRedisStorage } from './common/storage/throttler-redis.storage';
 import { EventsModule } from './events/events.module';
 import { MailModule } from './mail/mail.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule } from '@/prisma';
 import { ProductsModule } from './products/products.module';
-import { RedisModule } from './redis/redis.module';
-import { RedisService } from './redis/redis.service';
+import { RedisModule, RedisService } from '@/redis';
 import { ReviewsModule } from './reviews/reviews.module';
 import { StorageModule } from './storage/storage.module';
 import { UsersModule } from './users/users.module';
@@ -100,9 +97,7 @@ import { UsersModule } from './users/users.module';
       useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('JWT_SECRET_KEY'),
         signOptions: {
-          expiresIn: configService.getOrThrow<number>(
-            'JWT_ACCESS_TOKEN_EXPIRES_IN'
-          ),
+          expiresIn: configService.getOrThrow<number>('JWT_ACCESS_TOKEN_EXPIRES_IN'),
         },
       }),
     }),

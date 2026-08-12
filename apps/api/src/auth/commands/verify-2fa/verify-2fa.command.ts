@@ -28,6 +28,6 @@ export class Verify2FACommand implements ICommand {
     public readonly code: string,
     public readonly sessionId?: string,
     public readonly ipAddress?: string,
-    public readonly userAgent?: string
+    public readonly userAgent?: string,
   ) {}
 }

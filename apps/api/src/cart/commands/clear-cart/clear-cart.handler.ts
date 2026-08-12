@@ -24,7 +24,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { CartDto, CartItemDto } from '../../dtos/cart.dto';
 import { CartRepository } from '../../infrastructure/cart.repository';
-import { CartWithItems } from '../../types/cart.types';
+import { CartWithItems } from '../../cart.types';
 import { ClearCartCommand } from './clear-cart.command';
 
 @CommandHandler(ClearCartCommand)

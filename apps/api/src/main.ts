@@ -31,8 +31,7 @@ import session from 'express-session';
 
 import { AppModule } from './app.module';
 import { CsrfMiddleware } from './common/middleware/csrf.middleware';
-import { CsrfService } from './common/services/csrf.service';
-import { SecurityLoggerService } from './common/services/security-logger.service';
+import { CsrfService, SecurityLoggerService } from '@/common/services';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -46,13 +45,7 @@ async function bootstrap() {
     origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Accept',
-      'X-Requested-With',
-      'X-CSRF-Token',
-    ],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-CSRF-Token'],
     exposedHeaders: ['Content-Type', 'Authorization'],
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -94,7 +87,7 @@ async function bootstrap() {
         secure: isProduction,
         sameSite: 'lax', // Always lax for multiple ports/subdomains
       },
-    })
+    }),
   );
 
   // Setup CSRF protection
@@ -109,16 +102,14 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-    })
+    }),
   );
 
   // Swagger configuration
   // Protect Swagger with Basic Auth in production
   if (isProduction) {
-    const swaggerUsername =
-      configService.getOrThrow<string>('SWAGGER_USERNAME');
-    const swaggerPassword =
-      configService.getOrThrow<string>('SWAGGER_PASSWORD');
+    const swaggerUsername = configService.getOrThrow<string>('SWAGGER_USERNAME');
+    const swaggerPassword = configService.getOrThrow<string>('SWAGGER_PASSWORD');
 
     app.use(
       '/v1/docs',
@@ -126,7 +117,7 @@ async function bootstrap() {
         users: { [swaggerUsername]: swaggerPassword },
         challenge: true,
         realm: 'Swagger API Docs',
-      })
+      }),
     );
   }
 
@@ -142,7 +133,7 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'Bearer'
+      'Bearer',
     )
     .addSecurityRequirements('Bearer')
     .addCookieAuth('access_token')

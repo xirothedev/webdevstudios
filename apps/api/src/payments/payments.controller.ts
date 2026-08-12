@@ -20,17 +20,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { UserRole } from '@generated/prisma';
-import {
-  Body,
-  Controller,
-  Get,
-  Logger,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { PaymentTransactionStatus, UserRole } from '@generated/prisma';
+import { Body, Controller, Get, Logger, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
@@ -42,23 +33,18 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Public } from '@/common/decorators/public.decorator';
-import { Roles } from '@/common/decorators/roles.decorator';
-import {
-  ThrottleAPI,
-  ThrottlePayment,
-} from '@/common/decorators/throttle.decorator';
-import { RolesGuard } from '@/common/guards/roles.guard';
+import { Public, Roles, ThrottleAPI, ThrottlePayment } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
 
-import { CreatePaymentLinkCommand } from './commands/create-payment-link/create-payment-link.command';
-import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook/process-payment-webhook.command';
+import { CreatePaymentLinkCommand } from './commands/create-payment-link';
+import { ProcessPaymentWebhookCommand } from './commands/process-payment-webhook';
 import {
   CreatePaymentLinkRequestDto,
   PaymentLinkResponseDto,
   TransactionListResponseDto,
   WebhookDto,
 } from './dtos/payment.dto';
-import { ListTransactionsQuery } from './queries/list-transactions/list-transactions.query';
+import { ListTransactionsQuery } from './queries/list-transactions';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -67,7 +53,7 @@ export class PaymentsController {
 
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @ThrottlePayment()
@@ -86,11 +72,9 @@ export class PaymentsController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiResponse({ status: 409, description: 'Order already paid' })
   async createPaymentLink(
-    @Body() dto: CreatePaymentLinkRequestDto
+    @Body() dto: CreatePaymentLinkRequestDto,
   ): Promise<PaymentLinkResponseDto> {
-    const result = await this.commandBus.execute(
-      new CreatePaymentLinkCommand(dto.orderId)
-    );
+    const result = await this.commandBus.execute(new CreatePaymentLinkCommand(dto.orderId));
 
     return {
       paymentUrl: result.paymentUrl,
@@ -133,16 +117,14 @@ export class PaymentsController {
         virtualAccountNumber?: string;
       };
       signature: string;
-    }
+    },
   ): Promise<{ success: boolean }> {
     try {
       // PayOS webhook includes signature in the body
-      await this.commandBus.execute(
-        new ProcessPaymentWebhookCommand(webhookData)
-      );
+      await this.commandBus.execute(new ProcessPaymentWebhookCommand(webhookData));
 
       this.logger.log(
-        `Webhook processed successfully for paymentLinkId: ${webhookData.data?.paymentLinkId || 'unknown'}`
+        `Webhook processed successfully for paymentLinkId: ${webhookData.data?.paymentLinkId || 'unknown'}`,
       );
 
       return { success: true };
@@ -151,7 +133,7 @@ export class PaymentsController {
       // This is important for webhook URL verification
       this.logger.error(
         `Webhook processing failed: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error.stack : undefined
+        error instanceof Error ? error.stack : undefined,
       );
 
       // For webhook URL verification, PayOS expects 200 response
@@ -186,8 +168,7 @@ export class PaymentsController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'List payment transactions (Admin only)',
-    description:
-      'Get a paginated list of all payment transactions. Admin only endpoint.',
+    description: 'Get a paginated list of all payment transactions. Admin only endpoint.',
   })
   @ApiQuery({
     name: 'page',
@@ -219,14 +200,14 @@ export class PaymentsController {
   async listTransactions(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @Query('status') status?: string
+    @Query('status') status?: string,
   ): Promise<TransactionListResponseDto> {
     return this.queryBus.execute(
       new ListTransactionsQuery(
         page ? parseInt(page, 10) : 1,
         limit ? parseInt(limit, 10) : 10,
-        status as any
-      )
+        status as PaymentTransactionStatus | undefined,
+      ),
     );
   }
 }

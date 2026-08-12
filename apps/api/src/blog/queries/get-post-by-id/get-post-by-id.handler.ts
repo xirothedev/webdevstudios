@@ -25,8 +25,8 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { StorageService } from '@/storage/storage.service';
 
-import { BlogPostWithRelations } from '../../blog.interface';
-import { BlogPostDto, BlogPostWithContentDto } from '../../dtos/blog-post.dto';
+import { BlogPostWithRelations } from '../../blog.types';
+import { BlogPostDto, BlogPostWithContentDto } from '../../dtos';
 import { BlogRepository } from '../../infrastructure/blog.repository';
 import { GetBlogPostByIdQuery } from './get-post-by-id.query';
 
@@ -34,12 +34,10 @@ import { GetBlogPostByIdQuery } from './get-post-by-id.query';
 export class GetBlogPostByIdHandler implements IQueryHandler<GetBlogPostByIdQuery> {
   constructor(
     private readonly blogRepository: BlogRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
-  async execute(
-    query: GetBlogPostByIdQuery
-  ): Promise<BlogPostDto | BlogPostWithContentDto> {
+  async execute(query: GetBlogPostByIdQuery): Promise<BlogPostDto | BlogPostWithContentDto> {
     const { postId, includeContent = false } = query;
 
     const post = await this.blogRepository.findById(postId);

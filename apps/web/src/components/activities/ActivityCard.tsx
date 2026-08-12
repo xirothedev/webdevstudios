@@ -107,17 +107,12 @@ export function ActivityCard({ activity }: ActivityCardProps) {
           <Users size={12} /> {activity.attendees} tham gia
         </div>
 
-        <p className="mb-4 line-clamp-3 text-sm text-gray-400">
-          {activity.description}
-        </p>
+        <p className="mb-4 line-clamp-3 text-sm text-gray-400">{activity.description}</p>
 
         <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-4">
           <button className="group-hover:text-wds-accent flex items-center gap-2 text-sm font-medium text-white transition-colors">
             Xem chi tiết{' '}
-            <ArrowRight
-              size={14}
-              className="transition-transform group-hover:translate-x-1"
-            />
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </button>
         </div>
       </div>

@@ -20,15 +20,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { TokenStorageService } from '../../infrastructure/token-storage.service';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { TokenStorageService, UserRepository } from '../../infrastructure';
 import { VerifyEmailCommand } from './verify-email.command';
 
 @Injectable()
@@ -36,7 +31,7 @@ import { VerifyEmailCommand } from './verify-email.command';
 export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly tokenStorage: TokenStorageService
+    private readonly tokenStorage: TokenStorageService,
   ) {}
 
   async execute(command: VerifyEmailCommand): Promise<{ success: boolean }> {

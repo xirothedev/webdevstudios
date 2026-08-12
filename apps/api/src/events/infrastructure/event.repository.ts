@@ -23,7 +23,7 @@
 import { Event, EventType, Prisma } from '@generated/prisma';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 
 @Injectable()
 export class EventRepository {
@@ -95,7 +95,7 @@ export class EventRepository {
       organizer?: string;
       attendees?: number;
       surveyLink?: string;
-    }
+    },
   ): Promise<Event> {
     return this.prisma.event.update({
       where: { id },

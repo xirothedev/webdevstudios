@@ -53,8 +53,7 @@ export class UpdateBlogPostDto {
 
   @ApiPropertyOptional({
     description: 'Cover image URL',
-    example:
-      'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
+    example: 'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
     nullable: true,
   })
   @IsString()
@@ -81,8 +80,7 @@ export class UpdateBlogPostDto {
 
   @ApiPropertyOptional({
     description: 'SEO meta description',
-    example:
-      'Learn how to get started with Next.js in this comprehensive guide.',
+    example: 'Learn how to get started with Next.js in this comprehensive guide.',
     nullable: true,
   })
   @IsString()

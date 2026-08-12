@@ -33,43 +33,35 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { Public } from '../common/decorators/public.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { CreateBlogPostCommand } from './commands/create-post/create-post.command';
-import { DeleteBlogPostCommand } from './commands/delete-post/delete-post.command';
-import { PublishBlogPostCommand } from './commands/publish-post/publish-post.command';
-import { UpdateBlogPostCommand } from './commands/update-post/update-post.command';
+import { CurrentUser, Public, Roles } from '@/common/decorators';
+import { RolesGuard } from '@/common/guards';
+import { CreateBlogPostCommand } from './commands/create-post';
+import { DeleteBlogPostCommand } from './commands/delete-post';
+import { PublishBlogPostCommand } from './commands/publish-post';
+import { UpdateBlogPostCommand } from './commands/update-post';
 import {
   BlogPostDto,
   BlogPostListResponseDto,
   BlogPostWithContentDto,
-} from './dtos/blog-post.dto';
-import { CreateBlogPostDto } from './dtos/create-post.dto';
-import { GetBlogPostQueryDto } from './dtos/get-post-query.dto';
-import { ListBlogPostsQueryDto } from './dtos/list-posts-query.dto';
-import { SearchBlogPostsQueryDto } from './dtos/search-posts-query.dto';
-import { UpdateBlogPostDto } from './dtos/update-post.dto';
-import { GetBlogPostByIdQuery } from './queries/get-post-by-id/get-post-by-id.query';
-import { GetBlogPostBySlugQuery } from './queries/get-post-by-slug/get-post-by-slug.query';
-import { ListBlogPostsQuery } from './queries/list-posts/list-posts.query';
-import { SearchBlogPostsQuery } from './queries/search-posts/search-posts.query';
+  CreateBlogPostDto,
+  GetBlogPostQueryDto,
+  ListBlogPostsQueryDto,
+  SearchBlogPostsQueryDto,
+  UpdateBlogPostDto,
+} from './dtos';
+import { GetBlogPostByIdQuery } from './queries/get-post-by-id';
+import { GetBlogPostBySlugQuery } from './queries/get-post-by-slug';
+import { ListBlogPostsQuery } from './queries/list-posts';
+import { SearchBlogPostsQuery } from './queries/search-posts';
 
 @ApiTags('Blog')
 @Controller('blog/posts')
 export class BlogController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get()
@@ -83,15 +75,13 @@ export class BlogController {
     description: 'Blog posts retrieved successfully',
     type: BlogPostListResponseDto,
   })
-  async listPosts(
-    @Query() queryDto: ListBlogPostsQueryDto
-  ): Promise<BlogPostListResponseDto> {
+  async listPosts(@Query() queryDto: ListBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
     return this.queryBus.execute(
       new ListBlogPostsQuery(
         queryDto.page ?? 1,
         queryDto.pageSize ?? 10,
-        true // Only published posts for public endpoint
-      )
+        true, // Only published posts for public endpoint
+      ),
     );
   }
 
@@ -109,15 +99,13 @@ export class BlogController {
     description: 'Blog posts retrieved successfully',
     type: BlogPostListResponseDto,
   })
-  async listAllPosts(
-    @Query() queryDto: ListBlogPostsQueryDto
-  ): Promise<BlogPostListResponseDto> {
+  async listAllPosts(@Query() queryDto: ListBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
     return this.queryBus.execute(
       new ListBlogPostsQuery(
         queryDto.page ?? 1,
         queryDto.pageSize ?? 20,
-        undefined // No filter - get all posts
-      )
+        undefined, // No filter - get all posts
+      ),
     );
   }
 
@@ -132,15 +120,9 @@ export class BlogController {
     description: 'Search results retrieved successfully',
     type: BlogPostListResponseDto,
   })
-  async searchPosts(
-    @Query() queryDto: SearchBlogPostsQueryDto
-  ): Promise<BlogPostListResponseDto> {
+  async searchPosts(@Query() queryDto: SearchBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
     return this.queryBus.execute(
-      new SearchBlogPostsQuery(
-        queryDto.q,
-        queryDto.page ?? 1,
-        queryDto.pageSize ?? 10
-      )
+      new SearchBlogPostsQuery(queryDto.q, queryDto.page ?? 1, queryDto.pageSize ?? 10),
     );
   }
 
@@ -163,10 +145,10 @@ export class BlogController {
   @ApiResponse({ status: 404, description: 'Blog post not found' })
   async getPostBySlug(
     @Param('slug') slug: string,
-    @Query() queryDto: GetBlogPostQueryDto
+    @Query() queryDto: GetBlogPostQueryDto,
   ): Promise<BlogPostDto | BlogPostWithContentDto> {
     return this.queryBus.execute(
-      new GetBlogPostBySlugQuery(slug, queryDto.includeContent ?? false)
+      new GetBlogPostBySlugQuery(slug, queryDto.includeContent ?? false),
     );
   }
 
@@ -189,7 +171,7 @@ export class BlogController {
   @ApiResponse({ status: 409, description: 'Conflict - Slug already exists' })
   async createPost(
     @CurrentUser() user: { id: string },
-    @Body() dto: CreateBlogPostDto
+    @Body() dto: CreateBlogPostDto,
   ): Promise<BlogPostDto> {
     return this.commandBus.execute(
       new CreateBlogPostCommand(
@@ -201,8 +183,8 @@ export class BlogController {
         dto.coverImage || null,
         dto.isPublished || false,
         dto.metaTitle || null,
-        dto.metaDescription || null
-      )
+        dto.metaDescription || null,
+      ),
     );
   }
 
@@ -212,8 +194,7 @@ export class BlogController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get blog post by ID (Admin only)',
-    description:
-      'Get blog post details by ID with optional content. Admin only endpoint.',
+    description: 'Get blog post details by ID with optional content. Admin only endpoint.',
   })
   @ApiParam({
     name: 'id',
@@ -228,11 +209,9 @@ export class BlogController {
   @ApiResponse({ status: 404, description: 'Blog post not found' })
   async getPostById(
     @Param('id') id: string,
-    @Query() queryDto: GetBlogPostQueryDto
+    @Query() queryDto: GetBlogPostQueryDto,
   ): Promise<BlogPostDto | BlogPostWithContentDto> {
-    return this.queryBus.execute(
-      new GetBlogPostByIdQuery(id, queryDto.includeContent ?? true)
-    );
+    return this.queryBus.execute(new GetBlogPostByIdQuery(id, queryDto.includeContent ?? true));
   }
 
   @Patch(':id')
@@ -257,10 +236,7 @@ export class BlogController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Blog post not found' })
-  async updatePost(
-    @Param('id') id: string,
-    @Body() dto: UpdateBlogPostDto
-  ): Promise<BlogPostDto> {
+  async updatePost(@Param('id') id: string, @Body() dto: UpdateBlogPostDto): Promise<BlogPostDto> {
     return this.commandBus.execute(
       new UpdateBlogPostCommand(
         id,
@@ -270,8 +246,8 @@ export class BlogController {
         dto.coverImage !== undefined ? dto.coverImage : undefined,
         dto.isPublished,
         dto.metaTitle !== undefined ? dto.metaTitle : undefined,
-        dto.metaDescription !== undefined ? dto.metaDescription : undefined
-      )
+        dto.metaDescription !== undefined ? dto.metaDescription : undefined,
+      ),
     );
   }
 
@@ -281,8 +257,7 @@ export class BlogController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete blog post (Admin only)',
-    description:
-      'Delete blog post and associated content from R2. Admin only endpoint.',
+    description: 'Delete blog post and associated content from R2. Admin only endpoint.',
   })
   @ApiParam({
     name: 'id',
