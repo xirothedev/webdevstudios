@@ -176,4 +176,42 @@ export class BlogService {
       updatedAt: post.updatedAt,
     };
   }
+
+  async listPosts(params: { page?: number; pageSize?: number; publishedOnly?: boolean }) {
+    const { posts, total } = await this.blogRepository.findAll({
+      isPublished: params.publishedOnly ? true : undefined,
+      page: params.page,
+      pageSize: params.pageSize,
+    });
+    return { items: posts.map((p) => this.mapToDto(p)), total };
+  }
+
+  async getPostById(id: string) {
+    const post = await this.blogRepository.findById(id);
+    if (!post) throw new NotFoundException('Blog post not found');
+    return this.mapToDto(post);
+  }
+
+  async getPostBySlug(slug: string) {
+    const post = await this.blogRepository.findBySlug(slug);
+    if (!post) throw new NotFoundException('Blog post not found');
+    return this.mapToDto(post);
+  }
+
+  async deletePost(id: string) {
+    const post = await this.blogRepository.findById(id);
+    if (!post) throw new NotFoundException('Blog post not found');
+    await this.blogRepository.delete(id);
+  }
+
+  async publishPost(id: string) {
+    const post = await this.blogRepository.findById(id);
+    if (!post) throw new NotFoundException('Blog post not found');
+    if (post.isPublished) return this.mapToDto(post);
+    const updated = await this.blogRepository.update(id, {
+      isPublished: true,
+      publishedAt: new Date(),
+    });
+    return this.mapToDto(updated as unknown as BlogPostWithRelations);
+  }
 }
