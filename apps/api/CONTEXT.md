@@ -44,3 +44,5 @@ Registered account with role `USER` or `ADMIN`. Can be created via password regi
 ## Decisions
 - Strategies map to `OAuthProfile`; domain boundary is `OAuthService.handleOAuthCallback`.
 - Linking existing users is allowed and logs a security event.
+- An Order settles exactly once: concurrent settle attempts claim conditionally; losers no-op. Stock releases only inside the winning claim.
+- Payment webhooks settle only signature-verified payloads whose amount equals the Order total. Amount mismatches log to SecurityLog and never settle.
