@@ -1,28 +1,5 @@
-/**
- * Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
- *
- * Source Available License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to:
- * - View and study the Software for educational purposes
- * - Fork this repository on GitHub for personal reference
- * - Share links to this repository
- *
- * THE FOLLOWING ARE PROHIBITED:
- * - Using the Software in production or commercial applications
- * - Copying substantial portions of the Software into other projects
- * - Distributing modified versions of the Software
- * - Removing or altering copyright notices
- *
- * For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
- */
-
 import { OrderStatus, UserRole } from '@prisma/client';
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -35,26 +12,18 @@ import {
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles, ThrottleAPI } from '@/common/decorators';
 import { RolesGuard } from '@/common/guards';
-import { CancelOrderCommand } from './commands/cancel-order';
-import { CreateOrderCommand } from './commands/create-order';
-import { UpdateOrderStatusCommand } from './commands/update-order-status';
 import {
   CreateOrderDto,
   OrderDto,
   OrderListResponseDto,
   UpdateOrderStatusDto,
-} from './dtos/order.dto';
-import { GetOrderByIdQuery } from './queries/get-order-by-id';
-import { ListAllOrdersQuery } from './queries/list-all-orders';
-import { ListOrdersQuery } from './queries/list-orders';
+} from './dto/order.dto';
+import { OrderService } from './services/orders.service';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
+  constructor(private readonly orderService: OrderService) {}
 
   @ThrottleAPI()
   @Post()
@@ -76,17 +45,7 @@ export class OrdersController {
     @CurrentUser() user: { id: string },
     @Body() dto: CreateOrderDto,
   ): Promise<OrderDto> {
-    return this.commandBus.execute(
-      new CreateOrderCommand(
-        user.id,
-        dto.shippingAddress,
-        dto.orderType,
-        dto.productId,
-        dto.productSlug,
-        dto.size,
-        dto.quantity,
-      ),
-    );
+    return this.orderService.createOrder(user.id, dto);
   }
 
   @Get()
@@ -120,8 +79,10 @@ export class OrdersController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ): Promise<OrderListResponseDto> {
-    return this.queryBus.execute(
-      new ListOrdersQuery(user.id, page ? parseInt(page, 10) : 1, limit ? parseInt(limit, 10) : 10),
+    return this.orderService.listOrders(
+      user.id,
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
     );
   }
 
@@ -148,7 +109,7 @@ export class OrdersController {
     @Param('id') id: string,
     @CurrentUser() user: { id: string; role: UserRole },
   ): Promise<OrderDto> {
-    return this.queryBus.execute(new GetOrderByIdQuery(id, user.id, user.role));
+    return this.orderService.getOrderById(id, user.id, user.role);
   }
 
   @Get('admin/all')
@@ -191,12 +152,10 @@ export class OrdersController {
     @Query('limit') limit?: string,
     @Query('status') status?: string,
   ): Promise<OrderListResponseDto> {
-    return this.queryBus.execute(
-      new ListAllOrdersQuery(
-        page ? parseInt(page, 10) : 1,
-        limit ? parseInt(limit, 10) : 10,
-        status as OrderStatus | undefined,
-      ),
+    return this.orderService.listAllOrders(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
+      status as OrderStatus | undefined,
     );
   }
 
@@ -226,7 +185,7 @@ export class OrdersController {
     @Body() dto: UpdateOrderStatusDto,
     @CurrentUser() user: { role: UserRole },
   ): Promise<OrderDto> {
-    return this.commandBus.execute(new UpdateOrderStatusCommand(id, dto.status, user.role));
+    return this.orderService.updateOrderStatus(id, dto.status, user.role);
   }
 
   @Patch(':id/cancel')
@@ -256,6 +215,6 @@ export class OrdersController {
     @Param('id') id: string,
     @CurrentUser() user: { id: string },
   ): Promise<OrderDto> {
-    return this.commandBus.execute(new CancelOrderCommand(id, user.id));
+    return this.orderService.cancelOrder(id, user.id);
   }
 }

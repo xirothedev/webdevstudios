@@ -24,7 +24,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PayOS } from '@payos/node';
 
-import { CreatePaymentLinkDto } from '../dtos/payment.dto';
+import { CreatePaymentLinkDto } from '../dto/payment.dto';
 
 @Injectable()
 export class PayOSService {

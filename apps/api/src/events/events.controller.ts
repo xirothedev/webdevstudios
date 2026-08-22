@@ -33,7 +33,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -42,24 +41,16 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-
 import { parseISO } from 'date-fns';
 import { Public, Roles } from '@/common/decorators';
 import { RolesGuard } from '@/common/guards';
-import { CreateEventCommand } from './commands/create-event';
-import { DeleteEventCommand } from './commands/delete-event';
-import { UpdateEventCommand } from './commands/update-event';
-import { CreateEventDto, EventDto, UpdateEventDto } from './dtos';
-import { GetEventByIdQuery } from './queries/get-event-by-id';
-import { ListEventsQuery } from './queries/list-events';
+import { CreateEventDto, EventDto, UpdateEventDto } from './dto';
+import { EventsService } from './services/events.service';
 
 @ApiTags('Events')
 @Controller('events')
 export class EventsController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
+  constructor(private readonly eventsService: EventsService) {}
 
   @Get()
   @Public()
@@ -95,15 +86,11 @@ export class EventsController {
   ) {
     const eventTypes = types ? (types.split(',') as EventType[]) : undefined;
 
-    const events = await this.queryBus.execute(
-      new ListEventsQuery(
-        startDate ? parseISO(startDate) : undefined,
-        endDate ? parseISO(endDate) : undefined,
-        eventTypes,
-      ),
-    );
-
-    return events.map(EventDto.fromEntity);
+    return this.eventsService.listEvents({
+      startDate: startDate ? parseISO(startDate) : undefined,
+      endDate: endDate ? parseISO(endDate) : undefined,
+      types: eventTypes,
+    });
   }
 
   @Get(':id')
@@ -120,8 +107,7 @@ export class EventsController {
   })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async getEventById(@Param('id') id: string) {
-    const event = await this.queryBus.execute(new GetEventByIdQuery(id));
-    return EventDto.fromEntity(event);
+    return this.eventsService.getEventById(id);
   }
 
   @Post()
@@ -139,22 +125,7 @@ export class EventsController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   async createEvent(@Body() dto: CreateEventDto, @Request() req: { user?: { id: string } }) {
-    const event = await this.commandBus.execute(
-      new CreateEventCommand(
-        dto.title,
-        parseISO(dto.startDate),
-        parseISO(dto.endDate),
-        dto.type,
-        dto.description,
-        dto.location,
-        dto.organizer,
-        dto.attendees,
-        dto.surveyLink,
-        req.user?.id,
-      ),
-    );
-
-    return EventDto.fromEntity(event);
+    return this.eventsService.createEvent(dto, req.user?.id);
   }
 
   @Patch(':id')
@@ -174,22 +145,7 @@ export class EventsController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async updateEvent(@Param('id') id: string, @Body() dto: UpdateEventDto) {
-    const event = await this.commandBus.execute(
-      new UpdateEventCommand(
-        id,
-        dto.title,
-        dto.description,
-        dto.startDate ? parseISO(dto.startDate) : undefined,
-        dto.endDate ? parseISO(dto.endDate) : undefined,
-        dto.location,
-        dto.type,
-        dto.organizer,
-        dto.attendees,
-        dto.surveyLink,
-      ),
-    );
-
-    return EventDto.fromEntity(event);
+    return this.eventsService.updateEvent(id, dto);
   }
 
   @Delete(':id')
@@ -209,7 +165,6 @@ export class EventsController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async deleteEvent(@Param('id') id: string) {
-    const event = await this.commandBus.execute(new DeleteEventCommand(id));
-    return EventDto.fromEntity(event);
+    return this.eventsService.deleteEvent(id);
   }
 }

@@ -26,12 +26,10 @@ import * as UAParser from 'ua-parser-js';
 
 import { addDays } from 'date-fns';
 import { PrismaService } from '@/prisma';
-import {
-  SessionRepository,
-  TokenService,
-  TokenStorageService,
-  UserRepository,
-} from '../infrastructure';
+import { UserRepo } from '@/users/repo';
+
+import { SessionRepo } from '../repo';
+import { TokenService, TokenStorageService } from '../infrastructure';
 
 export interface OAuthUser {
   provider: OAuthProvider;
@@ -44,8 +42,8 @@ export interface OAuthUser {
 @Injectable()
 export class OAuthService {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly sessionRepository: SessionRepository,
+    private readonly userRepo: UserRepo,
+    private readonly sessionRepo: SessionRepo,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
     private readonly prisma: PrismaService,
@@ -94,7 +92,7 @@ export class OAuthService {
       });
     } else {
       // Check if user with this email exists
-      const existingUser = await this.userRepository.findByEmail(email);
+      const existingUser = await this.userRepo.findByEmail(email);
 
       if (existingUser) {
         // Link OAuth account to existing user
@@ -109,7 +107,7 @@ export class OAuthService {
         });
       } else {
         // Create new user
-        user = await this.userRepository.create({
+        user = await this.userRepo.create({
           email,
           fullName: name,
           emailVerified: true,
@@ -126,7 +124,7 @@ export class OAuthService {
 
         // Set avatar only on creation if user has no avatar
         if (picture && !user.avatar) {
-          await this.userRepository.update(user.id, { avatar: picture });
+          await this.userRepo.update(user.id, { avatar: picture });
         }
       }
     }
@@ -165,7 +163,7 @@ export class OAuthService {
 
     // Create session
     const expiresAt = addDays(new Date(), 30); // 30 days
-    const session = await this.sessionRepository.create({
+    const session = await this.sessionRepo.create({
       userId: user.id,
       token: accessToken,
       refreshToken,

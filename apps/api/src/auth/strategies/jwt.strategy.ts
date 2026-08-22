@@ -26,7 +26,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { UserRepository } from '../infrastructure';
+import { UserRepo } from '@/users/repo';
 
 // Custom extractor to get token from cookies or Authorization header
 const cookieExtractor = (req: Request): string | null => {
@@ -52,7 +52,7 @@ const jwtExtractor = (req: Request): string | null => {
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     readonly configService: ConfigService,
-    private readonly userRepository: UserRepository,
+    private readonly userRepo: UserRepo,
   ) {
     super({
       jwtFromRequest: jwtExtractor,
@@ -62,7 +62,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { sub: string; email: string; role?: string }) {
-    const user = await this.userRepository.findById(payload.sub);
+    const user = await this.userRepo.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }

@@ -23,13 +23,14 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-import { SessionRepository, TokenStorageService } from '../infrastructure';
+import { SessionRepo } from '../repo';
+import { TokenStorageService } from '../infrastructure';
 
 @Injectable()
 export class MfaGuard implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepo: SessionRepo,
     private readonly tokenStorage: TokenStorageService,
   ) {}
 
@@ -59,7 +60,7 @@ export class MfaGuard implements CanActivate {
     const token = authHeader.replace('Bearer ', '');
 
     // Find session by token
-    const session = await this.sessionRepository.findByToken(token);
+    const session = await this.sessionRepo.findByToken(token);
     if (!session || session.status !== 'ACTIVE') {
       throw new ForbiddenException('Invalid or expired session');
     }

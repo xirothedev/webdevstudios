@@ -21,34 +21,19 @@
  */
 
 import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
 
 import { ProductsModule } from '../products/products.module';
 // Controller
 import { CartController } from './cart.controller';
-// Commands
-import { AddToCartHandler } from './commands/add-to-cart';
-import { ClearCartHandler } from './commands/clear-cart';
-import { RemoveFromCartHandler } from './commands/remove-from-cart';
-import { UpdateCartItemHandler } from './commands/update-cart-item';
 // Repository
-import { CartRepository } from './infrastructure/cart.repository';
-// Queries
-import { GetCartHandler } from './queries/get-cart';
-
-const CommandHandlers = [
-  AddToCartHandler,
-  UpdateCartItemHandler,
-  RemoveFromCartHandler,
-  ClearCartHandler,
-];
-
-const QueryHandlers = [GetCartHandler];
+import { CartRepo } from './repo';
+// Service
+import { CartService } from './services/cart.service';
 
 @Module({
-  imports: [CqrsModule, ProductsModule],
+  imports: [ProductsModule],
   controllers: [CartController],
-  providers: [...CommandHandlers, ...QueryHandlers, CartRepository],
-  exports: [CartRepository],
+  providers: [CartRepo, CartService],
+  exports: [CartRepo, CartService],
 })
 export class CartModule {}

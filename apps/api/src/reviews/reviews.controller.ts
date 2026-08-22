@@ -33,7 +33,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -46,25 +45,19 @@ import {
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Public, Roles } from '@/common/decorators';
 import { RolesGuard } from '@/common/guards';
-import { CreateReviewCommand } from './commands/create-review';
-import { DeleteReviewCommand } from './commands/delete-review';
-import { UpdateReviewCommand } from './commands/update-review';
 import {
   CreateReviewDto,
   GetProductReviewsQueryDto,
   ReviewDto,
   ReviewListResponseDto,
   UpdateReviewDto,
-} from './dtos/review.dto';
-import { GetProductReviewsQuery } from './queries/get-product-reviews';
+} from './dto';
+import { ReviewsService } from './services/reviews.service';
 
 @ApiTags('Reviews')
 @Controller('products')
 export class ReviewsController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
+  constructor(private readonly reviewsService: ReviewsService) {}
 
   @Post(':slug/reviews')
   @ApiBearerAuth()
@@ -92,7 +85,7 @@ export class ReviewsController {
     @CurrentUser() user: { id: string },
     @Body() dto: CreateReviewDto,
   ): Promise<ReviewDto> {
-    return this.commandBus.execute(new CreateReviewCommand(user.id, slug, dto.rating, dto.comment));
+    return this.reviewsService.createReview(user.id, slug, dto);
   }
 
   @Get(':slug/reviews')
@@ -132,9 +125,7 @@ export class ReviewsController {
     slug: ProductSlug,
     @Query() queryDto: GetProductReviewsQueryDto,
   ): Promise<ReviewListResponseDto> {
-    return this.queryBus.execute(
-      new GetProductReviewsQuery(slug, queryDto.page ?? 1, queryDto.limit ?? 10),
-    );
+    return this.reviewsService.getProductReviews(slug, queryDto);
   }
 
   @Patch('reviews/:id')
@@ -162,7 +153,7 @@ export class ReviewsController {
     @CurrentUser() user: { id: string },
     @Body() dto: UpdateReviewDto,
   ): Promise<ReviewDto> {
-    return this.commandBus.execute(new UpdateReviewCommand(id, user.id, dto.rating, dto.comment));
+    return this.reviewsService.updateReview(id, user.id, dto);
   }
 
   @Delete('reviews/:id')
@@ -192,6 +183,6 @@ export class ReviewsController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Review not found' })
   async deleteReview(@Param('id') id: string): Promise<{ success: boolean }> {
-    return this.commandBus.execute(new DeleteReviewCommand(id));
+    return this.reviewsService.deleteReview(id);
   }
 }
