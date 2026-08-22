@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { StorageService } from '@/storage/storage.service';
 
@@ -14,6 +14,8 @@ import { BlogPostRepo } from '../repo';
 
 @Injectable()
 export class BlogService {
+  private readonly logger = new Logger(BlogService.name);
+
   constructor(
     private readonly blogRepository: BlogPostRepo,
     private readonly storageService: StorageService,
@@ -79,7 +81,7 @@ export class BlogService {
         try {
           await this.storageService.deleteBlogContent(post.contentUrl);
         } catch (error) {
-          console.error('Failed to delete old content file:', error);
+          this.logger.error('Failed to delete old content file:', error);
         }
       }
 
@@ -129,7 +131,15 @@ export class BlogService {
   async deletePost(id: string): Promise<void> {
     const post = await this.blogRepository.findById(id);
     if (!post) throw new NotFoundException('Blog post not found');
+
     await this.blogRepository.delete(id);
+
+    // Fire-and-forget: a failed storage delete must not fail the row delete.
+    this.storageService
+      .deleteBlogContent(post.contentUrl)
+      .catch((error) =>
+        this.logger.error(`Failed to delete blog content for post ${id}: ${error}`),
+      );
   }
 
   async publishPost(id: string): Promise<BlogPostRow> {

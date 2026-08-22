@@ -20,20 +20,25 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { OrderRepo } from '../repo';
 import { OrderService } from '../services/orders.service';
 
 @Injectable()
-export class OrderExpirationScheduler {
+export class OrderExpirationScheduler implements OnModuleInit {
   private readonly logger = new Logger(OrderExpirationScheduler.name);
 
   constructor(
     private readonly orderRepo: OrderRepo,
     private readonly orderService: OrderService,
   ) {}
+
+  // Sweep once on startup so orders that expired while the app was down are handled
+  async onModuleInit() {
+    await this.handleExpiredOrders();
+  }
 
   // Run every 5 minutes to check for expired orders
   @Cron(CronExpression.EVERY_5_MINUTES)

@@ -61,7 +61,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; email: string; role?: string }) {
+  async validate(payload: { sub: string; email: string; role?: string; jti?: string }) {
     const user = await this.userRepo.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -71,6 +71,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       id: user.id,
       email: user.email,
       role: user.role,
+      sessionId: payload.jti,
     };
   }
 }

@@ -6,12 +6,12 @@ import { ProductsModule } from '../products/products.module';
 import { OrdersController } from './orders.controller';
 import { OrderRepo } from './repo';
 import { OrderService } from './services/orders.service';
-import { OrderExpirationScheduler, OrderRecoveryScheduler } from './schedulers';
+import { OrderExpirationScheduler } from './schedulers';
 
 @Module({
   imports: [ScheduleModule, CartModule, ProductsModule],
   controllers: [OrdersController],
-  providers: [OrderRepo, OrderService, OrderExpirationScheduler, OrderRecoveryScheduler],
+  providers: [OrderRepo, OrderService, OrderExpirationScheduler],
   exports: [OrderRepo, OrderService],
 })
 export class OrdersModule {}

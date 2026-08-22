@@ -73,7 +73,8 @@ import {
 } from './dto';
 import { GitHubOAuthGuard, GoogleOAuthGuard } from './guards';
 import { AuthService } from './services/auth.service';
-import { OAuthService, type OAuthUser, OAuthRedirectService } from './services';
+import { OAuthService, OAuthRedirectService } from './services';
+import { OAuthProfile } from './strategies';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -482,7 +483,7 @@ export class AuthController {
     const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
-    const oauthUser = req.user as OAuthUser;
+    const oauthUser = req.user as OAuthProfile;
 
     try {
       const result = await this.oauthService.handleOAuthCallback(oauthUser, ipAddress, userAgent);
@@ -549,7 +550,7 @@ export class AuthController {
     const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
-    const oauthUser = req.user as OAuthUser;
+    const oauthUser = req.user as OAuthProfile;
 
     try {
       const result = await this.oauthService.handleOAuthCallback(oauthUser, ipAddress, userAgent);

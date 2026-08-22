@@ -27,6 +27,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import axios from 'axios';
 import { Profile, Strategy } from 'passport-github2';
 
+import { OAuthProfile } from './oauth-profile.types';
+
 @Injectable()
 export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(readonly configService: ConfigService) {
@@ -42,7 +44,7 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: (error: Error | null, user?: Record<string, unknown>) => void,
+    done: (error: Error | null, user?: OAuthProfile) => void,
   ): Promise<void> {
     const { id, displayName, username, photos } = profile;
 
@@ -65,7 +67,7 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
       return done(new Error('GitHub OAuth did not return email'), undefined);
     }
 
-    const user = {
+    const user: OAuthProfile = {
       provider: OAuthProvider.GITHUB,
       providerId: id.toString(),
       email: email.toLowerCase(),

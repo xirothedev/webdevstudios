@@ -26,6 +26,8 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 
+import { OAuthProfile } from './oauth-profile.types';
+
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(readonly configService: ConfigService) {
@@ -52,7 +54,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       name?.givenName && name?.familyName
         ? `${name.givenName} ${name.familyName}`
         : name?.givenName || name?.familyName || email;
-    const user = {
+    const user: OAuthProfile = {
       provider: OAuthProvider.GOOGLE,
       providerId: id,
       email,
