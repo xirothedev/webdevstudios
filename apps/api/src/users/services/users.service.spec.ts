@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { describe, expect, test } from 'bun:test';
 
 import { StorageService } from '../../storage/storage.service';
@@ -19,10 +20,18 @@ const fullUser = {
   updatedAt: new Date(),
 };
 
-const makeService = (repoOverrides: Record<string, unknown> = {}) =>
+const makeStorage = (overrides: Record<string, unknown> = {}) =>
+  ({
+    extractKeyFromUrl: () => 'avatars/user-1/old.webp',
+    deleteFile: async () => {},
+    uploadImage: async () => ({ url: 'https://example.com/new.webp' }),
+    ...overrides,
+  }) as unknown as StorageService;
+
+const makeService = (repoOverrides: Record<string, unknown> = {}, storage?: StorageService) =>
   new UsersService(
     { findById: async () => fullUser, ...repoOverrides } as unknown as UserRepo,
-    {} as unknown as StorageService,
+    storage ?? makeStorage(),
   );
 
 describe('UsersService.getUserById privacy branch', () => {
@@ -46,5 +55,195 @@ describe('UsersService.getUserById privacy branch', () => {
       fullName: 'Test User',
       avatar: 'https://example.com/a.webp',
     });
+  });
+});
+
+describe('UsersService.updateProfile', () => {
+  test('only provided fields are updated', async () => {
+    let updated: Record<string, unknown> = {};
+    const service = makeService({
+      update: async (_id: string, data: Record<string, unknown>) => {
+        updated = data;
+        return fullUser;
+      },
+    });
+
+    await service.updateProfile('user-1', { fullName: 'New Name' } as never);
+
+    expect(updated).toEqual({ fullName: 'New Name' });
+  });
+
+  test('missing user throws NotFound', async () => {
+    const service = makeService({ findById: async () => null });
+
+    await expect(service.updateProfile('ghost', {} as never)).rejects.toThrow(NotFoundException);
+  });
+});
+
+describe('UsersService.updateAvatar', () => {
+  const file = { buffer: Buffer.from('img'), mimetype: 'image/png' } as never;
+
+  test('deletes the old avatar and persists the uploaded URL', async () => {
+    let deletedKey: string | undefined;
+    let uploadArgs: Record<string, unknown> = {};
+    const storage = makeStorage({
+      deleteFile: async (key: string) => {
+        deletedKey = key;
+      },
+      uploadImage: async (args: Record<string, unknown>) => {
+        uploadArgs = args;
+        return { url: 'https://example.com/new.webp' };
+      },
+    });
+    let updated: Record<string, unknown> = {};
+    const service = makeService(
+      {
+        update: async (_id: string, data: Record<string, unknown>) => {
+          updated = data;
+          return fullUser;
+        },
+      },
+      storage,
+    );
+
+    await service.updateAvatar('user-1', file);
+
+    expect(deletedKey).toBe('avatars/user-1/old.webp');
+    expect(uploadArgs).toMatchObject({ width: 400, height: 400, contentType: 'image/png' });
+    expect(String(uploadArgs.key)).toMatch(/^avatars\/user-1\//);
+    expect(updated).toEqual({ avatar: 'https://example.com/new.webp' });
+  });
+
+  test('a failing old-avatar delete never blocks the upload', async () => {
+    const storage = makeStorage({
+      deleteFile: async () => {
+        throw new Error('s3 down');
+      },
+    });
+    let persisted = false;
+    const service = makeService(
+      {
+        update: async () => {
+          persisted = true;
+          return fullUser;
+        },
+      },
+      storage,
+    );
+
+    await service.updateAvatar('user-1', file);
+
+    expect(persisted).toBe(true);
+  });
+
+  test('users without an avatar skip deletion entirely', async () => {
+    const storage = makeStorage({
+      deleteFile: async () => {
+        throw new Error('must not delete anything');
+      },
+    });
+    const service = makeService(
+      {
+        findById: async () => ({ ...fullUser, avatar: null }),
+        update: async () => ({ ...fullUser, avatar: 'https://example.com/new.webp' }),
+      },
+      storage,
+    );
+
+    const result = await service.updateAvatar('user-1', file);
+
+    expect(result.avatar).toBe('https://example.com/new.webp');
+  });
+});
+
+describe('UsersService.updateUser', () => {
+  test('admin-managed fields pass through to the repo', async () => {
+    let updated: Record<string, unknown> = {};
+    const service = makeService({
+      update: async (_id: string, data: Record<string, unknown>) => {
+        updated = data;
+        return fullUser;
+      },
+    });
+
+    await service.updateUser('user-1', { role: 'ADMIN', phone: '+84987654321' } as never);
+
+    expect(updated).toEqual({ role: 'ADMIN', phone: '+84987654321' });
+  });
+});
+
+describe('UsersService.deleteUser', () => {
+  test('removes the user and reports success', async () => {
+    let removedId: string | undefined;
+    const service = makeService({
+      remove: async (id: string) => {
+        removedId = id;
+      },
+    });
+
+    const result = await service.deleteUser('user-1');
+
+    expect(result).toEqual({ success: true });
+    expect(removedId).toBe('user-1');
+  });
+
+  test('missing user throws NotFound', async () => {
+    const service = makeService({ findById: async () => null });
+
+    await expect(service.deleteUser('ghost')).rejects.toThrow(NotFoundException);
+  });
+});
+
+describe('UsersService reads & admin listings', () => {
+  test('getOwnProfile returns the user or throws NotFound', async () => {
+    const ok = makeService();
+    expect((await ok.getOwnProfile('user-1')).id).toBe('user-1');
+
+    const missing = makeService({ findById: async () => null });
+    await expect(missing.getOwnProfile('ghost')).rejects.toThrow(NotFoundException);
+  });
+
+  test('getUserById throws NotFound for unknown ids', async () => {
+    const service = makeService({ findById: async () => null });
+
+    await expect(service.getUserById('ghost')).rejects.toThrow(NotFoundException);
+  });
+
+  test('listUsers computes total pages', async () => {
+    const service = makeService({
+      list: async () => ({ users: [{ ...fullUser }], total: 11 }),
+    });
+
+    const result = await service.listUsers(2, 10, 'USER' as never);
+
+    expect(result.pagination).toEqual({ page: 2, limit: 10, total: 11, totalPages: 2 });
+    expect(result.users[0].email).toBe('user@example.com');
+  });
+
+  test('searchUsers projects the public shape for non-admins', async () => {
+    const service = makeService({
+      searchByKeyword: async () => ({ users: [fullUser], total: 1 }),
+    });
+
+    const result = await service.searchUsers('test', 1, 10, 'USER' as never);
+
+    expect(result.users).toEqual([
+      { id: 'user-1', fullName: 'Test User', avatar: 'https://example.com/a.webp' },
+    ]);
+  });
+
+  test('searchUsers hands private rows to admins untouched', async () => {
+    let sawAdminFlag: boolean | undefined;
+    const service = makeService({
+      searchByKeyword: async (_q: string, _p: number, _l: number, isAdmin: boolean) => {
+        sawAdminFlag = isAdmin;
+        return { users: [fullUser], total: 1 };
+      },
+    });
+
+    const result = await service.searchUsers('test', 1, 10, 'ADMIN' as never);
+
+    expect(sawAdminFlag).toBe(true);
+    expect((result.users[0] as typeof fullUser).email).toBe('user@example.com');
   });
 });

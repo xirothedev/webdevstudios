@@ -117,3 +117,114 @@ describe('BlogService', () => {
     );
   });
 });
+
+describe('BlogService.getPostById', () => {
+  test('missing id throws NotFound', async () => {
+    const service = new BlogService(makeRepo({ findById: async () => null }), fakeStorage);
+
+    await expect(service.getPostById('missing')).rejects.toThrow(NotFoundException);
+  });
+});
+
+describe('BlogService.withContent', () => {
+  test('storage miss surfaces as NotFound', async () => {
+    const storage = {
+      ...fakeStorage,
+      getBlogContent: async () => {
+        throw new Error('s3 404');
+      },
+    } as unknown as StorageService;
+    const repo = makeRepo({ findById: async () => ({ id: 'p1', contentUrl: 'u' }) });
+    const service = new BlogService(repo, storage);
+
+    await expect(service.getPostById('p1', { includeContent: true } as never)).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+});
+
+describe('BlogService.deletePost', () => {
+  test('missing id throws NotFound without deleting', async () => {
+    let deleted = false;
+    const repo = makeRepo({
+      findById: async () => null,
+      delete: async () => {
+        deleted = true;
+      },
+    });
+    const service = new BlogService(repo, fakeStorage);
+
+    await expect(service.deletePost('missing')).rejects.toThrow(NotFoundException);
+    expect(deleted).toBe(false);
+  });
+});
+
+describe('BlogService.publishPost', () => {
+  test('unpublished posts get stamped and published', async () => {
+    let updated: Record<string, unknown> = {};
+    const repo = makeRepo({
+      findById: async () => ({ id: 'p1', isPublished: false }),
+      update: async (_id: string, data: Record<string, unknown>) => {
+        updated = data;
+        return {};
+      },
+    });
+    const service = new BlogService(repo, fakeStorage);
+
+    await service.publishPost('p1');
+
+    expect(updated.isPublished).toBe(true);
+    expect(updated.publishedAt).toBeInstanceOf(Date);
+  });
+});
+
+describe('BlogService list passthroughs', () => {
+  test('listPublishedPosts defaults to page 1 pageSize 10', async () => {
+    let sawArgs: Record<string, unknown> = {};
+    const repo = makeRepo({
+      findAll: async (args: Record<string, unknown>) => {
+        sawArgs = args;
+        return { posts: [], total: 0 };
+      },
+    });
+    const service = new BlogService(repo, fakeStorage);
+
+    const result = await service.listPublishedPosts({} as never);
+
+    expect(sawArgs).toEqual({ isPublished: true, page: 1, pageSize: 10 });
+    expect(result).toEqual({ items: [], total: 0 });
+  });
+
+  test('listAllPosts defaults to page 1 pageSize 20 without the published filter', async () => {
+    let sawArgs: Record<string, unknown> = {};
+    const repo = makeRepo({
+      findAll: async (args: Record<string, unknown>) => {
+        sawArgs = args;
+        return { posts: [], total: 0 };
+      },
+    });
+    const service = new BlogService(repo, fakeStorage);
+
+    await service.listAllPosts({} as never);
+
+    expect(sawArgs).toEqual({ page: 1, pageSize: 20 });
+  });
+
+  test('searchPosts forwards the query with defaults', async () => {
+    let sawQuery: string | undefined;
+    let sawArgs: Record<string, unknown> = {};
+    const repo = makeRepo({
+      search: async (q: string, args: Record<string, unknown>) => {
+        sawQuery = q;
+        sawArgs = args;
+        return { posts: [], total: 0 };
+      },
+    });
+    const service = new BlogService(repo, fakeStorage);
+
+    await service.searchPosts({ q: 'hello', page: 3 } as never);
+
+    expect(sawQuery).toBe('hello');
+    expect(sawArgs).toEqual({ page: 3, pageSize: 10 });
+  });
+});

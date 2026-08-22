@@ -1,3 +1,4 @@
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { describe, expect, test } from 'bun:test';
 
 import type { SecurityLoggerService } from '@/common/services';
@@ -28,6 +29,14 @@ const webhookBody = (code: string): PayOSWebhookBody => ({
   signature: 'sig',
 });
 
+const payableOrder = {
+  id: 'order-1',
+  code: '#ORD-1234',
+  paymentStatus: 'PENDING',
+  totalAmount: 329000,
+  items: [{ productName: 'Áo thun', quantity: 1, price: 299000 }],
+};
+
 const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
   const calls: string[] = [];
   const paymentRepo = {
@@ -43,10 +52,12 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
         items: [{ productId: 'p1', size: null, quantity: 2 }],
       },
     }),
+    findByOrderId: async () => null,
     updateStatus: async () => calls.push('tx-update'),
     ...overrides.paymentRepo,
   } as unknown as PaymentRepo;
   const orderRepo = {
+    findById: async () => payableOrder,
     updatePaymentStatus: async () => calls.push('payment-status'),
     updateStatus: async () => calls.push('status'),
     ...overrides.orderRepo,
@@ -100,5 +111,191 @@ describe('PaymentsService.processWebhook', () => {
     await service.processWebhook(webhookBody('00'));
 
     expect(calls).toEqual([]);
+  });
+
+  test('invalid signatures are logged for security and rejected', async () => {
+    let loggedPath: string | undefined;
+    const securityLogger = {
+      logWebhookSignatureFailure: async (path: string) => {
+        loggedPath = path;
+      },
+    } as unknown as SecurityLoggerService;
+    const payOSService = {
+      verifyWebhook: async () => {
+        throw new Error('signature mismatch');
+      },
+    } as unknown as PayOSService;
+    const service = new PaymentsService(
+      {} as never,
+      {} as never,
+      {} as never,
+      payOSService,
+      securityLogger,
+    );
+
+    await expect(service.processWebhook(webhookBody('00'))).rejects.toThrow(BadRequestException);
+    expect(loggedPath).toBe('/v1/payments/webhook');
+  });
+});
+
+describe('PaymentsService.createPaymentLink', () => {
+  test('missing order throws NotFound', async () => {
+    const { service } = makeDeps({
+      orderRepo: { findById: async () => null },
+    });
+
+    await expect(service.createPaymentLink('order-404')).rejects.toThrow(NotFoundException);
+  });
+
+  test('already-paid order throws Conflict', async () => {
+    const { service } = makeDeps({
+      orderRepo: { findById: async () => ({ ...payableOrder, paymentStatus: 'PAID' }) },
+    });
+
+    await expect(service.createPaymentLink('order-1')).rejects.toThrow(ConflictException);
+  });
+
+  test('pending transaction with a URL returns it without contacting PayOS', async () => {
+    let linkCreated = false;
+    const { calls, service } = makeDeps({
+      paymentRepo: {
+        findByOrderId: async () => ({
+          status: 'PENDING',
+          paymentUrl: 'https://pay existing',
+          transactionCode: 'existing-tx',
+        }),
+        create: async () => {
+          linkCreated = true;
+          return {};
+        },
+      },
+      payOSService: {
+        createPaymentLink: async () => {
+          linkCreated = true;
+          return {};
+        },
+      },
+    });
+
+    const result = await service.createPaymentLink('order-1');
+
+    expect(result).toEqual({
+      paymentUrl: 'https://pay existing',
+      transactionCode: 'existing-tx',
+    });
+    expect(linkCreated).toBe(false);
+    expect(calls).toEqual([]);
+  });
+
+  test('settled existing transaction throws Conflict', async () => {
+    const { service } = makeDeps({
+      paymentRepo: {
+        findByOrderId: async () => ({ status: 'PAID', paymentUrl: null }),
+      },
+    });
+
+    await expect(service.createPaymentLink('order-1')).rejects.toThrow(ConflictException);
+  });
+
+  test('unconfigured return/cancel URLs throw BadRequest', async () => {
+    const { returnUrl, cancelUrl } = process.env as { returnUrl?: string; cancelUrl?: string };
+    delete process.env.PAYOS_RETURN_URL;
+    delete process.env.PAYOS_CANCEL_URL;
+    try {
+      const { service } = makeDeps({
+        orderRepo: { findById: async () => payableOrder },
+      });
+
+      await expect(service.createPaymentLink('order-1')).rejects.toThrow(BadRequestException);
+    } finally {
+      process.env.PAYOS_RETURN_URL = returnUrl ?? '';
+      process.env.PAYOS_CANCEL_URL = cancelUrl ?? '';
+    }
+  });
+
+  test('happy path creates a PayOS link and stores a pending transaction', async () => {
+    const created: Record<string, unknown> = {};
+    let linkArgs: Record<string, unknown> = {};
+    const { service } = makeDeps({
+      orderRepo: { findById: async () => payableOrder },
+      paymentRepo: {
+        findByOrderId: async () => null,
+        create: async (data: Record<string, unknown>) => {
+          Object.assign(created, data);
+          return data;
+        },
+      },
+      payOSService: {
+        createPaymentLink: async (args: Record<string, unknown>) => {
+          linkArgs = args;
+          return { paymentUrl: 'https://pay.new', transactionCode: 'tx-new' };
+        },
+      },
+    });
+    process.env.PAYOS_RETURN_URL ||= 'https://shop.example/return';
+    process.env.PAYOS_CANCEL_URL ||= 'https://shop.example/cancel';
+
+    const result = await service.createPaymentLink('order-1');
+
+    expect(result).toEqual({ paymentUrl: 'https://pay.new', transactionCode: 'tx-new' });
+    expect(linkArgs.orderCode).toBe('1234');
+    expect(linkArgs.amount).toBe(329000);
+    expect(created).toMatchObject({
+      orderId: 'order-1',
+      transactionCode: 'tx-new',
+      amount: 329000,
+      status: 'PENDING',
+      paymentUrl: 'https://pay.new',
+    });
+  });
+});
+
+describe('PaymentsService misc', () => {
+  test('order codes without trailing digits fall back to a stable hash', async () => {
+    let linkArgs: Record<string, unknown> = {};
+    const { service } = makeDeps({
+      paymentRepo: {
+        findByOrderId: async () => null,
+        create: async () => ({}),
+      },
+      orderRepo: {
+        findById: async () => ({ ...payableOrder, code: 'ORD-ABC' }),
+      },
+      payOSService: {
+        createPaymentLink: async (args: Record<string, unknown>) => {
+          linkArgs = args;
+          return { paymentUrl: 'https://pay.new', transactionCode: 'tx-1' };
+        },
+      },
+    });
+    process.env.PAYOS_RETURN_URL ||= 'https://shop.example/return';
+    process.env.PAYOS_CANCEL_URL ||= 'https://shop.example/cancel';
+
+    await service.createPaymentLink('order-1');
+
+    const orderCode = Number(linkArgs.orderCode);
+    expect(Number.isInteger(orderCode)).toBe(true);
+    expect(orderCode).toBeGreaterThan(0);
+    expect(orderCode).toBeLessThan(1_000_000_000);
+  });
+
+  test('listTransactions forwards paging and status to the repo', async () => {
+    const forwarded: unknown[][] = [];
+    const { service } = makeDeps({
+      paymentRepo: {
+        listTransactions: async (...args: unknown[]) => {
+          forwarded.push(args);
+          return { transactions: [], pagination: { page: 2, limit: 25, total: 0, totalPages: 0 } };
+        },
+      },
+    });
+
+    const result = await service.listTransactions(2, 25, 'PAID' as never);
+
+    expect(forwarded).toEqual([[2, 25, 'PAID']]);
+    expect(result).toEqual({
+      transactions: [],
+      pagination: { page: 2, limit: 25, total: 0, totalPages: 0 },
+    });
   });
 });
