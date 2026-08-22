@@ -42,10 +42,11 @@ import {
   BlogPostListResponseDto,
   BlogPostWithContentDto,
   CreateBlogPostDto,
+  GetBlogPostQueryDto,
   ListBlogPostsQueryDto,
   SearchBlogPostsQueryDto,
   UpdateBlogPostDto,
-} from './dtos';
+} from './dto';
 
 @ApiTags('Blog')
 @Controller('blog/posts')
@@ -64,12 +65,7 @@ export class BlogController {
     type: BlogPostListResponseDto,
   })
   async listPosts(@Query() queryDto: ListBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
-    const result = await this.blogService.listPosts({
-      page: queryDto.page ?? 1,
-      pageSize: queryDto.pageSize ?? 10,
-      publishedOnly: true,
-    });
-    return { items: result.items, total: result.total } as unknown as BlogPostListResponseDto;
+    return this.blogService.listPublishedPosts(queryDto);
   }
 
   @Get('admin/all')
@@ -87,12 +83,7 @@ export class BlogController {
     type: BlogPostListResponseDto,
   })
   async listAllPosts(@Query() queryDto: ListBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
-    const result = await this.blogService.listPosts({
-      page: queryDto.page ?? 1,
-      pageSize: queryDto.pageSize ?? 20,
-      publishedOnly: false,
-    });
-    return { items: result.items, total: result.total } as unknown as BlogPostListResponseDto;
+    return this.blogService.listAllPosts(queryDto);
   }
 
   @Get('search')
@@ -107,13 +98,7 @@ export class BlogController {
     type: BlogPostListResponseDto,
   })
   async searchPosts(@Query() queryDto: SearchBlogPostsQueryDto): Promise<BlogPostListResponseDto> {
-    // For now, fallback to list with publishedOnly
-    const result = await this.blogService.listPosts({
-      page: queryDto.page ?? 1,
-      pageSize: queryDto.pageSize ?? 10,
-      publishedOnly: true,
-    });
-    return { items: result.items, total: result.total } as unknown as BlogPostListResponseDto;
+    return this.blogService.searchPosts(queryDto);
   }
 
   @Get(':slug')
@@ -133,8 +118,11 @@ export class BlogController {
     type: BlogPostWithContentDto,
   })
   @ApiResponse({ status: 404, description: 'Blog post not found' })
-  async getPostBySlug(@Param('slug') slug: string): Promise<BlogPostDto> {
-    return this.blogService.getPostBySlug(slug);
+  async getPostBySlug(
+    @Param('slug') slug: string,
+    @Query() query: GetBlogPostQueryDto,
+  ): Promise<BlogPostDto | BlogPostWithContentDto> {
+    return this.blogService.getPostBySlug(slug, query);
   }
 
   @Post()
@@ -158,17 +146,7 @@ export class BlogController {
     @CurrentUser() user: { id: string },
     @Body() dto: CreateBlogPostDto,
   ): Promise<BlogPostDto> {
-    return this.blogService.createPost({
-      authorId: user.id,
-      slug: dto.slug,
-      title: dto.title,
-      content: dto.content,
-      excerpt: dto.excerpt || null,
-      coverImage: dto.coverImage || null,
-      isPublished: dto.isPublished || false,
-      metaTitle: dto.metaTitle || null,
-      metaDescription: dto.metaDescription || null,
-    });
+    return this.blogService.createPost(user.id, dto);
   }
 
   @Get('admin/:id')
@@ -190,8 +168,11 @@ export class BlogController {
     type: BlogPostWithContentDto,
   })
   @ApiResponse({ status: 404, description: 'Blog post not found' })
-  async getPostById(@Param('id') id: string): Promise<BlogPostDto> {
-    return this.blogService.getPostById(id);
+  async getPostById(
+    @Param('id') id: string,
+    @Query() query: GetBlogPostQueryDto,
+  ): Promise<BlogPostDto | BlogPostWithContentDto> {
+    return this.blogService.getPostById(id, query);
   }
 
   @Patch(':id')
@@ -216,12 +197,8 @@ export class BlogController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Blog post not found' })
-  async updatePost(
-    @Param('id') _id: string,
-    @Body() _dto: UpdateBlogPostDto,
-  ): Promise<BlogPostDto> {
-    // TODO: implement update in BlogService
-    throw new Error('Not implemented');
+  async updatePost(@Param('id') id: string, @Body() dto: UpdateBlogPostDto): Promise<BlogPostDto> {
+    return this.blogService.updatePost(id, dto);
   }
 
   @Delete(':id')

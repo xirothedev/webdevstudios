@@ -154,23 +154,11 @@ export class BlogPostListResponseDto {
     description: 'List of blog posts',
     type: [BlogPostDto],
   })
-  posts: BlogPostDto[];
+  items: BlogPostDto[];
 
   @ApiProperty({
     description: 'Total number of posts',
     example: 10,
   })
   total: number;
-
-  @ApiProperty({
-    description: 'Current page',
-    example: 1,
-  })
-  page: number;
-
-  @ApiProperty({
-    description: 'Page size',
-    example: 10,
-  })
-  pageSize: number;
 }

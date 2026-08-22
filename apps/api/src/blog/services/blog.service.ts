@@ -2,89 +2,53 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 
 import { StorageService } from '@/storage/storage.service';
 
-import { BlogPostWithRelations } from '../blog.types';
-import { BlogPostDto } from '../dtos';
-import { BlogRepository } from '../infrastructure/blog.repository';
+import { BlogPostRow, BlogPostRowWithContent } from '../blog.types';
+import {
+  CreateBlogPostDto,
+  GetBlogPostQueryDto,
+  ListBlogPostsQueryDto,
+  SearchBlogPostsQueryDto,
+  UpdateBlogPostDto,
+} from '../dto';
+import { BlogPostRepo } from '../repo';
 
 @Injectable()
 export class BlogService {
   constructor(
-    private readonly blogRepository: BlogRepository,
+    private readonly blogRepository: BlogPostRepo,
     private readonly storageService: StorageService,
   ) {}
 
-  async createPost(params: {
-    authorId: string;
-    slug: string;
-    title: string;
-    content: string;
-    excerpt?: string | null;
-    coverImage?: string | null;
-    isPublished: boolean;
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-  }): Promise<BlogPostDto> {
-    const {
-      authorId,
-      slug,
-      title,
-      content,
-      excerpt,
-      coverImage,
-      isPublished,
-      metaTitle,
-      metaDescription,
-    } = params;
-
-    const existingPost = await this.blogRepository.findBySlug(slug);
+  async createPost(authorId: string, dto: CreateBlogPostDto): Promise<BlogPostRow> {
+    const existingPost = await this.blogRepository.findBySlug(dto.slug);
     if (existingPost) {
-      throw new ConflictException(`Blog post with slug "${slug}" already exists`);
+      throw new ConflictException(`Blog post with slug "${dto.slug}" already exists`);
     }
 
-    const contentUrl = await this.storageService.uploadBlogContent(slug, content);
-    const contentSize = Buffer.from(content, 'utf-8').length;
+    const contentUrl = await this.storageService.uploadBlogContent(dto.slug, dto.content);
 
-    const post = await this.blogRepository.create({
-      slug,
-      title,
+    return this.blogRepository.create({
+      slug: dto.slug,
+      title: dto.title,
       contentUrl,
-      contentSize,
-      excerpt: excerpt || this.extractExcerpt(content),
-      coverImage: coverImage || null,
+      contentSize: Buffer.from(dto.content, 'utf-8').length,
+      excerpt: dto.excerpt ?? this.extractExcerpt(dto.content),
+      coverImage: dto.coverImage ?? null,
       authorId,
-      isPublished,
-      publishedAt: isPublished ? new Date() : null,
-      metaTitle: metaTitle || null,
-      metaDescription: metaDescription || null,
+      isPublished: dto.isPublished ?? false,
+      publishedAt: dto.isPublished ? new Date() : null,
+      metaTitle: dto.metaTitle ?? null,
+      metaDescription: dto.metaDescription ?? null,
     });
-
-    const fullPost = await this.blogRepository.findById(post.id);
-    if (!fullPost) {
-      throw new Error('Failed to fetch created post');
-    }
-
-    return this.mapToDto(fullPost);
   }
 
-  async updatePost(params: {
-    postId: string;
-    title?: string;
-    content?: string;
-    excerpt?: string | null;
-    coverImage?: string | null;
-    isPublished?: boolean;
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-  }): Promise<BlogPostDto> {
-    const { postId, title, content, excerpt, coverImage, isPublished, metaTitle, metaDescription } =
-      params;
-
+  async updatePost(postId: string, dto: UpdateBlogPostDto): Promise<BlogPostRow> {
     const post = await this.blogRepository.findById(postId);
     if (!post) {
       throw new NotFoundException(`Blog post with id ${postId} not found`);
     }
 
-    const updateData: {
+    const data: {
       title?: string;
       contentUrl?: string;
       contentSize?: number | null;
@@ -96,45 +60,115 @@ export class BlogService {
       metaDescription?: string | null;
     } = {};
 
-    if (title !== undefined) updateData.title = title;
-    if (coverImage !== undefined) updateData.coverImage = coverImage;
-    if (isPublished !== undefined) {
-      updateData.isPublished = isPublished;
-      if (isPublished && !post.isPublished) {
-        updateData.publishedAt = new Date();
+    if (dto.title !== undefined) data.title = dto.title;
+    if (dto.coverImage !== undefined) data.coverImage = dto.coverImage;
+    if (dto.isPublished !== undefined) {
+      data.isPublished = dto.isPublished;
+      if (dto.isPublished && !post.isPublished) {
+        data.publishedAt = new Date();
       }
     }
-    if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
-    if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
+    if (dto.metaTitle !== undefined) data.metaTitle = dto.metaTitle;
+    if (dto.metaDescription !== undefined) data.metaDescription = dto.metaDescription;
 
-    if (content !== undefined) {
-      const newContentUrl = await this.storageService.uploadBlogContent(postId, content);
-      const contentSize = Buffer.from(content, 'utf-8').length;
-      updateData.contentUrl = newContentUrl;
-      updateData.contentSize = contentSize;
+    if (dto.content !== undefined) {
+      const contentUrl = await this.storageService.uploadBlogContent(postId, dto.content);
+      data.contentSize = Buffer.from(dto.content, 'utf-8').length;
 
-      if (post.contentUrl !== newContentUrl) {
+      if (post.contentUrl !== contentUrl) {
         try {
           await this.storageService.deleteBlogContent(post.contentUrl);
         } catch (error) {
-          // Log error but don't fail the update
           console.error('Failed to delete old content file:', error);
         }
       }
 
-      updateData.excerpt = excerpt !== undefined ? excerpt : this.extractExcerpt(content);
-    } else if (excerpt !== undefined) {
-      updateData.excerpt = excerpt;
+      data.excerpt = dto.excerpt !== undefined ? dto.excerpt : this.extractExcerpt(dto.content);
+    } else if (dto.excerpt !== undefined) {
+      data.excerpt = dto.excerpt;
     }
 
-    await this.blogRepository.update(postId, updateData);
+    return this.blogRepository.update(postId, data);
+  }
 
-    const updatedPost = await this.blogRepository.findById(postId);
-    if (!updatedPost) {
-      throw new NotFoundException('Blog post not found after update');
+  async getPostById(
+    id: string,
+    query?: GetBlogPostQueryDto,
+  ): Promise<BlogPostRow | BlogPostRowWithContent> {
+    const post = await this.blogRepository.findById(id);
+    if (!post) throw new NotFoundException('Blog post not found');
+
+    if (query?.includeContent) return this.withContent(post);
+    return post;
+  }
+
+  async getPostBySlug(
+    slug: string,
+    query?: GetBlogPostQueryDto,
+  ): Promise<BlogPostRow | BlogPostRowWithContent> {
+    const post = await this.blogRepository.findBySlug(slug);
+    if (!post) throw new NotFoundException(`Blog post with slug "${slug}" not found`);
+
+    if (query?.includeContent) return this.withContent(post);
+
+    if (post.isPublished) await this.blogRepository.incrementViewCount(post.id);
+    return post;
+  }
+
+  private async withContent(post: BlogPostRow): Promise<BlogPostRowWithContent> {
+    try {
+      const content = await this.storageService.getBlogContent(post.contentUrl);
+      return { ...post, content };
+    } catch {
+      throw new NotFoundException(
+        'Blog post content not found. The content may not have been uploaded to storage yet.',
+      );
     }
+  }
 
-    return this.mapToDto(updatedPost);
+  async deletePost(id: string): Promise<void> {
+    const post = await this.blogRepository.findById(id);
+    if (!post) throw new NotFoundException('Blog post not found');
+    await this.blogRepository.delete(id);
+  }
+
+  async publishPost(id: string): Promise<BlogPostRow> {
+    const post = await this.blogRepository.findById(id);
+    if (!post) throw new NotFoundException('Blog post not found');
+    if (post.isPublished) return post;
+
+    return this.blogRepository.update(id, { isPublished: true, publishedAt: new Date() });
+  }
+
+  async listPublishedPosts(
+    query: ListBlogPostsQueryDto,
+  ): Promise<{ items: BlogPostRow[]; total: number }> {
+    const { posts, total } = await this.blogRepository.findAll({
+      isPublished: true,
+      page: query.page ?? 1,
+      pageSize: query.pageSize ?? 10,
+    });
+    return { items: posts, total };
+  }
+
+  async listAllPosts(
+    query: ListBlogPostsQueryDto,
+  ): Promise<{ items: BlogPostRow[]; total: number }> {
+    const { posts, total } = await this.blogRepository.findAll({
+      page: query.page ?? 1,
+      pageSize: query.pageSize ?? 20,
+    });
+    return { items: posts, total };
+  }
+
+  async searchPosts(
+    query: SearchBlogPostsQueryDto,
+  ): Promise<{ items: BlogPostRow[]; total: number }> {
+    const { posts, total } = await this.blogRepository.search(query.q, {
+      page: query.page ?? 1,
+      pageSize: query.pageSize ?? 10,
+    });
+    return { items: posts, total };
   }
 
   private extractExcerpt(content: string, maxLength = 500): string {
@@ -151,67 +185,5 @@ export class BlogService {
       return plainText;
     }
     return `${plainText.substring(0, maxLength - 3)}...`;
-  }
-
-  private mapToDto(post: BlogPostWithRelations): BlogPostDto {
-    return {
-      id: post.id,
-      slug: post.slug,
-      title: post.title,
-      contentUrl: post.contentUrl,
-      contentSize: post.contentSize,
-      excerpt: post.excerpt,
-      coverImage: post.coverImage,
-      author: {
-        id: post.author.id,
-        fullName: post.author.fullName,
-        avatar: post.author.avatar,
-      },
-      isPublished: post.isPublished,
-      publishedAt: post.publishedAt,
-      viewCount: post.viewCount,
-      metaTitle: post.metaTitle,
-      metaDescription: post.metaDescription,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-    };
-  }
-
-  async listPosts(params: { page?: number; pageSize?: number; publishedOnly?: boolean }) {
-    const { posts, total } = await this.blogRepository.findAll({
-      isPublished: params.publishedOnly ? true : undefined,
-      page: params.page,
-      pageSize: params.pageSize,
-    });
-    return { items: posts.map((p) => this.mapToDto(p)), total };
-  }
-
-  async getPostById(id: string) {
-    const post = await this.blogRepository.findById(id);
-    if (!post) throw new NotFoundException('Blog post not found');
-    return this.mapToDto(post);
-  }
-
-  async getPostBySlug(slug: string) {
-    const post = await this.blogRepository.findBySlug(slug);
-    if (!post) throw new NotFoundException('Blog post not found');
-    return this.mapToDto(post);
-  }
-
-  async deletePost(id: string) {
-    const post = await this.blogRepository.findById(id);
-    if (!post) throw new NotFoundException('Blog post not found');
-    await this.blogRepository.delete(id);
-  }
-
-  async publishPost(id: string) {
-    const post = await this.blogRepository.findById(id);
-    if (!post) throw new NotFoundException('Blog post not found');
-    if (post.isPublished) return this.mapToDto(post);
-    const updated = await this.blogRepository.update(id, {
-      isPublished: true,
-      publishedAt: new Date(),
-    });
-    return this.mapToDto(updated as unknown as BlogPostWithRelations);
   }
 }

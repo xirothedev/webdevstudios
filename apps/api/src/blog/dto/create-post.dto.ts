@@ -21,7 +21,10 @@
  */
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+
+const emptyToNull = ({ value }: { value: unknown }) => (value === '' ? null : value);
 
 export class CreateBlogPostDto {
   @ApiProperty({
@@ -54,6 +57,7 @@ export class CreateBlogPostDto {
     example: 'Learn how to get started with Next.js...',
     nullable: true,
   })
+  @Transform(emptyToNull)
   @IsString()
   @IsOptional()
   @MaxLength(500)
@@ -64,6 +68,7 @@ export class CreateBlogPostDto {
     example: 'https://r2.example.com/blog/images/covers/clx1234567890-cover.webp',
     nullable: true,
   })
+  @Transform(emptyToNull)
   @IsString()
   @IsOptional()
   coverImage?: string | null;
@@ -82,6 +87,7 @@ export class CreateBlogPostDto {
     example: 'Getting Started with Next.js - WebDev Studios',
     nullable: true,
   })
+  @Transform(emptyToNull)
   @IsString()
   @IsOptional()
   @MaxLength(255)
@@ -92,6 +98,7 @@ export class CreateBlogPostDto {
     example: 'Learn how to get started with Next.js in this comprehensive guide.',
     nullable: true,
   })
+  @Transform(emptyToNull)
   @IsString()
   @IsOptional()
   @MaxLength(500)

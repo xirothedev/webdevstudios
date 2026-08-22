@@ -21,44 +21,20 @@
  */
 
 import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
-import { BlogService } from './services/blog.service';
 
 // Storage
 import { StorageModule } from '../storage/storage.module';
 // Controller
 import { BlogController } from './blog.controller';
-// Commands
-import { CreateBlogPostHandler } from './commands/create-post';
-import { DeleteBlogPostHandler } from './commands/delete-post';
-import { PublishBlogPostHandler } from './commands/publish-post';
-import { UpdateBlogPostHandler } from './commands/update-post';
 // Repository
-import { BlogRepository } from './infrastructure/blog.repository';
-// Queries
-import { GetBlogPostByIdHandler } from './queries/get-post-by-id';
-import { GetBlogPostBySlugHandler } from './queries/get-post-by-slug';
-import { ListBlogPostsHandler } from './queries/list-posts';
-import { SearchBlogPostsHandler } from './queries/search-posts';
-
-const CommandHandlers = [
-  CreateBlogPostHandler,
-  UpdateBlogPostHandler,
-  DeleteBlogPostHandler,
-  PublishBlogPostHandler,
-];
-
-const QueryHandlers = [
-  ListBlogPostsHandler,
-  GetBlogPostBySlugHandler,
-  GetBlogPostByIdHandler,
-  SearchBlogPostsHandler,
-];
+import { BlogPostRepo } from './repo';
+// Service
+import { BlogService } from './services/blog.service';
 
 @Module({
-  imports: [CqrsModule, StorageModule],
+  imports: [StorageModule],
   controllers: [BlogController],
-  providers: [...CommandHandlers, ...QueryHandlers, BlogRepository, BlogService],
-  exports: [BlogRepository, BlogService],
+  providers: [BlogPostRepo, BlogService],
+  exports: [BlogService],
 })
 export class BlogModule {}

@@ -20,13 +20,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPost, BlogTag } from '@prisma/client';
+import { BlogPost } from '@prisma/client';
 
-export type BlogPostWithRelations = BlogPost & {
-  author: {
-    id: string;
-    fullName: string | null;
-    avatar: string | null;
-  };
-  tags: BlogTag[];
+export type BlogPostAuthorRow = {
+  id: string;
+  fullName: string | null;
+  avatar: string | null;
 };
+
+export type BlogPostRow = Omit<BlogPost, 'authorId'> & {
+  author: BlogPostAuthorRow;
+};
+
+export type BlogPostRowWithContent = BlogPostRow & { content: string };
