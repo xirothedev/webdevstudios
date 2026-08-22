@@ -1,21 +1,7 @@
-import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-
-import { ReviewWithRelations } from '../review.types';
-
-const REVIEW_SELECT = {
-  id: true,
-  rating: true,
-  comment: true,
-  userId: true,
-  productId: true,
-  createdAt: true,
-  updatedAt: true,
-  user: { select: { id: true, fullName: true, avatar: true } },
-  product: { select: { id: true, slug: true } },
-} satisfies Prisma.ReviewSelect;
+import { REVIEW_SELECT, type ReviewWithRelations } from './review.selects';
 
 @Injectable()
 export class ReviewRepo {

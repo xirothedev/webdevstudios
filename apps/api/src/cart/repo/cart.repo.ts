@@ -2,29 +2,12 @@ import { Prisma, ProductSize } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-
-import { CartItemWithProduct, CartWithItems } from '../cart.types';
-
-const CART_WITH_ITEMS_INCLUDE = {
-  items: {
-    include: {
-      product: {
-        include: {
-          sizeStocks: true,
-        },
-      },
-    },
-    orderBy: { id: 'desc' as const },
-  },
-} satisfies Prisma.CartInclude;
-
-const CART_ITEM_INCLUDE = {
-  product: {
-    include: {
-      sizeStocks: true,
-    },
-  },
-} satisfies Prisma.CartItemInclude;
+import {
+  CART_WITH_ITEMS_INCLUDE,
+  CART_ITEM_INCLUDE,
+  type CartWithItems,
+  type CartItemWithProduct,
+} from './cart.selects';
 
 @Injectable()
 export class CartRepo {

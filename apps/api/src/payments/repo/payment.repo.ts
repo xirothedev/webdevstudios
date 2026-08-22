@@ -8,22 +8,7 @@ import {
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-
-const PAYMENT_TRANSACTION_SELECT = {
-  id: true,
-  orderId: true,
-  transactionCode: true,
-  amount: true,
-  status: true,
-  paymentUrl: true,
-  payosData: true,
-  createdAt: true,
-  updatedAt: true,
-} satisfies Prisma.PaymentTransactionSelect;
-
-export type PaymentTransactionRow = Prisma.PaymentTransactionGetPayload<{
-  select: typeof PAYMENT_TRANSACTION_SELECT;
-}>;
+import { PAYMENT_TRANSACTION_SELECT, type PaymentTransactionRow } from './payment.selects';
 
 export type PaymentTransactionWithOrder = PaymentTransactionRow & {
   order: {

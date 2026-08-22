@@ -1,27 +1,7 @@
-import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-
-import { BlogPostRow } from '../blog.types';
-
-const BLOG_POST_SELECT = {
-  id: true,
-  slug: true,
-  title: true,
-  contentUrl: true,
-  contentSize: true,
-  excerpt: true,
-  coverImage: true,
-  isPublished: true,
-  publishedAt: true,
-  viewCount: true,
-  metaTitle: true,
-  metaDescription: true,
-  createdAt: true,
-  updatedAt: true,
-  author: { select: { id: true, fullName: true, avatar: true } },
-} satisfies Prisma.BlogPostSelect;
+import { BLOG_POST_SELECT, type BlogPostRow } from './blog-post.selects';
 
 @Injectable()
 export class BlogPostRepo {

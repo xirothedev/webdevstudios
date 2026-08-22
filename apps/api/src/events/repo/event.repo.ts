@@ -2,24 +2,7 @@ import { EventType, Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-
-import { EventRow } from '../events.types';
-
-const EVENT_SELECT = {
-  id: true,
-  title: true,
-  description: true,
-  startDate: true,
-  endDate: true,
-  location: true,
-  type: true,
-  organizer: true,
-  attendees: true,
-  surveyLink: true,
-  createdBy: true,
-  createdAt: true,
-  updatedAt: true,
-} satisfies Prisma.EventSelect;
+import { EVENT_SELECT, type EventRow } from './event.selects';
 
 @Injectable()
 export class EventRepo {
