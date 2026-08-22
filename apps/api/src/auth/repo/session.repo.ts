@@ -16,17 +16,21 @@ type SessionWithRelations = Session & {
 export class SessionRepo {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: {
-    userId: string;
-    token: string;
-    refreshToken?: string;
-    deviceId?: string;
-    ipAddress?: string;
-    userAgent?: string;
-    expiresAt: Date;
-  }): Promise<Session> {
+  async create(
+    data: {
+      userId: string;
+      token: string;
+      refreshToken?: string;
+      deviceId?: string;
+      ipAddress?: string;
+      userAgent?: string;
+      expiresAt: Date;
+    },
+    id?: string,
+  ): Promise<Session> {
     return this.prisma.session.create({
       data: {
+        ...(id ? { id } : {}),
         userId: data.userId,
         token: data.token,
         refreshToken: data.refreshToken,
@@ -35,6 +39,16 @@ export class SessionRepo {
         userAgent: data.userAgent,
         expiresAt: data.expiresAt,
         status: SessionStatus.ACTIVE,
+      },
+    });
+  }
+
+  async findById(id: string): Promise<SessionWithRelations | null> {
+    return this.prisma.session.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        device: true,
       },
     });
   }

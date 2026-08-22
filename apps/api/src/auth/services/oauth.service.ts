@@ -20,24 +20,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType, OAuthProvider } from '@prisma/client';
+import { DeviceType } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import * as UAParser from 'ua-parser-js';
 
 import { addDays } from 'date-fns';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '@/prisma';
 import { UserRepo } from '@/users/repo';
 
 import { SessionRepo } from '../repo';
 import { TokenService, TokenStorageService } from '../infrastructure';
-
-export interface OAuthUser {
-  provider: OAuthProvider;
-  providerId: string;
-  email: string;
-  name?: string;
-  picture?: string;
-}
+import { OAuthProfile } from '../strategies';
 
 @Injectable()
 export class OAuthService {
@@ -50,7 +44,7 @@ export class OAuthService {
   ) {}
 
   async handleOAuthCallback(
-    oauthUser: OAuthUser,
+    oauthUser: OAuthProfile,
     ipAddress?: string,
     userAgent?: string,
   ): Promise<{
@@ -151,11 +145,15 @@ export class OAuthService {
     }
 
     // Generate tokens
-    const accessToken = this.tokenService.generateAccessToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const sessionId = randomUUID();
+    const accessToken = this.tokenService.generateAccessToken(
+      {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      sessionId,
+    );
 
     const refreshToken = this.tokenService.generateRefreshToken({
       sub: user.id,
@@ -163,15 +161,18 @@ export class OAuthService {
 
     // Create session
     const expiresAt = addDays(new Date(), 30); // 30 days
-    const session = await this.sessionRepo.create({
-      userId: user.id,
-      token: accessToken,
-      refreshToken,
-      deviceId,
-      ipAddress,
-      userAgent,
-      expiresAt,
-    });
+    const session = await this.sessionRepo.create(
+      {
+        userId: user.id,
+        token: accessToken,
+        refreshToken,
+        deviceId,
+        ipAddress,
+        userAgent,
+        expiresAt,
+      },
+      sessionId,
+    );
 
     // Mark MFA as verified (OAuth users don't need 2FA for OAuth login)
     const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);

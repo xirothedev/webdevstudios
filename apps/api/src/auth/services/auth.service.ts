@@ -10,6 +10,7 @@ import * as argon2 from 'argon2';
 import * as UAParser from 'ua-parser-js';
 
 import { addDays, addSeconds, isBefore } from 'date-fns';
+import { randomUUID } from 'crypto';
 
 import { PrismaService } from '@/prisma';
 import { UserRepo } from '@/users/repo';
@@ -153,11 +154,15 @@ export class AuthService {
       deviceId = device.id;
     }
 
-    const accessToken = this.tokenService.generateAccessToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const sessionId = randomUUID();
+    const accessToken = this.tokenService.generateAccessToken(
+      {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      sessionId,
+    );
 
     const refreshToken = this.tokenService.generateRefreshToken({
       sub: user.id,
@@ -167,15 +172,18 @@ export class AuthService {
     const expiresIn = dto.rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
     const expiresAt = addSeconds(new Date(), expiresIn);
 
-    const session = await this.sessionRepo.create({
-      userId: user.id,
-      token: accessToken,
-      refreshToken,
-      deviceId,
-      ipAddress,
-      userAgent,
-      expiresAt,
-    });
+    const session = await this.sessionRepo.create(
+      {
+        userId: user.id,
+        token: accessToken,
+        refreshToken,
+        deviceId,
+        ipAddress,
+        userAgent,
+        expiresAt,
+      },
+      sessionId,
+    );
 
     if (!user.mfaEnabled) {
       const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
@@ -215,11 +223,14 @@ export class AuthService {
       throw new UnauthorizedException('Session expired');
     }
 
-    const newAccessToken = this.tokenService.generateAccessToken({
-      sub: payload.sub,
-      email: session.user.email,
-      role: session.user.role,
-    });
+    const newAccessToken = this.tokenService.generateAccessToken(
+      {
+        sub: payload.sub,
+        email: session.user.email,
+        role: session.user.role,
+      },
+      session.id,
+    );
 
     const newRefreshToken = this.tokenService.generateRefreshToken({
       sub: payload.sub,
@@ -436,26 +447,33 @@ export class AuthService {
         deviceId = device.id;
       }
 
-      const accessToken = this.tokenService.generateAccessToken({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      });
+      const sessionId = randomUUID();
+      const accessToken = this.tokenService.generateAccessToken(
+        {
+          sub: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        sessionId,
+      );
 
       const refreshToken = this.tokenService.generateRefreshToken({
         sub: user.id,
       });
 
       const expiresAt = addDays(new Date(), 7);
-      const session = await this.sessionRepo.create({
-        userId: user.id,
-        token: accessToken,
-        refreshToken,
-        deviceId,
-        ipAddress,
-        userAgent,
-        expiresAt,
-      });
+      const session = await this.sessionRepo.create(
+        {
+          userId: user.id,
+          token: accessToken,
+          refreshToken,
+          deviceId,
+          ipAddress,
+          userAgent,
+          expiresAt,
+        },
+        sessionId,
+      );
 
       const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
       await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
