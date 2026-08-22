@@ -77,6 +77,10 @@ RUN printf '%s\n' \
   '  }' \
   '}' > apps/api/tsconfig.json
 
+# Writable dir for winston file transports: LOG_DIR defaults to ./logs,
+# resolved against the container workdir /app
+RUN mkdir -p logs && chown nestjs:nodejs logs
+
 USER nestjs
 
 EXPOSE 4000

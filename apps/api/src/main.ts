@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -151,8 +151,9 @@ async function bootstrap() {
 
   const port = configService.get<number>('PORT', 4000);
   await app.listen(port);
-  console.log(`🚀 API server running on http://localhost:${port}/v1`);
-  console.log(`📚 Swagger docs available at http://localhost:${port}/v1/docs`);
+  const logger = new Logger('Bootstrap');
+  logger.log(`API server running on http://localhost:${port}/v1`);
+  logger.log(`Swagger docs available at http://localhost:${port}/v1/docs`);
 }
 
 void bootstrap();
