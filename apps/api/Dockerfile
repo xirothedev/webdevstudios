@@ -3,7 +3,7 @@ FROM oven/bun:1.3.14-alpine AS base
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Dependencies stage
+# Dependencies stage — invalidated only by lockfile/workspace manifests
 FROM base AS deps
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
@@ -12,7 +12,16 @@ COPY apps/api/package.json ./apps/api/
 COPY apps/api/prisma.config.ts ./apps/api/
 COPY apps/api/prisma ./apps/api/prisma
 COPY apps/api/tsconfig.json ./apps/api/
-RUN bun install --frozen-lockfile --linker isolated
+
+ENV CI=true
+# Cache mount: bun's download store persists even when the layer invalidates
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile --linker isolated
+
+# Prisma stage — client regenerates only when schema or lockfile changes
+FROM deps AS prisma
+WORKDIR /app/apps/api
+RUN bun run prisma:generate
 
 # Builder stage
 FROM base AS builder
@@ -21,33 +30,52 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
+# Fresh client from the prisma stage wins over anything in the build context
+COPY --from=prisma /app/apps/api/src/generated ./apps/api/src/generated
 
-# Build the API with Bun
+# Build the API
 WORKDIR /app/apps/api
-# Generate Prisma client
-RUN bun run prisma:generate
-
-# Build the API with Bun
 RUN bun run build
 WORKDIR /app
 
-# Production runner stage
+# Production runner stage — prod-only install, scripts skipped (client is copied)
 FROM base AS runner
 ENV NODE_ENV=production
 
-# Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-# Copy necessary files
+COPY package.json bun.lock ./
+COPY apps/web/package.json ./apps/web/
+COPY apps/api/package.json ./apps/api/
+
+ENV CI=true
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile --production --ignore-scripts --linker isolated
+
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/src ./apps/api/src
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/src/generated ./apps/api/src/generated
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
-COPY --from=builder /app/apps/api/tsconfig.json ./apps/api/tsconfig.json
+
+# Runtime tsconfig: aliases must resolve into dist so bun loads ONE copy of each
+# class. Mapping @/* to ./src/* instead makes Nest register a class from dist
+# while services inject the same-named class loaded from src — DI token mismatch.
+# @prisma/client stays pointed at the generated client.
+RUN printf '%s\n' \
+  '{' \
+  '  "compilerOptions": {' \
+  '    "baseUrl": ".", ' \
+  '    "paths": { ' \
+  '      "@/*": ["./dist/*"], ' \
+  '      "@prisma/client": ["./src/generated/prisma"], ' \
+  '      "@prisma/client/*": ["./src/generated/prisma/*"] ' \
+  '    }' \
+  '  }' \
+  '}' > apps/api/tsconfig.json
 
 USER nestjs
 
