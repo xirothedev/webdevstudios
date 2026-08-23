@@ -10,13 +10,13 @@ import { PaymentsService, type PayOSWebhookBody } from './payments.service';
 import type { PayOSService } from './payos.service';
 
 // ponytail: hand-rolled fakes per repo-seam rule; swap for a builder if this file grows past ~150 lines
-const webhookBody = (code: string): PayOSWebhookBody => ({
+const webhookBody = (code: string, amount = 299000): PayOSWebhookBody => ({
   code: '00',
   desc: 'success',
   success: true,
   data: {
     orderCode: 1234,
-    amount: 299000,
+    amount,
     description: 'Thanh toan',
     accountNumber: '123',
     reference: 'ref',
@@ -49,6 +49,7 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
         id: 'order-1',
         code: '#ORD-1234',
         userId: 'u1',
+        totalAmount: 299000,
         items: [{ productId: 'p1', size: null, quantity: 2 }],
       },
     }),
@@ -57,7 +58,7 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
     ...overrides.paymentRepo,
   } as unknown as PaymentRepo;
   const orderRepo = {
-    findById: async () => payableOrder,
+    findById: async () => ({ id: 'order-1', code: '#ORD-1234', totalAmount: 299000 }),
     updatePaymentStatus: async () => calls.push('payment-status'),
     updateStatus: async () => calls.push('status'),
     ...overrides.orderRepo,
@@ -75,9 +76,11 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
   } as unknown as PayOSService;
   const securityLogger = {
     logWebhookSignatureFailure: async () => {},
+    ...overrides.securityLogger,
   } as unknown as SecurityLoggerService;
   return {
     calls,
+    securityLogger,
     service: new PaymentsService(
       paymentRepo,
       orderRepo,
@@ -108,32 +111,29 @@ describe('PaymentsService.processWebhook', () => {
   test('failure webhook on an expired order loses the settle claim and writes nothing', async () => {
     const { calls, service } = makeDeps({
       ordersService: { settle: async () => null },
-      paymentRepo: { updateStatus: async () => calls.push('tx-update') },
-      orderRepo: {
-        updatePaymentStatus: async () => calls.push('payment-status'),
-        updateStatus: async () => calls.push('status'),
-      },
     });
 
-    await service.processWebhook(webhookBody('01'));
+    const settled = await service.processWebhook(webhookBody('01'));
 
     expect(calls).toEqual([]);
+    expect(settled).toBe(false);
   });
 
-  test('already-paid transactions are ignored (idempotency)', async () => {
+  test('already-paid transactions return true (idempotency)', async () => {
     const { calls, service } = makeDeps({
       paymentRepo: {
         findByTransactionCode: async () => ({
           id: 'tx-1',
           status: 'PAID',
-          order: { id: 'o', code: 'c', items: [] },
+          order: { id: 'o', code: 'c', totalAmount: 299000, items: [] },
         }),
       },
     });
 
-    await service.processWebhook(webhookBody('00'));
+    const settled = await service.processWebhook(webhookBody('00'));
 
     expect(calls).toEqual([]);
+    expect(settled).toBe(true);
   });
 
   test('invalid signatures are logged for security and rejected', async () => {
@@ -158,6 +158,30 @@ describe('PaymentsService.processWebhook', () => {
 
     await expect(service.processWebhook(webhookBody('00'))).rejects.toThrow(BadRequestException);
     expect(loggedPath).toBe('/v1/payments/webhook');
+  });
+
+  test('amount mismatch logs to SecurityLog and throws', async () => {
+    let loggedPath: string | undefined;
+    const { service } = makeDeps({
+      securityLogger: {
+        logWebhookSignatureFailure: async (path: string) => {
+          loggedPath = path;
+        },
+      },
+    });
+
+    await expect(service.processWebhook(webhookBody('00', 99999))).rejects.toThrow(
+      BadRequestException,
+    );
+    expect(loggedPath).toBe('/v1/payments/webhook/amount-mismatch');
+  });
+
+  test('unknown paymentLinkId throws NotFound', async () => {
+    const { service } = makeDeps({
+      paymentRepo: { findByTransactionCode: async () => null },
+    });
+
+    await expect(service.processWebhook(webhookBody('00'))).rejects.toThrow(NotFoundException);
   });
 });
 
