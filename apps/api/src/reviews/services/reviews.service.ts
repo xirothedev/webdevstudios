@@ -9,6 +9,7 @@ import { ProductSlug } from '@prisma/client';
 
 import { OrderRepo } from '@/orders/repo';
 import { ProductRepo } from '@/products/repo';
+import { StorageService } from '@/storage/storage.service';
 
 import {
   CreateReviewDto,
@@ -26,6 +27,7 @@ export class ReviewsService {
     private readonly reviewRepository: ReviewRepo,
     private readonly productRepository: ProductRepo,
     private readonly orderRepository: OrderRepo,
+    private readonly storageService: StorageService,
   ) {}
 
   async createReview(userId: string, slug: ProductSlug, dto: CreateReviewDto): Promise<ReviewDto> {
@@ -173,7 +175,7 @@ export class ReviewsService {
       comment: review.comment,
       userId: review.userId,
       userFullName: review.user.fullName || 'Anonymous',
-      userAvatar: review.user.avatar,
+      userAvatar: this.storageService.resolveMediaUrl(review.user.avatar),
       productId: review.productId,
       productSlug: review.product.slug,
       createdAt: review.createdAt,

@@ -77,7 +77,7 @@ export class BlogPostRepo {
   async create(data: {
     slug: string;
     title: string;
-    contentUrl: string;
+    contentKey: string;
     contentSize: number | null;
     excerpt: string | null;
     coverImage: string | null;
@@ -94,7 +94,7 @@ export class BlogPostRepo {
     id: string,
     data: {
       title?: string;
-      contentUrl?: string;
+      contentKey?: string;
       contentSize?: number | null;
       excerpt?: string | null;
       coverImage?: string | null;

@@ -64,7 +64,6 @@ async function main() {
     select: {
       id: true,
       slug: true,
-      contentUrl: true,
     },
   });
 
@@ -85,8 +84,8 @@ async function main() {
         continue;
       }
 
-      // Upload content to R2
-      const key = `blog/posts/${post.slug}/content.md`;
+      // Upload content to R2, keyed by post id
+      const key = `blog/posts/${post.id}/content.md`;
       const contentBuffer = Buffer.from(postData.content, 'utf-8');
 
       await s3Client.send(
@@ -99,14 +98,10 @@ async function main() {
         }),
       );
 
-      // Update contentUrl in database to full R2 URL
-      const publicUrl = process.env.R2_PUBLIC_URL || process.env.R2_ENDPOINT;
-      const fullUrl = `${publicUrl}/${key}`;
-
       await prisma.blogPost.update({
         where: { id: post.id },
         data: {
-          contentUrl: fullUrl,
+          contentKey: key,
           contentSize: contentBuffer.length,
         },
       });

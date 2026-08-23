@@ -7,14 +7,17 @@ import { BlogPostRepo } from '../repo';
 import { BlogService } from './blog.service';
 
 // ponytail: hand-rolled fakes per repo-seam rule; swap for a builder if this file grows past ~150 lines
+const author = { id: 'author-1', fullName: 'Test Author', avatar: null };
+
 const baseRepo = {
   findBySlug: async () => null,
   findById: async () => null,
   findAll: async () => ({ posts: [], total: 0 }),
   search: async () => ({ posts: [], total: 0 }),
-  create: async (data: Record<string, unknown>) => ({ id: 'post-1', ...data }),
+  create: async (data: Record<string, unknown>) => ({ id: 'post-1', author, ...data }),
   update: async (id: string, data: Record<string, unknown>) => ({
     id,
+    author,
     isPublished: false,
     ...data,
   }),
@@ -26,9 +29,11 @@ const makeRepo = (overrides: Record<string, unknown> = {}) =>
   ({ ...baseRepo, ...overrides }) as unknown as BlogPostRepo;
 
 const fakeStorage = {
-  uploadBlogContent: async () => 'https://r2.example.com/content.md',
+  uploadBlogContent: async (postId: string) => `blog/posts/${postId}/content.md`,
   deleteBlogContent: async () => {},
   getBlogContent: async () => '# stored',
+  // ponytail: identity passthrough keeps fixture values observable
+  resolveMediaUrl: (ref: string | null | undefined) => ref ?? null,
 } as unknown as StorageService;
 
 const baseCreateDto = {
@@ -70,10 +75,35 @@ describe('BlogService', () => {
     expect(created.publishedAt).toBeNull();
   });
 
+  test('createPost keys content by post id, not slug', async () => {
+    let uploadedId: string | undefined;
+    let secondWrite: Record<string, unknown> = {};
+    const repo = makeRepo({
+      create: async (data: Record<string, unknown>) => ({ id: 'post-1', author, ...data }),
+      update: async (_id: string, data: Record<string, unknown>) => {
+        secondWrite = data;
+        return { id: 'post-1', author, ...data };
+      },
+    });
+    const storage = {
+      ...fakeStorage,
+      uploadBlogContent: async (postId: string) => {
+        uploadedId = postId;
+        return `blog/posts/${postId}/content.md`;
+      },
+    } as unknown as StorageService;
+    const service = new BlogService(repo, storage);
+
+    await service.createPost('author-1', baseCreateDto as never);
+
+    expect(uploadedId).toBe('post-1');
+    expect(secondWrite.contentKey).toBe('blog/posts/post-1/content.md');
+  });
+
   test('publishPost skips update when already published', async () => {
     let updated = false;
     const repo = makeRepo({
-      findById: async () => ({ id: 'p1', isPublished: true }),
+      findById: async () => ({ id: 'p1', author, isPublished: true }),
       update: async () => {
         updated = true;
         return {};
@@ -89,7 +119,7 @@ describe('BlogService', () => {
     let viewed = false;
     let fetchedContent = false;
     const repo = makeRepo({
-      findBySlug: async () => ({ id: 'p1', isPublished: true, contentUrl: 'u' }),
+      findBySlug: async () => ({ id: 'p1', author, isPublished: true, contentKey: 'u' }),
       incrementViewCount: async () => {
         viewed = true;
         return {};
@@ -134,7 +164,7 @@ describe('BlogService.withContent', () => {
         throw new Error('s3 404');
       },
     } as unknown as StorageService;
-    const repo = makeRepo({ findById: async () => ({ id: 'p1', contentUrl: 'u' }) });
+    const repo = makeRepo({ findById: async () => ({ id: 'p1', contentKey: 'u' }) });
     const service = new BlogService(repo, storage);
 
     await expect(service.getPostById('p1', { includeContent: true } as never)).rejects.toThrow(
@@ -166,7 +196,7 @@ describe('BlogService.publishPost', () => {
       findById: async () => ({ id: 'p1', isPublished: false }),
       update: async (_id: string, data: Record<string, unknown>) => {
         updated = data;
-        return {};
+        return { id: 'p1', author };
       },
     });
     const service = new BlogService(repo, fakeStorage);

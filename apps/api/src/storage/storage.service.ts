@@ -29,15 +29,48 @@ import {
 import { Injectable } from '@nestjs/common';
 
 import { StorageException } from './exceptions';
-import {
-  CacheOptions,
-  CacheStrategy,
-  UploadFileOptions,
-  UploadImageOptions,
-  UploadResult,
-} from './interfaces/storage.interface';
 import { StorageConfig } from './storage.config';
 import { processImage, validateImage } from './utils/image-optimization.util';
+
+export type CacheStrategy = 'immutable' | 'long-lived' | 'short-lived' | 'no-cache';
+
+export interface CacheOptions {
+  /**
+   * Cache strategy:
+   * - 'immutable': Files never change (1 year cache, immutable)
+   * - 'long-lived': Files rarely change (30 days cache)
+   * - 'short-lived': Files may change (1 day cache)
+   * - 'no-cache': Don't cache
+   */
+  strategy?: CacheStrategy;
+  /**
+   * Custom max-age in seconds (overrides strategy default)
+   */
+  maxAge?: number;
+}
+
+export interface UploadFileOptions {
+  key: string;
+  file: Buffer;
+  contentType: string;
+  metadata?: Record<string, string>;
+  cache?: CacheOptions;
+}
+
+export interface UploadImageOptions {
+  key: string;
+  file: Buffer;
+  contentType: string;
+  width?: number;
+  height?: number;
+  format?: 'webp' | 'jpeg' | 'png';
+}
+
+export interface UploadResult {
+  key: string;
+  url: string;
+  size: number;
+}
 
 @Injectable()
 export class StorageService {
@@ -185,71 +218,44 @@ export class StorageService {
   }
 
   /**
-   * Extract key from R2 URL
-   * Handles both full R2 URLs and relative paths
+   * Resolve a stored media reference to a public URL.
+   * Rows persist R2 keys; absolute URLs (e.g. OAuth provider pictures) pass through untouched.
    */
-  extractKeyFromUrl(url: string): string | null {
-    try {
-      const baseUrl = this.config.publicUrl.endsWith('/')
-        ? this.config.publicUrl.slice(0, -1)
-        : this.config.publicUrl;
-
-      // If URL is a full R2 URL, extract the key
-      if (url.startsWith(baseUrl)) {
-        return url.replace(`${baseUrl}/`, '');
-      }
-
-      // If URL is a relative path (e.g., "blog/posts/slug/content.md"),
-      // treat it as a key directly
-      // Normalize: remove leading slash if present
-      const normalizedKey = url.startsWith('/') ? url.slice(1) : url;
-
-      // Validate: key should not be empty and should not contain "://" (to avoid treating full URLs as keys)
-      if (normalizedKey && !normalizedKey.includes('://')) {
-        return normalizedKey;
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
+  resolveMediaUrl(ref: string | null | undefined): string | null {
+    if (!ref) return null;
+    return ref.includes('://') ? ref : this.getFileUrl(ref);
   }
 
   /**
    * Upload blog content (markdown) to R2
-   * @param identifier Blog post ID or slug (unique identifier)
+   * @param postId Blog post ID
    * @param content Markdown content
-   * @returns R2 URL to the uploaded content
+   * @returns The R2 object key of the uploaded content
    */
-  async uploadBlogContent(identifier: string, content: string): Promise<string> {
-    const key = `blog/posts/${identifier}/content.md`;
+  async uploadBlogContent(postId: string, content: string): Promise<string> {
+    const key = `blog/posts/${postId}/content.md`;
     const contentBuffer = Buffer.from(content, 'utf-8');
 
-    const result = await this.uploadFile({
+    await this.uploadFile({
       key,
       file: contentBuffer,
       contentType: 'text/markdown',
       cache: { strategy: 'long-lived' }, // Cache for 30 days
     });
 
-    return result.url;
+    return key;
   }
 
   /**
    * Get blog content from R2
-   * @param contentUrl R2 URL to the content file
+   * @param contentKey R2 object key of the content file
    * @returns Markdown content as string
    */
-  async getBlogContent(contentUrl: string): Promise<string> {
+  async getBlogContent(contentKey: string): Promise<string> {
     try {
-      const key = this.extractKeyFromUrl(contentUrl);
-      if (!key) {
-        throw new StorageException('Invalid content URL');
-      }
-
       const command = new GetObjectCommand({
         Bucket: this.config.bucketName,
-        Key: key,
+        Key: contentKey,
       });
 
       const response = await this.s3Client.send(command);
@@ -285,26 +291,22 @@ export class StorageService {
 
   /**
    * Delete blog content from R2
-   * @param contentUrl R2 URL to the content file
+   * @param contentKey R2 object key of the content file
    */
-  async deleteBlogContent(contentUrl: string): Promise<void> {
-    const key = this.extractKeyFromUrl(contentUrl);
-    if (!key) {
-      throw new StorageException('Invalid content URL');
-    }
-    await this.deleteFile(key);
+  async deleteBlogContent(contentKey: string): Promise<void> {
+    await this.deleteFile(contentKey);
   }
 
   /**
    * Upload blog cover image to R2
    * @param postId Blog post ID
    * @param file Image file buffer
-   * @returns R2 URL to the uploaded image
+   * @returns The R2 object key of the uploaded image
    */
   async uploadBlogCoverImage(postId: string, file: Buffer): Promise<string> {
     const key = `blog/images/covers/${postId}-cover.webp`;
 
-    const result = await this.uploadImage({
+    await this.uploadImage({
       key,
       file,
       contentType: 'image/webp', // Will be converted to WebP by processImage
@@ -312,6 +314,6 @@ export class StorageService {
       height: 630, // Cover image height (Open Graph recommended size)
     });
 
-    return result.url;
+    return key;
   }
 }

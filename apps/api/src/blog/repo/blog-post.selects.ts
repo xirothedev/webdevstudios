@@ -6,7 +6,7 @@ export const BLOG_POST_SELECT = {
   id: true,
   slug: true,
   title: true,
-  contentUrl: true,
+  contentKey: true,
   contentSize: true,
   excerpt: true,
   coverImage: true,

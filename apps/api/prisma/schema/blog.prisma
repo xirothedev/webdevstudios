@@ -28,14 +28,14 @@ model BlogPost {
   title String @db.VarChar(255)
 
   // Content stored in R2
-  contentUrl  String // R2 URL to markdown file (e.g., "blog/posts/{id}/content.md")
+  contentKey  String // R2 object key for the markdown file (e.g., "blog/posts/{id}/content.md")
   contentSize Int? // File size in bytes (for monitoring)
 
   // Searchable excerpt (stored in DB for full-text search)
   excerpt String? @db.VarChar(500)
 
   // Cover image (also in R2)
-  coverImage String? // R2 URL to cover image
+  coverImage String? // R2 object key to cover image
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id])

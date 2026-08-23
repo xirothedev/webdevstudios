@@ -22,6 +22,8 @@
 
 import { Module } from '@nestjs/common';
 
+import { StorageModule } from '../storage/storage.module';
+
 import { OrdersModule } from '../orders/orders.module';
 import { ProductsModule } from '../products/products.module';
 // Controller
@@ -32,7 +34,7 @@ import { ReviewRepo } from './repo';
 import { ReviewsService } from './services/reviews.service';
 
 @Module({
-  imports: [ProductsModule, OrdersModule],
+  imports: [ProductsModule, OrdersModule, StorageModule],
   controllers: [ReviewsController],
   providers: [ReviewRepo, ReviewsService],
   exports: [ReviewRepo, ReviewsService],
