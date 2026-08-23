@@ -27,10 +27,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { plainToClass } from 'class-transformer';
 import Redis from 'ioredis';
-
-import { VerificationDto } from './redis.dto';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -38,11 +35,16 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   private client: Redis;
 
+  getClient(): Redis {
+    return this.client;
+  }
+
   async onModuleInit() {
     try {
       this.client = new Redis({
         host: this.config.get<string>('REDIS_HOST', '127.0.0.1'),
         port: this.config.get<number>('REDIS_PORT', 6379),
+        password: this.config.get<string>('REDIS_PASSWORD'),
       });
 
       // Handle errors to prevent unhandled error events
@@ -77,63 +79,5 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     if (this.client && this.client.status === 'ready') {
       await this.client.quit();
     }
-  }
-
-  async hSet(key: string, data: VerificationDto): Promise<void> {
-    const { id, tries } = data;
-    await this.client.hset(key, 'id', id, 'tries', tries.toString());
-    await this.client.expire(key, this.config.getOrThrow<number>('REDIS_TTL', 300));
-  }
-
-  async hGet(key: string, field: string): Promise<string | null> {
-    return this.client.hget(key, field);
-  }
-
-  async hGetAll(key: string): Promise<VerificationDto> {
-    const result = await this.client.hgetall(key);
-    // Convert tries from string to number
-    const parsedResult = {
-      ...result,
-      tries: result.tries ? parseInt(result.tries, 10) : 0,
-    };
-    return plainToClass(VerificationDto, parsedResult);
-  }
-
-  async hIncrBy(key: string, field: string, increment = 1): Promise<number> {
-    const value = await this.client.hincrby(key, field, increment);
-    return value;
-  }
-
-  async hDel(key: string, field: string): Promise<void> {
-    await this.client.hdel(key, field);
-  }
-
-  async del(key: string): Promise<void> {
-    await this.client.del(key);
-  }
-
-  // Methods for Throttler support
-  async get(key: string): Promise<string | null> {
-    return this.client.get(key);
-  }
-
-  async set(key: string, value: string, expiryMode: 'EX' | 'PX', time: number): Promise<void> {
-    if (expiryMode === 'EX') {
-      await this.client.setex(key, time, value);
-    } else {
-      await this.client.psetex(key, time, value);
-    }
-  }
-
-  async exists(key: string): Promise<number> {
-    return this.client.exists(key);
-  }
-
-  async ttl(key: string): Promise<number> {
-    return this.client.ttl(key);
-  }
-
-  async incr(key: string): Promise<number> {
-    return this.client.incr(key);
   }
 }

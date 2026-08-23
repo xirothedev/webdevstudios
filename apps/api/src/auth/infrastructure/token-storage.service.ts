@@ -22,22 +22,24 @@
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+
+import { RedisService } from '@/redis';
 
 @Injectable()
 export class TokenStorageService {
-  private readonly client: Redis;
+  // ponytail: lazy so getClient() is only called after RedisService.onModuleInit
+  private get client() {
+    return this.redisService.getClient();
+  }
+
   private readonly emailVerificationPrefix = 'email-verification:';
   private readonly passwordResetPrefix = 'password-reset:';
   private readonly sessionMfaPrefix = 'session:';
 
-  constructor(private readonly configService: ConfigService) {
-    this.client = new Redis({
-      host: this.configService.get<string>('REDIS_HOST', 'localhost'),
-      port: this.configService.get<number>('REDIS_PORT', 6379),
-      password: this.configService.get<string>('REDIS_PASSWORD'),
-    });
-  }
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
+  ) {}
 
   /**
    * Store email verification token in Redis
