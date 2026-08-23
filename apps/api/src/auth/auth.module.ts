@@ -36,7 +36,13 @@ import { TokenService, TokenStorageService, TotpService } from './infrastructure
 // Repository
 import { SessionRepo } from './repo';
 // Services
-import { AuthService, OAuthService, OAuthRedirectService, SessionIssuer } from './services';
+import {
+  AuthCookies,
+  AuthService,
+  OAuthService,
+  OAuthRedirectService,
+  SessionIssuer,
+} from './services';
 // Strategies
 import { GitHubStrategy, GoogleStrategy, JwtStrategy } from './strategies';
 // Users module (UserRepo)
@@ -76,6 +82,7 @@ import { UsersModule } from '../users/users.module';
     MfaGuard,
     // Services
     SessionIssuer,
+    AuthCookies,
     AuthService,
     OAuthService,
     OAuthRedirectService,

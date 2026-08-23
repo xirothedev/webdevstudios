@@ -286,8 +286,33 @@ describe('AuthService.refresh', () => {
 
     const result = await service.refresh('current');
 
-    expect(result).toEqual({ accessToken: 'access:user-1:USER', refreshToken: 'refresh:user-1' });
+    expect(result).toMatchObject({
+      accessToken: 'access:user-1:USER',
+      refreshToken: 'refresh:user-1',
+    });
     expect(rotatedTo).toBe('refresh:user-1');
+  });
+
+  test('returns the remaining session lifetime as ttlSeconds', async () => {
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const service = makeDeps({} as never, {
+      tokenService: {
+        verifyToken: () => ({ sub: 'user-1' }),
+        generateAccessToken: () => 'access-1',
+        generateRefreshToken: () => 'refresh-1',
+      },
+      sessionRepo: {
+        findByRefreshToken: async () => ({ ...baseSession, expiresAt }),
+        updateRefreshToken: async () => {},
+      },
+      tokenStorage: { getSessionMfaVerified: async () => false },
+    });
+
+    const result = await service.refresh('current');
+
+    // ~10 minutes minus elapsed time between the expiry check and the return
+    expect(result.ttlSeconds).toBeGreaterThan(10 * 60 - 5);
+    expect(result.ttlSeconds).toBeLessThanOrEqual(10 * 60);
   });
 });
 
@@ -615,6 +640,8 @@ describe('AuthService.verify2FA', () => {
       mfaTrusted: true,
       ttlSeconds: 7 * 24 * 60 * 60,
     });
+    // cookie write downstream reuses the issuer ttl, not its own constant
+    expect(result.ttlSeconds).toBe(opts.ttlSeconds);
   });
 });
 
@@ -653,12 +680,15 @@ describe('AuthService.login issuance policy', () => {
       mfaTrusted: true,
       ttlSeconds: 30 * 24 * 60 * 60,
     });
+    // the controller reuses THIS value for the cookie write
+    expect(result.ttlSeconds).toBe((issueArgs[1] as { ttlSeconds: number }).ttlSeconds);
   });
 
   test('default login keeps the session at 7 days', async () => {
-    const { issueArgs } = await loginUser(false);
+    const { result, issueArgs } = await loginUser(false);
 
     expect(issueArgs[1]).toMatchObject({ ttlSeconds: 7 * 24 * 60 * 60 });
+    expect(result.ttlSeconds).toBe(7 * 24 * 60 * 60);
   });
 });
 

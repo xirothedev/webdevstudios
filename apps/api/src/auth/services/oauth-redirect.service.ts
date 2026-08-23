@@ -24,9 +24,12 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 
+import { AuthCookies } from './auth-cookies.service';
+
 interface OAuthCallbackResult {
   accessToken: string;
   refreshToken: string;
+  ttlSeconds: number;
   user: {
     id: string;
     email: string;
@@ -37,36 +40,16 @@ interface OAuthCallbackResult {
 
 @Injectable()
 export class OAuthRedirectService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly authCookies: AuthCookies,
+  ) {}
 
   /**
    * Get frontend URL from config
    */
   private getFrontendUrl(): string {
     return this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000');
-  }
-
-  /**
-   * Set authentication cookies
-   */
-  setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax', // Always lax for multiple ports/subdomains
-      maxAge: 15 * 60 * 1000, // 15 minutes
-      path: '/',
-    });
-
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax', // Always lax for multiple ports/subdomains
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/',
-    });
   }
 
   /**
@@ -105,8 +88,7 @@ export class OAuthRedirectService {
    * Sets cookies and redirects to frontend
    */
   handleSuccess(res: Response, result: OAuthCallbackResult, redirectUrl?: string): void {
-    // Set cookies
-    this.setAuthCookies(res, result.accessToken, result.refreshToken);
+    this.authCookies.set(res, result, result.ttlSeconds);
 
     // Redirect to frontend callback page
     const callbackUrl = this.buildCallbackUrl(redirectUrl);

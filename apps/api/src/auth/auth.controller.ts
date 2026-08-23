@@ -72,6 +72,7 @@ import {
   VerifyEmailDto,
 } from './dto';
 import { GitHubOAuthGuard, GoogleOAuthGuard } from './guards';
+import { AuthCookies } from './services/auth-cookies.service';
 import { AuthService } from './services/auth.service';
 import { OAuthService, OAuthRedirectService } from './services';
 import { OAuthProfile } from './strategies';
@@ -83,6 +84,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly oauthService: OAuthService,
     private readonly oauthRedirectService: OAuthRedirectService,
+    private readonly authCookies: AuthCookies,
   ) {}
 
   @Public()
@@ -142,26 +144,7 @@ export class AuthController {
 
     // Set cookies if login successful (not 2FA required)
     if (!result.requires2FA && result.accessToken && result.refreshToken) {
-      const isProduction = process.env.NODE_ENV === 'production';
-      const maxAge = dto.rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
-
-      // Set access token cookie
-      res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax', // Always lax for multiple ports/subdomains
-        maxAge: 15 * 60 * 1000, // 15 minutes
-        path: '/',
-      });
-
-      // Set refresh token cookie
-      res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax', // Always lax for multiple ports/subdomains
-        maxAge,
-        path: '/',
-      });
+      this.authCookies.set(res, result, result.ttlSeconds!);
     }
 
     return result;
@@ -240,26 +223,7 @@ export class AuthController {
 
     const result = await this.authService.refresh(token);
 
-    // Set new cookies
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    // Set access token cookie
-    res.cookie('access_token', result.accessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax', // Always lax for multiple ports/subdomains
-      maxAge: 15 * 60 * 1000, // 15 minutes
-      path: '/',
-    });
-
-    // Set refresh token cookie
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax', // Always lax for multiple ports/subdomains
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      path: '/',
-    });
+    this.authCookies.set(res, result, result.ttlSeconds);
 
     return result;
   }
@@ -302,9 +266,7 @@ export class AuthController {
   ) {
     const result = await this.authService.logout(user.id, sessionId);
 
-    // Clear cookies
-    res.clearCookie('access_token', { path: '/' });
-    res.clearCookie('refresh_token', { path: '/' });
+    this.authCookies.clear(res);
 
     return result;
   }
@@ -407,23 +369,11 @@ export class AuthController {
 
     // Set cookies if login flow (tokens returned)
     if (result.accessToken && result.refreshToken) {
-      const isProduction = process.env.NODE_ENV === 'production';
-
-      res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax', // Always lax for multiple ports/subdomains
-        maxAge: 15 * 60 * 1000, // 15 minutes
-        path: '/',
-      });
-
-      res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax', // Always lax for multiple ports/subdomains
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/',
-      });
+      this.authCookies.set(
+        res,
+        { accessToken: result.accessToken, refreshToken: result.refreshToken },
+        result.ttlSeconds!,
+      );
     }
 
     return result;

@@ -43,6 +43,7 @@ export class OAuthService {
   ): Promise<{
     accessToken: string;
     refreshToken: string;
+    ttlSeconds: number;
     user: {
       id: string;
       email: string;
@@ -117,16 +118,18 @@ export class OAuthService {
     }
 
     // OAuth authentication is treated as inherently stronger than password
+    const ttlSeconds = 30 * 24 * 60 * 60;
     const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
       ip: ipAddress,
       userAgent,
       mfaTrusted: true,
-      ttlSeconds: 30 * 24 * 60 * 60,
+      ttlSeconds,
     });
 
     return {
       accessToken,
       refreshToken,
+      ttlSeconds,
       user: {
         id: user.id,
         email: user.email,

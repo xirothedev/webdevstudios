@@ -94,6 +94,7 @@ export class AuthService {
   ): Promise<{
     accessToken: string;
     refreshToken: string;
+    ttlSeconds?: number;
     user: {
       id: string;
       email: string;
@@ -136,17 +137,18 @@ export class AuthService {
       };
     }
 
+    const ttlSeconds = dto.rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
     const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
       ip: ipAddress,
       userAgent,
       mfaTrusted: !user.mfaEnabled,
-      // ponytail: rememberMe ? 30d : 7d, mirrors cookie maxAge in controller
-      ttlSeconds: dto.rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
+      ttlSeconds,
     });
 
     return {
       accessToken,
       refreshToken,
+      ttlSeconds,
       user: {
         id: user.id,
         email: user.email,
@@ -160,6 +162,7 @@ export class AuthService {
   async refresh(refreshToken: string): Promise<{
     accessToken: string;
     refreshToken: string;
+    ttlSeconds: number;
   }> {
     let payload;
     try {
@@ -203,6 +206,8 @@ export class AuthService {
     return {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
+      // cookie must die with the session, not a hardcoded lifetime
+      ttlSeconds: Math.max(0, Math.floor((session.expiresAt.getTime() - Date.now()) / 1000)),
     };
   }
 
@@ -308,6 +313,7 @@ export class AuthService {
   ): Promise<{
     accessToken?: string;
     refreshToken?: string;
+    ttlSeconds?: number;
     user?: {
       id: string;
       email: string;
@@ -383,16 +389,18 @@ export class AuthService {
     }
 
     if (sessionId) {
+      const ttlSeconds = 7 * 24 * 60 * 60;
       const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
         ip: ipAddress,
         userAgent,
         mfaTrusted: true,
-        ttlSeconds: 7 * 24 * 60 * 60,
+        ttlSeconds,
       });
 
       return {
         accessToken,
         refreshToken,
+        ttlSeconds,
         user: {
           id: user.id,
           email: user.email,

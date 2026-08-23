@@ -149,12 +149,14 @@ describe('OAuthService.handleOAuthCallback', () => {
       externalAccount: { findUnique: async () => ({ ...externalAccount }) },
     });
 
-    await service.handleOAuthCallback(oauthUser);
+    const result = await service.handleOAuthCallback(oauthUser);
 
     const issueCall = calls.find((c) => c.startsWith('issuer-issue'));
     expect(issueCall).toBeTruthy();
     const { userId, opts } = JSON.parse(issueCall!.slice('issuer-issue:'.length));
     expect(userId).toBe('user-1');
     expect(opts).toMatchObject({ mfaTrusted: true, ttlSeconds: 30 * 24 * 60 * 60 });
+    // cookie write downstream reuses the issuer ttl
+    expect(result.ttlSeconds).toBe(opts.ttlSeconds);
   });
 });
