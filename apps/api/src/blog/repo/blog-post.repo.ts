@@ -3,6 +3,21 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma';
 import { BLOG_POST_SELECT, type BlogPostRow } from './blog-post.selects';
 
+export type BlogPostUpdateData = Partial<
+  Pick<
+    BlogPostRow,
+    | 'title'
+    | 'contentKey'
+    | 'contentSize'
+    | 'excerpt'
+    | 'coverImage'
+    | 'isPublished'
+    | 'publishedAt'
+    | 'metaTitle'
+    | 'metaDescription'
+  >
+>;
+
 @Injectable()
 export class BlogPostRepo {
   constructor(private readonly prisma: PrismaService) {}
@@ -90,20 +105,7 @@ export class BlogPostRepo {
     return this.prisma.blogPost.create({ data, select: BLOG_POST_SELECT });
   }
 
-  async update(
-    id: string,
-    data: {
-      title?: string;
-      contentKey?: string;
-      contentSize?: number | null;
-      excerpt?: string | null;
-      coverImage?: string | null;
-      isPublished?: boolean;
-      publishedAt?: Date | null;
-      metaTitle?: string | null;
-      metaDescription?: string | null;
-    },
-  ): Promise<BlogPostRow> {
+  async update(id: string, data: BlogPostUpdateData): Promise<BlogPostRow> {
     return this.prisma.blogPost.update({ where: { id }, data, select: BLOG_POST_SELECT });
   }
 

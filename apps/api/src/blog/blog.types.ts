@@ -20,16 +20,4 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { BlogPost } from '@prisma/client';
-
-export type BlogPostAuthorRow = {
-  id: string;
-  fullName: string | null;
-  avatar: string | null;
-};
-
-export type BlogPostRow = Omit<BlogPost, 'authorId'> & {
-  author: BlogPostAuthorRow;
-};
-
-export type BlogPostRowWithContent = BlogPostRow & { content: string };
+export type { BlogPostRow, BlogPostRowWithContent } from './repo/blog-post.selects';

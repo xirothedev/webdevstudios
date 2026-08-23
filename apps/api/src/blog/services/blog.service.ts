@@ -10,7 +10,7 @@ import {
   SearchBlogPostsQueryDto,
   UpdateBlogPostDto,
 } from '../dto';
-import { BlogPostRepo } from '../repo';
+import { BlogPostRepo, type BlogPostUpdateData } from '../repo';
 
 @Injectable()
 export class BlogService {
@@ -59,17 +59,7 @@ export class BlogService {
       throw new NotFoundException(`Blog post with id ${postId} not found`);
     }
 
-    const data: {
-      title?: string;
-      contentKey?: string;
-      contentSize?: number | null;
-      excerpt?: string | null;
-      coverImage?: string | null;
-      isPublished?: boolean;
-      publishedAt?: Date | null;
-      metaTitle?: string | null;
-      metaDescription?: string | null;
-    } = {};
+    const data: BlogPostUpdateData = {};
 
     if (dto.title !== undefined) data.title = dto.title;
     if (dto.coverImage !== undefined) data.coverImage = dto.coverImage;
