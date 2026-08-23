@@ -17,7 +17,7 @@ import {
 
 import { CartRepo } from '@/cart/repo';
 import { PrismaService } from '@/prisma';
-import { ProductRepo } from '@/products/repo';
+import { availableStock, ProductRepo } from '@/products/repo';
 
 import { CreateOrderDto, OrderDto, OrderListResponseDto } from '../dto';
 import { OrderRepo, OrderRow } from '../repo';
@@ -44,6 +44,7 @@ export class OrderService {
       );
     }
 
+    let cartId: string | null = null;
     const orderItems: Array<{
       productId: string | null;
       productSlug: ProductSlug;
@@ -59,6 +60,7 @@ export class OrderService {
       if (!cart.items || cart.items.length === 0) {
         throw new BadRequestException('Cart is empty');
       }
+      cartId = cart.id;
 
       // Validate stock and calculate totals from cart
       for (const cartItem of cart.items) {
@@ -67,22 +69,14 @@ export class OrderService {
           throw new NotFoundException(`Product ${cartItem.productId} not found`);
         }
 
-        let availableStock: number;
-        if (product.hasSizes && cartItem.size) {
-          const sizeStock = await this.productRepo.getStockBySize(product.id, cartItem.size);
-          if (sizeStock === null) {
-            throw new NotFoundException(
-              `Size ${cartItem.size} not found for product ${product.id}`,
-            );
-          }
-          availableStock = sizeStock;
-        } else {
-          availableStock = product.stock;
+        const available = availableStock(product, cartItem.size);
+        if (available === null) {
+          throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`);
         }
 
-        if (cartItem.quantity > availableStock) {
+        if (cartItem.quantity > available) {
           throw new ConflictException(
-            `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`,
+            `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${available}, Requested: ${cartItem.quantity}`,
           );
         }
 
@@ -114,23 +108,18 @@ export class OrderService {
         throw new BadRequestException('Product slug mismatch');
       }
 
-      let availableStock: number;
-      if (product.hasSizes && size) {
-        const sizeStock = await this.productRepo.getStockBySize(product.id, size);
-        if (sizeStock === null) {
-          throw new NotFoundException(`Size ${size} not found for product ${product.id}`);
-        }
-        availableStock = sizeStock;
-      } else {
-        if (product.hasSizes && !size) {
-          throw new BadRequestException('Size is required for this product');
-        }
-        availableStock = product.stock;
+      if (product.hasSizes && !size) {
+        throw new BadRequestException('Size is required for this product');
       }
 
-      if (quantity > availableStock) {
+      const available = availableStock(product, size);
+      if (available === null) {
+        throw new NotFoundException(`Size ${size} not found for product ${product.id}`);
+      }
+
+      if (quantity > available) {
         throw new ConflictException(
-          `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${availableStock}, Requested: ${quantity}`,
+          `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${available}, Requested: ${quantity}`,
         );
       }
 
@@ -173,31 +162,22 @@ export class OrderService {
         tx,
       );
 
-      // Deduct stock within transaction
-      for (const item of orderItems) {
-        if (item.productId) {
-          if (item.size) {
-            await tx.productSizeStock.updateMany({
-              where: { productId: item.productId, size: item.size },
-              data: { stock: { decrement: item.quantity } },
-            });
-          } else {
-            await tx.product.update({
-              where: { id: item.productId },
-              data: { stock: { decrement: item.quantity } },
-            });
-          }
-        }
+      // Deduct stock within transaction; conditional update guards against oversell races
+      await this.productRepo.reserve(
+        tx,
+        orderItems.flatMap((item) =>
+          item.productId
+            ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
+            : [],
+        ),
+      );
+
+      if (cartId) {
+        await this.cartRepo.clearCart(cartId, tx);
       }
 
       return orderRecord;
     });
-
-    // Clear cart only if FROM_CART
-    if (orderType === 'FROM_CART') {
-      const cart = await this.cartRepo.findOrCreateCart(userId);
-      await this.cartRepo.clearCart(cart.id);
-    }
 
     return this.toDto(order);
   }
@@ -289,15 +269,14 @@ export class OrderService {
     }
 
     // Restore stock
-    for (const item of order.items) {
-      if (item.productId) {
-        if (item.size) {
-          await this.productRepo.incrementSizeStock(item.productId, item.size, item.quantity);
-        } else {
-          await this.productRepo.incrementStock(item.productId, item.quantity);
-        }
-      }
-    }
+    await this.productRepo.release(
+      undefined,
+      order.items.flatMap((item) =>
+        item.productId
+          ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
+          : [],
+      ),
+    );
 
     const cancelled = await this.orderRepo.findById(orderId);
     return this.toDto(cancelled!);
@@ -334,21 +313,14 @@ export class OrderService {
       }
 
       // Restore stock
-      for (const item of order.items) {
-        if (item.productId) {
-          if (item.size) {
-            await tx.productSizeStock.updateMany({
-              where: { productId: item.productId, size: item.size },
-              data: { stock: { increment: item.quantity } },
-            });
-          } else {
-            await tx.product.update({
-              where: { id: item.productId },
-              data: { stock: { increment: item.quantity } },
-            });
-          }
-        }
-      }
+      await this.productRepo.release(
+        tx,
+        order.items.flatMap((item) =>
+          item.productId
+            ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
+            : [],
+        ),
+      );
 
       // Update payment transaction if exists
       const paymentTransaction = await tx.paymentTransaction.findUnique({

@@ -65,7 +65,8 @@ const makeRepos = (
   } as unknown as CartRepo;
   const productRepo = {
     findById: async () => baseProduct,
-    getStockBySize: async () => null,
+    reserve: async () => {},
+    release: async () => {},
     ...overrides.productRepo,
   } as unknown as ProductRepo;
   return { orderRepo, cartRepo, productRepo };
@@ -236,29 +237,26 @@ describe('OrderService.cancelOrder', () => {
   });
 
   test('losing the concurrent claim is rejected without stock changes', async () => {
-    const stockCalls: unknown[][] = [];
+    let releaseCalled = false;
     const { orderRepo, cartRepo, productRepo } = makeRepos({
       orderRepo: {
         findById: async () => ({ ...baseOrder }),
         cancelPending: async () => 0,
       },
       productRepo: {
-        incrementSizeStock: async (...args: unknown[]) => {
-          stockCalls.push(args);
-        },
-        incrementStock: async (...args: unknown[]) => {
-          stockCalls.push(args);
+        release: async () => {
+          releaseCalled = true;
         },
       },
     });
     const service = new OrderService(orderRepo, cartRepo, productRepo, makePrisma());
 
     await expect(service.cancelOrder('order-1', 'u1')).rejects.toThrow(BadRequestException);
-    expect(stockCalls).toEqual([]);
+    expect(releaseCalled).toBe(false);
   });
 
-  test('cancelling restores stock for sized and unsized items', async () => {
-    const stockCalls: Record<string, unknown[]> = {};
+  test('cancelling releases stock for sized and unsized items in one call', async () => {
+    const released: unknown[][] = [];
     const { orderRepo, cartRepo, productRepo } = makeRepos({
       orderRepo: {
         findById: async () => ({
@@ -268,11 +266,8 @@ describe('OrderService.cancelOrder', () => {
         cancelPending: async () => 1,
       },
       productRepo: {
-        incrementSizeStock: async (productId: string, size: string, quantity: number) => {
-          stockCalls.size = [productId, size, quantity];
-        },
-        incrementStock: async (productId: string, quantity: number) => {
-          stockCalls.plain = [productId, quantity];
+        release: async (_tx: unknown, items: unknown[]) => {
+          released.push(items);
         },
       },
     });
@@ -281,8 +276,12 @@ describe('OrderService.cancelOrder', () => {
     const dto = await service.cancelOrder('order-1', 'u1');
 
     expect(dto.status).toBe('PENDING');
-    expect(stockCalls.plain).toEqual(['p1', 2]);
-    expect(stockCalls.size).toEqual(['p1', 'M', 2]);
+    expect(released).toEqual([
+      [
+        { productId: 'p1', size: null, quantity: 2 },
+        { productId: 'p1', size: 'M', quantity: 2 },
+      ],
+    ]);
   });
 });
 

@@ -1,12 +1,68 @@
 import { Prisma, Product, ProductSize, ProductSlug } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
 import { PRODUCT_SELECT, type ProductWithRelations } from './product.selects';
 
+export type StockItem = {
+  productId: string;
+  size: ProductSize | null;
+  quantity: number;
+};
+
+export function availableStock(
+  product: Pick<ProductWithRelations, 'hasSizes' | 'stock' | 'sizeStocks'>,
+  size?: ProductSize | null,
+): number | null {
+  if (!product.hasSizes || !size) {
+    return product.stock;
+  }
+  return product.sizeStocks.find((sizeStock) => sizeStock.size === size)?.stock ?? null;
+}
+
 @Injectable()
 export class ProductRepo {
   constructor(private readonly prisma: PrismaService) {}
+
+  async reserve(tx: Prisma.TransactionClient | undefined, items: StockItem[]): Promise<void> {
+    const client = tx ?? this.prisma;
+
+    for (const item of items) {
+      const result = item.size
+        ? await client.productSizeStock.updateMany({
+            where: { productId: item.productId, size: item.size, stock: { gte: item.quantity } },
+            data: { stock: { decrement: item.quantity } },
+          })
+        : await client.product.updateMany({
+            where: { id: item.productId, stock: { gte: item.quantity } },
+            data: { stock: { decrement: item.quantity } },
+          });
+
+      if (result.count === 0) {
+        throw new ConflictException(
+          `Insufficient stock for product ${item.productId}${item.size ? ` (${item.size})` : ''}`,
+        );
+      }
+    }
+  }
+
+  async release(tx: Prisma.TransactionClient | undefined, items: StockItem[]): Promise<void> {
+    const client = tx ?? this.prisma;
+
+    for (const item of items) {
+      if (item.size) {
+        await client.productSizeStock.updateMany({
+          where: { productId: item.productId, size: item.size },
+          data: { stock: { increment: item.quantity } },
+        });
+      } else {
+        await client.product.updateMany({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+    }
+  }
 
   async findBySlug(slug: ProductSlug): Promise<ProductWithRelations | null> {
     return this.prisma.product.findUnique({
@@ -28,19 +84,6 @@ export class ProductRepo {
       where: { id },
       select: PRODUCT_SELECT,
     });
-  }
-
-  async getStockBySize(productId: string, size: ProductSize): Promise<number | null> {
-    const sizeStock = await this.prisma.productSizeStock.findUnique({
-      where: {
-        productId_size: {
-          productId,
-          size,
-        },
-      },
-    });
-
-    return sizeStock?.stock ?? null;
   }
 
   async updateStock(
@@ -88,78 +131,6 @@ export class ProductRepo {
         productId_size: {
           productId,
           size,
-        },
-      },
-    });
-  }
-
-  async decrementStock(
-    productId: string,
-    quantity: number,
-    tx?: Prisma.TransactionClient,
-  ): Promise<Product> {
-    return (tx ?? this.prisma).product.update({
-      where: { id: productId },
-      data: {
-        stock: {
-          decrement: quantity,
-        },
-      },
-    });
-  }
-
-  async decrementSizeStock(
-    productId: string,
-    size: ProductSize,
-    quantity: number,
-    tx?: Prisma.TransactionClient,
-  ): Promise<void> {
-    await (tx ?? this.prisma).productSizeStock.update({
-      where: {
-        productId_size: {
-          productId,
-          size,
-        },
-      },
-      data: {
-        stock: {
-          decrement: quantity,
-        },
-      },
-    });
-  }
-
-  async incrementStock(
-    productId: string,
-    quantity: number,
-    tx?: Prisma.TransactionClient,
-  ): Promise<Product> {
-    return (tx ?? this.prisma).product.update({
-      where: { id: productId },
-      data: {
-        stock: {
-          increment: quantity,
-        },
-      },
-    });
-  }
-
-  async incrementSizeStock(
-    productId: string,
-    size: ProductSize,
-    quantity: number,
-    tx?: Prisma.TransactionClient,
-  ): Promise<void> {
-    await (tx ?? this.prisma).productSizeStock.update({
-      where: {
-        productId_size: {
-          productId,
-          size,
-        },
-      },
-      data: {
-        stock: {
-          increment: quantity,
         },
       },
     });

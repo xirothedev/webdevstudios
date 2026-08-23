@@ -214,15 +214,14 @@ export class PaymentsService {
       await this.orderRepo.updateStatus(order.id, OrderStatus.CANCELLED);
 
       // Restore stock
-      for (const item of order.items) {
-        if (item.productId) {
-          if (item.size) {
-            await this.productRepo.incrementSizeStock(item.productId, item.size, item.quantity);
-          } else {
-            await this.productRepo.incrementStock(item.productId, item.quantity);
-          }
-        }
-      }
+      await this.productRepo.release(
+        undefined,
+        order.items.flatMap((item) =>
+          item.productId
+            ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
+            : [],
+        ),
+      );
 
       this.logger.log(
         `Payment failed for order ${order.code}, orderCode ${paymentData.orderCode}. Stock restored.`,

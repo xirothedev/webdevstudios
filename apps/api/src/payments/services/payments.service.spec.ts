@@ -63,8 +63,7 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
     ...overrides.orderRepo,
   } as unknown as OrderRepo;
   const productRepo = {
-    incrementStock: async () => calls.push('increment-stock'),
-    incrementSizeStock: async () => calls.push('increment-size-stock'),
+    release: async () => calls.push('release'),
     ...overrides.productRepo,
   } as unknown as ProductRepo;
   const payOSService = {
@@ -94,7 +93,7 @@ describe('PaymentsService.processWebhook', () => {
 
     await service.processWebhook(webhookBody('01'));
 
-    expect(calls).toEqual(['tx-update', 'payment-status', 'status', 'increment-stock']);
+    expect(calls).toEqual(['tx-update', 'payment-status', 'status', 'release']);
   });
 
   test('already-paid transactions are ignored (idempotency)', async () => {
