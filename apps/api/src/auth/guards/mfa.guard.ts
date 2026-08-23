@@ -22,14 +22,14 @@
 
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
-import { PrismaService } from '@/prisma';
+import { UserRepo } from '@/users/repo';
 import { SessionRepo } from '../repo';
 import { TokenStorageService } from '../infrastructure';
 
 @Injectable()
 export class MfaGuard implements CanActivate {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly userRepo: UserRepo,
     private readonly sessionRepo: SessionRepo,
     private readonly tokenStorage: TokenStorageService,
   ) {}
@@ -43,10 +43,7 @@ export class MfaGuard implements CanActivate {
     }
 
     // Check if user has 2FA enabled
-    const dbUser = await this.prisma.user.findUnique({
-      where: { id: user.id },
-      select: { mfaEnabled: true },
-    });
+    const dbUser = await this.userRepo.findById(user.id);
 
     if (!dbUser?.mfaEnabled) {
       throw new ForbiddenException('2FA is not enabled for this user');

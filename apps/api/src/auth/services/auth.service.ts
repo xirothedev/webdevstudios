@@ -1,4 +1,3 @@
-import { MFAMethod } from '@prisma/client';
 import {
   BadRequestException,
   ConflictException,
@@ -10,7 +9,6 @@ import * as argon2 from 'argon2';
 
 import { isBefore } from 'date-fns';
 
-import { PrismaService } from '@/prisma';
 import { UserRepo } from '@/users/repo';
 
 import { MailService } from '../../mail/mail.service';
@@ -22,7 +20,7 @@ import {
   Verify2FADto,
   VerifyEmailDto,
 } from '../dto';
-import { SessionRepo } from '../repo';
+import { MfaRepo, SessionRepo } from '../repo';
 import { TokenService, TokenStorageService, TotpService } from '../infrastructure';
 import { SessionIssuer } from './session-issuer.service';
 
@@ -31,10 +29,10 @@ export class AuthService {
   constructor(
     private readonly userRepo: UserRepo,
     private readonly sessionRepo: SessionRepo,
+    private readonly mfaRepo: MfaRepo,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
     private readonly totpService: TotpService,
-    private readonly prisma: PrismaService,
     private readonly mailService: MailService,
     private readonly sessionIssuer: SessionIssuer,
   ) {}
@@ -273,27 +271,9 @@ export class AuthService {
 
     const hashedBackupCodes = await Promise.all(backupCodes.map((code) => argon2.hash(code)));
 
-    await this.prisma.userMFAMethod.create({
-      data: {
-        userId,
-        methodType: MFAMethod.TOTP,
-        secret,
-        isActive: false,
-        isVerified: false,
-      },
-    });
+    await this.mfaRepo.provisionTotp(userId, secret, hashedBackupCodes);
 
-    await Promise.all(
-      hashedBackupCodes.map((hashedCode) =>
-        this.prisma.mFABackupCode.create({
-          data: {
-            userId,
-            code: hashedCode,
-          },
-        }),
-      ),
-    );
-
+    // Legacy mirror: MfaRepo.resolveSecret falls back to User.mfaSecret
     await this.userRepo.update(userId, {
       mfaSecret: secret,
     });
@@ -325,66 +305,23 @@ export class AuthService {
   }> {
     const { code, sessionId } = dto;
 
-    const user = await this.userRepo.findByIdWithSecrets(userId);
+    const user = await this.userRepo.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const mfaMethod = await this.prisma.userMFAMethod.findFirst({
-      where: {
-        userId,
-        methodType: MFAMethod.TOTP,
-        isActive: true,
-      },
-    });
-
-    if (!mfaMethod && !user.mfaSecret) {
-      throw new BadRequestException('2FA is not enabled for this user');
-    }
-
-    const secret = mfaMethod?.secret || user.mfaSecret;
+    const secret = await this.mfaRepo.resolveSecret(userId);
     if (!secret) {
-      throw new BadRequestException('2FA secret not found');
+      throw new BadRequestException('2FA is not enabled for this user');
     }
 
     const isValidTotp = this.totpService.verifyCode(secret, code);
 
     if (!isValidTotp) {
-      const backupCodes = await this.prisma.mFABackupCode.findMany({
-        where: {
-          userId,
-          isUsed: false,
-        },
-      });
+      const consumed = await this.mfaRepo.verifyBackupCodeAndConsume(userId, code);
 
-      let isValidBackup = false;
-      let usedBackupCodeId: string | null = null;
-
-      for (const backupCode of backupCodes) {
-        try {
-          const isValid = await argon2.verify(backupCode.code, code);
-          if (isValid) {
-            isValidBackup = true;
-            usedBackupCodeId = backupCode.id;
-            break;
-          }
-        } catch {
-          // Continue checking other codes
-        }
-      }
-
-      if (!isValidBackup) {
+      if (!consumed) {
         throw new UnauthorizedException('Invalid 2FA code');
-      }
-
-      if (usedBackupCodeId) {
-        await this.prisma.mFABackupCode.update({
-          where: { id: usedBackupCodeId },
-          data: {
-            isUsed: true,
-            usedAt: new Date(),
-          },
-        });
       }
     }
 
@@ -411,14 +348,9 @@ export class AuthService {
       };
     }
 
-    if (mfaMethod && !mfaMethod.isVerified) {
-      await this.prisma.userMFAMethod.update({
-        where: { id: mfaMethod.id },
-        data: {
-          isVerified: true,
-          isActive: true,
-        },
-      });
+    const activeTotp = await this.mfaRepo.findActiveTotp(userId);
+    if (activeTotp && !activeTotp.isVerified) {
+      await this.mfaRepo.activateTotp(activeTotp.id);
 
       await this.userRepo.update(userId, {
         mfaEnabled: true,

@@ -33,8 +33,8 @@ import { AuthController } from './auth.controller';
 import { GitHubOAuthGuard, GoogleOAuthGuard, MfaGuard } from './guards';
 // Infrastructure
 import { TokenService, TokenStorageService, TotpService } from './infrastructure';
-// Repository
-import { SessionRepo } from './repo';
+// Repositories
+import { ExternalAccountRepo, MfaRepo, SessionRepo } from './repo';
 // Services
 import {
   AuthCookies,
@@ -66,8 +66,10 @@ import { UsersModule } from '../users/users.module';
   ],
   controllers: [AuthController],
   providers: [
-    // Repository
+    // Repositories
     SessionRepo,
+    ExternalAccountRepo,
+    MfaRepo,
     // Infrastructure
     TokenService,
     TokenStorageService,
