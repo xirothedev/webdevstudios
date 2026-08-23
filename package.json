@@ -28,7 +28,8 @@
     "audit": "bun audit --audit-level=moderate",
     "audit:fix": "bun update --latest && bun audit --audit-level=moderate",
     "outdated": "bun outdated --recursive",
-    "lint:boundaries": "depcruise packages"
+    "lint:boundaries": "depcruise packages",
+    "lint:app-boundaries": "depcruise apps/api/src --config .dependency-cruiser.cjs --output-type err --exclude node_modules"
   },
   "devDependencies": {
     "dependency-cruiser": "^18.2.0",

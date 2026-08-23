@@ -2,7 +2,7 @@ import { OAuthProvider, Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-import { USER_SELECT, type UserRow } from '@/users/repo/user.selects';
+import { USER_SELECT, type UserRow } from '@/users/repo';
 
 export type ExternalAccountRow = {
   id: string;

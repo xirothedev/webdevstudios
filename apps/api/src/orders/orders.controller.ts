@@ -9,8 +9,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Roles, ThrottleAPI } from '@/common/decorators';
+import { CurrentUser, Roles, ThrottleAPI } from '@/common/decorators';
 import { RolesGuard } from '@/common/guards';
 import {
   CreateOrderDto,

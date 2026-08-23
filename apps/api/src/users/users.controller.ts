@@ -45,10 +45,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Public, Roles } from '@/common/decorators';
+import { CurrentUser, Public, Roles } from '@/common/decorators';
 import { RolesGuard } from '@/common/guards';
-import { FileValidationPipe } from '../storage/pipes/file-validation.pipe';
+import { FileValidationPipe } from '@/storage';
 import {
   PrivateUserDto,
   PublicUserDto,

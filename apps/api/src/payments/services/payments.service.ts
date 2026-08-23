@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 
 import { SecurityLoggerService } from '@/common/services';
-import { OrderService } from '@/orders/services/orders.service';
+import { OrderService } from '@/orders/services';
 import { OrderRepo } from '@/orders/repo';
 
 import { TransactionListResponseDto } from '../dto/payment.dto';
