@@ -218,3 +218,36 @@ export class OrdersController {
     return this.orderService.cancelOrder(id, user.id);
   }
 }
+
+@ApiTags('Orders')
+@Controller('admin/orders')
+export class AdminOrdersController {
+  constructor(private readonly orderService: OrderService) {}
+
+  @Post(':id/mark-paid')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Mark order as paid (Admin only)',
+    description:
+      'Settle an order as paid. Only PENDING orders can be claimed; the settle is idempotent.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Order ID',
+    example: 'clx1234567890',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Order marked as paid successfully',
+    type: OrderDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request - Order is not PENDING' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async markPaid(@Param('id') id: string): Promise<OrderDto> {
+    return this.orderService.markPaid(id);
+  }
+}

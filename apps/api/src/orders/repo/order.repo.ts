@@ -178,10 +178,29 @@ export class OrderRepo {
     return this.prisma.order.update({ where: { id }, data: { status }, select: ORDER_SELECT });
   }
 
-  async cancelPending(id: string): Promise<number> {
-    const res = await this.prisma.order.updateMany({
+  async cancelPending(id: string, tx?: Prisma.TransactionClient): Promise<number> {
+    const res = await (tx ?? this.prisma).order.updateMany({
       where: { id, status: OrderStatus.PENDING },
       data: { status: OrderStatus.CANCELLED },
+    });
+    return res.count;
+  }
+
+  // Conditional settle claim: PENDING-only, writes final status+paymentStatus in one row write
+  async claimSettled(id: string, paid: boolean, tx?: Prisma.TransactionClient): Promise<number> {
+    const res = await (tx ?? this.prisma).order.updateMany({
+      where: { id, status: OrderStatus.PENDING },
+      data: paid
+        ? { status: OrderStatus.CONFIRMED, paymentStatus: PaymentStatus.PAID }
+        : { status: OrderStatus.CANCELLED, paymentStatus: PaymentStatus.FAILED },
+    });
+    return res.count;
+  }
+
+  async expirePending(id: string, tx?: Prisma.TransactionClient): Promise<number> {
+    const res = await (tx ?? this.prisma).order.updateMany({
+      where: { id, status: OrderStatus.PENDING, paymentStatus: PaymentStatus.PENDING },
+      data: { status: OrderStatus.CANCELLED, paymentStatus: PaymentStatus.FAILED },
     });
     return res.count;
   }

@@ -2,8 +2,8 @@ import { BadRequestException, ConflictException, NotFoundException } from '@nest
 import { describe, expect, test } from 'bun:test';
 
 import type { SecurityLoggerService } from '@/common/services';
+import type { OrderService } from '@/orders/services/orders.service';
 import type { OrderRepo } from '@/orders/repo';
-import type { ProductRepo } from '@/products/repo';
 
 import type { PaymentRepo } from '../repo';
 import { PaymentsService, type PayOSWebhookBody } from './payments.service';
@@ -62,10 +62,13 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
     updateStatus: async () => calls.push('status'),
     ...overrides.orderRepo,
   } as unknown as OrderRepo;
-  const productRepo = {
-    release: async () => calls.push('release'),
-    ...overrides.productRepo,
-  } as unknown as ProductRepo;
+  const ordersService = {
+    settle: async (_orderId: string, opts: { paid: boolean }) => {
+      calls.push(`settle:${opts.paid}`);
+      return { id: _orderId, status: opts.paid ? 'CONFIRMED' : 'CANCELLED' };
+    },
+    ...overrides.ordersService,
+  } as unknown as OrderService;
   const payOSService = {
     verifyWebhook: async (body: PayOSWebhookBody) => ({ code: body.data.code, data: body.data }),
     ...overrides.payOSService,
@@ -75,25 +78,46 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
   } as unknown as SecurityLoggerService;
   return {
     calls,
-    service: new PaymentsService(paymentRepo, orderRepo, productRepo, payOSService, securityLogger),
+    service: new PaymentsService(
+      paymentRepo,
+      orderRepo,
+      ordersService,
+      payOSService,
+      securityLogger,
+    ),
   };
 };
 
 describe('PaymentsService.processWebhook', () => {
-  test('success code marks transaction PAID and order CONFIRMED without stock restore', async () => {
+  test('success code delegates a paid settle', async () => {
     const { calls, service } = makeDeps();
 
     await service.processWebhook(webhookBody('00'));
 
-    expect(calls).toEqual(['tx-update', 'payment-status', 'status']);
+    expect(calls).toEqual(['settle:true']);
   });
 
-  test('failed code cancels the order and restores stock', async () => {
+  test('failed code delegates an unpaid settle (restock handled by settle)', async () => {
     const { calls, service } = makeDeps();
 
     await service.processWebhook(webhookBody('01'));
 
-    expect(calls).toEqual(['tx-update', 'payment-status', 'status', 'release']);
+    expect(calls).toEqual(['settle:false']);
+  });
+
+  test('failure webhook on an expired order loses the settle claim and writes nothing', async () => {
+    const { calls, service } = makeDeps({
+      ordersService: { settle: async () => null },
+      paymentRepo: { updateStatus: async () => calls.push('tx-update') },
+      orderRepo: {
+        updatePaymentStatus: async () => calls.push('payment-status'),
+        updateStatus: async () => calls.push('status'),
+      },
+    });
+
+    await service.processWebhook(webhookBody('01'));
+
+    expect(calls).toEqual([]);
   });
 
   test('already-paid transactions are ignored (idempotency)', async () => {

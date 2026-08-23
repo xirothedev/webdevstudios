@@ -1,4 +1,4 @@
-import { PaymentTransactionStatus, OrderStatus, PaymentStatus } from '@prisma/client';
+import { PaymentTransactionStatus } from '@prisma/client';
 import {
   BadRequestException,
   ConflictException,
@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 
 import { SecurityLoggerService } from '@/common/services';
+import { OrderService } from '@/orders/services/orders.service';
 import { OrderRepo } from '@/orders/repo';
-import { ProductRepo } from '@/products/repo';
 
 import { TransactionListResponseDto } from '../dto/payment.dto';
 import { PaymentRepo } from '../repo';
@@ -42,7 +42,7 @@ export class PaymentsService {
   constructor(
     private readonly paymentRepo: PaymentRepo,
     private readonly orderRepo: OrderRepo,
-    private readonly productRepo: ProductRepo,
+    private readonly ordersService: OrderService,
     private readonly payOSService: PayOSService,
     private readonly securityLogger: SecurityLoggerService,
   ) {}
@@ -186,45 +186,21 @@ export class PaymentsService {
     // PayOS webhook codes: 00 = success, others = failed/cancelled
     const isSuccess = paymentData.code === '00' || verifiedData.code === '00';
 
-    if (isSuccess) {
-      // Payment successful
-      await this.paymentRepo.updateStatus(
-        paymentTransaction.id,
-        PaymentTransactionStatus.PAID,
-        verifiedData,
-      );
+    // Settle owns the conditional claim: status, paymentStatus, transaction row
+    // and stock release happen once inside its transaction; a lost claim (e.g.
+    // the order expired meanwhile) no-ops here.
+    const settled = await this.ordersService.settle(order.id, {
+      paid: isSuccess,
+      payosData: verifiedData,
+    });
 
-      await this.orderRepo.updatePaymentStatus(order.id, PaymentStatus.PAID);
-
-      await this.orderRepo.updateStatus(order.id, OrderStatus.CONFIRMED);
-
+    if (settled) {
       this.logger.log(
-        `Payment successful for order ${order.code}, orderCode ${paymentData.orderCode}`,
+        `Payment ${isSuccess ? 'successful' : 'failed'} for order ${order.code}, orderCode ${paymentData.orderCode}`,
       );
     } else {
-      // Payment failed or cancelled
-      await this.paymentRepo.updateStatus(
-        paymentTransaction.id,
-        PaymentTransactionStatus.FAILED,
-        verifiedData,
-      );
-
-      await this.orderRepo.updatePaymentStatus(order.id, PaymentStatus.FAILED);
-
-      await this.orderRepo.updateStatus(order.id, OrderStatus.CANCELLED);
-
-      // Restore stock
-      await this.productRepo.release(
-        undefined,
-        order.items.flatMap((item) =>
-          item.productId
-            ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
-            : [],
-        ),
-      );
-
       this.logger.log(
-        `Payment failed for order ${order.code}, orderCode ${paymentData.orderCode}. Stock restored.`,
+        `Settlement already resolved for order ${order.code}, orderCode ${paymentData.orderCode} - skipping`,
       );
     }
   }
