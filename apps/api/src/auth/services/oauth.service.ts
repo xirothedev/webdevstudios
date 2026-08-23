@@ -20,27 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
-import * as UAParser from 'ua-parser-js';
 
-import { addDays } from 'date-fns';
-import { randomUUID } from 'crypto';
 import { PrismaService } from '@/prisma';
 import { UserRepo } from '@/users/repo';
 
-import { SessionRepo } from '../repo';
-import { TokenService, TokenStorageService } from '../infrastructure';
+import { SessionIssuer } from './session-issuer.service';
 import { OAuthProfile } from '../strategies';
 
 @Injectable()
 export class OAuthService {
   constructor(
     private readonly userRepo: UserRepo,
-    private readonly sessionRepo: SessionRepo,
-    private readonly tokenService: TokenService,
-    private readonly tokenStorage: TokenStorageService,
     private readonly prisma: PrismaService,
+    private readonly sessionIssuer: SessionIssuer,
   ) {}
 
   async handleOAuthCallback(
@@ -123,60 +116,13 @@ export class OAuthService {
       }
     }
 
-    // Create device record
-    let deviceId: string | undefined;
-    if (userAgent) {
-      const parser = new UAParser.UAParser(userAgent);
-      const result = parser.getResult();
-      const deviceType = this.getDeviceType(result);
-      const deviceName = this.getDeviceName(result);
-
-      const device = await this.prisma.device.create({
-        data: {
-          userId: user.id,
-          name: deviceName,
-          type: deviceType,
-          userAgent,
-          ipAddress,
-          fingerprint: this.generateFingerprint(userAgent, ipAddress),
-        },
-      });
-      deviceId = device.id;
-    }
-
-    // Generate tokens
-    const sessionId = randomUUID();
-    const accessToken = this.tokenService.generateAccessToken(
-      {
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      sessionId,
-    );
-
-    const refreshToken = this.tokenService.generateRefreshToken({
-      sub: user.id,
+    // OAuth authentication is treated as inherently stronger than password
+    const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
+      ip: ipAddress,
+      userAgent,
+      mfaTrusted: true,
+      ttlSeconds: 30 * 24 * 60 * 60,
     });
-
-    // Create session
-    const expiresAt = addDays(new Date(), 30); // 30 days
-    const session = await this.sessionRepo.create(
-      {
-        userId: user.id,
-        token: accessToken,
-        refreshToken,
-        deviceId,
-        ipAddress,
-        userAgent,
-        expiresAt,
-      },
-      sessionId,
-    );
-
-    // Mark MFA as verified (OAuth users don't need 2FA for OAuth login)
-    const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
-    await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
 
     return {
       accessToken,
@@ -188,36 +134,5 @@ export class OAuthService {
         emailVerified: user.emailVerified,
       },
     };
-  }
-
-  private getDeviceType(parser: UAParser.IResult): DeviceType {
-    const { device } = parser;
-    if (device?.type === 'mobile') return DeviceType.MOBILE;
-    if (device?.type === 'tablet') return DeviceType.TABLET;
-    return DeviceType.DESKTOP;
-  }
-
-  private getDeviceName(parser: UAParser.IResult): string {
-    const browser = parser.browser;
-    const os = parser.os;
-    const device = parser.device;
-
-    const parts: string[] = [];
-    if (device?.vendor && device?.model) {
-      parts.push(`${device.vendor} ${device.model}`);
-    }
-    if (os?.name) {
-      parts.push(os.name);
-    }
-    if (browser?.name) {
-      parts.push(browser.name);
-    }
-
-    return parts.join(' - ') || 'Unknown Device';
-  }
-
-  private generateFingerprint(userAgent?: string, ipAddress?: string): string {
-    const parts = [userAgent || '', ipAddress || ''];
-    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255);
   }
 }

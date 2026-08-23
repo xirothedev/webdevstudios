@@ -43,24 +43,6 @@ const makeService = (overrides: Record<string, Record<string, unknown>> = {}) =>
       },
       ...overrides.userRepo,
     },
-    sessionRepo: {
-      create: async (data: Record<string, unknown>) => {
-        calls.push('session-create');
-        return { id: 'session-oauth', ...data };
-      },
-      ...overrides.sessionRepo,
-    },
-    tokenService: {
-      generateAccessToken: () => 'access-oauth',
-      generateRefreshToken: () => 'refresh-oauth',
-      ...overrides.tokenService,
-    },
-    tokenStorage: {
-      storeSessionMfaVerified: async (sessionId: string, ttl: number) => {
-        calls.push(`mfa-flag:${sessionId}:${ttl}`);
-      },
-      ...overrides.tokenStorage,
-    },
     prisma: {
       externalAccount: {
         findUnique: async () => null,
@@ -74,22 +56,24 @@ const makeService = (overrides: Record<string, Record<string, unknown>> = {}) =>
         },
         ...overrides.externalAccount,
       },
-      device: {
-        create: async ({ data }: { data: Record<string, unknown> }) => {
-          calls.push('device-create');
-          return { id: 'device-1', ...data };
-        },
-        ...overrides.device,
-      },
       ...overrides.prismaRoot,
+    },
+    sessionIssuer: {
+      issue: async (userId: string, opts: Record<string, unknown>) => {
+        calls.push(`issuer-issue:${JSON.stringify({ userId, opts })}`);
+        return {
+          session: { id: 'session-oauth' },
+          accessToken: 'access-oauth',
+          refreshToken: 'refresh-oauth',
+        };
+      },
+      ...overrides.sessionIssuer,
     },
   };
   const service = new OAuthService(
     deps.userRepo as unknown as UserRepo,
-    deps.sessionRepo as never,
-    deps.tokenService as never,
-    deps.tokenStorage as never,
     deps.prisma as never,
+    deps.sessionIssuer as never,
   );
   return { calls, service };
 };
@@ -167,26 +151,10 @@ describe('OAuthService.handleOAuthCallback', () => {
 
     await service.handleOAuthCallback(oauthUser);
 
-    // 30 days ± scheduler slop
-    const flag = calls.find((c) => c.startsWith('mfa-flag'));
-    expect(flag).toBeTruthy();
-    const ttl = Number(flag!.split(':')[2]);
-    expect(ttl).toBeGreaterThan(29 * 24 * 3600);
-    expect(ttl).toBeLessThanOrEqual(30 * 24 * 3600);
-  });
-
-  test('no userAgent means no device row', async () => {
-    const { calls, service } = makeService({
-      externalAccount: { findUnique: async () => ({ ...externalAccount }) },
-      device: {
-        create: async () => {
-          throw new Error('must not create a device without userAgent');
-        },
-      },
-    });
-
-    await service.handleOAuthCallback(oauthUser, '10.0.0.9');
-
-    expect(calls).toContain('session-create');
+    const issueCall = calls.find((c) => c.startsWith('issuer-issue'));
+    expect(issueCall).toBeTruthy();
+    const { userId, opts } = JSON.parse(issueCall!.slice('issuer-issue:'.length));
+    expect(userId).toBe('user-1');
+    expect(opts).toMatchObject({ mfaTrusted: true, ttlSeconds: 30 * 24 * 60 * 60 });
   });
 });

@@ -1,4 +1,4 @@
-import { DeviceType, MFAMethod } from '@prisma/client';
+import { MFAMethod } from '@prisma/client';
 import {
   BadRequestException,
   ConflictException,
@@ -7,10 +7,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as argon2 from 'argon2';
-import * as UAParser from 'ua-parser-js';
 
-import { addDays, addSeconds, isBefore } from 'date-fns';
-import { randomUUID } from 'crypto';
+import { isBefore } from 'date-fns';
 
 import { PrismaService } from '@/prisma';
 import { UserRepo } from '@/users/repo';
@@ -26,6 +24,7 @@ import {
 } from '../dto';
 import { SessionRepo } from '../repo';
 import { TokenService, TokenStorageService, TotpService } from '../infrastructure';
+import { SessionIssuer } from './session-issuer.service';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +36,7 @@ export class AuthService {
     private readonly totpService: TotpService,
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
+    private readonly sessionIssuer: SessionIssuer,
   ) {}
 
   async register(dto: RegisterDto): Promise<{ userId: string }> {
@@ -136,59 +136,13 @@ export class AuthService {
       };
     }
 
-    let deviceId: string | undefined;
-    if (userAgent) {
-      const parser = new UAParser.UAParser(userAgent);
-      const result = parser.getResult();
-
-      const device = await this.prisma.device.create({
-        data: {
-          userId: user.id,
-          name: this.getDeviceName(result),
-          type: this.getDeviceType(result),
-          userAgent,
-          ipAddress,
-          fingerprint: this.generateFingerprint(userAgent, ipAddress),
-        },
-      });
-      deviceId = device.id;
-    }
-
-    const sessionId = randomUUID();
-    const accessToken = this.tokenService.generateAccessToken(
-      {
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      sessionId,
-    );
-
-    const refreshToken = this.tokenService.generateRefreshToken({
-      sub: user.id,
+    const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
+      ip: ipAddress,
+      userAgent,
+      mfaTrusted: !user.mfaEnabled,
+      // ponytail: rememberMe ? 30d : 7d, mirrors cookie maxAge in controller
+      ttlSeconds: dto.rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
     });
-
-    // ponytail: rememberMe ? 30d : 7d, mirrors cookie maxAge in controller
-    const expiresIn = dto.rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
-    const expiresAt = addSeconds(new Date(), expiresIn);
-
-    const session = await this.sessionRepo.create(
-      {
-        userId: user.id,
-        token: accessToken,
-        refreshToken,
-        deviceId,
-        ipAddress,
-        userAgent,
-        expiresAt,
-      },
-      sessionId,
-    );
-
-    if (!user.mfaEnabled) {
-      const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
-      await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
-    }
 
     return {
       accessToken,
@@ -429,54 +383,12 @@ export class AuthService {
     }
 
     if (sessionId) {
-      let deviceId: string | undefined;
-      if (userAgent) {
-        const parser = new UAParser.UAParser(userAgent);
-        const result = parser.getResult();
-
-        const device = await this.prisma.device.create({
-          data: {
-            userId: user.id,
-            name: this.getDeviceName(result),
-            type: this.getDeviceType(result),
-            userAgent,
-            ipAddress,
-            fingerprint: this.generateFingerprint(userAgent, ipAddress),
-          },
-        });
-        deviceId = device.id;
-      }
-
-      const sessionId = randomUUID();
-      const accessToken = this.tokenService.generateAccessToken(
-        {
-          sub: user.id,
-          email: user.email,
-          role: user.role,
-        },
-        sessionId,
-      );
-
-      const refreshToken = this.tokenService.generateRefreshToken({
-        sub: user.id,
+      const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
+        ip: ipAddress,
+        userAgent,
+        mfaTrusted: true,
+        ttlSeconds: 7 * 24 * 60 * 60,
       });
-
-      const expiresAt = addDays(new Date(), 7);
-      const session = await this.sessionRepo.create(
-        {
-          userId: user.id,
-          token: accessToken,
-          refreshToken,
-          deviceId,
-          ipAddress,
-          userAgent,
-          expiresAt,
-        },
-        sessionId,
-      );
-
-      const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
-      await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
 
       return {
         accessToken,
@@ -547,36 +459,5 @@ export class AuthService {
     await this.tokenStorage.deletePasswordResetToken(dto.token);
 
     return { success: true };
-  }
-
-  private getDeviceType(parser: UAParser.IResult): DeviceType {
-    const { device } = parser;
-    if (device?.type === 'mobile') return DeviceType.MOBILE;
-    if (device?.type === 'tablet') return DeviceType.TABLET;
-    return DeviceType.DESKTOP;
-  }
-
-  private getDeviceName(parser: UAParser.IResult): string {
-    const browser = parser.browser;
-    const os = parser.os;
-    const device = parser.device;
-
-    const parts: string[] = [];
-    if (device.vendor && device.model) {
-      parts.push(`${device.vendor} ${device.model}`);
-    }
-    if (os.name) {
-      parts.push(os.name);
-    }
-    if (browser.name) {
-      parts.push(browser.name);
-    }
-
-    return parts.join(' - ') || 'Unknown Device';
-  }
-
-  private generateFingerprint(userAgent?: string, ipAddress?: string): string {
-    const parts = [userAgent || '', ipAddress || ''];
-    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255);
   }
 }

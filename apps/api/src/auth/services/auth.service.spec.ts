@@ -33,6 +33,7 @@ type DepOverrides = {
   tokenService?: Record<string, unknown>;
   tokenStorage?: Record<string, unknown>;
   mailService?: Record<string, unknown>;
+  sessionIssuer?: Record<string, unknown>;
 };
 
 const makeDeps = (
@@ -59,6 +60,14 @@ const makeDeps = (
       },
     },
     mailService: overrides.mailService ?? {},
+    sessionIssuer: {
+      issue: async () => ({
+        session: { id: 'session-issued' },
+        accessToken: 'access-issued',
+        refreshToken: 'refresh-issued',
+      }),
+      ...overrides.sessionIssuer,
+    },
   };
   return new AuthService(
     deps.userRepo as unknown as UserRepo,
@@ -68,6 +77,7 @@ const makeDeps = (
     deps.totpService as never,
     deps.prisma as never,
     deps.mailService as never,
+    deps.sessionIssuer as never,
   );
 };
 
@@ -424,6 +434,7 @@ describe('AuthService.enable2FA', () => {
       totpService as never,
       prisma as never,
       {} as never,
+      {} as never,
     );
 
     const result = await service.enable2FA('user-1');
@@ -481,6 +492,17 @@ describe('AuthService.verify2FA', () => {
       },
       ...overrides.sessionRepo,
     };
+    const sessionIssuer = {
+      issue: async (userId: string, opts: Record<string, unknown>) => {
+        calls.push(`issuer-issue:${JSON.stringify({ userId, opts })}`);
+        return {
+          session: { id: 'session-9' },
+          accessToken: 'access-issued',
+          refreshToken: 'refresh-issued',
+        };
+      },
+      ...(overrides.sessionIssuer ?? {}),
+    };
     const service = new AuthService(
       {
         findByIdWithSecrets: async () => ('user' in overrides ? overrides.user : mfaUser),
@@ -505,6 +527,7 @@ describe('AuthService.verify2FA', () => {
       } as never,
       prisma as never,
       {} as never,
+      sessionIssuer as never,
     );
     return { calls, service };
   };
@@ -569,7 +592,7 @@ describe('AuthService.verify2FA', () => {
     );
   });
 
-  test('challenge completion issues tokens, a session, and stores the MFA flag', async () => {
+  test('challenge completion issues through the SessionIssuer with the 7-day policy', async () => {
     const { calls, service } = makeMfaDeps({});
 
     const result = await service.verify2FA(
@@ -579,12 +602,63 @@ describe('AuthService.verify2FA', () => {
       'Mozilla/5.0 (iPhone)',
     );
 
-    expect(result.accessToken).toBe('access-1');
-    expect(result.refreshToken).toBe('refresh-1');
+    expect(result.accessToken).toBe('access-issued');
+    expect(result.refreshToken).toBe('refresh-issued');
     expect(result.user).toMatchObject({ id: baseUser.id, email: baseUser.email });
-    for (const step of ['device-create', 'session-create', 'store-mfa']) {
-      expect(calls).toContain(step);
-    }
+    const issueCall = calls.find((c) => c.startsWith('issuer-issue'));
+    expect(issueCall).toBeTruthy();
+    const { userId, opts } = JSON.parse(issueCall!.slice('issuer-issue:'.length));
+    expect(userId).toBe(baseUser.id);
+    expect(opts).toMatchObject({
+      ip: '10.0.0.1',
+      userAgent: 'Mozilla/5.0 (iPhone)',
+      mfaTrusted: true,
+      ttlSeconds: 7 * 24 * 60 * 60,
+    });
+  });
+});
+
+describe('AuthService.login issuance policy', () => {
+  const loginUser = async (rememberMe: boolean) => {
+    let issueArgs: unknown[] = [];
+    const hashed = await argon2.hash('pw');
+    const service = makeDeps(
+      { findByEmail: async () => ({ ...baseUser, password: hashed }) },
+      {
+        sessionIssuer: {
+          issue: async (...args: unknown[]) => {
+            issueArgs = args;
+            return { session: { id: 's1' }, accessToken: 'a', refreshToken: 'r' };
+          },
+        },
+      },
+    );
+
+    const result = await service.login({
+      email: baseUser.email,
+      password: 'pw',
+      rememberMe,
+    } as never);
+
+    return { result, issueArgs };
+  };
+
+  test('rememberMe extends the session to 30 days', async () => {
+    const { result, issueArgs } = await loginUser(true);
+
+    expect(result.accessToken).toBe('a');
+    expect(issueArgs[0]).toBe(baseUser.id);
+    // reached only past the MFA challenge, so the flag is always stored
+    expect(issueArgs[1]).toMatchObject({
+      mfaTrusted: true,
+      ttlSeconds: 30 * 24 * 60 * 60,
+    });
+  });
+
+  test('default login keeps the session at 7 days', async () => {
+    const { issueArgs } = await loginUser(false);
+
+    expect(issueArgs[1]).toMatchObject({ ttlSeconds: 7 * 24 * 60 * 60 });
   });
 });
 
