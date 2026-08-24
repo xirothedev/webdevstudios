@@ -55,3 +55,11 @@ next-env.d.ts
 *.swp
 *.swo
 *~
+
+# Go twin local secrets
+apps/api-go/.env
+
+# build artifacts
+apps/api-go/server
+apps/api-go/api-go
+*.exe

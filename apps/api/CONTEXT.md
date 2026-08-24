@@ -31,7 +31,7 @@ Adding a provider requires:
 A logged-in device session holding a refresh token. Sessions created via OAuth are considered MFA-verified by issuance — OAuth authentication is treated as inherently stronger than password.
 
 ### User
-Registered account with role `USER` or `ADMIN`. Can be created via password registration or via OAuth linking. Email is unique and normalized case-insensitively.
+Registered account with role `CUSTOMER` or `ADMIN`. Can be created via password registration or via OAuth linking. Email is unique and normalized case-insensitively.
 
 ## Invariants
 - `ExternalAccount.providerId` is unique per `provider` via composite key.
