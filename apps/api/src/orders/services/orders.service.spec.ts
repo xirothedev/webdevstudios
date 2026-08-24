@@ -28,6 +28,10 @@ const makePrisma = () => {
         items: [],
       }),
     },
+    paymentTransaction: {
+      findUnique: async () => null,
+      update: async () => ({}),
+    },
     productSizeStock: { updateMany: async () => ({ count: 1 }) },
     product: { update: async () => ({}) },
   };
@@ -65,7 +69,8 @@ const makeRepos = (
   } as unknown as CartRepo;
   const productRepo = {
     findById: async () => baseProduct,
-    getStockBySize: async () => null,
+    reserve: async () => {},
+    release: async () => {},
     ...overrides.productRepo,
   } as unknown as ProductRepo;
   return { orderRepo, cartRepo, productRepo };
@@ -192,16 +197,14 @@ describe('OrderService.updateOrderStatus', () => {
     );
   });
 
-  test('confirming a pending-payment order marks it PAID', async () => {
-    let paymentStatusUpdate: string | undefined;
-    // ponytail: queue simulates row state before/after the payment-status write
-    const rows = [baseOrder, { ...baseOrder, status: 'CONFIRMED', paymentStatus: 'PAID' }];
+  test('confirming never touches the payment status', async () => {
+    let paymentTouched = false;
     const { orderRepo, cartRepo, productRepo } = makeRepos({
       orderRepo: {
-        findById: async () => rows.shift(),
-        updateStatus: async () => ({ ...baseOrder, status: 'CONFIRMED' }),
-        updatePaymentStatus: async (_id: string, status: string) => {
-          paymentStatusUpdate = status;
+        findById: async () => ({ ...baseOrder }),
+        updateStatus: async (_id: string, status: string) => ({ ...baseOrder, status }),
+        updatePaymentStatus: async () => {
+          paymentTouched = true;
           return {};
         },
       },
@@ -210,9 +213,170 @@ describe('OrderService.updateOrderStatus', () => {
 
     const dto = await service.updateOrderStatus('order-1', 'CONFIRMED', 'ADMIN');
 
-    expect(paymentStatusUpdate).toBe('PAID');
+    expect(dto.status).toBe('CONFIRMED');
+    expect(dto.paymentStatus).toBe('PENDING');
+    expect(paymentTouched).toBe(false);
+  });
+});
+describe('OrderService.settle', () => {
+  const makeSettleDeps = (
+    overrides: {
+      claimSettled?: (id: string, paid: boolean) => Promise<number>;
+      paymentTx?: unknown;
+    } = {},
+  ) => {
+    const events: string[] = [];
+    let txStatus: string | undefined;
+    // ponytail: fake row state flips when a claim wins, mirroring updateMany
+    let settledState: { paid: boolean } | null = null;
+    const claim =
+      overrides.claimSettled ??
+      (async (_id: string, paid: boolean) => {
+        settledState = { paid };
+        return 1;
+      });
+    const tx = {
+      order: { updateMany: async () => ({ count: 0 }) },
+      paymentTransaction: {
+        findUnique: async () => (overrides.paymentTx === undefined ? null : { id: 'ptx-1' }),
+        update: async ({ data }: { data: { status: string } }) => {
+          txStatus = data.status;
+          return {};
+        },
+      },
+      productSizeStock: { updateMany: async () => events.push('size-release') },
+      product: { update: async () => events.push('stock-release') },
+    };
+    const prisma = {
+      $transaction: async (fn: (t: unknown) => Promise<unknown>) => fn(tx),
+    } as unknown as PrismaService;
+    const { orderRepo, cartRepo, productRepo } = makeRepos({
+      orderRepo: {
+        findById: async () => {
+          if (!settledState) return { ...baseOrder };
+          return {
+            ...baseOrder,
+            status: settledState.paid ? 'CONFIRMED' : 'CANCELLED',
+            paymentStatus: settledState.paid ? 'PAID' : 'FAILED',
+          };
+        },
+        claimSettled: async (id: string, paid: boolean) => {
+          const count = await claim(id, paid);
+          if (count > 0) settledState = { paid };
+          return count;
+        },
+      },
+      productRepo: {
+        release: async () => events.push('release'),
+      },
+    });
+    const service = new OrderService(orderRepo, cartRepo, productRepo, prisma);
+    return { events, getTxStatus: () => txStatus, service };
+  };
+
+  test('winning the claim settles PAID without restocking', async () => {
+    let claimedPaid: boolean | undefined;
+    const { events, getTxStatus, service } = makeSettleDeps({
+      claimSettled: async (_id, paid) => {
+        claimedPaid = paid;
+        return 1;
+      },
+      paymentTx: { id: 'ptx-1' },
+    });
+
+    const dto = await service.settle('order-1', { paid: true });
+
+    expect(claimedPaid).toBe(true);
+    expect(getTxStatus()).toBe('PAID');
+    expect(dto?.status).toBe('CONFIRMED');
+    expect(dto?.paymentStatus).toBe('PAID');
+    expect(events).toEqual([]);
+  });
+
+  test('settling twice claims once and rests stock exactly once', async () => {
+    let claims = 0;
+    const { events, service } = makeSettleDeps({
+      claimSettled: async () => (++claims === 1 ? 1 : 0),
+    });
+
+    const first = await service.settle('order-1', { paid: false });
+    const second = await service.settle('order-1', { paid: false });
+
+    expect(first?.status).toBe('CANCELLED');
+    expect(first?.paymentStatus).toBe('FAILED');
+    expect(second).toBeNull();
+    expect(events).toEqual(['release']);
+  });
+
+  test('unpaid settle fails the transaction row and releases inside the transaction', async () => {
+    const { events, getTxStatus, service } = makeSettleDeps({
+      paymentTx: { id: 'ptx-1' },
+    });
+
+    await service.settle('order-1', { paid: false });
+
+    expect(getTxStatus()).toBe('FAILED');
+    expect(events).toEqual(['release']);
+  });
+
+  test('losing the claim no-ops without stock or transaction writes', async () => {
+    const { events, getTxStatus, service } = makeSettleDeps({
+      claimSettled: async () => 0,
+      paymentTx: { id: 'ptx-1' },
+    });
+
+    const result = await service.settle('order-1', { paid: true });
+
+    expect(result).toBeNull();
+    expect(getTxStatus()).toBeUndefined();
+    expect(events).toEqual([]);
+  });
+});
+
+describe('OrderService.markPaid', () => {
+  test('marks a PENDING order paid via the settle claim', async () => {
+    let released = false;
+    const { orderRepo, cartRepo, productRepo } = makeRepos({
+      orderRepo: {
+        findById: async () => ({
+          ...baseOrder,
+          status: 'CONFIRMED',
+          paymentStatus: 'PAID',
+        }),
+        claimSettled: async (_id: string, paid: boolean) => (paid ? 1 : 0),
+      },
+      productRepo: {
+        release: async () => {
+          released = true;
+        },
+      },
+    });
+    const service = new OrderService(orderRepo, cartRepo, productRepo, makePrisma());
+
+    const dto = await service.markPaid('order-1');
+
     expect(dto.status).toBe('CONFIRMED');
     expect(dto.paymentStatus).toBe('PAID');
+    expect(released).toBe(false);
+  });
+
+  test('non-PENDING orders are rejected PENDING-only', async () => {
+    let released = false;
+    const { orderRepo, cartRepo, productRepo } = makeRepos({
+      orderRepo: {
+        findById: async () => ({ ...baseOrder }),
+        claimSettled: async () => 0,
+      },
+      productRepo: {
+        release: async () => {
+          released = true;
+        },
+      },
+    });
+    const service = new OrderService(orderRepo, cartRepo, productRepo, makePrisma());
+
+    await expect(service.markPaid('order-1')).rejects.toThrow(BadRequestException);
+    expect(released).toBe(false);
   });
 });
 
@@ -236,29 +400,26 @@ describe('OrderService.cancelOrder', () => {
   });
 
   test('losing the concurrent claim is rejected without stock changes', async () => {
-    const stockCalls: unknown[][] = [];
+    let releaseCalled = false;
     const { orderRepo, cartRepo, productRepo } = makeRepos({
       orderRepo: {
         findById: async () => ({ ...baseOrder }),
         cancelPending: async () => 0,
       },
       productRepo: {
-        incrementSizeStock: async (...args: unknown[]) => {
-          stockCalls.push(args);
-        },
-        incrementStock: async (...args: unknown[]) => {
-          stockCalls.push(args);
+        release: async () => {
+          releaseCalled = true;
         },
       },
     });
     const service = new OrderService(orderRepo, cartRepo, productRepo, makePrisma());
 
     await expect(service.cancelOrder('order-1', 'u1')).rejects.toThrow(BadRequestException);
-    expect(stockCalls).toEqual([]);
+    expect(releaseCalled).toBe(false);
   });
 
-  test('cancelling restores stock for sized and unsized items', async () => {
-    const stockCalls: Record<string, unknown[]> = {};
+  test('cancelling releases stock for sized and unsized items in one call', async () => {
+    const released: unknown[][] = [];
     const { orderRepo, cartRepo, productRepo } = makeRepos({
       orderRepo: {
         findById: async () => ({
@@ -268,11 +429,8 @@ describe('OrderService.cancelOrder', () => {
         cancelPending: async () => 1,
       },
       productRepo: {
-        incrementSizeStock: async (productId: string, size: string, quantity: number) => {
-          stockCalls.size = [productId, size, quantity];
-        },
-        incrementStock: async (productId: string, quantity: number) => {
-          stockCalls.plain = [productId, quantity];
+        release: async (_tx: unknown, items: unknown[]) => {
+          released.push(items);
         },
       },
     });
@@ -281,8 +439,12 @@ describe('OrderService.cancelOrder', () => {
     const dto = await service.cancelOrder('order-1', 'u1');
 
     expect(dto.status).toBe('PENDING');
-    expect(stockCalls.plain).toEqual(['p1', 2]);
-    expect(stockCalls.size).toEqual(['p1', 'M', 2]);
+    expect(released).toEqual([
+      [
+        { productId: 'p1', size: null, quantity: 2 },
+        { productId: 'p1', size: 'M', quantity: 2 },
+      ],
+    ]);
   });
 });
 
@@ -315,9 +477,14 @@ describe('OrderService.expireOrder', () => {
     await service.expireOrder('order-1');
   });
 
-  test('losing the concurrent expiry claim skips stock restore', async () => {
+  test('losing the concurrent expiry claim skips stock restore and txn update', async () => {
+    const events: string[] = [];
     const tx = {
       order: { updateMany: async () => ({ count: 0 }) },
+      paymentTransaction: {
+        findUnique: async () => ({ id: 'ptx-1' }),
+        update: async () => events.push('ptx'),
+      },
       productSizeStock: {
         updateMany: async () => {
           throw new Error('stock must not be restored');
@@ -333,11 +500,51 @@ describe('OrderService.expireOrder', () => {
       $transaction: async (fn: (t: unknown) => Promise<unknown>) => fn(tx),
     } as unknown as PrismaService;
     const { orderRepo, cartRepo, productRepo } = makeRepos({
-      orderRepo: { findById: async () => ({ ...baseOrder }) },
+      orderRepo: {
+        findById: async () => ({ ...baseOrder }),
+        expirePending: async () => 0,
+      },
+      productRepo: {
+        release: async () => {
+          throw new Error('stock must not be restored');
+        },
+      },
     });
     const service = new OrderService(orderRepo, cartRepo, productRepo, prisma);
 
     await service.expireOrder('order-1');
+
+    expect(events).toEqual([]);
+  });
+
+  test('winning the expiry claim releases stock then expires the transaction', async () => {
+    const events: string[] = [];
+    const tx = {
+      order: { updateMany: async () => ({ count: 1 }) },
+      paymentTransaction: {
+        findUnique: async () => ({ id: 'ptx-1' }),
+        update: async ({ data }: { data: { status: string } }) => events.push(`ptx:${data.status}`),
+      },
+      productSizeStock: { updateMany: async () => {} },
+      product: { update: async () => {} },
+    };
+    const prisma = {
+      $transaction: async (fn: (t: unknown) => Promise<unknown>) => fn(tx),
+    } as unknown as PrismaService;
+    const { orderRepo, cartRepo, productRepo } = makeRepos({
+      orderRepo: {
+        findById: async () => ({ ...baseOrder }),
+        expirePending: async () => 1,
+      },
+      productRepo: {
+        release: async () => events.push('release'),
+      },
+    });
+    const service = new OrderService(orderRepo, cartRepo, productRepo, prisma);
+
+    await service.expireOrder('order-1');
+
+    expect(events).toEqual(['release', 'ptx:EXPIRED']);
   });
 });
 

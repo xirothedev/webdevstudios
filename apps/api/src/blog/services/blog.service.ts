@@ -10,7 +10,7 @@ import {
   SearchBlogPostsQueryDto,
   UpdateBlogPostDto,
 } from '../dto';
-import { BlogPostRepo } from '../repo';
+import { BlogPostRepo, type BlogPostUpdateData } from '../repo';
 
 @Injectable()
 export class BlogService {
@@ -27,12 +27,11 @@ export class BlogService {
       throw new ConflictException(`Blog post with slug "${dto.slug}" already exists`);
     }
 
-    const contentUrl = await this.storageService.uploadBlogContent(dto.slug, dto.content);
-
-    return this.blogRepository.create({
+    // The content key derives from the post id, so the row must exist before uploading.
+    const created = await this.blogRepository.create({
       slug: dto.slug,
       title: dto.title,
-      contentUrl,
+      contentKey: '',
       contentSize: Buffer.from(dto.content, 'utf-8').length,
       excerpt: dto.excerpt ?? this.extractExcerpt(dto.content),
       coverImage: dto.coverImage ?? null,
@@ -42,6 +41,16 @@ export class BlogService {
       metaTitle: dto.metaTitle ?? null,
       metaDescription: dto.metaDescription ?? null,
     });
+
+    try {
+      const contentKey = await this.storageService.uploadBlogContent(created.id, dto.content);
+      const post = await this.blogRepository.update(created.id, { contentKey });
+      return this.toResponse(post);
+    } catch (error) {
+      // Don't leave a row pointing at content that never uploaded.
+      await this.blogRepository.delete(created.id).catch(() => {});
+      throw error;
+    }
   }
 
   async updatePost(postId: string, dto: UpdateBlogPostDto): Promise<BlogPostRow> {
@@ -50,17 +59,7 @@ export class BlogService {
       throw new NotFoundException(`Blog post with id ${postId} not found`);
     }
 
-    const data: {
-      title?: string;
-      contentUrl?: string;
-      contentSize?: number | null;
-      excerpt?: string | null;
-      coverImage?: string | null;
-      isPublished?: boolean;
-      publishedAt?: Date | null;
-      metaTitle?: string | null;
-      metaDescription?: string | null;
-    } = {};
+    const data: BlogPostUpdateData = {};
 
     if (dto.title !== undefined) data.title = dto.title;
     if (dto.coverImage !== undefined) data.coverImage = dto.coverImage;
@@ -74,23 +73,15 @@ export class BlogService {
     if (dto.metaDescription !== undefined) data.metaDescription = dto.metaDescription;
 
     if (dto.content !== undefined) {
-      const contentUrl = await this.storageService.uploadBlogContent(postId, dto.content);
+      // Same postId-derived key every time, so uploads overwrite in place.
+      data.contentKey = await this.storageService.uploadBlogContent(postId, dto.content);
       data.contentSize = Buffer.from(dto.content, 'utf-8').length;
-
-      if (post.contentUrl !== contentUrl) {
-        try {
-          await this.storageService.deleteBlogContent(post.contentUrl);
-        } catch (error) {
-          this.logger.error('Failed to delete old content file:', error);
-        }
-      }
-
       data.excerpt = dto.excerpt !== undefined ? dto.excerpt : this.extractExcerpt(dto.content);
     } else if (dto.excerpt !== undefined) {
       data.excerpt = dto.excerpt;
     }
 
-    return this.blogRepository.update(postId, data);
+    return this.toResponse(await this.blogRepository.update(postId, data));
   }
 
   async getPostById(
@@ -101,7 +92,7 @@ export class BlogService {
     if (!post) throw new NotFoundException('Blog post not found');
 
     if (query?.includeContent) return this.withContent(post);
-    return post;
+    return this.toResponse(post);
   }
 
   async getPostBySlug(
@@ -114,13 +105,22 @@ export class BlogService {
     if (query?.includeContent) return this.withContent(post);
 
     if (post.isPublished) await this.blogRepository.incrementViewCount(post.id);
-    return post;
+    return this.toResponse(post);
+  }
+
+  // Rows persist R2 keys; clients get derived URLs.
+  private toResponse<T extends BlogPostRow>(post: T): T {
+    return {
+      ...post,
+      coverImage: this.storageService.resolveMediaUrl(post.coverImage),
+      author: { ...post.author, avatar: this.storageService.resolveMediaUrl(post.author.avatar) },
+    };
   }
 
   private async withContent(post: BlogPostRow): Promise<BlogPostRowWithContent> {
     try {
-      const content = await this.storageService.getBlogContent(post.contentUrl);
-      return { ...post, content };
+      const content = await this.storageService.getBlogContent(post.contentKey);
+      return { ...this.toResponse(post), content };
     } catch {
       throw new NotFoundException(
         'Blog post content not found. The content may not have been uploaded to storage yet.',
@@ -136,7 +136,7 @@ export class BlogService {
 
     // Fire-and-forget: a failed storage delete must not fail the row delete.
     this.storageService
-      .deleteBlogContent(post.contentUrl)
+      .deleteBlogContent(post.contentKey)
       .catch((error) =>
         this.logger.error(`Failed to delete blog content for post ${id}: ${error}`),
       );
@@ -145,9 +145,11 @@ export class BlogService {
   async publishPost(id: string): Promise<BlogPostRow> {
     const post = await this.blogRepository.findById(id);
     if (!post) throw new NotFoundException('Blog post not found');
-    if (post.isPublished) return post;
+    if (post.isPublished) return this.toResponse(post);
 
-    return this.blogRepository.update(id, { isPublished: true, publishedAt: new Date() });
+    return this.toResponse(
+      await this.blogRepository.update(id, { isPublished: true, publishedAt: new Date() }),
+    );
   }
 
   async listPublishedPosts(
@@ -158,7 +160,7 @@ export class BlogService {
       page: query.page ?? 1,
       pageSize: query.pageSize ?? 10,
     });
-    return { items: posts, total };
+    return { items: posts.map((p) => this.toResponse(p)), total };
   }
 
   async listAllPosts(
@@ -168,7 +170,7 @@ export class BlogService {
       page: query.page ?? 1,
       pageSize: query.pageSize ?? 20,
     });
-    return { items: posts, total };
+    return { items: posts.map((p) => this.toResponse(p)), total };
   }
 
   async searchPosts(
@@ -178,7 +180,7 @@ export class BlogService {
       page: query.page ?? 1,
       pageSize: query.pageSize ?? 10,
     });
-    return { items: posts, total };
+    return { items: posts.map((p) => this.toResponse(p)), total };
   }
 
   private extractExcerpt(content: string, maxLength = 500): string {

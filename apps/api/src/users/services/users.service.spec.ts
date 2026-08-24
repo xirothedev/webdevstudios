@@ -22,9 +22,10 @@ const fullUser = {
 
 const makeStorage = (overrides: Record<string, unknown> = {}) =>
   ({
-    extractKeyFromUrl: () => 'avatars/user-1/old.webp',
     deleteFile: async () => {},
-    uploadImage: async () => ({ url: 'https://example.com/new.webp' }),
+    // ponytail: fixtures use absolute URLs, identity passthrough keeps them observable
+    resolveMediaUrl: (ref: string | null | undefined) => ref ?? null,
+    uploadImage: async ({ key }: { key: string }) => ({ key, url: `https://cdn.test/${key}` }),
     ...overrides,
   }) as unknown as StorageService;
 
@@ -83,7 +84,7 @@ describe('UsersService.updateProfile', () => {
 describe('UsersService.updateAvatar', () => {
   const file = { buffer: Buffer.from('img'), mimetype: 'image/png' } as never;
 
-  test('deletes the old avatar and persists the uploaded URL', async () => {
+  test('deletes the old key avatar and persists the uploaded key', async () => {
     let deletedKey: string | undefined;
     let uploadArgs: Record<string, unknown> = {};
     const storage = makeStorage({
@@ -92,12 +93,13 @@ describe('UsersService.updateAvatar', () => {
       },
       uploadImage: async (args: Record<string, unknown>) => {
         uploadArgs = args;
-        return { url: 'https://example.com/new.webp' };
+        return { key: 'avatars/user-1/new.webp', url: 'https://cdn.test/avatars/user-1/new.webp' };
       },
     });
     let updated: Record<string, unknown> = {};
     const service = makeService(
       {
+        findById: async () => ({ ...fullUser, avatar: 'avatars/user-1/old.webp' }),
         update: async (_id: string, data: Record<string, unknown>) => {
           updated = data;
           return fullUser;
@@ -111,7 +113,27 @@ describe('UsersService.updateAvatar', () => {
     expect(deletedKey).toBe('avatars/user-1/old.webp');
     expect(uploadArgs).toMatchObject({ width: 400, height: 400, contentType: 'image/png' });
     expect(String(uploadArgs.key)).toMatch(/^avatars\/user-1\//);
-    expect(updated).toEqual({ avatar: 'https://example.com/new.webp' });
+    expect(updated).toEqual({ avatar: 'avatars/user-1/new.webp' });
+  });
+
+  test('an external (OAuth) avatar URL is not deleted', async () => {
+    let deleted = false;
+    const storage = makeStorage({
+      deleteFile: async () => {
+        deleted = true;
+      },
+    });
+    const service = makeService(
+      {
+        findById: async () => ({ ...fullUser, avatar: 'https://accounts.google.com/pic' }),
+        update: async () => fullUser,
+      },
+      storage,
+    );
+
+    await service.updateAvatar('user-1', file);
+
+    expect(deleted).toBe(false);
   });
 
   test('a failing old-avatar delete never blocks the upload', async () => {

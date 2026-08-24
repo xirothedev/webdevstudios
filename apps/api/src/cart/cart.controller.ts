@@ -23,7 +23,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser } from '@/common/decorators';
 import { AddToCartDto, CartDto, UpdateCartItemDto } from './dto';
 import { CartService } from './services/cart.service';
 

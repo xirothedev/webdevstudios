@@ -8,7 +8,7 @@ import {
 
 import { ProductSize } from '@prisma/client';
 
-import { ProductRepo } from '@/products/repo';
+import { availableStock, ProductRepo } from '@/products/repo';
 
 import { CartWithItems } from '../cart.types';
 import { AddToCartDto, CartDto, UpdateCartItemDto } from '../dto';
@@ -52,15 +52,9 @@ export class CartService {
     }
 
     // Check stock
-    let availableStock: number;
-    if (product.hasSizes && size) {
-      const sizeStock = await this.productRepository.getStockBySize(productId, size);
-      if (sizeStock === null) {
-        throw new NotFoundException(`Size ${size} not found for product ${productId}`);
-      }
-      availableStock = sizeStock;
-    } else {
-      availableStock = product.stock;
+    const available = availableStock(product, size);
+    if (available === null) {
+      throw new NotFoundException(`Size ${size} not found for product ${productId}`);
     }
 
     // Get or create cart
@@ -71,7 +65,7 @@ export class CartService {
     const currentQuantity = existingItem?.quantity || 0;
     const newTotalQuantity = currentQuantity + quantity;
 
-    if (newTotalQuantity > availableStock) {
+    if (newTotalQuantity > available) {
       throw new ConflictException(
         `Insufficient stock. Available: ${availableStock}, Requested: ${newTotalQuantity}`,
       );
@@ -110,19 +104,12 @@ export class CartService {
 
     // Get product and check stock
     const product = cartItem.product;
-    let availableStock: number;
-
-    if (product.hasSizes && cartItem.size) {
-      const sizeStock = await this.productRepository.getStockBySize(product.id, cartItem.size);
-      if (sizeStock === null) {
-        throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`);
-      }
-      availableStock = sizeStock;
-    } else {
-      availableStock = product.stock;
+    const available = availableStock(product, cartItem.size);
+    if (available === null) {
+      throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`);
     }
 
-    if (quantity > availableStock) {
+    if (quantity > available) {
       throw new ConflictException(
         `Insufficient stock. Available: ${availableStock}, Requested: ${quantity}`,
       );
@@ -174,14 +161,7 @@ export class CartService {
       const product = item.product;
       const productPrice = Number(product.priceCurrent);
       const subtotal = productPrice * item.quantity;
-
-      let stockAvailable: number;
-      if (product.hasSizes && item.size) {
-        const sizeStock = product.sizeStocks?.find((ss) => ss.size === item.size);
-        stockAvailable = sizeStock?.stock || 0;
-      } else {
-        stockAvailable = product.stock;
-      }
+      const stockAvailable = availableStock(product, item.size) ?? 0;
 
       return {
         id: item.id,

@@ -13,6 +13,11 @@ export class UsersService {
     private readonly storageService: StorageService,
   ) {}
 
+  // Rows persist R2 keys; clients get derived URLs (absolute OAuth pictures pass through).
+  private resolveUser<T extends { avatar: string | null }>(user: T): T {
+    return { ...user, avatar: this.storageService.resolveMediaUrl(user.avatar) };
+  }
+
   async updateProfile(userId: string, dto: UpdateProfileDto): Promise<UserRow> {
     const user = await this.userRepo.findById(userId);
     if (!user) {
@@ -27,7 +32,7 @@ export class UsersService {
       updateData.phone = dto.phone;
     }
 
-    return this.userRepo.update(userId, updateData);
+    return this.resolveUser(await this.userRepo.update(userId, updateData));
   }
 
   async updateAvatar(userId: string, file: Express.Multer.File): Promise<UserRow> {
@@ -36,14 +41,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.avatar) {
-      const oldKey = this.storageService.extractKeyFromUrl(user.avatar);
-      if (oldKey) {
-        try {
-          await this.storageService.deleteFile(oldKey);
-        } catch (error) {
-          console.error('Failed to delete old avatar:', error);
-        }
+    if (user.avatar && !user.avatar.includes('://')) {
+      // Stored avatars are R2 keys; absolute URLs are external (OAuth) and not ours to delete.
+      try {
+        await this.storageService.deleteFile(user.avatar);
+      } catch (error) {
+        console.error('Failed to delete old avatar:', error);
       }
     }
 
@@ -59,7 +62,7 @@ export class UsersService {
       height: 400,
     });
 
-    return this.userRepo.update(userId, { avatar: uploadResult.url });
+    return this.resolveUser(await this.userRepo.update(userId, { avatar: uploadResult.key }));
   }
 
   async updateUser(targetUserId: string, dto: UpdateUserDto): Promise<UserRow> {
@@ -88,7 +91,7 @@ export class UsersService {
       updateData.role = dto.role;
     }
 
-    return this.userRepo.update(targetUserId, updateData);
+    return this.resolveUser(await this.userRepo.update(targetUserId, updateData));
   }
 
   async deleteUser(userId: string): Promise<{ success: boolean }> {
@@ -107,7 +110,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user;
+    return this.resolveUser(user);
   }
 
   async getUserById(
@@ -121,10 +124,14 @@ export class UsersService {
     }
 
     if (requesterId === userId || requesterRole === UserRole.ADMIN) {
-      return user;
+      return this.resolveUser(user);
     }
 
-    return { id: user.id, fullName: user.fullName, avatar: user.avatar };
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      avatar: this.storageService.resolveMediaUrl(user.avatar),
+    };
   }
 
   async listUsers(
@@ -136,9 +143,10 @@ export class UsersService {
     pagination: { page: number; limit: number; total: number; totalPages: number };
   }> {
     const { users, total } = await this.userRepo.list(page, limit, role);
-    const totalPages = Math.ceil(total / limit);
-
-    return { users, pagination: { page, limit, total, totalPages } };
+    return {
+      users: users.map((u) => this.resolveUser(u)),
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async searchUsers(
@@ -157,11 +165,18 @@ export class UsersService {
 
     if (!isAdmin) {
       return {
-        users: users.map((user) => ({ id: user.id, fullName: user.fullName, avatar: user.avatar })),
+        users: users.map((user) => ({
+          id: user.id,
+          fullName: user.fullName,
+          avatar: this.storageService.resolveMediaUrl(user.avatar),
+        })),
         pagination: { page, limit, total, totalPages },
       };
     }
 
-    return { users, pagination: { page, limit, total, totalPages } };
+    return {
+      users: users.map((u) => this.resolveUser(u)),
+      pagination: { page, limit, total, totalPages },
+    };
   }
 }

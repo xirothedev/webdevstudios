@@ -33,10 +33,16 @@ import { AuthController } from './auth.controller';
 import { GitHubOAuthGuard, GoogleOAuthGuard, MfaGuard } from './guards';
 // Infrastructure
 import { TokenService, TokenStorageService, TotpService } from './infrastructure';
-// Repository
-import { SessionRepo } from './repo';
+// Repositories
+import { ExternalAccountRepo, MfaRepo, SessionRepo } from './repo';
 // Services
-import { AuthService, OAuthService, OAuthRedirectService } from './services';
+import {
+  AuthCookies,
+  AuthService,
+  OAuthService,
+  OAuthRedirectService,
+  SessionIssuer,
+} from './services';
 // Strategies
 import { GitHubStrategy, GoogleStrategy, JwtStrategy } from './strategies';
 // Users module (UserRepo)
@@ -60,8 +66,10 @@ import { UsersModule } from '../users/users.module';
   ],
   controllers: [AuthController],
   providers: [
-    // Repository
+    // Repositories
     SessionRepo,
+    ExternalAccountRepo,
+    MfaRepo,
     // Infrastructure
     TokenService,
     TokenStorageService,
@@ -75,6 +83,8 @@ import { UsersModule } from '../users/users.module';
     GitHubOAuthGuard,
     MfaGuard,
     // Services
+    SessionIssuer,
+    AuthCookies,
     AuthService,
     OAuthService,
     OAuthRedirectService,

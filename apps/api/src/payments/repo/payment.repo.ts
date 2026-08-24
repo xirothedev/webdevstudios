@@ -17,6 +17,7 @@ export type PaymentTransactionWithOrder = PaymentTransactionRow & {
     userId: string;
     status: OrderStatus;
     paymentStatus: PaymentStatus;
+    totalAmount: Prisma.Decimal;
     items: Array<{ productId: string | null; size: ProductSize | null; quantity: number }>;
   };
 };
@@ -82,6 +83,7 @@ export class PaymentRepo {
             userId: true,
             status: true,
             paymentStatus: true,
+            totalAmount: true,
             items: { select: { productId: true, size: true, quantity: true } },
           },
         },

@@ -30,9 +30,11 @@ const baseUser = {
 
 type DepOverrides = {
   sessionRepo?: Record<string, unknown>;
+  mfaRepo?: Record<string, unknown>;
   tokenService?: Record<string, unknown>;
   tokenStorage?: Record<string, unknown>;
   mailService?: Record<string, unknown>;
+  sessionIssuer?: Record<string, unknown>;
 };
 
 const makeDeps = (
@@ -48,26 +50,29 @@ const makeDeps = (
   const deps = {
     userRepo: { findByEmail: async () => null, ...userRepoOverrides },
     sessionRepo,
+    mfaRepo: overrides.mfaRepo ?? {},
     tokenService: overrides.tokenService ?? {},
     tokenStorage: overrides.tokenStorage ?? {},
     totpService: {},
-    prisma: {
-      device: {
-        create: async () => {
-          throw new Error('device must not be created');
-        },
-      },
-    },
     mailService: overrides.mailService ?? {},
+    sessionIssuer: {
+      issue: async () => ({
+        session: { id: 'session-issued' },
+        accessToken: 'access-issued',
+        refreshToken: 'refresh-issued',
+      }),
+      ...overrides.sessionIssuer,
+    },
   };
   return new AuthService(
     deps.userRepo as unknown as UserRepo,
     sessionRepo as unknown as SessionRepo,
+    deps.mfaRepo as never,
     deps.tokenService as never,
     deps.tokenStorage as never,
     deps.totpService as never,
-    deps.prisma as never,
     deps.mailService as never,
+    deps.sessionIssuer as never,
   );
 };
 
@@ -109,7 +114,7 @@ describe('AuthService.login failure paths', () => {
     const service = makeDeps({
       findByEmail: async () => ({ ...baseUser, password: hashed, mfaEnabled: true }),
     });
-    // sessionRepo.create and prisma.device.create throw if reached
+    // sessionRepo.create throws if reached
 
     const result = await service.login({ email: baseUser.email, password: 'pw' } as never);
     expect(result.requires2FA).toBe(true);
@@ -276,8 +281,33 @@ describe('AuthService.refresh', () => {
 
     const result = await service.refresh('current');
 
-    expect(result).toEqual({ accessToken: 'access:user-1:USER', refreshToken: 'refresh:user-1' });
+    expect(result).toMatchObject({
+      accessToken: 'access:user-1:USER',
+      refreshToken: 'refresh:user-1',
+    });
     expect(rotatedTo).toBe('refresh:user-1');
+  });
+
+  test('returns the remaining session lifetime as ttlSeconds', async () => {
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const service = makeDeps({} as never, {
+      tokenService: {
+        verifyToken: () => ({ sub: 'user-1' }),
+        generateAccessToken: () => 'access-1',
+        generateRefreshToken: () => 'refresh-1',
+      },
+      sessionRepo: {
+        findByRefreshToken: async () => ({ ...baseSession, expiresAt }),
+        updateRefreshToken: async () => {},
+      },
+      tokenStorage: { getSessionMfaVerified: async () => false },
+    });
+
+    const result = await service.refresh('current');
+
+    // ~10 minutes minus elapsed time between the expiry check and the return
+    expect(result.ttlSeconds).toBeGreaterThan(10 * 60 - 5);
+    expect(result.ttlSeconds).toBeLessThanOrEqual(10 * 60);
   });
 });
 
@@ -383,32 +413,12 @@ describe('AuthService.enable2FA', () => {
   });
 
   test('creates an unverified TOTP method plus hashed backup codes', async () => {
-    let mfaMethodData: Record<string, unknown> | undefined;
+    let provisioned: { userId: string; secret: string; codes: string[] } | undefined;
     let updatedSecret: Record<string, unknown> | undefined;
-    const backupCodesCreated: Record<string, unknown>[] = [];
     const totpService = {
       generateSecret: () => 'BASE32SECRET',
       generateQRCode: async () => 'data:image/png;base64,qr',
       generateBackupCodes: () => ['11111111', '22222222'],
-    };
-    const prisma = {
-      userMFAMethod: {
-        create: async ({ data }: { data: Record<string, unknown> }) => {
-          mfaMethodData = data;
-          return { id: 'm1' };
-        },
-      },
-      mFABackupCode: {
-        create: async ({ data }: { data: Record<string, unknown> }) => {
-          backupCodesCreated.push(data);
-          return { id: 'b' };
-        },
-      },
-      device: {
-        create: async () => {
-          throw new Error('no device during enable2FA');
-        },
-      },
     };
     const service = new AuthService(
       {
@@ -419,10 +429,15 @@ describe('AuthService.enable2FA', () => {
         },
       } as never,
       {} as never,
+      {
+        provisionTotp: async (userId: string, secret: string, codes: string[]) => {
+          provisioned = { userId, secret, codes };
+        },
+      } as never,
       {} as never,
       {} as never,
       totpService as never,
-      prisma as never,
+      {} as never,
       {} as never,
     );
 
@@ -431,65 +446,49 @@ describe('AuthService.enable2FA', () => {
     expect(result.qrCode).toMatch(/^data:image\/png/);
     expect(result.secret).toBe('BASE32SECRET');
     expect(result.backupCodes).toEqual(['11111111', '22222222']);
-    expect(mfaMethodData).toMatchObject({
-      userId: 'user-1',
-      secret: 'BASE32SECRET',
-      isActive: false,
-      isVerified: false,
-    });
-    expect(backupCodesCreated).toHaveLength(2);
+    expect(provisioned).toMatchObject({ userId: 'user-1', secret: 'BASE32SECRET' });
     // stored codes must be hashes, not plaintext
-    expect(await argon2.verify(String(backupCodesCreated[0].code), '11111111')).toBe(true);
+    expect(await argon2.verify(provisioned!.codes[0], '11111111')).toBe(true);
+    expect(await argon2.verify(provisioned!.codes[1], '22222222')).toBe(true);
+    // legacy mirror write so MfaRepo.resolveSecret can fall back
     expect(updatedSecret).toEqual({ mfaSecret: 'BASE32SECRET' });
   });
 });
 
 describe('AuthService.verify2FA', () => {
-  const mfaUser = { ...baseUser, mfaSecret: 'SECRET', mfaEnabled: false };
-
   const makeMfaDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
     const calls: string[] = [];
-    const prisma = {
-      userMFAMethod: {
-        findFirst: async () => null,
-        update: async ({ data }: { data: Record<string, unknown> }) => {
-          calls.push(`method-update:${JSON.stringify(data)}`);
-          return {};
-        },
-        ...overrides.userMFAMethod,
+    const mfaRepo = {
+      resolveSecret: async () => 'SECRET',
+      findActiveTotp: async () => null,
+      verifyBackupCodeAndConsume: async () => false,
+      activateTotp: async (id: string) => {
+        calls.push(`method-activate:${id}`);
+        return {};
       },
-      mFABackupCode: {
-        findMany: async () => [],
-        update: async ({ data }: { data: Record<string, unknown> }) => {
-          calls.push(`backup-used:${JSON.stringify(data)}`);
-          return {};
-        },
-        ...overrides.mFABackupCode,
-      },
-      device: {
-        create: async ({ data }: { data: Record<string, unknown> }) => {
-          calls.push('device-create');
-          return { id: 'device-1', ...data };
-        },
-        ...overrides.device,
-      },
+      ...overrides.mfaRepo,
     };
-    const sessionRepo = {
-      create: async (data: Record<string, unknown>) => {
-        calls.push('session-create');
-        return { id: 'session-9', ...data };
+    const sessionIssuer = {
+      issue: async (userId: string, opts: Record<string, unknown>) => {
+        calls.push(`issuer-issue:${JSON.stringify({ userId, opts })}`);
+        return {
+          session: { id: 'session-9' },
+          accessToken: 'access-issued',
+          refreshToken: 'refresh-issued',
+        };
       },
-      ...overrides.sessionRepo,
+      ...(overrides.sessionIssuer ?? {}),
     };
     const service = new AuthService(
       {
-        findByIdWithSecrets: async () => ('user' in overrides ? overrides.user : mfaUser),
+        findById: async () => ('user' in overrides ? overrides.user : { ...baseUser }),
         update: async (_id: string, data: Record<string, unknown>) => {
           calls.push(`user-update:${JSON.stringify(data)}`);
           return {};
         },
       } as never,
-      sessionRepo as never,
+      {} as never,
+      mfaRepo as never,
       {
         generateAccessToken: () => 'access-1',
         generateRefreshToken: () => 'refresh-1',
@@ -503,8 +502,8 @@ describe('AuthService.verify2FA', () => {
         verifyCode: () => true,
         ...(overrides.totpService ?? {}),
       } as never,
-      prisma as never,
       {} as never,
+      sessionIssuer as never,
     );
     return { calls, service };
   };
@@ -517,8 +516,10 @@ describe('AuthService.verify2FA', () => {
     );
   });
 
-  test('no configured TOTP throws BadRequest', async () => {
-    const { service } = makeMfaDeps({ user: { ...baseUser, mfaSecret: null } });
+  test('no configured secret throws BadRequest', async () => {
+    const { service } = makeMfaDeps({
+      mfaRepo: { resolveSecret: async () => null },
+    });
 
     await expect(service.verify2FA('user-1', { code: '123456' } as never)).rejects.toThrow(
       BadRequestException,
@@ -527,41 +528,33 @@ describe('AuthService.verify2FA', () => {
 
   test('first verification activates the method and flips mfaEnabled', async () => {
     const { calls, service } = makeMfaDeps({
-      userMFAMethod: {
-        findFirst: async () => ({ id: 'm1', secret: 'SECRET', isVerified: false }),
+      mfaRepo: {
+        findActiveTotp: async () => ({ id: 'm1', secret: 'SECRET', isVerified: false }),
       },
     });
 
     const result = await service.verify2FA('user-1', { code: '123456' } as never);
 
     expect(result).toEqual({ verified: true });
-    expect(calls.some((c) => c.startsWith('method-update'))).toBe(true);
+    expect(calls).toContain('method-activate:m1');
     expect(calls).toContain('user-update:{"mfaEnabled":true}');
   });
 
-  test('valid backup code is consumed when the TOTP code fails', async () => {
-    const hashed = await argon2.hash('11111111');
-    const { calls, service } = makeMfaDeps({
+  test('valid backup code completes verification when the TOTP code fails', async () => {
+    const { service } = makeMfaDeps({
       totpService: { verifyCode: () => false },
-      mFABackupCode: {
-        findMany: async () => [{ id: 'bk-1', code: hashed }],
-      },
+      mfaRepo: { verifyBackupCodeAndConsume: async () => true },
     });
 
     const result = await service.verify2FA('user-1', { code: '11111111' } as never);
 
     expect(result.verified).toBe(true);
-    expect(calls.some((c) => c.startsWith('backup-used') && c.includes('"isUsed":true'))).toBe(
-      true,
-    );
   });
 
   test('wrong TOTP without a matching backup throws Unauthorized', async () => {
     const { service } = makeMfaDeps({
       totpService: { verifyCode: () => false },
-      mFABackupCode: {
-        findMany: async () => [{ id: 'bk-1', code: await argon2.hash('99999999') }],
-      },
+      mfaRepo: { verifyBackupCodeAndConsume: async () => false },
     });
 
     await expect(service.verify2FA('user-1', { code: '11111111' } as never)).rejects.toThrow(
@@ -569,7 +562,7 @@ describe('AuthService.verify2FA', () => {
     );
   });
 
-  test('challenge completion issues tokens, a session, and stores the MFA flag', async () => {
+  test('challenge completion issues through the SessionIssuer with the 7-day policy', async () => {
     const { calls, service } = makeMfaDeps({});
 
     const result = await service.verify2FA(
@@ -579,12 +572,68 @@ describe('AuthService.verify2FA', () => {
       'Mozilla/5.0 (iPhone)',
     );
 
-    expect(result.accessToken).toBe('access-1');
-    expect(result.refreshToken).toBe('refresh-1');
+    expect(result.accessToken).toBe('access-issued');
+    expect(result.refreshToken).toBe('refresh-issued');
     expect(result.user).toMatchObject({ id: baseUser.id, email: baseUser.email });
-    for (const step of ['device-create', 'session-create', 'store-mfa']) {
-      expect(calls).toContain(step);
-    }
+    const issueCall = calls.find((c) => c.startsWith('issuer-issue'));
+    expect(issueCall).toBeTruthy();
+    const { userId, opts } = JSON.parse(issueCall!.slice('issuer-issue:'.length));
+    expect(userId).toBe(baseUser.id);
+    expect(opts).toMatchObject({
+      ip: '10.0.0.1',
+      userAgent: 'Mozilla/5.0 (iPhone)',
+      mfaTrusted: true,
+      ttlSeconds: 7 * 24 * 60 * 60,
+    });
+    // cookie write downstream reuses the issuer ttl, not its own constant
+    expect(result.ttlSeconds).toBe(opts.ttlSeconds);
+  });
+});
+
+describe('AuthService.login issuance policy', () => {
+  const loginUser = async (rememberMe: boolean) => {
+    let issueArgs: unknown[] = [];
+    const hashed = await argon2.hash('pw');
+    const service = makeDeps(
+      { findByEmail: async () => ({ ...baseUser, password: hashed }) },
+      {
+        sessionIssuer: {
+          issue: async (...args: unknown[]) => {
+            issueArgs = args;
+            return { session: { id: 's1' }, accessToken: 'a', refreshToken: 'r' };
+          },
+        },
+      },
+    );
+
+    const result = await service.login({
+      email: baseUser.email,
+      password: 'pw',
+      rememberMe,
+    } as never);
+
+    return { result, issueArgs };
+  };
+
+  test('rememberMe extends the session to 30 days', async () => {
+    const { result, issueArgs } = await loginUser(true);
+
+    expect(result.accessToken).toBe('a');
+    expect(issueArgs[0]).toBe(baseUser.id);
+    // reached only past the MFA challenge, so the flag is always stored
+    expect(issueArgs[1]).toMatchObject({
+      mfaTrusted: true,
+      ttlSeconds: 30 * 24 * 60 * 60,
+    });
+    // the controller reuses THIS value for the cookie write
+    expect(result.ttlSeconds).toBe((issueArgs[1] as { ttlSeconds: number }).ttlSeconds);
+  });
+
+  test('default login keeps the session at 7 days', async () => {
+    const { result, issueArgs } = await loginUser(false);
+
+    expect(issueArgs[1]).toMatchObject({ ttlSeconds: 7 * 24 * 60 * 60 });
+    expect(result.ttlSeconds).toBe(7 * 24 * 60 * 60);
   });
 });
 

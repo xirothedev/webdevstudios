@@ -8,4 +8,6 @@ Amendment during implementation: modules keep the flat `src/<module>/` layout
 (v2 grilling summary) instead of `modules/<domain>/`; layer folders inside each
 module are `repo/`, `services/`, `dto/`, with row shapes in `<module>.types.ts`.
 Repos are named `<Entity>Repo` (class-as-contract, no interfaces) per the org
-NestJS rules.
+NestJS rules. Exception: `MfaRepo` spans `userMFAMethod` + `mFABackupCode`
+because both tables represent one concept (MFA state) and splitting them adds
+indirection with no benefit. Document deliberate exceptions here.

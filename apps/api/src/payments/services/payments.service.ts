@@ -1,4 +1,4 @@
-import { PaymentTransactionStatus, OrderStatus, PaymentStatus } from '@prisma/client';
+import { PaymentTransactionStatus } from '@prisma/client';
 import {
   BadRequestException,
   ConflictException,
@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 
 import { SecurityLoggerService } from '@/common/services';
+import { OrderService } from '@/orders/services';
 import { OrderRepo } from '@/orders/repo';
-import { ProductRepo } from '@/products/repo';
 
 import { TransactionListResponseDto } from '../dto/payment.dto';
 import { PaymentRepo } from '../repo';
@@ -42,7 +42,7 @@ export class PaymentsService {
   constructor(
     private readonly paymentRepo: PaymentRepo,
     private readonly orderRepo: OrderRepo,
-    private readonly productRepo: ProductRepo,
+    private readonly ordersService: OrderService,
     private readonly payOSService: PayOSService,
     private readonly securityLogger: SecurityLoggerService,
   ) {}
@@ -116,32 +116,18 @@ export class PaymentsService {
     return { paymentUrl, transactionCode };
   }
 
-  async processWebhook(webhookData: PayOSWebhookBody): Promise<void> {
-    // Verify webhook signature - this will throw if invalid
+  async processWebhook(webhookData: PayOSWebhookBody): Promise<boolean> {
+    // Verify webhook signature — throws BadRequestException on invalid sig
     let verifiedData;
     try {
       verifiedData = await this.payOSService.verifyWebhook(webhookData);
     } catch (error) {
-      // For test webhooks during URL verification, PayOS might send invalid signatures
-      // Check if this looks like a test webhook
-      const paymentLinkId = webhookData.data?.paymentLinkId as string | undefined;
-      if (!paymentLinkId || paymentLinkId === 'test' || paymentLinkId.includes('test')) {
-        this.logger.log('Test webhook received - URL verification successful');
-        return; // Return success for test webhooks
-      }
-
-      // Log webhook signature failure for security monitoring (A08: Data Integrity)
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.warn(`Invalid webhook signature: ${errorMessage}`);
-      await this.securityLogger.logWebhookSignatureFailure(
-        '/v1/payments/webhook',
-        undefined, // IP address not available in handler context
-      );
-
+      await this.securityLogger.logWebhookSignatureFailure('/v1/payments/webhook', undefined);
       throw new BadRequestException('Invalid webhook signature');
     }
 
-    // Extract data from verified webhook
     const paymentData = verifiedData.data as {
       orderCode: number | string;
       amount: number;
@@ -155,79 +141,49 @@ export class PaymentsService {
       desc: string;
     };
 
-    // Find payment transaction by paymentLinkId (PayOS transaction identifier)
+    // Find payment transaction by paymentLinkId
     const paymentTransaction = await this.paymentRepo.findByTransactionCode(
       paymentData.paymentLinkId,
     );
     if (!paymentTransaction) {
-      // This might be a test webhook from PayOS for URL verification
-      // Log but don't throw error - let controller handle gracefully
-      this.logger.warn(
-        `Payment transaction not found: ${paymentData.paymentLinkId}. This might be a test webhook.`,
-      );
-      // For test webhooks, we should still return success to verify URL
-      // Check if this looks like a test webhook (no real orderCode match)
-      if (!paymentData.paymentLinkId || paymentData.paymentLinkId === 'test') {
-        this.logger.log('Test webhook received - URL verification successful');
-        return;
-      }
       throw new NotFoundException('Payment transaction not found');
     }
 
     const order = paymentTransaction.order;
 
-    // Check if already processed (idempotency)
+    // Idempotency: already settled → 200 no-op
     if (paymentTransaction.status === PaymentTransactionStatus.PAID) {
       this.logger.log(`Payment already processed: ${paymentData.orderCode}`);
-      return;
+      return true;
     }
 
-    // Process based on webhook code
-    // PayOS webhook codes: 00 = success, others = failed/cancelled
+    // Amount mismatch → SecurityLog, never settle
+    if (Number(paymentData.amount) !== Number(order.totalAmount)) {
+      this.logger.warn(
+        `Amount mismatch for order ${order.code}: expected ${order.totalAmount}, got ${paymentData.amount}`,
+      );
+      await this.securityLogger.logWebhookSignatureFailure(
+        '/v1/payments/webhook/amount-mismatch',
+        undefined,
+      );
+      throw new BadRequestException('Amount mismatch');
+    }
+
     const isSuccess = paymentData.code === '00' || verifiedData.code === '00';
 
-    if (isSuccess) {
-      // Payment successful
-      await this.paymentRepo.updateStatus(
-        paymentTransaction.id,
-        PaymentTransactionStatus.PAID,
-        verifiedData,
-      );
+    // Settle owns the conditional claim: status, paymentStatus, transaction row
+    // and stock release happen once inside its transaction; a lost claim (e.g.
+    // the order expired meanwhile) no-ops here.
+    const settled = await this.ordersService.settle(order.id, {
+      paid: isSuccess,
+      payosData: verifiedData,
+    });
 
-      await this.orderRepo.updatePaymentStatus(order.id, PaymentStatus.PAID);
+    this.logger.log(
+      `Webhook settled: ${settled !== null} for order ${order.code}, code ${paymentData.orderCode}`,
+    );
 
-      await this.orderRepo.updateStatus(order.id, OrderStatus.CONFIRMED);
-
-      this.logger.log(
-        `Payment successful for order ${order.code}, orderCode ${paymentData.orderCode}`,
-      );
-    } else {
-      // Payment failed or cancelled
-      await this.paymentRepo.updateStatus(
-        paymentTransaction.id,
-        PaymentTransactionStatus.FAILED,
-        verifiedData,
-      );
-
-      await this.orderRepo.updatePaymentStatus(order.id, PaymentStatus.FAILED);
-
-      await this.orderRepo.updateStatus(order.id, OrderStatus.CANCELLED);
-
-      // Restore stock
-      for (const item of order.items) {
-        if (item.productId) {
-          if (item.size) {
-            await this.productRepo.incrementSizeStock(item.productId, item.size, item.quantity);
-          } else {
-            await this.productRepo.incrementStock(item.productId, item.quantity);
-          }
-        }
-      }
-
-      this.logger.log(
-        `Payment failed for order ${order.code}, orderCode ${paymentData.orderCode}. Stock restored.`,
-      );
-    }
+    return settled !== null;
   }
 
   async listTransactions(

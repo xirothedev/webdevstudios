@@ -63,17 +63,14 @@ async function main() {
     const postData = allBlogPosts[i];
     const publishedAt = new Date(now.getTime() - i * 24 * 60 * 60 * 1000); // Stagger dates
 
-    // For seed purposes, we'll use a relative path as contentUrl
-    // This will be treated as a key directly by extractKeyFromUrl
-    // Format matches uploadBlogContent: blog/posts/{slug}/content.md
-    const contentUrl = `blog/posts/${postData.slug}/content.md`;
     const contentSize = Buffer.from(postData.content, 'utf-8').length;
 
+    // The content key derives from the post id, so create the row first, then update it.
     const post = await prisma.blogPost.create({
       data: {
         slug: postData.slug,
         title: postData.title,
-        contentUrl,
+        contentKey: '',
         contentSize,
         excerpt: postData.excerpt,
         coverImage: null, // Can be added later
@@ -84,6 +81,11 @@ async function main() {
         metaTitle: postData.metaTitle,
         metaDescription: postData.metaDescription,
       },
+    });
+
+    await prisma.blogPost.update({
+      where: { id: post.id },
+      data: { contentKey: `blog/posts/${post.id}/content.md` },
     });
 
     createdPosts.push(post);

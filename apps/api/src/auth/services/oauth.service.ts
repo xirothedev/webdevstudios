@@ -20,27 +20,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
-import * as UAParser from 'ua-parser-js';
 
-import { addDays } from 'date-fns';
-import { randomUUID } from 'crypto';
-import { PrismaService } from '@/prisma';
-import { UserRepo } from '@/users/repo';
-
-import { SessionRepo } from '../repo';
-import { TokenService, TokenStorageService } from '../infrastructure';
+import { ExternalAccountRepo } from '../repo';
+import { SessionIssuer } from './session-issuer.service';
 import { OAuthProfile } from '../strategies';
 
 @Injectable()
 export class OAuthService {
   constructor(
-    private readonly userRepo: UserRepo,
-    private readonly sessionRepo: SessionRepo,
-    private readonly tokenService: TokenService,
-    private readonly tokenStorage: TokenStorageService,
-    private readonly prisma: PrismaService,
+    private readonly externalAccountRepo: ExternalAccountRepo,
+    private readonly sessionIssuer: SessionIssuer,
   ) {}
 
   async handleOAuthCallback(
@@ -50,6 +40,7 @@ export class OAuthService {
   ): Promise<{
     accessToken: string;
     refreshToken: string;
+    ttlSeconds: number;
     user: {
       id: string;
       email: string;
@@ -57,130 +48,21 @@ export class OAuthService {
       emailVerified: boolean;
     };
   }> {
-    const { provider, providerId, email, name, picture } = oauthUser;
+    const user = await this.externalAccountRepo.findOrLinkOrCreate(oauthUser);
 
-    // Find or create external account
-    const externalAccount = await this.prisma.externalAccount.findUnique({
-      where: {
-        provider_providerId: {
-          provider,
-          providerId,
-        },
-      },
-      include: {
-        user: true,
-      },
+    // OAuth authentication is treated as inherently stronger than password
+    const ttlSeconds = 30 * 24 * 60 * 60;
+    const { accessToken, refreshToken } = await this.sessionIssuer.issue(user.id, {
+      ip: ipAddress,
+      userAgent,
+      mfaTrusted: true,
+      ttlSeconds,
     });
-
-    let user;
-
-    if (externalAccount) {
-      // User exists - login
-      user = externalAccount.user;
-      // Update provider email to reflect current provider state
-      await this.prisma.externalAccount.update({
-        where: {
-          provider_providerId: { provider, providerId },
-        },
-        data: { providerEmail: email },
-      });
-    } else {
-      // Check if user with this email exists
-      const existingUser = await this.userRepo.findByEmail(email);
-
-      if (existingUser) {
-        // Link OAuth account to existing user
-        user = existingUser;
-        await this.prisma.externalAccount.create({
-          data: {
-            provider,
-            providerId,
-            providerEmail: email,
-            userId: user.id,
-          },
-        });
-      } else {
-        // Create new user
-        user = await this.userRepo.create({
-          email,
-          fullName: name,
-          emailVerified: true,
-        });
-
-        await this.prisma.externalAccount.create({
-          data: {
-            provider,
-            providerId,
-            providerEmail: email,
-            userId: user.id,
-          },
-        });
-
-        // Set avatar only on creation if user has no avatar
-        if (picture && !user.avatar) {
-          await this.userRepo.update(user.id, { avatar: picture });
-        }
-      }
-    }
-
-    // Create device record
-    let deviceId: string | undefined;
-    if (userAgent) {
-      const parser = new UAParser.UAParser(userAgent);
-      const result = parser.getResult();
-      const deviceType = this.getDeviceType(result);
-      const deviceName = this.getDeviceName(result);
-
-      const device = await this.prisma.device.create({
-        data: {
-          userId: user.id,
-          name: deviceName,
-          type: deviceType,
-          userAgent,
-          ipAddress,
-          fingerprint: this.generateFingerprint(userAgent, ipAddress),
-        },
-      });
-      deviceId = device.id;
-    }
-
-    // Generate tokens
-    const sessionId = randomUUID();
-    const accessToken = this.tokenService.generateAccessToken(
-      {
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      sessionId,
-    );
-
-    const refreshToken = this.tokenService.generateRefreshToken({
-      sub: user.id,
-    });
-
-    // Create session
-    const expiresAt = addDays(new Date(), 30); // 30 days
-    const session = await this.sessionRepo.create(
-      {
-        userId: user.id,
-        token: accessToken,
-        refreshToken,
-        deviceId,
-        ipAddress,
-        userAgent,
-        expiresAt,
-      },
-      sessionId,
-    );
-
-    // Mark MFA as verified (OAuth users don't need 2FA for OAuth login)
-    const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
-    await this.tokenStorage.storeSessionMfaVerified(session.id, ttl);
 
     return {
       accessToken,
       refreshToken,
+      ttlSeconds,
       user: {
         id: user.id,
         email: user.email,
@@ -188,36 +70,5 @@ export class OAuthService {
         emailVerified: user.emailVerified,
       },
     };
-  }
-
-  private getDeviceType(parser: UAParser.IResult): DeviceType {
-    const { device } = parser;
-    if (device?.type === 'mobile') return DeviceType.MOBILE;
-    if (device?.type === 'tablet') return DeviceType.TABLET;
-    return DeviceType.DESKTOP;
-  }
-
-  private getDeviceName(parser: UAParser.IResult): string {
-    const browser = parser.browser;
-    const os = parser.os;
-    const device = parser.device;
-
-    const parts: string[] = [];
-    if (device?.vendor && device?.model) {
-      parts.push(`${device.vendor} ${device.model}`);
-    }
-    if (os?.name) {
-      parts.push(os.name);
-    }
-    if (browser?.name) {
-      parts.push(browser.name);
-    }
-
-    return parts.join(' - ') || 'Unknown Device';
-  }
-
-  private generateFingerprint(userAgent?: string, ipAddress?: string): string {
-    const parts = [userAgent || '', ipAddress || ''];
-    return Buffer.from(parts.join('|')).toString('base64').substring(0, 255);
   }
 }

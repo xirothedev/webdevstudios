@@ -1,5 +1,15 @@
 import { PaymentTransactionStatus, UserRole } from '@prisma/client';
-import { Body, Controller, Get, Logger, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Logger,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -55,6 +65,7 @@ export class PaymentsController {
   }
 
   @Post('webhook')
+  @HttpCode(200)
   @Public()
   @ApiOperation({
     summary: 'PayOS webhook endpoint',
@@ -63,29 +74,17 @@ export class PaymentsController {
   })
   @ApiBody({ type: WebhookDto })
   @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid webhook signature' })
+  @ApiResponse({ status: 400, description: 'Invalid webhook signature or amount mismatch' })
+  @ApiResponse({ status: 404, description: 'Payment transaction not found' })
+  @ApiResponse({ status: 500, description: 'Processing error' })
   async handleWebhook(@Body() webhookData: PayOSWebhookBody): Promise<{ success: boolean }> {
-    try {
-      await this.paymentsService.processWebhook(webhookData);
+    const settled = await this.paymentsService.processWebhook(webhookData);
 
-      this.logger.log(
-        `Webhook processed successfully for paymentLinkId: ${webhookData.data?.paymentLinkId || 'unknown'}`,
-      );
+    this.logger.log(
+      `Webhook processed for paymentLinkId: ${webhookData.data?.paymentLinkId || 'unknown'} (settled: ${settled})`,
+    );
 
-      return { success: true };
-    } catch (error) {
-      // Log error but return 200 to PayOS to prevent retries for invalid webhooks
-      // This is important for webhook URL verification
-      this.logger.error(
-        `Webhook processing failed: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error.stack : undefined,
-      );
-
-      // For webhook URL verification, PayOS expects 200 response
-      // Even if we can't process the webhook, we should return 200
-      // to confirm the endpoint is reachable
-      return { success: false };
-    }
+    return { success: true };
   }
 
   @ThrottleAPI()

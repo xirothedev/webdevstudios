@@ -2,6 +2,7 @@ import {
   OrderStatus,
   PaymentStatus,
   PaymentTransactionStatus,
+  Prisma,
   ProductSize,
   ProductSlug,
   UserRole,
@@ -17,7 +18,7 @@ import {
 
 import { CartRepo } from '@/cart/repo';
 import { PrismaService } from '@/prisma';
-import { ProductRepo } from '@/products/repo';
+import { availableStock, ProductRepo, type StockItem } from '@/products/repo';
 
 import { CreateOrderDto, OrderDto, OrderListResponseDto } from '../dto';
 import { OrderRepo, OrderRow } from '../repo';
@@ -44,6 +45,7 @@ export class OrderService {
       );
     }
 
+    let cartId: string | null = null;
     const orderItems: Array<{
       productId: string | null;
       productSlug: ProductSlug;
@@ -59,6 +61,7 @@ export class OrderService {
       if (!cart.items || cart.items.length === 0) {
         throw new BadRequestException('Cart is empty');
       }
+      cartId = cart.id;
 
       // Validate stock and calculate totals from cart
       for (const cartItem of cart.items) {
@@ -67,22 +70,14 @@ export class OrderService {
           throw new NotFoundException(`Product ${cartItem.productId} not found`);
         }
 
-        let availableStock: number;
-        if (product.hasSizes && cartItem.size) {
-          const sizeStock = await this.productRepo.getStockBySize(product.id, cartItem.size);
-          if (sizeStock === null) {
-            throw new NotFoundException(
-              `Size ${cartItem.size} not found for product ${product.id}`,
-            );
-          }
-          availableStock = sizeStock;
-        } else {
-          availableStock = product.stock;
+        const available = availableStock(product, cartItem.size);
+        if (available === null) {
+          throw new NotFoundException(`Size ${cartItem.size} not found for product ${product.id}`);
         }
 
-        if (cartItem.quantity > availableStock) {
+        if (cartItem.quantity > available) {
           throw new ConflictException(
-            `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${availableStock}, Requested: ${cartItem.quantity}`,
+            `  stock for ${product.name}${cartItem.size ? ` (${cartItem.size})` : ''}. Available: ${available}, Requested: ${cartItem.quantity}`,
           );
         }
 
@@ -114,23 +109,18 @@ export class OrderService {
         throw new BadRequestException('Product slug mismatch');
       }
 
-      let availableStock: number;
-      if (product.hasSizes && size) {
-        const sizeStock = await this.productRepo.getStockBySize(product.id, size);
-        if (sizeStock === null) {
-          throw new NotFoundException(`Size ${size} not found for product ${product.id}`);
-        }
-        availableStock = sizeStock;
-      } else {
-        if (product.hasSizes && !size) {
-          throw new BadRequestException('Size is required for this product');
-        }
-        availableStock = product.stock;
+      if (product.hasSizes && !size) {
+        throw new BadRequestException('Size is required for this product');
       }
 
-      if (quantity > availableStock) {
+      const available = availableStock(product, size);
+      if (available === null) {
+        throw new NotFoundException(`Size ${size} not found for product ${product.id}`);
+      }
+
+      if (quantity > available) {
         throw new ConflictException(
-          `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${availableStock}, Requested: ${quantity}`,
+          `Insufficient stock for ${product.name}${size ? ` (${size})` : ''}. Available: ${available}, Requested: ${quantity}`,
         );
       }
 
@@ -173,31 +163,22 @@ export class OrderService {
         tx,
       );
 
-      // Deduct stock within transaction
-      for (const item of orderItems) {
-        if (item.productId) {
-          if (item.size) {
-            await tx.productSizeStock.updateMany({
-              where: { productId: item.productId, size: item.size },
-              data: { stock: { decrement: item.quantity } },
-            });
-          } else {
-            await tx.product.update({
-              where: { id: item.productId },
-              data: { stock: { decrement: item.quantity } },
-            });
-          }
-        }
+      // Deduct stock within transaction; conditional update guards against oversell races
+      await this.productRepo.reserve(
+        tx,
+        orderItems.flatMap((item) =>
+          item.productId
+            ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
+            : [],
+        ),
+      );
+
+      if (cartId) {
+        await this.cartRepo.clearCart(cartId, tx);
       }
 
       return orderRecord;
     });
-
-    // Clear cart only if FROM_CART
-    if (orderType === 'FROM_CART') {
-      const cart = await this.cartRepo.findOrCreateCart(userId);
-      await this.cartRepo.clearCart(cart.id);
-    }
 
     return this.toDto(order);
   }
@@ -252,14 +233,49 @@ export class OrderService {
 
     const updatedOrder = await this.orderRepo.updateStatus(orderId, status);
 
-    // If order is confirmed, update payment status to PAID
-    if (status === 'CONFIRMED' && updatedOrder.paymentStatus === 'PENDING') {
-      await this.orderRepo.updatePaymentStatus(orderId, 'PAID');
-      const finalOrder = await this.orderRepo.findById(orderId);
-      return this.toDto(finalOrder!);
-    }
-
     return this.toDto(updatedOrder);
+  }
+
+  // Settles an order exactly once: PENDING-only conditional claim, losers no-op.
+  // Status, paymentStatus, transaction row and stock release happen in one transaction.
+  async settle(
+    orderId: string,
+    opts: { paid: boolean; payosData?: unknown },
+  ): Promise<OrderDto | null> {
+    const order = await this.orderRepo.findById(orderId);
+    if (!order) {
+      throw new NotFoundException(`Order with id ${orderId} not found`);
+    }
+    const items = this.stockItems(order.items);
+
+    return this.prisma.$transaction(async (tx) => {
+      const claimed = await this.orderRepo.claimSettled(orderId, opts.paid, tx);
+      if (claimed === 0) {
+        return null;
+      }
+
+      await this.markTransaction(
+        tx,
+        orderId,
+        opts.paid ? PaymentTransactionStatus.PAID : PaymentTransactionStatus.FAILED,
+        opts.payosData,
+      );
+
+      if (!opts.paid) {
+        await this.productRepo.release(tx, items);
+      }
+
+      const settled = await this.orderRepo.findById(orderId, tx);
+      return this.toDto(settled!);
+    });
+  }
+
+  async markPaid(orderId: string): Promise<OrderDto> {
+    const settled = await this.settle(orderId, { paid: true });
+    if (!settled) {
+      throw new BadRequestException('Only PENDING orders can be marked paid');
+    }
+    return settled;
   }
 
   async cancelOrder(orderId: string, userId: string): Promise<OrderDto> {
@@ -281,22 +297,13 @@ export class OrderService {
     }
 
     // Claim the cancellation - concurrent actor may have won
-    const claimed = await this.orderRepo.cancelPending(orderId);
-    if (claimed === 0) {
+    const claimed = await this.claimAndRelease(orderId, this.stockItems(order.items), (tx) =>
+      this.orderRepo.cancelPending(orderId, tx),
+    );
+    if (!claimed) {
       throw new BadRequestException(
         `Cannot cancel order with status ${order.status}. Only PENDING orders can be cancelled.`,
       );
-    }
-
-    // Restore stock
-    for (const item of order.items) {
-      if (item.productId) {
-        if (item.size) {
-          await this.productRepo.incrementSizeStock(item.productId, item.size, item.quantity);
-        } else {
-          await this.productRepo.incrementStock(item.productId, item.quantity);
-        }
-      }
     }
 
     const cancelled = await this.orderRepo.findById(orderId);
@@ -322,47 +329,63 @@ export class OrderService {
       return;
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      // Claim the expiry - concurrent actor may have won
-      const claimed = await tx.order.updateMany({
-        where: { id: orderId, status: OrderStatus.PENDING, paymentStatus: PaymentStatus.PENDING },
-        data: { status: OrderStatus.CANCELLED, paymentStatus: PaymentStatus.FAILED },
-      });
-      if (claimed.count === 0) {
-        this.logger.log(`Order ${orderId} expired concurrently - skipping`);
-        return;
-      }
+    const claimed = await this.claimAndRelease(
+      orderId,
+      this.stockItems(order.items),
+      (tx) => this.orderRepo.expirePending(orderId, tx),
+      (tx) => this.markTransaction(tx, orderId, PaymentTransactionStatus.EXPIRED),
+    );
 
-      // Restore stock
-      for (const item of order.items) {
-        if (item.productId) {
-          if (item.size) {
-            await tx.productSizeStock.updateMany({
-              where: { productId: item.productId, size: item.size },
-              data: { stock: { increment: item.quantity } },
-            });
-          } else {
-            await tx.product.update({
-              where: { id: item.productId },
-              data: { stock: { increment: item.quantity } },
-            });
-          }
-        }
-      }
-
-      // Update payment transaction if exists
-      const paymentTransaction = await tx.paymentTransaction.findUnique({
-        where: { orderId },
-      });
-      if (paymentTransaction) {
-        await tx.paymentTransaction.update({
-          where: { id: paymentTransaction.id },
-          data: { status: PaymentTransactionStatus.EXPIRED },
-        });
-      }
-    });
+    if (!claimed) {
+      this.logger.log(`Order ${orderId} expired concurrently - skipping`);
+      return;
+    }
 
     this.logger.log(`Order ${orderId} expired and stock restored after 15 minutes`);
+  }
+
+  // One claim-and-release path shared by cancelOrder and expireOrder
+  private async claimAndRelease(
+    orderId: string,
+    items: StockItem[],
+    claim: (tx: Prisma.TransactionClient) => Promise<number>,
+    afterClaim?: (tx: Prisma.TransactionClient) => Promise<void>,
+  ): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      const claimed = await claim(tx);
+      if (claimed === 0) {
+        return false;
+      }
+
+      await this.productRepo.release(tx, items);
+      await afterClaim?.(tx);
+      return true;
+    });
+  }
+
+  private async markTransaction(
+    tx: Prisma.TransactionClient,
+    orderId: string,
+    status: PaymentTransactionStatus,
+    payosData?: unknown,
+  ): Promise<void> {
+    const paymentTransaction = await tx.paymentTransaction.findUnique({
+      where: { orderId },
+    });
+    if (paymentTransaction) {
+      await tx.paymentTransaction.update({
+        where: { id: paymentTransaction.id },
+        data: { status, ...(payosData ? { payosData: payosData as object } : {}) },
+      });
+    }
+  }
+
+  private stockItems(items: OrderRow['items']): StockItem[] {
+    return items.flatMap((item) =>
+      item.productId
+        ? [{ productId: item.productId, size: item.size, quantity: item.quantity }]
+        : [],
+    );
   }
 
   private toDto(order: OrderRow): OrderDto {

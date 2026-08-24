@@ -2,21 +2,21 @@ import { BadRequestException, ConflictException, NotFoundException } from '@nest
 import { describe, expect, test } from 'bun:test';
 
 import type { SecurityLoggerService } from '@/common/services';
+import type { OrderService } from '@/orders/services/orders.service';
 import type { OrderRepo } from '@/orders/repo';
-import type { ProductRepo } from '@/products/repo';
 
 import type { PaymentRepo } from '../repo';
 import { PaymentsService, type PayOSWebhookBody } from './payments.service';
 import type { PayOSService } from './payos.service';
 
 // ponytail: hand-rolled fakes per repo-seam rule; swap for a builder if this file grows past ~150 lines
-const webhookBody = (code: string): PayOSWebhookBody => ({
+const webhookBody = (code: string, amount = 299000): PayOSWebhookBody => ({
   code: '00',
   desc: 'success',
   success: true,
   data: {
     orderCode: 1234,
-    amount: 299000,
+    amount,
     description: 'Thanh toan',
     accountNumber: '123',
     reference: 'ref',
@@ -49,6 +49,7 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
         id: 'order-1',
         code: '#ORD-1234',
         userId: 'u1',
+        totalAmount: 299000,
         items: [{ productId: 'p1', size: null, quantity: 2 }],
       },
     }),
@@ -57,60 +58,82 @@ const makeDeps = (overrides: Record<string, Record<string, unknown>> = {}) => {
     ...overrides.paymentRepo,
   } as unknown as PaymentRepo;
   const orderRepo = {
-    findById: async () => payableOrder,
+    findById: async () => ({ id: 'order-1', code: '#ORD-1234', totalAmount: 299000 }),
     updatePaymentStatus: async () => calls.push('payment-status'),
     updateStatus: async () => calls.push('status'),
     ...overrides.orderRepo,
   } as unknown as OrderRepo;
-  const productRepo = {
-    incrementStock: async () => calls.push('increment-stock'),
-    incrementSizeStock: async () => calls.push('increment-size-stock'),
-    ...overrides.productRepo,
-  } as unknown as ProductRepo;
+  const ordersService = {
+    settle: async (_orderId: string, opts: { paid: boolean }) => {
+      calls.push(`settle:${opts.paid}`);
+      return { id: _orderId, status: opts.paid ? 'CONFIRMED' : 'CANCELLED' };
+    },
+    ...overrides.ordersService,
+  } as unknown as OrderService;
   const payOSService = {
     verifyWebhook: async (body: PayOSWebhookBody) => ({ code: body.data.code, data: body.data }),
     ...overrides.payOSService,
   } as unknown as PayOSService;
   const securityLogger = {
     logWebhookSignatureFailure: async () => {},
+    ...overrides.securityLogger,
   } as unknown as SecurityLoggerService;
   return {
     calls,
-    service: new PaymentsService(paymentRepo, orderRepo, productRepo, payOSService, securityLogger),
+    securityLogger,
+    service: new PaymentsService(
+      paymentRepo,
+      orderRepo,
+      ordersService,
+      payOSService,
+      securityLogger,
+    ),
   };
 };
 
 describe('PaymentsService.processWebhook', () => {
-  test('success code marks transaction PAID and order CONFIRMED without stock restore', async () => {
+  test('success code delegates a paid settle', async () => {
     const { calls, service } = makeDeps();
 
     await service.processWebhook(webhookBody('00'));
 
-    expect(calls).toEqual(['tx-update', 'payment-status', 'status']);
+    expect(calls).toEqual(['settle:true']);
   });
 
-  test('failed code cancels the order and restores stock', async () => {
+  test('failed code delegates an unpaid settle (restock handled by settle)', async () => {
     const { calls, service } = makeDeps();
 
     await service.processWebhook(webhookBody('01'));
 
-    expect(calls).toEqual(['tx-update', 'payment-status', 'status', 'increment-stock']);
+    expect(calls).toEqual(['settle:false']);
   });
 
-  test('already-paid transactions are ignored (idempotency)', async () => {
+  test('failure webhook on an expired order loses the settle claim and writes nothing', async () => {
+    const { calls, service } = makeDeps({
+      ordersService: { settle: async () => null },
+    });
+
+    const settled = await service.processWebhook(webhookBody('01'));
+
+    expect(calls).toEqual([]);
+    expect(settled).toBe(false);
+  });
+
+  test('already-paid transactions return true (idempotency)', async () => {
     const { calls, service } = makeDeps({
       paymentRepo: {
         findByTransactionCode: async () => ({
           id: 'tx-1',
           status: 'PAID',
-          order: { id: 'o', code: 'c', items: [] },
+          order: { id: 'o', code: 'c', totalAmount: 299000, items: [] },
         }),
       },
     });
 
-    await service.processWebhook(webhookBody('00'));
+    const settled = await service.processWebhook(webhookBody('00'));
 
     expect(calls).toEqual([]);
+    expect(settled).toBe(true);
   });
 
   test('invalid signatures are logged for security and rejected', async () => {
@@ -135,6 +158,30 @@ describe('PaymentsService.processWebhook', () => {
 
     await expect(service.processWebhook(webhookBody('00'))).rejects.toThrow(BadRequestException);
     expect(loggedPath).toBe('/v1/payments/webhook');
+  });
+
+  test('amount mismatch logs to SecurityLog and throws', async () => {
+    let loggedPath: string | undefined;
+    const { service } = makeDeps({
+      securityLogger: {
+        logWebhookSignatureFailure: async (path: string) => {
+          loggedPath = path;
+        },
+      },
+    });
+
+    await expect(service.processWebhook(webhookBody('00', 99999))).rejects.toThrow(
+      BadRequestException,
+    );
+    expect(loggedPath).toBe('/v1/payments/webhook/amount-mismatch');
+  });
+
+  test('unknown paymentLinkId throws NotFound', async () => {
+    const { service } = makeDeps({
+      paymentRepo: { findByTransactionCode: async () => null },
+    });
+
+    await expect(service.processWebhook(webhookBody('00'))).rejects.toThrow(NotFoundException);
   });
 });
 

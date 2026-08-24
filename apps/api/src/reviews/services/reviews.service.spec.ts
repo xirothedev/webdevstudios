@@ -8,6 +8,7 @@ import { describe, expect, test } from 'bun:test';
 
 import { OrderRepo } from '@/orders/repo';
 import { ProductRepo } from '@/products/repo';
+import { StorageService } from '@/storage/storage.service';
 
 import { ReviewRepo } from '../repo';
 import { ReviewsService } from './reviews.service';
@@ -21,6 +22,8 @@ const makeService = (fakes: {
     fakes.reviewRepo as unknown as ReviewRepo,
     fakes.productRepo as unknown as ProductRepo,
     fakes.orderRepo as unknown as OrderRepo,
+    // ponytail: fixtures use absolute URLs, passthrough keeps them observable
+    { resolveMediaUrl: (ref: string | null) => ref } as unknown as StorageService,
   );
 
 describe('ReviewsService', () => {

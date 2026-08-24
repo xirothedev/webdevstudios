@@ -63,10 +63,10 @@ export class BlogPostDto {
   title: string;
 
   @ApiProperty({
-    description: 'R2 URL to markdown content',
-    example: 'https://r2.example.com/blog/posts/clx1234567890/content.md',
+    description: 'R2 object key of the markdown content',
+    example: 'blog/posts/clx1234567890/content.md',
   })
-  contentUrl: string;
+  contentKey: string;
 
   @ApiPropertyOptional({
     description: 'Content size in bytes',
