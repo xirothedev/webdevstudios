@@ -20,11 +20,13 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { OAuthProvider } from '@generated/prisma';
+import { OAuthProvider } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
+
+import { OAuthProfile } from './oauth-profile.types';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -52,7 +54,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       name?.givenName && name?.familyName
         ? `${name.givenName} ${name.familyName}`
         : name?.givenName || name?.familyName || email;
-    const user = {
+    const user: OAuthProfile = {
       provider: OAuthProvider.GOOGLE,
       providerId: id,
       email,

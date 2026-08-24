@@ -21,29 +21,20 @@
  */
 
 import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
 
 import { OrdersModule } from '../orders/orders.module';
 import { ProductsModule } from '../products/products.module';
-// Commands
-import { CreateReviewHandler } from './commands/create-review';
-import { DeleteReviewHandler } from './commands/delete-review';
-import { UpdateReviewHandler } from './commands/update-review';
-// Repository
-import { ReviewRepository } from './infrastructure/review.repository';
-// Queries
-import { GetProductReviewsHandler } from './queries/get-product-reviews';
 // Controller
 import { ReviewsController } from './reviews.controller';
-
-const CommandHandlers = [CreateReviewHandler, UpdateReviewHandler, DeleteReviewHandler];
-
-const QueryHandlers = [GetProductReviewsHandler];
+// Repository
+import { ReviewRepo } from './repo';
+// Service
+import { ReviewsService } from './services/reviews.service';
 
 @Module({
-  imports: [CqrsModule, ProductsModule, OrdersModule],
+  imports: [ProductsModule, OrdersModule],
   controllers: [ReviewsController],
-  providers: [...CommandHandlers, ...QueryHandlers, ReviewRepository],
-  exports: [ReviewRepository],
+  providers: [ReviewRepo, ReviewsService],
+  exports: [ReviewRepo, ReviewsService],
 })
 export class ReviewsModule {}

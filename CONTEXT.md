@@ -32,6 +32,10 @@ _Avoid_: basket, bag
 A checkout-created purchase containing order items, a total, a status, and a payment status; unpaid orders expire and are cancelled.
 _Avoid_: purchase, transaction
 
+**Settle**:
+The single transition that resolves a pending Order as paid or unpaid; it claims the Order exactly once and releases reserved stock exactly once, regardless of which caller triggers it (payment webhook, expiry, cancellation, admin mark-paid).
+_Avoid_: confirm, complete, finalize
+
 **Payment**:
 A PayOS-backed payment attempt for an Order, created as a payment link; a webhook verifies the result and updates the order's payment status.
 _Avoid_: transaction, charge

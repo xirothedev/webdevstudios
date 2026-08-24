@@ -21,28 +21,17 @@
  */
 
 import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
 
-// Commands
-import { CreateEventHandler } from './commands/create-event';
-import { DeleteEventHandler } from './commands/delete-event';
-import { UpdateEventHandler } from './commands/update-event';
 // Controller
 import { EventsController } from './events.controller';
 // Repository
-import { EventRepository } from './infrastructure/event.repository';
-// Queries
-import { GetEventByIdHandler } from './queries/get-event-by-id';
-import { ListEventsHandler } from './queries/list-events';
-
-const CommandHandlers = [CreateEventHandler, UpdateEventHandler, DeleteEventHandler];
-
-const QueryHandlers = [ListEventsHandler, GetEventByIdHandler];
+import { EventRepo } from './repo';
+// Service
+import { EventsService } from './services/events.service';
 
 @Module({
-  imports: [CqrsModule],
   controllers: [EventsController],
-  providers: [...CommandHandlers, ...QueryHandlers, EventRepository],
-  exports: [EventRepository],
+  providers: [EventRepo, EventsService],
+  exports: [EventRepo, EventsService],
 })
 export class EventsModule {}

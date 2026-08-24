@@ -21,33 +21,17 @@
  */
 
 import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
 
-// Commands
-import { UpdateProductHandler } from './commands/update-product';
-import { UpdateProductSizesHandler } from './commands/update-product-sizes';
-import { UpdateProductStockHandler } from './commands/update-product-stock';
-// Repository
-import { ProductRepository } from './infrastructure/product.repository';
 // Controller
 import { ProductsController } from './products.controller';
-// Queries
-import { GetProductBySlugHandler } from './queries/get-product-by-slug';
-import { GetProductStockHandler } from './queries/get-product-stock';
-import { ListProductsHandler } from './queries/list-products';
-
-const CommandHandlers = [
-  UpdateProductHandler,
-  UpdateProductStockHandler,
-  UpdateProductSizesHandler,
-];
-
-const QueryHandlers = [GetProductBySlugHandler, GetProductStockHandler, ListProductsHandler];
+// Repository
+import { ProductRepo } from './repo';
+// Service
+import { ProductsService } from './services/products.service';
 
 @Module({
-  imports: [CqrsModule],
   controllers: [ProductsController],
-  providers: [...CommandHandlers, ...QueryHandlers, ProductRepository],
-  exports: [ProductRepository],
+  providers: [ProductRepo, ProductsService],
+  exports: [ProductRepo, ProductsService],
 })
 export class ProductsModule {}

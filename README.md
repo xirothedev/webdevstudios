@@ -31,7 +31,7 @@ A fullstack monorepo e-commerce platform built with Next.js 16 and NestJS 11, fe
 WebDev Studios E-commerce Platform is a monorepo fullstack application built with:
 
 - **Frontend**: Next.js 16 (App Router) with TypeScript, Tailwind CSS v4, and motion/react
-- **Backend**: NestJS 11 with CQRS pattern, PostgreSQL, and Prisma ORM
+- **Backend**: NestJS 11 with a controller → service → repository architecture, PostgreSQL, and Prisma ORM
 - **Monorepo**: Turborepo for efficient build and development workflows
 - **Runtime & Package Manager**: Bun 1.3.x
 
@@ -59,7 +59,7 @@ The platform serves as both a showcase website for WebDev Studios club and an e-
 
 - **Framework**: NestJS 11.x
 - **Language**: TypeScript 5.7.3
-- **Architecture**: CQRS pattern with `@nestjs/cqrs`
+- **Architecture**: Controller → Service → Repository per module
 - **Database**: PostgreSQL with Prisma 7.2.0
 - **Authentication**: JWT with Passport.js
 - **OAuth**: Google OAuth 2.0, GitHub OAuth
@@ -96,13 +96,14 @@ webdevstudios/
 └── package.json      # Root workspace config
 ```
 
-### Backend Architecture (CQRS)
+### Backend Architecture
 
-- **Commands**: Write operations (Create, Update, Delete)
-- **Queries**: Read operations (List, Get by ID)
-- **Domain**: Business entities and logic
-- **Infrastructure**: Repositories, external services
-- **Controllers**: API endpoints that dispatch Commands/Queries
+Each module follows the same layout: `<module>/{controller, module, services/, repo/, dto/, types}`.
+
+- **Controllers**: API endpoints; validate via DTOs and delegate to services
+- **Services**: Business logic; own transaction boundaries
+- **Repos**: The only persistence surface (`<Entity>Repo`, class-as-contract); domain-verb methods, no raw Prisma in services
+- **DTOs**: Request validation (`dto/`); response row shapes in `<module>.types.ts`
 
 ### Frontend Architecture
 
@@ -634,7 +635,7 @@ webdevstudios/
 ## 📝 Notes
 
 - **Product Schema**: Optimized for 4 fixed products. If expansion is needed, consider rebuilding the schema.
-- **CQRS Pattern**: Backend MUST follow CQRS - Controllers only dispatch Commands/Queries, no business logic.
+- **Service/Repo Pattern**: Business logic lives in services; repos are the only persistence surface; controllers stay thin.
 - **Server Components First**: Frontend prioritizes Server Components, use `'use client'` only when necessary.
 - **Type Safety**: TypeScript strict mode, avoid `any`, use enums for constants.
 - **Code Quality**: Always run `bun run lint` and `bun run format` after coding.

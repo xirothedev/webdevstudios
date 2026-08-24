@@ -20,7 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Product, ProductSizeStock } from '@generated/prisma';
+import { Product, ProductSizeStock } from '@prisma/client';
 
 export type ProductWithRelations = Product & {
   sizeStocks: ProductSizeStock[];

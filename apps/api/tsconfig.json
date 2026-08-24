@@ -28,7 +28,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/*": ["./src/*"],
-      "@generated/*": ["./generated/*"]
+      "@prisma/client": ["./src/generated/prisma"]
     }
   }
 }

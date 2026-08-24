@@ -33,7 +33,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -53,16 +52,6 @@ import {
   ThrottleStrict,
 } from '@/common/decorators';
 import { JwtAuthGuard } from '@/common/guards';
-// Commands
-import { Enable2FACommand } from './commands/enable-2fa';
-import { LoginCommand } from './commands/login';
-import { LogoutCommand } from './commands/logout';
-import { RefreshTokenCommand } from './commands/refresh-token';
-import { RegisterCommand } from './commands/register';
-import { RequestPasswordResetCommand } from './commands/request-password-reset';
-import { ResetPasswordCommand } from './commands/reset-password';
-import { Verify2FACommand } from './commands/verify-2fa';
-import { VerifyEmailCommand } from './commands/verify-email';
 import { CurrentUser } from './decorators/current-user.decorator';
 // DTOs
 import {
@@ -81,19 +70,17 @@ import {
   Verify2FADto,
   Verify2FAResponseDto,
   VerifyEmailDto,
-} from './dtos';
+} from './dto';
 import { GitHubOAuthGuard, GoogleOAuthGuard } from './guards';
-// Queries
-import { GetCurrentUserQuery } from './queries/get-current-user';
-import { GetSessionsQuery } from './queries/get-sessions';
-import { OAuthService, type OAuthUser, OAuthRedirectService } from './services';
+import { AuthService } from './services/auth.service';
+import { OAuthService, OAuthRedirectService } from './services';
+import { OAuthProfile } from './strategies';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
+    private readonly authService: AuthService,
     private readonly oauthService: OAuthService,
     private readonly oauthRedirectService: OAuthRedirectService,
   ) {}
@@ -117,9 +104,7 @@ export class AuthController {
     description: 'User with this email already exists',
   })
   async register(@Body() dto: RegisterDto) {
-    return this.commandBus.execute(
-      new RegisterCommand(dto.email, dto.password, dto.fullName, dto.phone),
-    );
+    return this.authService.register(dto);
   }
 
   @Public()
@@ -153,9 +138,7 @@ export class AuthController {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
 
-    const result = await this.commandBus.execute(
-      new LoginCommand(dto.email, dto.password, dto.rememberMe, ipAddress, userAgent),
-    );
+    const result = await this.authService.login(dto, ipAddress, userAgent);
 
     // Set cookies if login successful (not 2FA required)
     if (!result.requires2FA && result.accessToken && result.refreshToken) {
@@ -211,7 +194,7 @@ export class AuthController {
     description: 'Email is already verified or invalid token',
   })
   async verifyEmail(@Query() dto: VerifyEmailDto) {
-    return this.commandBus.execute(new VerifyEmailCommand(dto.token));
+    return this.authService.verifyEmail(dto);
   }
 
   @Public()
@@ -255,7 +238,7 @@ export class AuthController {
       throw new BadRequestException('Refresh token is required');
     }
 
-    const result = await this.commandBus.execute(new RefreshTokenCommand(token));
+    const result = await this.authService.refresh(token);
 
     // Set new cookies
     const isProduction = process.env.NODE_ENV === 'production';
@@ -317,7 +300,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body('sessionId') sessionId?: string,
   ) {
-    const result = await this.commandBus.execute(new LogoutCommand(user.id, sessionId));
+    const result = await this.authService.logout(user.id, sessionId);
 
     // Clear cookies
     res.clearCookie('access_token', { path: '/' });
@@ -343,7 +326,7 @@ export class AuthController {
     description: 'Unauthorized',
   })
   async getCurrentUser(@CurrentUser() user: { id: string }) {
-    return this.queryBus.execute(new GetCurrentUserQuery(user.id));
+    return this.authService.getCurrentUser(user.id);
   }
 
   @Get('sessions')
@@ -363,7 +346,7 @@ export class AuthController {
     description: 'Unauthorized',
   })
   async getSessions(@CurrentUser() user: { id: string }) {
-    return this.queryBus.execute(new GetSessionsQuery(user.id));
+    return this.authService.getSessions(user.id);
   }
 
   @Throttle2FA()
@@ -389,7 +372,7 @@ export class AuthController {
     description: 'Unauthorized',
   })
   async enable2FA(@CurrentUser() user: { id: string }) {
-    return this.commandBus.execute(new Enable2FACommand(user.id));
+    return this.authService.enable2FA(user.id);
   }
 
   @Throttle2FA()
@@ -420,9 +403,7 @@ export class AuthController {
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
 
-    const result = await this.commandBus.execute(
-      new Verify2FACommand(user.id, dto.code, dto.sessionId, ipAddress, userAgent),
-    );
+    const result = await this.authService.verify2FA(user.id, dto, ipAddress, userAgent);
 
     // Set cookies if login flow (tokens returned)
     if (result.accessToken && result.refreshToken) {
@@ -502,7 +483,7 @@ export class AuthController {
     const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
-    const oauthUser = req.user as OAuthUser;
+    const oauthUser = req.user as OAuthProfile;
 
     try {
       const result = await this.oauthService.handleOAuthCallback(oauthUser, ipAddress, userAgent);
@@ -569,7 +550,7 @@ export class AuthController {
     const redirectUrl = req.session?.oauthRedirectUrl;
     const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('user-agent');
-    const oauthUser = req.user as OAuthUser;
+    const oauthUser = req.user as OAuthProfile;
 
     try {
       const result = await this.oauthService.handleOAuthCallback(oauthUser, ipAddress, userAgent);
@@ -597,7 +578,7 @@ export class AuthController {
     type: SuccessResponseDto,
   })
   async requestPasswordReset(@Body() dto: RequestPasswordResetDto) {
-    return this.commandBus.execute(new RequestPasswordResetCommand(dto.email));
+    return this.authService.requestPasswordReset(dto);
   }
 
   @Public()
@@ -619,6 +600,6 @@ export class AuthController {
     description: 'Invalid or expired reset token',
   })
   async resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.commandBus.execute(new ResetPasswordCommand(dto.token, dto.newPassword));
+    return this.authService.resetPassword(dto);
   }
 }

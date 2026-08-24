@@ -23,13 +23,14 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/prisma';
-import { SessionRepository, TokenStorageService } from '../infrastructure';
+import { SessionRepo } from '../repo';
+import { TokenStorageService } from '../infrastructure';
 
 @Injectable()
 export class MfaGuard implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepo: SessionRepo,
     private readonly tokenStorage: TokenStorageService,
   ) {}
 
@@ -51,15 +52,18 @@ export class MfaGuard implements CanActivate {
       throw new ForbiddenException('2FA is not enabled for this user');
     }
 
-    const authHeader = request.headers.authorization;
-    if (!authHeader) {
-      throw new ForbiddenException('Authorization header missing');
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-
-    // Find session by token
-    const session = await this.sessionRepository.findByToken(token);
+    // Resolve the session by its stable id (jti claim). Tokens minted before
+    // this change carry no jti — fall back to token-string lookup.
+    // ponytail: delete the fallback when the Session.token column is dropped
+    const session = user.sessionId
+      ? await this.sessionRepo.findById(user.sessionId)
+      : await this.sessionRepo.findByToken(
+          request.cookies?.['access_token'] ??
+            (request.headers.authorization?.startsWith('Bearer ')
+              ? request.headers.authorization.slice(7)
+              : undefined) ??
+            '',
+        );
     if (!session || session.status !== 'ACTIVE') {
       throw new ForbiddenException('Invalid or expired session');
     }

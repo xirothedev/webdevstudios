@@ -24,9 +24,7 @@
         "PORT"
       ]
     },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
+    "lint": {},
     "test": {
       "dependsOn": ["^build"],
       "cache": false

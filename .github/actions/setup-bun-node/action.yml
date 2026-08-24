@@ -9,6 +9,17 @@ runs:
   steps:
     - uses: oven-sh/setup-bun@v2
       with:
-        bun-version: latest
+        # ponytail: pin to the version that wrote bun.lock — 'latest' drifts and breaks --frozen-lockfile
+        bun-version: 1.3.14
     - run: bun install --frozen-lockfile
       shell: bash
+    # Turbo's local task cache shared across jobs and runs; turbo validates
+    # task hashes itself, so stale entries are harmless
+    - uses: actions/cache@v6
+      with:
+        path: |
+          .turbo
+          node_modules/.cache/turbo
+        key: turbo-${{ github.job }}-${{ github.sha }}
+        restore-keys: |
+          turbo-${{ github.job }}-

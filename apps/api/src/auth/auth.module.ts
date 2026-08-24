@@ -22,7 +22,6 @@
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { StringValue } from 'ms';
@@ -30,51 +29,23 @@ import { StringValue } from 'ms';
 import { MailModule } from '../mail/mail.module';
 // Controller
 import { AuthController } from './auth.controller';
-// Commands
-import { Enable2FAHandler } from './commands/enable-2fa';
-import { LoginHandler } from './commands/login';
-import { LogoutHandler } from './commands/logout';
-import { RefreshTokenHandler } from './commands/refresh-token';
-import { RegisterHandler } from './commands/register';
-import { RequestPasswordResetHandler } from './commands/request-password-reset';
-import { ResetPasswordHandler } from './commands/reset-password';
-import { Verify2FAHandler } from './commands/verify-2fa';
-import { VerifyEmailHandler } from './commands/verify-email';
 // Guards
 import { GitHubOAuthGuard, GoogleOAuthGuard, MfaGuard } from './guards';
-import {
-  SessionRepository,
-  TokenService,
-  TokenStorageService,
-  TotpService,
-  UserRepository,
-} from './infrastructure';
-// Queries
-import { GetCurrentUserHandler } from './queries/get-current-user';
-import { GetSessionsHandler } from './queries/get-sessions';
-import { OAuthService, OAuthRedirectService } from './services';
+// Infrastructure
+import { TokenService, TokenStorageService, TotpService } from './infrastructure';
+// Repository
+import { SessionRepo } from './repo';
 // Services
+import { AuthService, OAuthService, OAuthRedirectService } from './services';
 // Strategies
 import { GitHubStrategy, GoogleStrategy, JwtStrategy } from './strategies';
-
-const CommandHandlers = [
-  RegisterHandler,
-  LoginHandler,
-  VerifyEmailHandler,
-  Enable2FAHandler,
-  Verify2FAHandler,
-  RequestPasswordResetHandler,
-  ResetPasswordHandler,
-  RefreshTokenHandler,
-  LogoutHandler,
-];
-
-const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
+// Users module (UserRepo)
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
-    CqrsModule,
     PassportModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -89,9 +60,9 @@ const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
   ],
   controllers: [AuthController],
   providers: [
+    // Repository
+    SessionRepo,
     // Infrastructure
-    UserRepository,
-    SessionRepository,
     TokenService,
     TokenStorageService,
     TotpService,
@@ -104,13 +75,10 @@ const QueryHandlers = [GetCurrentUserHandler, GetSessionsHandler];
     GitHubOAuthGuard,
     MfaGuard,
     // Services
+    AuthService,
     OAuthService,
     OAuthRedirectService,
-    // Command Handlers
-    ...CommandHandlers,
-    // Query Handlers
-    ...QueryHandlers,
   ],
-  exports: [UserRepository, SessionRepository, TokenService, TotpService],
+  exports: [SessionRepo, TokenService, TotpService],
 })
 export class AuthModule {}

@@ -20,39 +20,31 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { DeviceType, OAuthProvider } from '@generated/prisma';
+import { DeviceType } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import * as UAParser from 'ua-parser-js';
 
 import { addDays } from 'date-fns';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '@/prisma';
-import {
-  SessionRepository,
-  TokenService,
-  TokenStorageService,
-  UserRepository,
-} from '../infrastructure';
+import { UserRepo } from '@/users/repo';
 
-export interface OAuthUser {
-  provider: OAuthProvider;
-  providerId: string;
-  email: string;
-  name?: string;
-  picture?: string;
-}
+import { SessionRepo } from '../repo';
+import { TokenService, TokenStorageService } from '../infrastructure';
+import { OAuthProfile } from '../strategies';
 
 @Injectable()
 export class OAuthService {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly sessionRepository: SessionRepository,
+    private readonly userRepo: UserRepo,
+    private readonly sessionRepo: SessionRepo,
     private readonly tokenService: TokenService,
     private readonly tokenStorage: TokenStorageService,
     private readonly prisma: PrismaService,
   ) {}
 
   async handleOAuthCallback(
-    oauthUser: OAuthUser,
+    oauthUser: OAuthProfile,
     ipAddress?: string,
     userAgent?: string,
   ): Promise<{
@@ -94,7 +86,7 @@ export class OAuthService {
       });
     } else {
       // Check if user with this email exists
-      const existingUser = await this.userRepository.findByEmail(email);
+      const existingUser = await this.userRepo.findByEmail(email);
 
       if (existingUser) {
         // Link OAuth account to existing user
@@ -109,7 +101,7 @@ export class OAuthService {
         });
       } else {
         // Create new user
-        user = await this.userRepository.create({
+        user = await this.userRepo.create({
           email,
           fullName: name,
           emailVerified: true,
@@ -126,7 +118,7 @@ export class OAuthService {
 
         // Set avatar only on creation if user has no avatar
         if (picture && !user.avatar) {
-          await this.userRepository.update(user.id, { avatar: picture });
+          await this.userRepo.update(user.id, { avatar: picture });
         }
       }
     }
@@ -153,11 +145,15 @@ export class OAuthService {
     }
 
     // Generate tokens
-    const accessToken = this.tokenService.generateAccessToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const sessionId = randomUUID();
+    const accessToken = this.tokenService.generateAccessToken(
+      {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      sessionId,
+    );
 
     const refreshToken = this.tokenService.generateRefreshToken({
       sub: user.id,
@@ -165,15 +161,18 @@ export class OAuthService {
 
     // Create session
     const expiresAt = addDays(new Date(), 30); // 30 days
-    const session = await this.sessionRepository.create({
-      userId: user.id,
-      token: accessToken,
-      refreshToken,
-      deviceId,
-      ipAddress,
-      userAgent,
-      expiresAt,
-    });
+    const session = await this.sessionRepo.create(
+      {
+        userId: user.id,
+        token: accessToken,
+        refreshToken,
+        deviceId,
+        ipAddress,
+        userAgent,
+        expiresAt,
+      },
+      sessionId,
+    );
 
     // Mark MFA as verified (OAuth users don't need 2FA for OAuth login)
     const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);

@@ -1,0 +1,168 @@
+/**
+ * Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+ *
+ * Source Available License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to:
+ * - View and study the Software for educational purposes
+ * - Fork this repository on GitHub for personal reference
+ * - Share links to this repository
+ *
+ * THE FOLLOWING ARE PROHIBITED:
+ * - Using the Software in production or commercial applications
+ * - Copying substantial portions of the Software into other projects
+ * - Distributing modified versions of the Software
+ * - Removing or altering copyright notices
+ *
+ * For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+ */
+
+import { ProductSize } from '@prisma/client';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Min } from 'class-validator';
+
+export class CartItemDto {
+  @ApiProperty({
+    description: 'Cart item ID',
+    example: 'clx1234567890',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'Product ID',
+    example: 'clx1234567890',
+  })
+  productId: string;
+
+  @ApiProperty({
+    description: 'Product name',
+    example: 'Áo thun WebDev Studios',
+  })
+  productName: string;
+
+  @ApiProperty({
+    description: 'Product slug',
+    example: 'AO_THUN',
+  })
+  productSlug: string;
+
+  @ApiProperty({
+    description: 'Product price',
+    example: 299000,
+    type: Number,
+  })
+  productPrice: number;
+
+  @ApiProperty({
+    description: 'Product image URL',
+    example: 'https://example.com/image.webp',
+  })
+  productImage: string;
+
+  @ApiPropertyOptional({
+    description: 'Product size (for products with sizes)',
+    enum: ProductSize,
+    example: ProductSize.M,
+    nullable: true,
+  })
+  size: ProductSize | null;
+
+  @ApiProperty({
+    description: 'Quantity',
+    example: 2,
+  })
+  quantity: number;
+
+  @ApiProperty({
+    description: 'Subtotal (price * quantity)',
+    example: 598000,
+    type: Number,
+  })
+  subtotal: number;
+
+  @ApiProperty({
+    description: 'Stock available',
+    example: 10,
+  })
+  stockAvailable: number;
+}
+
+export class CartDto {
+  @ApiProperty({
+    description: 'Cart ID',
+    example: 'clx1234567890',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'Cart items',
+    type: [CartItemDto],
+  })
+  items: CartItemDto[];
+
+  @ApiProperty({
+    description: 'Total items count',
+    example: 3,
+  })
+  totalItems: number;
+
+  @ApiProperty({
+    description: 'Total amount',
+    example: 897000,
+    type: Number,
+  })
+  totalAmount: number;
+
+  @ApiProperty({
+    description: 'Last update date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
+  updatedAt: Date;
+}
+
+export class AddToCartDto {
+  @ApiProperty({
+    description: 'Product ID',
+    example: 'clx1234567890',
+  })
+  @IsString()
+  @IsNotEmpty()
+  productId: string;
+
+  @ApiPropertyOptional({
+    description: 'Product size (required for products with sizes)',
+    enum: ProductSize,
+    example: ProductSize.M,
+  })
+  @IsEnum(ProductSize)
+  @IsOptional()
+  size?: ProductSize;
+
+  @ApiProperty({
+    description: 'Quantity',
+    example: 1,
+    minimum: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @Min(1)
+  quantity: number;
+}
+
+export class UpdateCartItemDto {
+  @ApiProperty({
+    description: 'Quantity',
+    example: 2,
+    minimum: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @Min(1)
+  quantity: number;
+}

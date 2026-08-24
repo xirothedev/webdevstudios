@@ -34,8 +34,13 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateAccessToken(payload: { sub: string; email: string; role?: string }): string {
-    return this.jwtService.sign(payload, {
+  generateAccessToken(
+    payload: { sub: string; email: string; role?: string },
+    sessionId?: string,
+  ): string {
+    // jti carries the Session id so identity survives refresh rotation
+    const claims = sessionId ? { ...payload, jti: sessionId } : payload;
+    return this.jwtService.sign(claims, {
       expiresIn: this.configService.get<StringValue>('JWT_ACCESS_TOKEN_EXPIRES_IN', '3600'),
     });
   }
@@ -50,6 +55,7 @@ export class TokenService {
     sub: string;
     email?: string;
     role?: string;
+    jti?: string;
     iat?: number;
     exp?: number;
   } {

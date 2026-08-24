@@ -20,21 +20,25 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { Injectable, Logger } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { ExpireOrderCommand } from '../commands/expire-order';
-import { OrderRepository } from '../infrastructure/order.repository';
+import { OrderRepo } from '../repo';
+import { OrderService } from '../services/orders.service';
 
 @Injectable()
-export class OrderExpirationScheduler {
+export class OrderExpirationScheduler implements OnModuleInit {
   private readonly logger = new Logger(OrderExpirationScheduler.name);
 
   constructor(
-    private readonly orderRepository: OrderRepository,
-    private readonly commandBus: CommandBus,
+    private readonly orderRepo: OrderRepo,
+    private readonly orderService: OrderService,
   ) {}
+
+  // Sweep once on startup so orders that expired while the app was down are handled
+  async onModuleInit() {
+    await this.handleExpiredOrders();
+  }
 
   // Run every 5 minutes to check for expired orders
   @Cron(CronExpression.EVERY_5_MINUTES)
@@ -42,7 +46,7 @@ export class OrderExpirationScheduler {
     this.logger.log('Checking for expired orders...');
 
     try {
-      const expiredOrders = await this.orderRepository.findExpiredPendingOrders();
+      const expiredOrders = await this.orderRepo.findExpiredPendingOrders();
 
       if (expiredOrders.length === 0) {
         this.logger.debug('No expired orders found');
@@ -54,7 +58,7 @@ export class OrderExpirationScheduler {
       // Process each expired order
       for (const order of expiredOrders) {
         try {
-          await this.commandBus.execute(new ExpireOrderCommand(order.id));
+          await this.orderService.expireOrder(order.id);
           this.logger.log(`Expired order ${order.id} (${order.code})`);
         } catch (error) {
           this.logger.error(

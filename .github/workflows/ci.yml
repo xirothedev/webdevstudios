@@ -61,8 +61,8 @@ jobs:
 
   build:
     name: Build
-    needs: changes
-    if: needs.changes.outputs.app == 'true'
+    needs: [changes, lint, test]
+    if: needs.changes.outputs.app == 'true' && !cancelled()
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

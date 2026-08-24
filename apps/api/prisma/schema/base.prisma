@@ -26,7 +26,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  output          = "../../generated/prisma"
+  output          = "../../src/generated/prisma"
   binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
   previewFeatures = ["postgresqlExtensions", "views", "fullTextSearchPostgres"]
 }
