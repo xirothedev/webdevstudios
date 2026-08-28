@@ -51,8 +51,8 @@ export default function PartnerPage() {
         />
 
         {/* Orange Glow Orbs */}
-        <div className="bg-wds-accent/10 absolute -top-[20%] -left-[10%] h-[600px] w-[600px] rounded-full blur-[120px]" />
-        <div className="bg-wds-accent/5 absolute top-[40%] -right-[10%] h-[500px] w-[500px] rounded-full blur-[100px]" />
+        <div className="bg-wds-accent/10 absolute top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full blur-[120px]" />
+        <div className="bg-wds-accent/5 absolute top-[40%] right-[-10%] h-[500px] w-[500px] rounded-full blur-[100px]" />
       </div>
 
       <main className="relative z-10 pt-32 pb-20">

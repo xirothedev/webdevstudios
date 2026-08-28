@@ -227,7 +227,7 @@ export function WDSContactGrid() {
         </m.div>
 
         {/* Bento Grid */}
-        <BentoGrid className="md:auto-rows-[18rem]">
+        <BentoGrid className="md:auto-rows-72">
           {contacts.map((contact) => (
             <BentoCard key={contact.name} {...contact} />
           ))}

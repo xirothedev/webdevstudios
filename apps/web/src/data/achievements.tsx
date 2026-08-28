@@ -105,7 +105,7 @@ export const AWARDS: AwardYearGroup[] = [
         rank: 'Danh hiệu',
         organizer: 'Đoàn trường ĐH CNTT',
         description: 'Được vinh danh là CLB có đóng góp tích cực nhất cho phong trào học thuật.',
-        icon: <Crown size={32} className="text-[#F7931E]" />,
+        icon: <Crown size={32} className="text-wds-accent" />,
       },
       {
         id: 5,
