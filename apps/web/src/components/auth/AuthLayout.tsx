@@ -36,9 +36,9 @@ export function AuthLayout({ children, variant = 'login' }: AuthLayoutProps) {
       {/* Animated gradient blobs */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Orange blob */}
-        <div className="blob animate-blob-1 absolute top-[10%] -left-[30%] h-[500px] w-[500px] rounded-full bg-orange-600/40 blur-[120px]" />
+        <div className="blob animate-blob-1 absolute top-[10%] left-[-30%] h-[500px] w-[500px] rounded-full bg-orange-600/40 blur-[120px]" />
         {/* Amber blob */}
-        <div className="blob animate-blob-2 absolute -right-[30%] bottom-[10%] h-[500px] w-[500px] rounded-full bg-amber-600/40 blur-[120px]" />
+        <div className="blob animate-blob-2 absolute right-[-30%] bottom-[10%] h-[500px] w-[500px] rounded-full bg-amber-600/40 blur-[120px]" />
         {/* Yellow accent blob */}
         <div className="blob animate-blob-3 absolute bottom-[-10%] left-[20%] h-[400px] w-[400px] rounded-full bg-yellow-600/30 blur-[100px]" />
         {/* Red-orange accent blob */}

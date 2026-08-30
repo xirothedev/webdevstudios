@@ -1,0 +1,55 @@
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// EVENTS (Club event calendar)
+// =========================================
+
+enum EventType {
+  MEETING // Meeting
+  WORKSHOP // Workshop
+  SOCIAL // Social event
+  COMPETITION // Competition
+  SURVEY // Survey
+  OTHER // Other
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  startDate   DateTime  @db.Timestamptz(6)
+  endDate     DateTime  @db.Timestamptz(6)
+  location    String?   @db.VarChar(255)
+  type        EventType
+  organizer   String?   @db.VarChar(100)
+  attendees   Int? // Number of attendees (optional)
+  surveyLink  String?   @db.Text // Google Form link for SURVEY events
+
+  // Audit fields
+  createdBy String? // User ID of admin who created event
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startDate])
+  @@index([endDate])
+  @@index([type])
+  @@map("events")
+}

@@ -24,13 +24,7 @@ import { apiClient } from '../api-client';
 import { ProductSize } from './products';
 
 export type OrderStatus =
-  | 'PENDING'
-  | 'CONFIRMED'
-  | 'PROCESSING'
-  | 'SHIPPING'
-  | 'DELIVERED'
-  | 'CANCELLED'
-  | 'RETURNED';
+  'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPING' | 'DELIVERED' | 'CANCELLED' | 'RETURNED';
 
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 

@@ -1,0 +1,849 @@
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// OAUTH & AUTHENTICATION
+// =========================================
+
+// Store OAuth login information (Google, Facebook, etc.)
+model ExternalAccount {
+  id            String        @id @default(cuid())
+  provider      OAuthProvider
+  providerId    String        @db.VarChar(255) // ID from provider (e.g.: Google user ID)
+  providerEmail String?       @db.VarChar(255) // Email from provider
+  accessToken   String?       @db.Text // Encrypted access token
+  refreshToken  String?       @db.Text // Encrypted refresh token
+  expiresAt     DateTime? // Token expiration
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Unique constraint: a provider can only be linked once with a user
+  @@unique([provider, providerId])
+  @@unique([provider, userId])
+  @@index([userId])
+  @@index([provider, providerId])
+  @@map("external_accounts")
+}
+
+// Manage user MFA methods
+model UserMFAMethod {
+  id         String    @id @default(cuid())
+  methodType MFAMethod // TOTP, SMS, EMAIL, BACKUP_CODE
+  secret     String?   @db.Text // Encrypted secret (for TOTP)
+  phone      String?   @db.VarChar(15) // For SMS
+  isActive   Boolean   @default(true)
+  isVerified Boolean   @default(false) // Whether verified
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  lastUsedAt DateTime? // Last time used
+
+  @@index([userId])
+  @@map("mfa_methods")
+}
+
+// Backup codes for MFA (single use)
+model MFABackupCode {
+  id     String    @id @default(cuid())
+  code   String    @db.VarChar(20) // Hashed backup code
+  isUsed Boolean   @default(false)
+  usedAt DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("mfa_backup_codes")
+}
+
+// Log login devices
+model Device {
+  id          String     @id @default(cuid())
+  name        String?    @db.VarChar(255) // Device name (e.g.: "iPhone 14 Pro")
+  type        DeviceType @default(UNKNOWN)
+  userAgent   String?    @db.Text // User agent string
+  ipAddress   String?    @db.VarChar(45) // IPv4 or IPv6
+  fingerprint String?    @db.VarChar(255) // Device fingerprint
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  isTrusted  Boolean  @default(false) // User has trusted this device
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  // Relations
+  session Session? // Current session of this device (one-to-one)
+
+  @@index([userId])
+  @@index([fingerprint])
+  @@map("devices")
+}
+
+// Manage login sessions
+model Session {
+  id           String  @id @default(cuid())
+  token        String  @unique @db.Text // Session token (JWT or random string)
+  refreshToken String? @unique @db.Text // Refresh token
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deviceId String? @unique // Link to Device (unique: one device has only one session)
+  device   Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  ipAddress String? @db.VarChar(45)
+  userAgent String? @db.Text
+
+  status    SessionStatus @default(ACTIVE)
+  expiresAt DateTime // Expiration time
+  revokedAt DateTime? // Revocation time
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([token])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../../src/generated/prisma"
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+  previewFeatures = ["postgresqlExtensions", "views", "fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// BLOG MANAGEMENT (Hybrid Storage: PostgreSQL + R2)
+// =========================================
+
+model BlogPost {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String @db.VarChar(255)
+
+  // Content stored in R2
+  contentKey  String // R2 object key for the markdown file (e.g., "blog/posts/{id}/content.md")
+  contentSize Int? // File size in bytes (for monitoring)
+
+  // Searchable excerpt (stored in DB for full-text search)
+  excerpt String? @db.VarChar(500)
+
+  // Cover image (also in R2)
+  coverImage String? // R2 object key to cover image
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  // Metadata
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  viewCount   Int       @default(0)
+
+  // SEO
+  metaTitle       String? @db.VarChar(255)
+  metaDescription String? @db.VarChar(500)
+
+  // Relations
+  tags     BlogTag[]
+  comments BlogComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished, publishedAt])
+  @@index([authorId])
+  @@index([title]) // Index for title search
+  @@index([excerpt]) // Index for excerpt search
+  @@map("blog_posts")
+}
+
+model BlogTag {
+  id   String @id @default(cuid())
+  name String @unique @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  posts BlogPost[]
+
+  @@map("blog_tags")
+}
+
+model BlogComment {
+  id       String   @id @default(cuid())
+  content  String   @db.Text
+  postId   String
+  post     BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User     @relation(fields: [authorId], references: [id])
+
+  parentId String? // For nested comments
+  parent   BlogComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  BlogComment[] @relation("CommentReplies")
+
+  isApproved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("blog_comments")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// ENUMS (Define fixed value sets)
+// =========================================
+
+enum UserRole {
+  ADMIN // Shop owner
+  CUSTOMER // Customer
+}
+
+enum OrderStatus {
+  PENDING // Awaiting payment
+  CONFIRMED // Confirmed
+  PROCESSING // Packaging
+  SHIPPING // Shipping
+  DELIVERED // Delivered successfully
+  CANCELLED // Cancelled
+  RETURNED // Returned
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum DiscountType {
+  PERCENTAGE // Discount by percentage
+  FIXED_AMOUNT // Fixed amount discount
+}
+
+enum OAuthProvider {
+  GOOGLE
+  FACEBOOK
+  GITHUB
+  APPLE
+}
+
+enum MFAMethod {
+  TOTP // Time-based One-Time Password (Google Authenticator, Authy)
+  SMS // SMS OTP
+  EMAIL // Email OTP
+  BACKUP_CODE // Backup codes
+}
+
+enum DeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  UNKNOWN
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+// =========================================
+// PRODUCT ENUMS
+// =========================================
+
+enum ProductSlug {
+  AO_THUN // T-shirt WebDev Studios
+  PAD_CHUOT // Mouse pad WebDev Studios
+  DAY_DEO // Lanyard WebDev Studios
+  MOC_KHOA // Keychain WebDev Studios
+}
+
+/**
+ * Product size (only t-shirt has sizes)
+ */
+enum ProductSize {
+  S
+  M
+  L
+  XL
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// EVENTS (Club event calendar)
+// =========================================
+
+enum EventType {
+  MEETING // Meeting
+  WORKSHOP // Workshop
+  SOCIAL // Social event
+  COMPETITION // Competition
+  SURVEY // Survey
+  OTHER // Other
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  startDate   DateTime  @db.Timestamptz(6)
+  endDate     DateTime  @db.Timestamptz(6)
+  location    String?   @db.VarChar(255)
+  type        EventType
+  organizer   String?   @db.VarChar(100)
+  attendees   Int? // Number of attendees (optional)
+  surveyLink  String?   @db.Text // Google Form link for SURVEY events
+
+  // Audit fields
+  createdBy String? // User ID of admin who created event
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startDate])
+  @@index([endDate])
+  @@index([type])
+  @@map("events")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// MARKETING & SOCIAL
+// =========================================
+
+model Voucher {
+  id    String       @id @default(cuid())
+  code  String       @unique @db.VarChar(20)
+  type  DiscountType
+  value Decimal      @db.Money // Discount value (amount or %)
+
+  minSpend    Decimal? @db.Money // Minimum order
+  maxDiscount Decimal? @db.Money // Maximum discount (for % type)
+
+  usageLimit Int @default(100) // Total usage count
+  usedCount  Int @default(0) // Used count
+
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+
+  @@map("vouchers")
+}
+
+model Review {
+  id      String  @id @default(cuid())
+  rating  Int     @default(5) // 1-5 stars
+  comment String? @db.Text
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@map("reviews")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// CART & ORDER SYSTEM
+// =========================================
+
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id     String @id @default(cuid())
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  size     ProductSize? // Product size (only t-shirt has, nullable)
+  quantity Int          @default(1)
+
+  @@unique([cartId, productId, size]) // A product + size can only appear once in a cart
+  @@index([cartId])
+  @@map("cart_items")
+}
+
+model Order {
+  id   String @id @default(cuid())
+  code String @unique // Short order code for customer (e.g.: #ORD-1234)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+
+  totalAmount   Decimal @db.Money // Final total amount
+  shippingFee   Decimal @default(0) @db.Money
+  discountValue Decimal @default(0) @db.Money
+
+  // Shipping address snapshot (Store text data to prevent changes when user edits profile)
+  shippingAddressId String          @unique
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items              OrderItem[]
+  paymentTransaction PaymentTransaction?
+
+  @@map("orders")
+}
+
+/**
+ * Shipping address (Snapshot at order time)
+ */
+model ShippingAddress {
+  id           String  @id @default(cuid())
+  fullName     String  @db.VarChar(255)
+  phone        String  @db.VarChar(20)
+  addressLine1 String  @db.VarChar(255)
+  addressLine2 String? @db.VarChar(255)
+  city         String  @db.VarChar(100)
+  district     String  @db.VarChar(100)
+  ward         String  @db.VarChar(100)
+  postalCode   String  @db.VarChar(20)
+
+  order Order?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shipping_addresses")
+}
+
+// Store product state AT TIME OF PURCHASE (Snapshot)
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String? // Can be null if product is deleted later
+  product   Product? @relation(fields: [productId], references: [id])
+
+  // Snapshot data (stored to prevent changes when product is updated)
+  productSlug ProductSlug // Store slug for easy lookup
+  productName String       @db.VarChar(255) // Store product name
+  size        ProductSize? // Product size (if available)
+  price       Decimal      @db.Money // Store price at time of purchase
+  quantity    Int
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// PAYMENT SYSTEM
+// =========================================
+
+model PaymentTransaction {
+  id              String                   @id @default(cuid())
+  orderId         String                   @unique
+  order           Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  transactionCode String                   @unique // PayOS transaction code
+  amount          Decimal                  @db.Money
+  status          PaymentTransactionStatus @default(PENDING)
+  paymentUrl      String? // URL for redirect
+  payosData       Json? // Store raw data from PayOS
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@map("payment_transactions")
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+  FAILED
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// PRODUCT MANAGEMENT (Simplified for 4 fixed products)
+// =========================================
+
+model Product {
+  id          String      @id @default(cuid())
+  slug        ProductSlug @unique // Enum ensures only 4 products
+  name        String      @db.VarChar(255)
+  description String      @db.Text
+
+  // Product pricing
+  priceCurrent  Decimal  @db.Money // Current price
+  priceOriginal Decimal? @db.Money // Original price (if discounted)
+  priceDiscount Decimal? @db.Money // Discount amount
+
+  // Product information
+  stock    Int     @default(0) // Total stock quantity
+  hasSizes Boolean @default(false) // Whether size selection is supported (only t-shirt)
+  badge    String? @db.VarChar(50) // Display badge (Limited Edition, Official Merch)
+
+  // Product ratings
+  ratingValue Decimal @default(0) @db.Decimal(3, 2) // Rating score (0-5)
+  ratingCount Int     @default(0) // Number of ratings
+
+  // Metadata
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  sizeStocks ProductSizeStock[] // Manage stock by size (only t-shirt)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@index([slug])
+  @@map("products")
+}
+
+/**
+ * Manage stock by size (only for t-shirt)
+ * If product doesn't have sizes, stock is stored directly in Product.stock
+ */
+model ProductSizeStock {
+  id    String      @id @default(cuid())
+  size  ProductSize // S, M, L, XL
+  stock Int         @default(0)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, size]) // Each size of a product has only 1 record
+  @@index([productId])
+  @@map("product_size_stocks")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+model SecurityLog {
+  id        String   @id @default(cuid())
+  type      String // SecurityEventType enum
+  severity  String // low, medium, high, critical
+  message   String   @db.Text
+  userId    String?
+  ipAddress String?
+  userAgent String?
+  path      String?
+  method    String?
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  // Indexes for efficient querying
+  @@index([type])
+  @@index([severity])
+  @@index([timestamp])
+  @@index([userId])
+  @@index([ipAddress])
+  @@map("security_logs")
+}
+
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// USER & AUTHENTICATION
+// =========================================
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique @db.VarChar(255)
+  password String?  @db.Text // Nullable because OAuth users don't have password
+  fullName String?  @db.VarChar(100)
+  phone    String?  @db.VarChar(15)
+  avatar   String?  @db.Text
+  role     UserRole @default(CUSTOMER)
+
+  // MFA fields
+  mfaEnabled Boolean @default(false)
+  mfaSecret  String? @db.Text // TOTP secret (encrypted)
+
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  addresses        Address[]
+  orders           Order[]
+  reviews          Review[]
+  cart             Cart? // 1 User has only 1 active cart
+  externalAccounts ExternalAccount[] // OAuth accounts
+  mfaMethods       UserMFAMethod[] // MFA methods
+  mfaBackupCodes   MFABackupCode[] // MFA backup codes
+  devices          Device[] // Logged devices
+  sessions         Session[] // Active sessions
+  blogPosts        BlogPost[] // Blog posts authored by user
+  blogComments     BlogComment[] // Blog comments by user
+
+  @@map("users")
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  recipient String  @db.VarChar(100) // Recipient name
+  phone     String  @db.VarChar(15)
+  street    String  @db.Text
+  city      String  @db.VarChar(50)
+  district  String  @db.VarChar(50)
+  ward      String  @db.VarChar(50)
+  isDefault Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
+}

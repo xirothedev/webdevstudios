@@ -44,6 +44,7 @@
   ],
   "ignorePatterns": [
     "node_modules/**",
+    "**/generated/**",
     "dist/**",
     ".next/**",
     "coverage/**",
