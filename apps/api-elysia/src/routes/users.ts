@@ -7,6 +7,8 @@ import { requireAuth, optionalAuth } from '../lib/auth';
 import { goTime, paging } from '../lib/util';
 import { putObject, resolveMediaUrl, storageEnabled } from '../lib/storage';
 
+const VALID_ROLES = ['ADMIN', 'CUSTOMER'] as const;
+
 function privateDTO(u: User) {
   return {
     id: u.id,
@@ -33,8 +35,7 @@ async function byID(id: string): Promise<User> {
 export const users = new Elysia()
   .get('/users/me', async ({ request, cookie }) => {
     const auth = await requireAuth({ request, cookie });
-    const u = await byID(auth.user.id);
-    return privateDTO(u);
+    return privateDTO(auth.user);
   })
   .patch('/users/profile', async ({ request, cookie, body }) => {
     const auth = await requireAuth({ request, cookie });
@@ -83,16 +84,20 @@ export const users = new Elysia()
     await putObject(key, buf, file.type).catch((e: Error) => {
       throw new ApiError(500, e.message);
     });
-    await db().user.update({ where: { id: auth.user.id }, data: { avatar: key } });
-    const u = await db().user.findUnique({ where: { id: auth.user.id } });
-    if (u === null) throw new ApiError(500, 'user verify failed');
+    const u = await db().user.update({ where: { id: auth.user.id }, data: { avatar: key } });
     return { ...privateDTO(u), avatar: resolveMediaUrl(u.avatar ?? '') };
   })
   // ponytail: mirrors Go — the list route is auth-only with no admin check.
   .get('/users', async ({ request, cookie, query }) => {
     await requireAuth({ request, cookie });
     const { page, limit } = paging(query.page, query.limit, 100);
-    const where = query.role && query.role !== '' ? { role: query.role as User['role'] } : {};
+    let where: Record<string, unknown> = {};
+    if (query.role && query.role !== '') {
+      if (!(VALID_ROLES as readonly string[]).includes(query.role)) {
+        throw new ApiError(400, 'role must be one of ADMIN, CUSTOMER');
+      }
+      where = { role: query.role };
+    }
     const total = await db().user.count({ where });
     const rows = await db().user.findMany({
       where,

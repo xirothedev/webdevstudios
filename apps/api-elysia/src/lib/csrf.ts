@@ -1,23 +1,16 @@
+import type { Cookie } from 'elysia';
 import { createHmac } from 'node:crypto';
 
 import { ApiError } from './errors';
 import { randomHex, safeEqual } from './util';
 
-type CookieSlot = {
-  value?: unknown;
-  httpOnly?: boolean;
-  path?: string;
-  sameSite?: 'strict' | 'lax' | 'none' | boolean;
-  maxAge?: number;
-};
-
 export type GuardContext = {
   request: Request;
   path: string;
-  cookie: Record<string, CookieSlot>;
+  cookie: Record<string, Cookie<unknown>>;
 };
 
-const EXEMPT_PREFIXES = ['/v1/auth/oauth', '/v1/payments/webhook', '/v1/docs'];
+const EXEMPT_PREFIXES = ['/v1/auth/oauth', '/v1/payments/webhook'];
 const EXEMPT_EXACT = '/v1/auth/refresh';
 
 function secret(): string {
@@ -41,7 +34,7 @@ export function validCsrfToken(token: string): boolean {
   return safeEqual(hmacHex(secret(), token.slice(dot + 1)), token.slice(0, dot));
 }
 
-export function issueCsrfToken(cookie: Record<string, CookieSlot>, value: string): void {
+export function issueCsrfToken(cookie: Record<string, Cookie<unknown>>, value: string): void {
   const slot = cookie._csrf;
   slot.value = value;
   slot.httpOnly = true;

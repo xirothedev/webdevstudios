@@ -1,20 +1,12 @@
+import type { Cookie } from 'elysia';
 import type { User } from '../generated/prisma/client';
 import { ApiError } from './errors';
 import { verifyToken } from './jwt';
 import { db } from './prisma';
 
-type CookieSlot = {
-  value?: unknown;
-  httpOnly?: boolean;
-  path?: string;
-  sameSite?: 'strict' | 'lax' | 'none' | boolean;
-  maxAge?: number;
-  secure?: boolean;
-};
-
 export type AuthContext = {
   request: Request;
-  cookie: Record<string, CookieSlot>;
+  cookie: Record<string, Cookie<unknown>>;
 };
 
 export interface AuthResult {
@@ -65,7 +57,7 @@ export async function requireAdmin(ctx: AuthContext): Promise<AuthResult> {
 }
 
 export function setAuthCookies(
-  cookie: Record<string, CookieSlot>,
+  cookie: Record<string, Cookie<unknown>>,
   accessToken: string,
   refreshToken: string,
   refreshTtlSeconds: number,
@@ -88,7 +80,7 @@ export function setAuthCookies(
   refresh.secure = secure;
 }
 
-export function clearAuthCookies(cookie: Record<string, CookieSlot>): void {
+export function clearAuthCookies(cookie: Record<string, Cookie<unknown>>): void {
   for (const name of ['access_token', 'refresh_token']) {
     const slot = cookie[name];
     slot.value = '';

@@ -2,7 +2,7 @@ import { Elysia } from 'elysia';
 import type { Event, EventType } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
 import { db } from '../lib/prisma';
-import { bindBody } from '../lib/validate';
+import { bindBody, readJsonObject } from '../lib/validate';
 import { requireAdmin } from '../lib/auth';
 import { goTime, newId } from '../lib/util';
 
@@ -111,26 +111,9 @@ export const events = new Elysia()
   })
   .patch('/events/:id', async ({ request, cookie, params }) => {
     await requireAdmin({ request, cookie });
-    const raw = (await (async () => {
-      const text = await request.text();
-      if (text.trim() === '') throw new ApiError(400, ['EOF']);
-      try {
-        return JSON.parse(text);
-      } catch {
-        throw new ApiError(400, ['Malformed JSON body']);
-      }
-    })()) as unknown;
-    if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
-      throw new ApiError(400, [
-        'json: cannot unmarshal ' +
-          (Array.isArray(raw) ? 'array' : typeof raw) +
-          ' into Go value of type map[string]interface {}',
-      ]);
-    }
+    const in1 = await readJsonObject(request);
     const e = await db().event.findUnique({ where: { id: params.id! } });
     if (e === null) throw new ApiError(404, `Event with ID ${params.id} not found`);
-
-    const in1 = raw as Record<string, unknown>;
     const updates: Record<string, unknown> = {};
     for (const k of ['title', 'description', 'location', 'organizer', 'surveyLink']) {
       const v = in1[k];
@@ -142,6 +125,7 @@ export const events = new Elysia()
       updates.type = s;
     }
     if ('attendees' in in1) {
+      // ponytail: mirrors Go `f, _ := v.(float64); int(f)` — non-number zero-fills.
       const f = typeof in1.attendees === 'number' ? in1.attendees : 0;
       updates.attendees = Math.trunc(f);
     }
@@ -154,11 +138,10 @@ export const events = new Elysia()
     }
     if (Object.keys(updates).length > 0) {
       updates.updatedAt = new Date();
-      await db().event.update({ where: { id: e.id }, data: updates });
+      const updated = await db().event.update({ where: { id: e.id }, data: updates });
+      return toDTO(updated);
     }
-    const fresh = await db().event.findUnique({ where: { id: e.id } });
-    if (fresh === null) throw new Error('event verify failed');
-    return toDTO(fresh);
+    return toDTO(e);
   })
   .delete('/events/:id', async ({ request, cookie, params }) => {
     await requireAdmin({ request, cookie });

@@ -202,6 +202,26 @@ function typeMismatchMessage(key: string, def: FieldDef, value: unknown): string
   return `property ${jsonKey(key)} must be a ${jsonKind(value)}`;
 }
 
+// Mirrors Go web.Bind into map[string]any — Go emits []string for bind errors.
+export async function readJsonObject(request: Request): Promise<Record<string, unknown>> {
+  const text = await request.text();
+  if (text.trim() === '') {
+    throw new ApiError(400, ['EOF']);
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new ApiError(400, ['Malformed JSON body']);
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new ApiError(400, [
+      `json: cannot unmarshal ${Array.isArray(parsed) ? 'array' : typeof parsed} into Go value of type map[string]interface {}`,
+    ]);
+  }
+  return parsed as Record<string, unknown>;
+}
+
 export function jsonKey(goFieldName: string): string {
   return goFieldName === '' ? goFieldName : goFieldName[0]!.toLowerCase() + goFieldName.slice(1);
 }
