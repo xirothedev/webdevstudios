@@ -1,3 +1,4 @@
+import CORS from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 
 import { ApiError, nestBody } from './lib/errors';
@@ -27,13 +28,18 @@ const STRICT_PATHS = new Set([
 ]);
 
 export const app = new Elysia({ prefix: '/v1' })
+  .use(CORS({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000', credentials: true }))
   .onBeforeHandle(async ({ request, path, route, cookie }) => {
     csrfGuard({ request, path, cookie });
-    const throttler = await getThrottler();
-    if (throttler !== null) {
-      const key = route ?? path;
-      const limit = STRICT_PATHS.has(key) ? 10 : 100;
-      await throttler(limit)({ path: key, request });
+    // ponytail: OPTIONS preflights are unauthed browser noise; counting them would
+    // burn strict-path quota (10/min) on every cross-origin state-changing POST.
+    if (request.method !== 'OPTIONS') {
+      const throttler = await getThrottler();
+      if (throttler !== null) {
+        const key = route ?? path;
+        const limit = STRICT_PATHS.has(key) ? 10 : 100;
+        await throttler(limit)({ path: key, request });
+      }
     }
   })
   .get('/ping', () => ({ message: 'pong from elysia' }))
