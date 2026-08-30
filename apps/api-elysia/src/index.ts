@@ -1,3 +1,4 @@
+import CORS from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 
 import { ApiError, nestBody } from './lib/errors';
@@ -27,13 +28,18 @@ const STRICT_PATHS = new Set([
 ]);
 
 export const app = new Elysia({ prefix: '/v1' })
+  .use(CORS({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000', credentials: true }))
   .onBeforeHandle(async ({ request, path, route, cookie }) => {
     csrfGuard({ request, path, cookie });
-    const throttler = await getThrottler();
-    if (throttler !== null) {
-      const key = route ?? path;
-      const limit = STRICT_PATHS.has(key) ? 10 : 100;
-      await throttler(limit)({ path: key, request });
+    // ponytail: OPTIONS preflights are unauthed browser noise; counting them would
+    // burn strict-path quota (10/min) on every cross-origin state-changing POST.
+    if (request.method !== 'OPTIONS') {
+      const throttler = await getThrottler();
+      if (throttler !== null) {
+        const key = route ?? path;
+        const limit = STRICT_PATHS.has(key) ? 10 : 100;
+        await throttler(limit)({ path: key, request });
+      }
     }
   })
   .get('/ping', () => ({ message: 'pong from elysia' }))
@@ -66,28 +72,7 @@ export const app = new Elysia({ prefix: '/v1' })
   .use(users)
   .use(auth)
   .use(events)
-  .use(blog)
-  .onError((ctx) => {
-    console.error(
-      'DBG onError',
-      ctx.code,
-      (ctx.error as Error)?.message,
-      (ctx.error as Error)?.constructor?.name,
-    );
-    const { code, error, set, request, path } = ctx;
-    if (error instanceof ApiError) {
-      set.status = error.status;
-      return nestBody(error.status, error.messageValue);
-    }
-    if (code === 'NOT_FOUND') {
-      set.status = 404;
-      return nestBody(404, `Cannot ${request.method} ${path}`);
-    }
-    const message = error instanceof Error ? error.message : String(error);
-    console.error('[error]', request.method, path, message);
-    set.status = 500;
-    return nestBody(500, message);
-  });
+  .use(blog);
 
 // ponytail: 4002 avoids 4000 (NestJS) and 4001 (Go) while all twins run locally.
 if (import.meta.main) {
@@ -105,6 +90,6 @@ if (import.meta.main) {
       5 * 60 * 1000,
     );
     app.listen(port);
-    console.log(`api-elysia listening on http://localhost:${port}/v1`);
+    console.warn(`api-elysia listening on http://localhost:${port}/v1`);
   })();
 }

@@ -3,36 +3,9 @@ import { Prisma, type Order } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
 import { db } from '../lib/prisma';
 import { PayosNotConfiguredError, createPaymentLink, verifyWebhookSignature } from '../lib/payos';
-import { bindBody } from '../lib/validate';
+import { bindBody, readJsonObject } from '../lib/validate';
 import { requireAuth } from '../lib/auth';
 import { goTime, newId } from '../lib/util';
-
-// Mirrors payments.service.MarkPaid (admin mark-paid).
-export async function markPaidOrder(orderID: string): Promise<void> {
-  const order = await db().order.findUnique({ where: { id: orderID } });
-  if (order === null) throw new ApiError(404, `Order with id ${orderID} not found`);
-  if (order.paymentStatus === 'PAID') {
-    throw new ApiError(409, 'Order is already paid');
-  }
-  const res = await db().order.updateMany({
-    where: { id: orderID, status: 'PENDING' },
-    data: {
-      status: 'CONFIRMED',
-      paymentStatus: 'PAID',
-      updatedAt: new Date(),
-    },
-  });
-  if (res.count === 0) {
-    throw new ApiError(
-      409,
-      `Cannot mark paid order with status ${order.status}. Only PENDING orders can be marked paid.`,
-    );
-  }
-  await db().paymentTransaction.updateMany({
-    where: { orderId: orderID },
-    data: { status: 'PAID', updatedAt: new Date() },
-  });
-}
 
 async function createLinkForOrder(orderID: string) {
   const order = await db().order.findUnique({
@@ -121,7 +94,7 @@ async function processWebhook(envelope: Record<string, unknown>): Promise<boolea
     where: { transactionCode: paymentLinkId },
   });
   if (tx === null) {
-    console.log(`payments: webhook for unknown paymentLinkId ${paymentLinkId} — ignoring`);
+    console.warn(`payments: webhook for unknown paymentLinkId ${paymentLinkId} — ignoring`);
     return false;
   }
   const order: Order | null = await db().order.findUnique({
@@ -160,25 +133,6 @@ async function processWebhook(envelope: Record<string, unknown>): Promise<boolea
     data: { status: txStatus, updatedAt: new Date() },
   });
   return success && settled.count > 0;
-}
-
-// ponytail: Go web.Binds into map[string]any — any JSON object accepted, arrays rejected.
-async function readJsonObject(request: Request): Promise<Record<string, unknown>> {
-  const text = await request.text();
-  if (text.trim() === '') throw new ApiError(400, 'EOF');
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw new ApiError(400, 'Malformed JSON body');
-  }
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    throw new ApiError(
-      400,
-      `json: cannot unmarshal ${Array.isArray(parsed) ? 'array' : typeof parsed} into Go value of type map[string]interface {}`,
-    );
-  }
-  return parsed as Record<string, unknown>;
 }
 
 export const payments = new Elysia()

@@ -37,7 +37,9 @@ function brief(u: User) {
 async function redisSet(key: string, value: string, ttlSeconds: number): Promise<void> {
   const rdb = await getRedis();
   if (rdb === null) return;
-  await rdb.set(key, value, 'EX', ttlSeconds).catch(() => {});
+  await rdb.set(key, value, 'EX', ttlSeconds).catch((e: unknown) => {
+    console.error('redis set failed:', e instanceof Error ? e.message : String(e));
+  });
 }
 
 // ponytail: mirrors Go provisionDevice; ContainsAny(char-set) quirk = /Mobile/ substring test.
@@ -107,8 +109,8 @@ export const auth = new Elysia()
       await sendVerificationEmail(user.email, token).catch((e: Error) => {
         console.error(`auth: verification mail failed for ${user.email}: ${e.message}`);
       });
-    } else {
-      console.log(
+    } else if (process.env.NODE_ENV !== 'production') {
+      console.warn(
         `[dev] mailer disabled; verification link for ${user.email}: /v1/auth/verify-email?token=${token}`,
       );
     }
@@ -291,8 +293,8 @@ export const auth = new Elysia()
     await redisSet(`passwordreset:${token}`, user.id, DAY_SECONDS);
     if (mailEnabled()) {
       await sendPasswordResetEmail(user.email, token);
-    } else {
-      console.log(
+    } else if (process.env.NODE_ENV !== 'production') {
+      console.warn(
         `[dev] password reset token for ${user.email}: /v1/auth/password/reset?token=${token}`,
       );
     }

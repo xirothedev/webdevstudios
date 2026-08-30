@@ -24,6 +24,15 @@ export const VALID_ORDER_STATUSES = [
   'RETURNED',
 ] as const;
 
+function assertValidStatus(status: string | undefined): void {
+  if (status && !(VALID_ORDER_STATUSES as readonly string[]).includes(status)) {
+    throw new ApiError(
+      400,
+      'status must be one of PENDING, CONFIRMED, PROCESSING, SHIPPING, DELIVERED, CANCELLED, RETURNED',
+    );
+  }
+}
+
 type OrderWithRelations = Order & {
   shippingAddress: ShippingAddress;
   items: OrderItem[];
@@ -416,7 +425,7 @@ export async function sweepExpiredOrders(): Promise<number> {
         await releaseStock(tx, items);
       });
       n += 1;
-      console.log(`orders: expired ${o.id} (${o.code}), stock restored`);
+      console.warn(`orders: expired ${o.id} (${o.code}), stock restored`);
     } catch (e) {
       if (!(e instanceof Error && e.message === 'not-claimed')) {
         console.error(`orders: expire ${o.id} failed:`, e);
@@ -461,6 +470,7 @@ export const orders = new Elysia()
   .get('/orders', async ({ request, cookie, query }) => {
     const auth = await requireAuth({ request, cookie });
     const { page, limit } = paging(query.page, query.limit);
+    assertValidStatus(query.status);
     return listOrders(auth.user.id, page, limit, query.status);
   })
   .get('/orders/:id', async ({ request, cookie, params }) => {
@@ -472,9 +482,9 @@ export const orders = new Elysia()
     return cancelOrder(params.id!, auth.user.id);
   })
   .get('/admin/orders/all', async ({ request, cookie, query }) => {
-    const auth = await requireAdmin({ request, cookie });
+    await requireAdmin({ request, cookie });
     const { page, limit } = paging(query.page, query.limit);
-    void auth;
+    assertValidStatus(query.status);
     const where = {
       ...(query.status ? { status: query.status as Order['status'] } : {}),
     };

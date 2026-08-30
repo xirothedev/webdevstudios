@@ -148,6 +148,7 @@ export const blog = new Elysia()
         metaTitle: in1.metaTitle ?? null,
         metaDescription: in1.metaDescription ?? null,
       },
+      include: { author: true },
     });
     const key = `blog/posts/${id}/content.md`;
     try {
@@ -161,14 +162,8 @@ export const blog = new Elysia()
         : new ApiError(500, e instanceof Error ? e.message : String(e));
     }
     await db().blogPost.update({ where: { id }, data: { contentKey: key } });
-    void created;
-    const fresh = await db().blogPost.findFirst({
-      where: { id },
-      include: { author: true },
-    });
-    if (fresh === null) throw new Error('post verify failed');
     set.status = 201;
-    return toDTO(fresh);
+    return toDTO({ ...created, contentKey: key });
   })
   .patch('/blog/posts/:id', async ({ request, cookie, body, params }) => {
     await requireAdmin({ request, cookie });
