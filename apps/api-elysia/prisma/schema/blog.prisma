@@ -1,0 +1,97 @@
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// BLOG MANAGEMENT (Hybrid Storage: PostgreSQL + R2)
+// =========================================
+
+model BlogPost {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String @db.VarChar(255)
+
+  // Content stored in R2
+  contentKey  String // R2 object key for the markdown file (e.g., "blog/posts/{id}/content.md")
+  contentSize Int? // File size in bytes (for monitoring)
+
+  // Searchable excerpt (stored in DB for full-text search)
+  excerpt String? @db.VarChar(500)
+
+  // Cover image (also in R2)
+  coverImage String? // R2 object key to cover image
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  // Metadata
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  viewCount   Int       @default(0)
+
+  // SEO
+  metaTitle       String? @db.VarChar(255)
+  metaDescription String? @db.VarChar(500)
+
+  // Relations
+  tags     BlogTag[]
+  comments BlogComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished, publishedAt])
+  @@index([authorId])
+  @@index([title]) // Index for title search
+  @@index([excerpt]) // Index for excerpt search
+  @@map("blog_posts")
+}
+
+model BlogTag {
+  id   String @id @default(cuid())
+  name String @unique @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  posts BlogPost[]
+
+  @@map("blog_tags")
+}
+
+model BlogComment {
+  id       String   @id @default(cuid())
+  content  String   @db.Text
+  postId   String
+  post     BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User     @relation(fields: [authorId], references: [id])
+
+  parentId String? // For nested comments
+  parent   BlogComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  BlogComment[] @relation("CommentReplies")
+
+  isApproved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("blog_comments")
+}

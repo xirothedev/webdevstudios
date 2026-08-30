@@ -1,0 +1,119 @@
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// CART & ORDER SYSTEM
+// =========================================
+
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id     String @id @default(cuid())
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  size     ProductSize? // Product size (only t-shirt has, nullable)
+  quantity Int           @default(1)
+
+  @@unique([cartId, productId, size]) // A product + size can only appear once in a cart
+  @@index([cartId])
+  @@map("cart_items")
+}
+
+model Order {
+  id   String @id @default(cuid())
+  code String @unique // Short order code for customer (e.g.: #ORD-1234)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+
+  totalAmount   Decimal @db.Money // Final total amount
+  shippingFee   Decimal @default(0) @db.Money
+  discountValue Decimal @default(0) @db.Money
+
+  // Shipping address snapshot (Store text data to prevent changes when user edits profile)
+  shippingAddressId String           @unique
+  shippingAddress   ShippingAddress  @relation(fields: [shippingAddressId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+  paymentTransaction PaymentTransaction?
+
+  @@map("orders")
+}
+
+/**
+ * Shipping address (Snapshot at order time)
+ */
+model ShippingAddress {
+  id          String @id @default(cuid())
+  fullName    String @db.VarChar(255)
+  phone       String @db.VarChar(20)
+  addressLine1 String @db.VarChar(255)
+  addressLine2 String? @db.VarChar(255)
+  city        String @db.VarChar(100)
+  district    String @db.VarChar(100)
+  ward        String @db.VarChar(100)
+  postalCode  String @db.VarChar(20)
+
+  order Order?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shipping_addresses")
+}
+
+// Store product state AT TIME OF PURCHASE (Snapshot)
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String? // Can be null if product is deleted later
+  product   Product? @relation(fields: [productId], references: [id])
+
+  // Snapshot data (stored to prevent changes when product is updated)
+  productSlug ProductSlug // Store slug for easy lookup
+  productName String      @db.VarChar(255) // Store product name
+  size        ProductSize? // Product size (if available)
+  price       Decimal      @db.Money // Store price at time of purchase
+  quantity    Int
+
+  @@index([orderId])
+  @@map("order_items")
+}
