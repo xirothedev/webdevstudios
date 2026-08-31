@@ -27,7 +27,11 @@ func openTestDB(t *testing.T) *gorm.DB {
 		t.Skip("DATABASE_URL not set — skipping DB integration tests")
 	}
 	if !strings.Contains(dsn, "sslmode=") {
-		dsn += "&sslmode=disable"
+		sep := "?"
+		if strings.Contains(dsn, "?") {
+			sep = "&"
+		}
+		dsn += sep + "sslmode=disable"
 	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
