@@ -1,0 +1,22 @@
+{
+  "name": "api-axum",
+  "version": "1.0.0",
+  "description": "WebDev Studios E-commerce Platform - Rust Axum Backend API",
+  "author": "Xiro The Dev <lethanhtrung.trungle@gmail.com>",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE.md",
+  "type": "module",
+  "scripts": {
+    "preinstall": "rustc --version >/dev/null 2>&1 || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable; cargo fetch",
+    "build": "cargo build --release",
+    "dev": "cargo watch -q -c -x run 2>/dev/null || cargo run",
+    "start": "cargo run --release",
+    "test": "cargo test",
+    "test:watch": "cargo watch -x test",
+    "lint": "cargo clippy -- -D warnings",
+    "check": "cargo check",
+    "format": "cargo fmt --all",
+    "format:check": "cargo fmt --all -- --check",
+    "clean": "cargo clean"
+  }
+}
