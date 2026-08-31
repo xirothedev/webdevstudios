@@ -81,6 +81,7 @@ fn is_exempt(method: &Method, path: &str) -> bool {
         || path == "/v1/auth/refresh"
 }
 
+#[allow(clippy::result_large_err)]
 pub async fn guard(State(csrf): State<Csrf>, req: Request, next: Next) -> Result<Response, Response> {
     let path = req.uri().path().to_string();
     let method = req.method();

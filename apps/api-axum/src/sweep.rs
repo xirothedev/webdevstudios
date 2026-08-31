@@ -83,11 +83,11 @@ pub async fn expire_pending(db: &DatabaseConnection, order_id: &str) -> bool {
         // ponytail: Go's orders/stock.go release() increments both SizeStocks and Products
         // for sized items to keep the denormalized Products.stock total in sync; this mirrors
         // that intentionally, not a double-restore.
-        if let Some(size) = item.size.clone() {
-            if !release_size_stock(&txn, product_id, size, item.quantity).await {
-                let _ = txn.rollback().await;
-                return false;
-            }
+        if let Some(size) = item.size.clone()
+            && !release_size_stock(&txn, product_id, size, item.quantity).await
+        {
+            let _ = txn.rollback().await;
+            return false;
         }
         if !release_product_stock(&txn, product_id, item.quantity).await {
             let _ = txn.rollback().await;
