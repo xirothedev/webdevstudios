@@ -28,10 +28,15 @@ jobs:
           filters: |
             app:
               - 'apps/api/**'
+              - 'apps/api-axum/**'
+              - 'apps/api-go/**'
+              - 'apps/api-elysia/**'
               - 'apps/web/**'
               - 'packages/**'
               - 'turbo.json'
               - 'bun.lock'
+              - '**/Cargo.lock'
+              - '**/Cargo.toml'
               - '.github/workflows/ci.yml'
               - '.github/actions/**'
 

@@ -11,6 +11,12 @@ runs:
       with:
         # ponytail: pin to the version that wrote bun.lock — 'latest' drifts and breaks --frozen-lockfile
         bun-version: 1.3.14
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy, rustfmt
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: apps/api-axum -> target
     - run: bun install --frozen-lockfile
       shell: bash
     # Turbo's local task cache shared across jobs and runs; turbo validates
