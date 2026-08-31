@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app: ${{ steps.filter.outputs.app }}
+      go: ${{ steps.filter.outputs.go }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
@@ -32,11 +33,16 @@ jobs:
               - 'apps/api-go/**'
               - 'apps/api-elysia/**'
               - 'apps/web/**'
+              - 'apps/api-elysia/**'
               - 'packages/**'
               - 'turbo.json'
               - 'bun.lock'
               - '**/Cargo.lock'
               - '**/Cargo.toml'
+              - '.github/workflows/ci.yml'
+              - '.github/actions/**'
+            go:
+              - 'apps/api-go/**'
               - '.github/workflows/ci.yml'
               - '.github/actions/**'
 
@@ -77,3 +83,36 @@ jobs:
       - uses: ./.github/actions/setup-rust
       - uses: ./.github/actions/setup-bun-node
       - run: bunx --bun --no-install turbo run build
+
+  go-test:
+    name: Go Test
+    needs: changes
+    if: needs.changes.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wds_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: apps/api-go/go.mod
+      - name: Run Go tests
+        working-directory: apps/api-go
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/wds_test
+        run: |
+          go build ./...
+          go test ./... -count=1

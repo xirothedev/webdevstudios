@@ -31,6 +31,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useCartDrawer } from '@/contexts/cart-drawer.context';
 import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
+import { shippingFee, isFreeShipping } from '@/lib/shipping';
 import { formatPrice } from '@/lib/utils';
 
 import { QuantitySelector } from './QuantitySelector';
@@ -239,17 +240,16 @@ export function FloatingCartButton() {
                       <div className="flex justify-between text-white/80">
                         <span>Phí vận chuyển:</span>
                         <span className="font-semibold">
-                          {(cart?.totalAmount ?? 0) >= 500000
+                          {isFreeShipping(cart?.totalAmount ?? 0)
                             ? 'Miễn phí'
-                            : formatPrice(30000) + '₫'}
+                            : formatPrice(shippingFee(cart?.totalAmount ?? 0)) + '₫'}
                         </span>
                       </div>
                       <div className="flex justify-between border-t border-white/10 pt-2 text-lg font-bold text-white">
                         <span>Tổng cộng:</span>
                         <span>
                           {formatPrice(
-                            (cart?.totalAmount ?? 0) +
-                              ((cart?.totalAmount ?? 0) >= 500000 ? 0 : 30000),
+                            (cart?.totalAmount ?? 0) + shippingFee(cart?.totalAmount ?? 0),
                           )}
                           ₫
                         </span>

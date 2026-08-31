@@ -19,6 +19,12 @@ func bad(code int, format string, args ...any) *HTTPError {
 
 var errNotClaimed = errors.New("order claim lost")
 
+// ponytail: mirrors apps/web/src/lib/shipping.ts — keep in sync
+const (
+	freeShippingThreshold = 500000
+	shippingFeeAmount     = 30000
+)
+
 type Service struct {
 	db *gorm.DB
 }
@@ -88,8 +94,8 @@ func (s *Service) Create(userID string, in CreateOrderInput) (*OrderDTO, error) 
 		return nil, bad(400, "Invalid order type: %s", in.OrderType)
 	}
 
-	shippingFee := 30000.0
-	if total >= 500000 {
+	shippingFee := float64(shippingFeeAmount)
+	if total >= freeShippingThreshold {
 		shippingFee = 0 // free if total >= 500k
 	}
 	discount := 0.0 // vouchers arrive later

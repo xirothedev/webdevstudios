@@ -271,7 +271,7 @@ describe('OrderService.settle', () => {
       },
     });
     const service = new OrderService(orderRepo, cartRepo, productRepo, prisma);
-    return { events, getTxStatus: () => txStatus, service };
+    return { events, getTxStatus: () => txStatus, service, tx };
   };
 
   test('winning the claim settles PAID without restocking', async () => {
@@ -328,6 +328,25 @@ describe('OrderService.settle', () => {
     const result = await service.settle('order-1', { paid: true });
 
     expect(result).toBeNull();
+    expect(getTxStatus()).toBeUndefined();
+    expect(events).toEqual([]);
+  });
+
+  test('markTx callback runs inside the transaction instead of the default marking', async () => {
+    let receivedTx: unknown;
+    const { events, getTxStatus, service, tx } = makeSettleDeps({
+      paymentTx: { id: 'ptx-1' },
+    });
+
+    const dto = await service.settle('order-1', {
+      paid: true,
+      markTx: async (t: unknown) => {
+        receivedTx = t;
+      },
+    });
+
+    expect(dto?.status).toBe('CONFIRMED');
+    expect(receivedTx).toBe(tx);
     expect(getTxStatus()).toBeUndefined();
     expect(events).toEqual([]);
   });

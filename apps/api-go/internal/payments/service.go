@@ -129,7 +129,7 @@ func (s *Service) ProcessWebhook(envelope map[string]any) (bool, error) {
 	}
 
 	var order orders.Order
-	if err := s.db.First(&order, map[string]any{"id": tx.OrderID}).Error; err != nil {
+	if err := s.db.Preload("Items").First(&order, map[string]any{"id": tx.OrderID}).Error; err != nil {
 		return false, err
 	}
 	if amount != float64(order.TotalAmount) {
@@ -138,20 +138,33 @@ func (s *Service) ProcessWebhook(envelope map[string]any) (bool, error) {
 		return false, nil
 	}
 
-	claimed := s.db.Model(&orders.Order{}).
-		Where(map[string]any{"id": order.ID, "status": "PENDING"}).
-		Updates(settleUpdates(success))
-	if claimed.Error != nil {
-		return false, claimed.Error
+	// Claim the order and release reserved stock on a failed payment inside
+	// one transaction so a lost claim or failed release cannot leave stock
+	// permanently held (parity with NestJS/Elysia settle paths).
+	claimedRows := int64(0)
+	if err := s.db.Transaction(func(txDB *gorm.DB) error {
+		res := txDB.Model(&orders.Order{}).
+			Where(map[string]any{"id": order.ID, "status": "PENDING"}).
+			Updates(settleUpdates(success))
+		if res.Error != nil {
+			return res.Error
+		}
+		claimedRows = res.RowsAffected
+		if claimedRows > 0 && !success {
+			return orders.ReleaseStockFor(txDB, order.Items)
+		}
+		return nil
+	}); err != nil {
+		return false, err
 	}
 	newTxStatus := "FAILED"
-	if success && code == "00" && claimed.RowsAffected > 0 {
+	if success && code == "00" && claimedRows > 0 {
 		newTxStatus = "PAID"
 	} else if !success {
 		newTxStatus = "CANCELLED"
 	}
 	s.db.Model(&Transaction{}).Where(map[string]any{"id": tx.ID}).Update("status", newTxStatus)
-	return success && claimed.RowsAffected > 0, nil
+	return success && claimedRows > 0, nil
 }
 
 func settleUpdates(success bool) map[string]any {

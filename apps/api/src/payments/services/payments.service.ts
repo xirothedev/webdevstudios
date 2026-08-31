@@ -171,12 +171,21 @@ export class PaymentsService {
 
     const isSuccess = paymentData.code === '00' || verifiedData.code === '00';
 
-    // Settle owns the conditional claim: status, paymentStatus, transaction row
-    // and stock release happen once inside its transaction; a lost claim (e.g.
-    // the order expired meanwhile) no-ops here.
+    // Settle owns the conditional claim: status, paymentStatus, stock release
+    // happen once inside its transaction; the payments module writes its own
+    // transaction row via markTx (ADR-0004 amendment). A lost claim (e.g. the
+    // order expired meanwhile) no-ops here.
     const settled = await this.ordersService.settle(order.id, {
       paid: isSuccess,
       payosData: verifiedData,
+      markTx: async (tx) => {
+        await this.paymentRepo.updateStatus(
+          paymentTransaction.id,
+          isSuccess ? PaymentTransactionStatus.PAID : PaymentTransactionStatus.FAILED,
+          verifiedData,
+          tx,
+        );
+      },
     });
 
     this.logger.log(

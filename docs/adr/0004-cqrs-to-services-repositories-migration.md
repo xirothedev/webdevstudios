@@ -11,3 +11,8 @@ Repos are named `<Entity>Repo` (class-as-contract, no interfaces) per the org
 NestJS rules. Exception: `MfaRepo` spans `userMFAMethod` + `mFABackupCode`
 because both tables represent one concept (MFA state) and splitting them adds
 indirection with no benefit. Document deliberate exceptions here.
+
+Amendment (2026-08-31, architecture review): cross-module row writes inside a
+service-owned transaction go through an injected callback (e.g.
+`OrderService.settle` takes `markTx`), never raw Prisma — the legacy raw
+`paymentTransaction` write in `OrderService` is removed by this pattern.

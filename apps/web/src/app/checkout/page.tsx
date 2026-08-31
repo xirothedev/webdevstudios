@@ -37,6 +37,7 @@ import { useCart } from '@/lib/api/hooks/use-cart';
 import { useCreateOrder, useOrders } from '@/lib/api/hooks/use-orders';
 import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments';
 import { CreateOrderRequest, ShippingAddress } from '@/lib/api/orders';
+import { shippingFee } from '@/lib/shipping';
 import { formatPrice } from '@/lib/utils';
 import { ProductSize } from '@/types/product';
 
@@ -205,8 +206,8 @@ export default function CheckoutPage() {
     subtotal = cart.totalAmount;
   }
 
-  const shippingFee = subtotal >= 500000 ? 0 : 30000;
-  const total = subtotal + shippingFee;
+  const fee = shippingFee(subtotal);
+  const total = subtotal + fee;
 
   return (
     <div className="bg-wds-background text-wds-text min-h-screen">
@@ -388,7 +389,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-white/80">
                     <span>Phí vận chuyển:</span>
-                    <span>{shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee) + '₫'}</span>
+                    <span>{fee === 0 ? 'Miễn phí' : formatPrice(fee) + '₫'}</span>
                   </div>
                   <div className="flex justify-between border-t border-white/10 pt-3 text-lg font-bold text-white">
                     <span>Tổng cộng:</span>

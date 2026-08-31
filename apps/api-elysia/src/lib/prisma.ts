@@ -10,7 +10,7 @@ function createClient() {
   });
 }
 
-type DatabaseClient = ReturnType<typeof createClient>;
+export type DatabaseClient = ReturnType<typeof createClient>;
 
 let client: DatabaseClient | null = null;
 

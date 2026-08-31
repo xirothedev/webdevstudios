@@ -40,6 +40,10 @@ _Avoid_: confirm, complete, finalize
 A PayOS-backed payment attempt for an Order, created as a payment link; a webhook verifies the result and updates the order's payment status.
 _Avoid_: transaction, charge
 
+**ShippingFee**:
+A delivery cost added to an Order total: a flat fee, waived when the subtotal reaches the free-shipping threshold. One policy, mirrored per app (web, api, api-go, api-elysia) — changing it touches every mirror.
+_Avoid_: delivery cost, postage
+
 **BlogPost**:
 A blog article with markdown content, a cover image, tags, an author, a publish state, and a view count.
 _Avoid_: article, story

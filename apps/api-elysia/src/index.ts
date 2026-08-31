@@ -4,9 +4,11 @@ import { Elysia } from 'elysia';
 import { ApiError, nestBody } from './lib/errors';
 import { csrfGuard, generateCsrfToken, issueCsrfToken } from './lib/csrf';
 import { getThrottler } from './lib/throttle';
+import { db } from './lib/prisma';
+import { sweepExpiredOrders as sweep } from './lib/orders';
 import products from './routes/products';
 import cart from './routes/cart';
-import orders, { sweepExpiredOrders as sweep } from './routes/orders';
+import orders from './routes/orders';
 import payments from './routes/payments';
 import reviews from './routes/reviews';
 import users from './routes/users';
@@ -78,12 +80,12 @@ export const app = new Elysia({ prefix: '/v1' })
 if (import.meta.main) {
   const port = Number(process.env.PORT ?? 4002);
   void (async () => {
-    await sweep().catch((e: unknown) => {
+    await sweep(db()).catch((e: unknown) => {
       console.error('sweep failed:', e instanceof Error ? e.message : String(e));
     });
     setInterval(
       () => {
-        void sweep().catch((e: unknown) => {
+        void sweep(db()).catch((e: unknown) => {
           console.error('sweep failed:', e instanceof Error ? e.message : String(e));
         });
       },
