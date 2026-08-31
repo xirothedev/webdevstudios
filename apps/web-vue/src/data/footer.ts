@@ -1,0 +1,98 @@
+/**
+ * Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+ *
+ * Source Available License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to:
+ * - View and study the Software for educational purposes
+ * - Fork this repository on GitHub for personal reference
+ * - Share links to this repository
+ *
+ * THE FOLLOWING ARE PROHIBITED:
+ * - Using the Software in production or commercial applications
+ * - Copying substantial portions of the Software into other projects
+ * - Distributing modified versions of the Software
+ * - Removing or altering copyright notices
+ *
+ * For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+ */
+
+export type FooterLink = {
+  label: string;
+  href: string;
+  target?: '_blank';
+  rel?: string;
+};
+
+export type FooterSection = {
+  title: string;
+  links: FooterLink[];
+};
+
+export type ContactInfo = {
+  label: string;
+  content: string;
+  href?: string;
+  target?: '_blank';
+  rel?: string;
+};
+
+export const footerSections: FooterSection[] = [
+  {
+    title: 'SẢN PHẨM',
+    links: [
+      { label: 'Áo thun', href: '/shop/ao-thun' },
+      { label: 'Móc khóa', href: '/shop/moc-khoa' },
+      { label: 'Dây đeo', href: '/shop/day-deo' },
+      { label: 'Pad chuột', href: '/shop/pad-chuot' },
+    ],
+  },
+  {
+    title: 'VỀ CLB',
+    links: [
+      { label: 'Về chúng tôi', href: '/about' },
+      { label: 'Thành tích', href: '/achievements' },
+      { label: 'Hoạt động', href: '/activities' },
+      { label: 'Đối tác', href: '/partner' },
+      { label: 'FAQ', href: '/faq' },
+      { label: 'Thế hệ', href: '/generation' },
+    ],
+  },
+  {
+    title: 'ĐIỀU KHOẢN',
+    links: [
+      { label: 'Điều khoản sử dụng', href: '/terms' },
+      { label: 'Chính sách quyền riêng tư', href: '/privacy' },
+      // { label: 'Chính sách đổi trả', href: '/refund' },
+    ],
+  },
+];
+
+export const contactInfo: ContactInfo[] = [
+  {
+    label: 'Email:',
+    content: 'webdevstudios.org@gmail.com',
+    href: 'mailto:webdevstudios.org@gmail.com',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  },
+  {
+    label: 'Chủ nhiệm:',
+    content: 'Lâm Chí Dĩnh - 0794161275',
+    href: 'tel:0794161275',
+  },
+  {
+    label: 'Fanpage:',
+    content: 'facebook.com/webdevstudios.org',
+    href: 'https://facebook.com/webdevstudios.org',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  },
+  {
+    label: 'Văn phòng:',
+    content: 'B8.04, tòa B, trường Đại học Công nghệ Thông tin – ĐHQG TP.HCM.',
+  },
+];
