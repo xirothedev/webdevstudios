@@ -1,0 +1,14 @@
+name: Setup Rust
+description: >
+  Shared setup for Rust jobs: stable toolchain with clippy + rustfmt and
+  Swatinem cache for apps/api-axum. Assumes actions/checkout already ran.
+
+runs:
+  using: composite
+  steps:
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy, rustfmt
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: apps/api-axum -> target
