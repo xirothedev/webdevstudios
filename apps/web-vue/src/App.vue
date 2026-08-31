@@ -4,6 +4,7 @@ import { useHead } from '@unhead/vue';
 import CsrfInitializer from '@/components/CsrfInitializer.vue';
 import Footer from '@/components/Footer.vue';
 import Navbar from '@/components/Navbar.vue';
+import FloatingCartButton from '@/components/shop/floating-cart-button.vue';
 import { provideAuth } from '@/composables/use-auth';
 import { useCartDrawer } from '@/composables/use-cart-drawer';
 import { defaultMetadata } from '@/lib/metadata';
@@ -31,5 +32,6 @@ useHead({
   <main class="bg-background text-foreground min-h-screen pt-14 md:pt-16">
     <RouterView />
   </main>
+  <FloatingCartButton />
   <Footer />
 </template>
