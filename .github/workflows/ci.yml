@@ -98,6 +98,9 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: apps/api-go/go.mod
       - name: Run Go tests
         working-directory: apps/api-go
         env:
