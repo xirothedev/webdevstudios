@@ -69,15 +69,8 @@ fn const_time_eq(a: &str, b: &str) -> bool {
 }
 
 fn read_csrf_cookie(req: &Request) -> Option<String> {
-    let raw = req.headers().get(header::COOKIE)?.to_str().ok()?;
-    for part in raw.split(';') {
-        if let Some((name, value)) = part.trim().split_once('=') {
-            if name.trim() == "_csrf" {
-                return Some(value.trim().to_string());
-            }
-        }
-    }
-    None
+    let header = req.headers().get(header::COOKIE)?.to_str().ok()?;
+    crate::cookies::parse_cookies(Some(header)).get("_csrf").cloned()
 }
 
 fn is_exempt(method: &Method, path: &str) -> bool {

@@ -10,6 +10,8 @@ pub struct Model {
     pub id: String,
     #[sea_orm(column_name = "orderId", column_type = "Text", unique)]
     pub order_id: String,
+    // ponytail: `transactionCode` is the PayOS external API field (payment link id), not the
+    // domain `Payment` Avoid `transaction` — kept for wire parity with Prisma/payOS
     #[sea_orm(column_name = "transactionCode", column_type = "Text", unique)]
     pub transaction_code: String,
     pub amount: Decimal,

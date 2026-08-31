@@ -20,6 +20,7 @@ pub struct PaymentItem {
     pub price: f64,
 }
 
+// ponytail: PayOS external field `transactionCode`/`paymentLinkId` — not domain `Payment` Avoid `transaction`
 #[derive(Debug)]
 pub struct CreatedLink {
     pub checkout_url: String,

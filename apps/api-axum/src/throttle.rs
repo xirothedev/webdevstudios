@@ -47,6 +47,7 @@ impl Throttle {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
+        let route = route.split('?').next().unwrap_or(route);
         let key = format!("throttle:{}:{}:{}:{}", limiter.name, route, ip, now / limiter.ttl_secs);
         let count: isize = match conn.incr(&key, 1).await {
             Ok(count) => count,

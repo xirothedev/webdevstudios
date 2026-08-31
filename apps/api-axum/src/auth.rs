@@ -78,7 +78,8 @@ impl Jwt {
         &self,
         token: &str,
     ) -> Result<RefreshClaims, jsonwebtoken::errors::Error> {
-        let v = Validation::new(Algorithm::HS256);
+        let mut v = Validation::new(Algorithm::HS256);
+        v.leeway = 60;
         verify_hs256_secret(&self.secret, token, &v)
     }
 }
