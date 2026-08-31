@@ -95,8 +95,10 @@ export class PaymentRepo {
     id: string,
     status: PaymentTransactionStatus,
     payosData?: unknown,
+    tx?: Prisma.TransactionClient,
   ): Promise<PaymentTransactionRow> {
-    return this.prisma.paymentTransaction.update({
+    const client = tx ?? this.prisma;
+    return client.paymentTransaction.update({
       where: { id },
       data: {
         status,

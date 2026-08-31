@@ -23,6 +23,10 @@ import { availableStock, ProductRepo, type StockItem } from '@/products/repo';
 import { CreateOrderDto, OrderDto, OrderListResponseDto } from '../dto';
 import { OrderRepo, OrderRow } from '../repo';
 
+// ponytail: mirrors apps/web/src/lib/shipping.ts and the Go/Elysia APIs — keep in sync
+const FREE_SHIPPING_THRESHOLD = 500_000;
+const SHIPPING_FEE = 30_000;
+
 @Injectable()
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
@@ -140,7 +144,7 @@ export class OrderService {
     }
 
     // Calculate shipping fee (free if total >= 500k)
-    const shippingFee = totalAmount >= 500000 ? 0 : 30000;
+    const shippingFee = totalAmount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
     const discountValue = 0; // Can be extended later with vouchers
 
     const finalAmount = totalAmount + shippingFee - discountValue;
@@ -238,9 +242,15 @@ export class OrderService {
 
   // Settles an order exactly once: PENDING-only conditional claim, losers no-op.
   // Status, paymentStatus, transaction row and stock release happen in one transaction.
+  // markTx lets the calling module own the payment-transaction write (ADR-0004
+  // amendment); without it the orders module marks the order's tx row itself.
   async settle(
     orderId: string,
-    opts: { paid: boolean; payosData?: unknown },
+    opts: {
+      paid: boolean;
+      payosData?: unknown;
+      markTx?: (tx: Prisma.TransactionClient) => Promise<void>;
+    },
   ): Promise<OrderDto | null> {
     const order = await this.orderRepo.findById(orderId);
     if (!order) {
@@ -254,12 +264,16 @@ export class OrderService {
         return null;
       }
 
-      await this.markTransaction(
-        tx,
-        orderId,
-        opts.paid ? PaymentTransactionStatus.PAID : PaymentTransactionStatus.FAILED,
-        opts.payosData,
-      );
+      if (opts.markTx) {
+        await opts.markTx(tx);
+      } else {
+        await this.markTransaction(
+          tx,
+          orderId,
+          opts.paid ? PaymentTransactionStatus.PAID : PaymentTransactionStatus.FAILED,
+          opts.payosData,
+        );
+      }
 
       if (!opts.paid) {
         await this.productRepo.release(tx, items);

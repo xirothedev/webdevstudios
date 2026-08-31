@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation';
 import { QuantitySelector } from '@/components/shop/QuantitySelector';
 import { Button } from '@/components/ui/button';
 import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
+import { shippingFee, isFreeShipping } from '@/lib/shipping';
 import { formatPrice } from '@/lib/utils';
 
 function CartContentInner() {
@@ -146,13 +147,15 @@ function CartContentInner() {
               </div>
               <div className="flex justify-between text-white/80">
                 <span>Phí vận chuyển:</span>
-                <span>{cart.totalAmount >= 500000 ? 'Miễn phí' : formatPrice(30000) + '₫'}</span>
+                <span>
+                  {isFreeShipping(cart.totalAmount)
+                    ? 'Miễn phí'
+                    : formatPrice(shippingFee(cart.totalAmount)) + '₫'}
+                </span>
               </div>
               <div className="flex justify-between border-t border-white/10 pt-3 text-lg font-bold text-white">
                 <span>Tổng cộng:</span>
-                <span>
-                  {formatPrice(cart.totalAmount + (cart.totalAmount >= 500000 ? 0 : 30000))}₫
-                </span>
+                <span>{formatPrice(cart.totalAmount + shippingFee(cart.totalAmount))}₫</span>
               </div>
             </div>
             <Button

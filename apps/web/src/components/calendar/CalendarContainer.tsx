@@ -30,7 +30,7 @@ import { vi } from 'date-fns/locale';
 import { useCallback, useMemo, useState } from 'react';
 import { Calendar, dateFnsLocalizer, View, type Event as RBCEvent } from 'react-big-calendar';
 
-import { mockEvents } from '@/lib/events/mock-events';
+import { useEvents } from '@/lib/api/hooks/use-events';
 import { Event, EventType } from '@/lib/events/types';
 import { filterEventsByType, getEventTypeColor } from '@/lib/events/utils';
 
@@ -61,6 +61,8 @@ export function CalendarContainer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<EventType[]>([]);
 
+  const { events } = useEvents();
+
   // Calculate event counts per type
   const eventCounts = useMemo(() => {
     const counts: Record<EventType, number> = {
@@ -72,20 +74,20 @@ export function CalendarContainer() {
       [EventType.OTHER]: 0,
     };
 
-    mockEvents.forEach((event) => {
+    events.forEach((event) => {
       counts[event.type]++;
     });
 
     return counts;
-  }, []);
+  }, [events]);
 
   // Filter events based on selected types
   const filteredEvents = useMemo(() => {
     if (selectedTypes.length === 0) {
-      return mockEvents;
+      return events;
     }
-    return filterEventsByType(mockEvents, selectedTypes);
-  }, [selectedTypes]);
+    return filterEventsByType(events, selectedTypes);
+  }, [events, selectedTypes]);
 
   // Convert events to react-big-calendar format
   const calendarEvents: CalendarEvent[] = useMemo(() => {

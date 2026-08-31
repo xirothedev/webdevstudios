@@ -79,6 +79,13 @@ func reserve(tx *gorm.DB, items []StockItem) error {
 	return nil
 }
 
+// ReleaseStockFor releases the reserved stock of an order's items.
+// Exported so the payments module can free stock when a webhook settles an
+// order to CANCELLED/FAILED (single-claim losers leave stock untouched).
+func ReleaseStockFor(db *gorm.DB, orderItems []OrderItem) error {
+	return release(db, stockItems(orderItems))
+}
+
 // release is the exact inverse, used by cancel and expire.
 func release(tx *gorm.DB, items []StockItem) error {
 	for _, it := range items {
