@@ -14,6 +14,7 @@
   "private": true,
   "workspaces": [
     "apps/*",
+    "infra",
     "packages/*"
   ],
   "scripts": {
@@ -21,8 +22,8 @@
     "build": "bunx --bun --no-install turbo run build",
     "lint": "bunx --bun --no-install turbo run lint",
     "test": "bunx --bun --no-install turbo run test",
-    "format": "bunx --bun --no-install prettier --write \"apps/api/**/*.{js,jsx,ts,tsx,json,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,yml,yaml}\" && cd apps/web && bun run format && cd ../web-vue && bun run format",
-    "format:check": "bunx --bun --no-install prettier --check \"apps/api/**/*.{js,jsx,ts,tsx,json,yml,yaml}\" \"*.{js,jsx,ts,tsx,json,yml,yaml}\" && cd apps/web && bun run format:check && cd ../web-vue && bun run format:check",
+    "format": "bunx --bun --no-install prettier --write \"apps/api/**/*.{js,jsx,ts,tsx,json,yml,yaml}\" \"infra/**/*.{ts,json,yml}\" \"*.{js,jsx,ts,tsx,json,yml,yaml}\" && cd apps/web && bun run format && cd ../web-vue && bun run format",
+    "format:check": "bunx --bun --no-install prettier --check \"apps/api/**/*.{js,jsx,ts,tsx,json,yml,yaml}\" \"infra/**/*.{ts,json,yml}\" \"*.{js,jsx,ts,tsx,json,yml,yaml}\" && cd apps/web && bun run format:check && cd ../web-vue && bun run format:check",
     "clean": "bunx --bun --no-install turbo run clean",
     "prepare": "bunx --bun --no-install husky",
     "audit": "bun audit --audit-level=moderate",

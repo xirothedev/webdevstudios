@@ -1,0 +1,5 @@
+# One AWS account, two CDK stages (prod and lab)
+
+One AWS account hosts two CDK stages: `prod` (api + web: RDS Multi-AZ, ElastiCache, WAF, blue/green, always-on) and `lab` (api-go, api-axum, api-elysia: single-AZ, no WAF, scale-to-zero outside 08:00–23:00 ICT). web-vue is a Vite SPA and serves as static files from S3 + CloudFront instead of a container (its Dockerfile exists only for LAN parity on xiroserver-lan). Organizational isolation (multi-account Control Tower) was rejected: the lab stack serves no traffic, and stage isolation plus a $100 budget alarm covers the risk at a fraction of the running cost.
+
+File storage stays on Cloudflare R2 — the SDK code is already written against it and S3 migration buys nothing. Email goes through Resend over its SMTP interface, keeping Nodemailer config-shaped and dropping the SES sandbox wait. DNS: `webdevstudio.resonance.io.vn` delegates from the parent Cloudflare zone to a Route 53 hosted zone via NS records, so ACM uses DNS validation and the edge stays pure AWS (CloudFront + WAF); CI assumes roles via GitHub OIDC with a manual approval gate on the `production` environment.

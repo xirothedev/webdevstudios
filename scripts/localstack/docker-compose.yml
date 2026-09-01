@@ -1,0 +1,23 @@
+# AWS giả lập (https://github.com/localstack/localstack) — chạy trên xiroserver-lan
+# docker compose up -d  → endpoint: http://xiroserver-lan:4566
+name: localstack
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - '4566:4566' # single edge port cho mọi service
+    environment:
+      - SERVICES=s3,sqs,sns,dynamodb,secretsmanager,iam,lambda
+      - DEBUG=0
+    volumes:
+      - './init:/etc/localstack/init/ready.d' # chạy sau khi edge sẵn sàng
+      - 'localstack-data:/var/lib/localstack'
+    healthcheck:
+      test: ['CMD', 'awslocal', 's3', 'ls']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  localstack-data:
