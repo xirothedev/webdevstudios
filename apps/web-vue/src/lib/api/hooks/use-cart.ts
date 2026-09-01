@@ -210,21 +210,3 @@ export function useRemoveFromCart() {
     },
   });
 }
-
-// Mutation: Clear cart
-export function useClearCart() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: () => cartApi.clearCart(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: cartKeys.current() });
-      toast.success('Đã xóa tất cả khỏi giỏ hàng');
-    },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Không thể xóa giỏ hàng. Vui lòng thử lại.';
-      toast.error(errorMessage);
-    },
-  });
-}

@@ -36,7 +36,7 @@ const { data: usersData } = useAdminUsers(1, 1);
 const { data: productsData } = useAdminProducts();
 const { data: ordersListData } = useAdminOrders(1, 1);
 
-const totalUsers = computed(() => usersData.value?.pagination.total || 0);
+const totalUsers = computed(() => usersData.value?.total || 0);
 const totalProducts = computed(() => productsData.value?.total || 0);
 const totalOrders = computed(() => ordersListData.value?.total || 0);
 const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);

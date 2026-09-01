@@ -38,7 +38,7 @@ const props = defineProps<{
 
 const queryClient = useQueryClient();
 const { data: products } = useAdminProducts();
-const product = computed(() => products.value?.products.find((p) => p.id === props.productId));
+const product = computed(() => products.value?.rows.find((p) => p.id === props.productId));
 
 const {
   handleSubmit,
