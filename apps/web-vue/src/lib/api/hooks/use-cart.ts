@@ -213,7 +213,6 @@ export function useRemoveFromCart() {
     },
   });
 }
-
 // Shared cart behavior for cart.vue, floating-cart-button.vue: optimistic
 // quantity/remove wiring plus per-item pending state, so UIs keep only markup.
 export function useCartActions() {
@@ -256,19 +255,3 @@ export function cartTotals(cart: { value: Cart | undefined }) {
   };
 }
 
-export function useClearCart() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: () => cartApi.clearCart(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: cartKeys.current() });
-      toast.success('Đã xóa tất cả khỏi giỏ hàng');
-    },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Không thể xóa giỏ hàng. Vui lòng thử lại.';
-      toast.error(errorMessage);
-    },
-  });
-}

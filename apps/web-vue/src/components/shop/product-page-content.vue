@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue';
 
 import { useAuth } from '@/composables/use-auth';
 import { useAddToCart } from '@/lib/api/hooks/use-cart';
-import { useSuspenseProduct } from '@/lib/api/hooks/use-products';
+import { useProduct } from '@/lib/api/hooks/use-products';
 import { toast } from '@/lib/toast';
 import { getBackendSlug } from '@/lib/product-slug-mapping';
 import { getProductStaticContent } from '@/lib/product-static-content';
@@ -34,7 +34,7 @@ const router = useRouter();
 const BACKEND_SLUG = getBackendSlug(props.productSlug);
 const { user, isAuthenticated } = useAuth();
 
-const { data: product, isLoading } = useSuspenseProduct(BACKEND_SLUG);
+const { data: product, isLoading } = useProduct(BACKEND_SLUG);
 
 const staticContent = getProductStaticContent(BACKEND_SLUG);
 

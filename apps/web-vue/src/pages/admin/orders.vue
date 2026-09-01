@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 
 import AdminDataTable from '@/components/admin/admin-data-table.vue';
@@ -7,11 +6,11 @@ import AdminHeader from '@/components/admin/admin-header.vue';
 import AdminLayout from '@/components/admin/admin-layout.vue';
 import TableActions from '@/components/admin/table-actions.vue';
 import TableFilters from '@/components/admin/table-filters.vue';
-import { adminKeys, useAdminOrders } from '@/lib/api/hooks/use-admin';
+import { useAdminOrders } from '@/lib/api/hooks/use-admin';
+import { useUpdateOrderStatus } from '@/lib/api/hooks/use-orders';
 import { formatDateTime } from '@/lib/date';
-import { ordersApi, type OrderStatus } from '@/lib/api/orders';
+import type { OrderStatus } from '@/lib/api/orders';
 import { usePageMeta } from '@/lib/metadata';
-import { toast } from '@/lib/toast';
 import { formatPrice } from '@/lib/utils';
 
 usePageMeta({
@@ -35,19 +34,7 @@ const limit = 10;
 const statusFilter = ref<OrderStatus | undefined>();
 
 const { data, isLoading } = useAdminOrders(page, limit, statusFilter);
-const queryClient = useQueryClient();
-
-const updateStatusMutation = useMutation({
-  mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
-    ordersApi.updateOrderStatus(orderId, status),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: [...adminKeys.all, 'orders'] });
-    toast.success('Order status updated successfully');
-  },
-  onError: () => {
-    toast.error('Failed to update order status');
-  },
-});
+const updateStatusMutation = useUpdateOrderStatus();
 
 const statusClass = (status: string) =>
   status === 'DELIVERED'
@@ -63,7 +50,7 @@ const paymentStatusClass = (status: string) =>
       ? 'bg-red-500/20 text-red-400'
       : 'bg-yellow-500/20 text-yellow-400';
 
-const orders = computed(() => data.value?.orders || []);
+const orders = computed(() => data.value?.rows || []);
 
 function promptStatusUpdate(orderId: string) {
   const newStatus = window.prompt(
@@ -81,16 +68,14 @@ function promptStatusUpdate(orderId: string) {
       <AdminHeader title="Orders Management" description="Quản lý đơn hàng trong hệ thống" />
       <div class="flex-1 space-y-4 p-6">
         <AdminDataTable
+          v-model:page="page"
           :columns="columns"
-          :data="orders"
+          :rows="orders"
           :is-loading="!!isLoading"
           empty-message="No orders found"
-          :page="page"
           :limit="limit"
-          :pagination="data ? { total: data.total } : null"
-          :next-disabled="!data?.orders || data.orders.length < limit"
+          :total="data?.total"
           subject="orders"
-          @update:page="page = $event"
         >
           <template #filters>
             <TableFilters

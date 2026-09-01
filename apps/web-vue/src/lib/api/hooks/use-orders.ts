@@ -1,14 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { computed, toValue, type MaybeRefOrGetter } from 'vue';
 
+import { adminKeys } from '@/lib/api/hooks/use-admin';
 import { type CreateOrderRequest, ordersApi, type OrderStatus } from '@/lib/api/orders';
 import { toast } from '@/lib/toast';
 
 // Reactive-params convention for all hook composables in this directory: params accept
 // MaybeRefOrGetter (plain value | ref | getter); queryKey uses computed(() => ...toValue(param)),
 // queryFn reads toValue(param) at call time, `enabled` is a computed. Plain args work unchanged.
-// useSuspense* hooks keep their apps/web names but are plain useQuery — Vue has no suspense
-// data boundary; pages v-if on .isPending instead.
 
 // Query Keys
 export const orderKeys = {
@@ -29,14 +28,6 @@ export function useOrders(
     queryFn: () => ordersApi.listOrders(toValue(page), toValue(limit)),
     staleTime: 30 * 1000, // 30 seconds
   });
-}
-
-// Suspense Query: List user orders (see convention note — plain useQuery in Vue)
-export function useSuspenseOrders(
-  page: MaybeRefOrGetter<number> = 1,
-  limit: MaybeRefOrGetter<number> = 10,
-) {
-  return useOrders(page, limit);
 }
 
 // Query: Get order by ID
@@ -97,11 +88,12 @@ export function useUpdateOrderStatus() {
     mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
       ordersApi.updateOrderStatus(orderId, status),
     onSuccess: (_, variables) => {
-      // Invalidate order detail and orders list
+      // Invalidate order detail + user lists + the admin orders list the page reads
       queryClient.invalidateQueries({
         queryKey: orderKeys.detail(variables.orderId),
       });
       queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: [...adminKeys.all, 'orders'] });
       toast.success('Trạng thái đơn hàng đã được cập nhật!');
     },
     onError: (error: unknown) => {

@@ -5,39 +5,42 @@ import { computed, ref, useSlots } from 'vue';
 
 import ColumnVisibilityToggle from './column-visibility-toggle.vue';
 import DataTable from './data-table.vue';
+import { nextDisabledFor } from './pagination';
 
 const props = withDefaults(
   defineProps<{
     columns: Array<{ id: string; label: string }>;
     // oxlint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any[];
+    rows: any[];
     isLoading?: boolean;
     emptyMessage?: string;
-    page?: number;
     limit?: number;
-    // null/undefined hides the footer (products has no pagination)
-    pagination?: { total: number; totalPages?: number } | null;
+    // undefined hides the footer (products has no pagination)
+    total?: number;
     subject?: string;
-    // pages without totalPages (orders) pass their own next-disable rule
-    nextDisabled?: boolean;
   }>(),
   {
     isLoading: false,
     emptyMessage: 'No data available',
-    page: 1,
     limit: 10,
-    nextDisabled: undefined,
+    total: undefined,
+    subject: '',
   },
 );
 
-const emit = defineEmits<{ 'update:page': [value: number] }>();
+const page = defineModel<number>('page', { default: 1 });
 
 const visibleColumns = ref<string[]>(props.columns.map((c) => c.id));
 
 const slots = useSlots();
 const cellSlots = computed(() => Object.keys(slots).filter((name) => name.startsWith('cell-')));
 
-const totalPages = computed(() => props.pagination?.totalPages ?? 0);
+const totalPages = computed(() =>
+  props.total == null ? 0 : Math.max(1, Math.ceil(props.total / props.limit)),
+);
+const nextDisabled = computed(() =>
+  nextDisabledFor(page.value, props.total, props.rows, props.limit),
+);
 </script>
 
 <template>
@@ -47,7 +50,7 @@ const totalPages = computed(() => props.pagination?.totalPages ?? 0);
   </div>
   <DataTable
     :columns="columns"
-    :data="data"
+    :data="rows"
     :visible-columns="visibleColumns"
     :is-loading="isLoading"
     :empty-message="emptyMessage"
@@ -56,23 +59,23 @@ const totalPages = computed(() => props.pagination?.totalPages ?? 0);
       <slot :name="name" v-bind="scope || {}" />
     </template>
   </DataTable>
-  <div v-if="pagination" class="text-wds-text/70 flex items-center justify-between text-sm">
+  <div v-if="total != null" class="text-wds-text/70 flex items-center justify-between text-sm">
     <div>
-      Showing {{ (page - 1) * limit + 1 }} to {{ Math.min(page * limit, pagination.total) }} of
-      {{ pagination.total }} {{ subject }}
+      Showing {{ (page - 1) * limit + 1 }} to {{ Math.min(page * limit, total) }} of {{ total }}
+      {{ subject }}
     </div>
     <div class="flex gap-2">
       <button
         class="border-wds-accent/30 bg-wds-background text-wds-text hover:bg-wds-accent/10 rounded-lg border px-4 py-2 disabled:opacity-50"
         :disabled="page === 1"
-        @click="emit('update:page', Math.max(1, page - 1))"
+        @click="page = Math.max(1, page - 1)"
       >
         Previous
       </button>
       <button
         class="border-wds-accent/30 bg-wds-background text-wds-text hover:bg-wds-accent/10 rounded-lg border px-4 py-2 disabled:opacity-50"
-        :disabled="nextDisabled ?? page >= totalPages"
-        @click="emit('update:page', totalPages ? Math.min(totalPages, page + 1) : page + 1)"
+        :disabled="nextDisabled"
+        @click="page = totalPages ? Math.min(totalPages, page + 1) : page + 1"
       >
         Next
       </button>

@@ -39,7 +39,7 @@ const statusClass = (status: string) =>
       : 'bg-yellow-500/20 text-yellow-400';
 
 const transactions = computed(() =>
-  (data.value?.transactions || []).map((transaction) => ({
+  (data.value?.rows || []).map((transaction) => ({
     ...transaction,
     orderCode: transaction.orderId || 'N/A',
   })),
@@ -55,15 +55,14 @@ const transactions = computed(() =>
       />
       <div class="flex-1 space-y-4 p-6">
         <AdminDataTable
+          v-model:page="page"
           :columns="columns"
-          :data="transactions"
+          :rows="transactions"
           :is-loading="!!isLoading"
           empty-message="No transactions found"
-          :page="page"
           :limit="limit"
-          :pagination="data?.pagination ?? null"
+          :total="data?.total"
           subject="transactions"
-          @update:page="page = $event"
         >
           <template #filters>
             <TableFilters

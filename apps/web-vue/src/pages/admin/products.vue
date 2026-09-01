@@ -36,7 +36,7 @@ const { data, isLoading } = useAdminProducts();
 
 const filteredData = computed(
   () =>
-    data.value?.products.filter(
+    data.value?.rows.filter(
       (product) =>
         product.name.toLowerCase().includes(search.value.toLowerCase()) ||
         product.slug.toLowerCase().includes(search.value.toLowerCase()),
@@ -85,7 +85,7 @@ const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: '
         <template v-if="activeTab === 'table'">
           <AdminDataTable
             :columns="columns"
-            :data="filteredData"
+            :rows="filteredData"
             :is-loading="!!isLoading"
             empty-message="No products found"
           >

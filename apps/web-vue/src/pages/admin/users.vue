@@ -6,9 +6,8 @@ import AdminHeader from '@/components/admin/admin-header.vue';
 import AdminLayout from '@/components/admin/admin-layout.vue';
 import TableActions from '@/components/admin/table-actions.vue';
 import TableFilters from '@/components/admin/table-filters.vue';
-import { useAdminUsers } from '@/lib/api/hooks/use-admin';
+import { useAdminUsers, useDeleteAdminUser } from '@/lib/api/hooks/use-admin';
 import { formatDate } from '@/lib/date';
-import { adminApi } from '@/lib/api/admin';
 import { usePageMeta } from '@/lib/metadata';
 import { toast } from '@/lib/toast';
 
@@ -35,27 +34,22 @@ const limit = 10;
 const search = ref('');
 const roleFilter = ref<UserRole | undefined>();
 
-const { data, isLoading, refetch } = useAdminUsers(page, limit, roleFilter);
+const { data, isLoading } = useAdminUsers(page, limit, roleFilter);
+const deleteUserMutation = useDeleteAdminUser();
 
 const filteredData = computed(() => {
-  if (!data.value?.users) return [];
-  if (!search.value) return data.value.users;
-  return data.value.users.filter(
+  if (!data.value?.rows) return [];
+  if (!search.value) return data.value.rows;
+  return data.value.rows.filter(
     (user) =>
       user.email.toLowerCase().includes(search.value.toLowerCase()) ||
       user.fullName?.toLowerCase().includes(search.value.toLowerCase()),
   );
 });
 
-async function handleDelete(userId: string) {
+function handleDelete(userId: string) {
   if (!confirm('Bạn có chắc chắn muốn xóa user này?')) return;
-  try {
-    await adminApi.deleteUser(userId);
-    toast.success('Đã xóa user thành công');
-    refetch();
-  } catch {
-    toast.error('Xóa user thất bại');
-  }
+  deleteUserMutation.mutate(userId);
 }
 </script>
 
@@ -65,15 +59,14 @@ async function handleDelete(userId: string) {
       <AdminHeader title="Users Management" description="Quản lý người dùng trong hệ thống" />
       <div class="flex-1 space-y-4 p-6">
         <AdminDataTable
+          v-model:page="page"
           :columns="columns"
-          :data="filteredData"
+          :rows="filteredData"
           :is-loading="!!isLoading"
           empty-message="No users found"
-          :page="page"
           :limit="limit"
-          :pagination="data?.pagination ?? null"
+          :total="data?.total"
           subject="users"
-          @update:page="page = $event"
         >
           <template #filters>
             <TableFilters
