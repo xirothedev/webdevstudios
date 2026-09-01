@@ -1,5 +1,4 @@
-// ponytail: T3 shared hooks dir has no blog.ts and src/lib/** is off-limits to this slice —
-// blog vue-query hooks live here until a shared file exists. Same shape as src/lib/api/hooks/*.
+/// Reactive-params convention per this directory (MaybeRefOrGetter + toValue).
 import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue, type MaybeRefOrGetter } from 'vue';
 

@@ -1,5 +1,4 @@
-// ponytail: T3 shared hooks dir has no admin.ts and src/lib/** is off-limits to this slice —
-// admin vue-query hooks live here until a shared file exists. Same shape as components/blog/use-blog.ts.
+/// Reactive-params convention per this directory (MaybeRefOrGetter + toValue).
 import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue, type MaybeRefOrGetter } from 'vue';
 
@@ -59,14 +58,3 @@ export function useAdminTransactions(
     queryFn: () => adminApi.listTransactions(toValue(page), toValue(limit), toValue(status)),
   });
 }
-
-// apps/web formats dates with date-fns; web-vue has no date-fns dep — Intl matches the
-// exact patterns used ('dd/MM/yyyy' and 'dd/MM/yyyy HH:mm').
-export const formatDate = (iso: string) => new Intl.DateTimeFormat('en-GB').format(new Date(iso));
-
-export const formatDateTime = (iso: string) => {
-  // date-fns 'dd/MM/yyyy HH:mm' in local time, no dep
-  const d = new Date(iso);
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
-};

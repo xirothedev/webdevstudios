@@ -45,6 +45,30 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
+// Single source of truth for "routes that never force a login redirect".
+// The router annotates route meta from this too — keep the two in sync here only.
+export const PUBLIC_ROUTES = [
+  '/', // Home page
+  '/shop', // Shop listing
+  '/about', // About page
+  '/faq', // FAQ page
+  '/generation', // Generation page
+  '/calendar', // Calendar page
+  '/achievements', // Achievements page
+  '/activities', // Activities page
+  '/partner', // Partner page
+  '/blog', // Blog listing page
+] as const;
+
+export const PUBLIC_ROUTE_PREFIXES = ['/shop/', '/auth/', '/legal/', '/blog/'] as const;
+
+export function isPublicRoute(path: string): boolean {
+  return (
+    (PUBLIC_ROUTES as readonly string[]).includes(path) ||
+    PUBLIC_ROUTE_PREFIXES.some((prefix) => path.startsWith(prefix))
+  );
+}
+
 // Create axios instance
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -111,19 +135,18 @@ apiClient.interceptors.response.use(
 
     // Handle 401 Unauthorized - try to refresh token
     // Skip refresh logic for auth endpoints (login, register, etc.) and refresh endpoint
-    const isAuthEndpoint =
-      originalRequest.url?.includes('/auth/login') ||
-      originalRequest.url?.includes('/auth/register') ||
-      originalRequest.url?.includes('/auth/signup') ||
-      originalRequest.url?.includes('/auth/verify-email') ||
-      originalRequest.url?.includes('/auth/password/reset-request') ||
-      originalRequest.url?.includes('/auth/password/reset') ||
-      originalRequest.url === '/auth/login' ||
-      originalRequest.url === '/auth/register' ||
-      originalRequest.url === '/auth/signup';
+    // ponytail: includes() covers the exact-equality arms the old code also had
+    const AUTH_ENDPOINTS = [
+      '/auth/login',
+      '/auth/register',
+      '/auth/signup',
+      '/auth/verify-email',
+      '/auth/password/reset-request',
+      '/auth/password/reset',
+    ];
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((path) => originalRequest.url?.includes(path));
 
-    const isRefreshEndpoint =
-      originalRequest.url?.includes('/auth/refresh') || originalRequest.url === '/auth/refresh';
+    const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
 
     // Don't refresh token for auth endpoints or refresh endpoint
     // Auth endpoints return 401 when credentials are wrong, not when token expired
@@ -170,31 +193,7 @@ apiClient.interceptors.response.use(
 
         // Only redirect if we're in the browser and not on public pages
         if (typeof window !== 'undefined') {
-          const currentPath = window.location.pathname;
-
-          // List of public routes that don't require authentication
-          const publicRoutes = [
-            '/', // Home page
-            '/shop', // Shop listing
-            '/about', // About page
-            '/faq', // FAQ page
-            '/generation', // Generation page
-            '/calendar', // Calendar page
-            '/achievements', // Achievements page
-            '/activities', // Activities page
-            '/partner', // Partner page
-            '/blog', // Blog listing page
-          ];
-
-          // Check if current path is a public route or auth route
-          const isPublicRoute =
-            publicRoutes.includes(currentPath) ||
-            currentPath.startsWith('/shop/') || // Shop product pages
-            currentPath.startsWith('/auth/') || // Auth pages
-            currentPath.startsWith('/legal/') || // Legal pages
-            currentPath.startsWith('/blog/'); // Blog pages
-
-          if (!isPublicRoute) {
+          if (!isPublicRoute(window.location.pathname)) {
             // Clear any auth-related state
             window.location.href = '/auth/login';
           }
@@ -219,8 +218,7 @@ apiClient.interceptors.response.use(
 
     // Handle 403 Forbidden - might be CSRF token issue
     if (status === 403 && !originalRequest._retry) {
-      const isCsrfEndpoint =
-        originalRequest.url?.includes('/csrf-token') || originalRequest.url === '/csrf-token';
+      const isCsrfEndpoint = originalRequest.url?.includes('/csrf-token');
 
       // If not CSRF endpoint, try to refresh CSRF token and retry
       if (!isCsrfEndpoint) {

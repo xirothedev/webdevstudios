@@ -49,13 +49,16 @@ const stockBySize = computed(() =>
     {} as Record<ProductSize, number>,
   ),
 );
-const selectedSizeStock = computed(
-  () => stockBySize.value?.[selectedSize.value] ?? product.value?.stock ?? 0,
-);
+// One derivation of sellable stock for the current selection (size-aware).
+const availableStock = computed(() => {
+  const p = product.value;
+  if (!p) return 0;
+  return p.hasSizes ? (stockBySize.value?.[selectedSize.value] ?? p.stock ?? 0) : (p.stock ?? 0);
+});
 
 // Clamp quantity when the selected size's stock is lower than current quantity
 // (React does this in render phase; a watcher is the Vue equivalent).
-watch(selectedSizeStock, (stock) => {
+watch(availableStock, (stock) => {
   if (product.value?.hasSizes && quantity.value > stock) {
     quantity.value = stock > 0 ? stock : 1;
   }
@@ -73,7 +76,7 @@ const handleAddToCart = () => {
     }
 
     // Validation: quantity must be valid
-    if (quantity.value <= 0 || quantity.value > selectedSizeStock.value) {
+    if (quantity.value <= 0 || quantity.value > availableStock.value) {
       toast.error('Số lượng không hợp lệ');
       return;
     }
@@ -85,7 +88,7 @@ const handleAddToCart = () => {
     });
   } else {
     // Validation: quantity must be valid
-    if (quantity.value <= 0 || quantity.value > product.value.stock) {
+    if (quantity.value <= 0 || quantity.value > availableStock.value) {
       toast.error('Số lượng không hợp lệ');
       return;
     }
@@ -104,13 +107,8 @@ const handleBuyNow = () => {
     return;
   }
 
-  // Check stock
-  const availableStock = product.value.hasSizes
-    ? product.value.sizeStocks?.find((ss) => ss.size === selectedSize.value)?.stock || 0
-    : product.value.stock || 0;
-
-  if (quantity.value > availableStock) {
-    toast.error(`Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock}`);
+  if (quantity.value > availableStock.value) {
+    toast.error(`Số lượng vượt quá tồn kho. Tồn kho hiện tại: ${availableStock.value}`);
     return;
   }
 
@@ -121,10 +119,7 @@ const handleBuyNow = () => {
 
 const increaseQuantity = () => {
   if (!product.value) return;
-  quantity.value = Math.min(
-    quantity.value + 1,
-    product.value.hasSizes ? (selectedSizeStock.value ?? 10) : (product.value.stock ?? 10),
-  );
+  quantity.value = Math.min(quantity.value + 1, availableStock.value);
 };
 
 const decreaseQuantity = () => {
@@ -233,8 +228,8 @@ const sizes = computed(() => product.value?.sizeStocks?.map((ss) => ss.size) || 
               <!-- Quantity Selector -->
               <ProductQuantitySelector
                 :quantity="quantity"
-                :stock="product.hasSizes ? selectedSizeStock : product.stock"
-                :max="product.hasSizes ? (selectedSizeStock ?? 0) : (product.stock ?? 0)"
+                :stock="availableStock"
+                :max="availableStock"
                 @increase="increaseQuantity"
                 @decrease="decreaseQuantity"
               />

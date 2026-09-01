@@ -2,13 +2,13 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 
+import AdminDataTable from '@/components/admin/admin-data-table.vue';
 import AdminHeader from '@/components/admin/admin-header.vue';
 import AdminLayout from '@/components/admin/admin-layout.vue';
-import ColumnVisibilityToggle from '@/components/admin/column-visibility-toggle.vue';
-import DataTable from '@/components/admin/data-table.vue';
 import TableActions from '@/components/admin/table-actions.vue';
 import TableFilters from '@/components/admin/table-filters.vue';
-import { adminKeys, formatDateTime, useAdminOrders } from '@/components/admin/use-admin';
+import { adminKeys, useAdminOrders } from '@/lib/api/hooks/use-admin';
+import { formatDateTime } from '@/lib/date';
 import { ordersApi, type OrderStatus } from '@/lib/api/orders';
 import { usePageMeta } from '@/lib/metadata';
 import { toast } from '@/lib/toast';
@@ -33,7 +33,6 @@ const columns = [
 const page = ref(1);
 const limit = 10;
 const statusFilter = ref<OrderStatus | undefined>();
-const visibleColumns = ref<string[]>(columns.map((c) => c.id));
 
 const { data, isLoading } = useAdminOrders(page, limit, statusFilter);
 const queryClient = useQueryClient();
@@ -81,39 +80,43 @@ function promptStatusUpdate(orderId: string) {
     <div class="flex h-full flex-col">
       <AdminHeader title="Orders Management" description="Quản lý đơn hàng trong hệ thống" />
       <div class="flex-1 space-y-4 p-6">
-        <div class="flex items-center justify-between">
-          <TableFilters
-            :filters="[
-              {
-                id: 'status',
-                label: 'Status',
-                type: 'select',
-                options: [
-                  { value: 'PENDING', label: 'Pending' },
-                  { value: 'CONFIRMED', label: 'Confirmed' },
-                  { value: 'PROCESSING', label: 'Processing' },
-                  { value: 'SHIPPING', label: 'Shipping' },
-                  { value: 'DELIVERED', label: 'Delivered' },
-                  { value: 'CANCELLED', label: 'Cancelled' },
-                  { value: 'RETURNED', label: 'Returned' },
-                ],
-              },
-            ]"
-            :filter-values="statusFilter ? { status: statusFilter } : {}"
-            @update:filter-value="
-              (_id, value) => (statusFilter = (value || undefined) as OrderStatus)
-            "
-            :on-clear="() => (statusFilter = undefined)"
-          />
-          <ColumnVisibilityToggle v-model="visibleColumns" :columns="columns" />
-        </div>
-        <DataTable
+        <AdminDataTable
           :columns="columns"
           :data="orders"
-          :visible-columns="visibleColumns"
           :is-loading="!!isLoading"
           empty-message="No orders found"
+          :page="page"
+          :limit="limit"
+          :pagination="data ? { total: data.total } : null"
+          :next-disabled="!data?.orders || data.orders.length < limit"
+          subject="orders"
+          @update:page="page = $event"
         >
+          <template #filters>
+            <TableFilters
+              :filters="[
+                {
+                  id: 'status',
+                  label: 'Status',
+                  type: 'select',
+                  options: [
+                    { value: 'PENDING', label: 'Pending' },
+                    { value: 'CONFIRMED', label: 'Confirmed' },
+                    { value: 'PROCESSING', label: 'Processing' },
+                    { value: 'SHIPPING', label: 'Shipping' },
+                    { value: 'DELIVERED', label: 'Delivered' },
+                    { value: 'CANCELLED', label: 'Cancelled' },
+                    { value: 'RETURNED', label: 'Returned' },
+                  ],
+                },
+              ]"
+              :filter-values="statusFilter ? { status: statusFilter } : {}"
+              @update:filter-value="
+                (_id, value) => (statusFilter = (value || undefined) as OrderStatus)
+              "
+              :on-clear="() => (statusFilter = undefined)"
+            />
+          </template>
           <template #cell-customer="{ row }">{{ row.shippingAddress.fullName }}</template>
           <template #cell-totalAmount="{ row }">{{ formatPrice(row.totalAmount) }}</template>
           <template #cell-status="{ row }">
@@ -136,29 +139,7 @@ function promptStatusUpdate(orderId: string) {
               ]"
             />
           </template>
-        </DataTable>
-        <div v-if="data" class="text-wds-text/70 flex items-center justify-between text-sm">
-          <div>
-            Showing {{ (page - 1) * limit + 1 }} to {{ Math.min(page * limit, data.total) }} of
-            {{ data.total }} orders
-          </div>
-          <div class="flex gap-2">
-            <button
-              class="border-wds-accent/30 bg-wds-background text-wds-text hover:bg-wds-accent/10 rounded-lg border px-4 py-2 disabled:opacity-50"
-              :disabled="page === 1"
-              @click="page = Math.max(1, page - 1)"
-            >
-              Previous
-            </button>
-            <button
-              class="border-wds-accent/30 bg-wds-background text-wds-text hover:bg-wds-accent/10 rounded-lg border px-4 py-2 disabled:opacity-50"
-              :disabled="!data.orders || data.orders.length < limit"
-              @click="page = page + 1"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        </AdminDataTable>
       </div>
     </div>
   </AdminLayout>

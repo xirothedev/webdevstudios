@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import CalendarContainer from '@/components/calendar/CalendarContainer.vue';
+import { useEvents } from '@/lib/api/hooks/use-events';
 import { usePageMeta } from '@/lib/metadata';
+
+// Same query key as CalendarContainer's useEvents — shares state, no duplicate fetch.
+const { isUsingMockData } = useEvents();
 
 usePageMeta({
   title: 'Lịch sự kiện',
@@ -18,6 +22,12 @@ usePageMeta({
           Xem tất cả các sự kiện, workshop và hoạt động của WebDev Studios
         </p>
       </div>
+      <p
+        v-if="isUsingMockData"
+        class="mb-4 w-fit rounded-full bg-amber-500/15 px-3 py-1 text-xs font-medium text-amber-600"
+      >
+        dữ liệu mẫu — API sự kiện không khả dụng
+      </p>
       <CalendarContainer />
     </div>
   </div>

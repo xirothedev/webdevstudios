@@ -6,7 +6,8 @@ import { RouterLink, useRoute } from 'vue-router';
 
 import Button from '@/components/ui/button.vue';
 import BlogPostContent from '@/components/blog/blog-post-content.vue';
-import { useBlogPost } from '@/components/blog/use-blog';
+import { useBlogPost } from '@/lib/api/hooks/use-blog';
+import { formatDateLong } from '@/lib/date';
 
 const route = useRoute();
 const slug = computed(() => String(route.params.slug));
@@ -30,14 +31,6 @@ useHead(
     };
   }),
 );
-
-function longDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
 </script>
 
 <template>
@@ -72,7 +65,7 @@ function longDate(iso: string): string {
 
           <div class="text-wds-text/70 flex flex-wrap items-center gap-4 text-sm">
             <span>{{ post.author.fullName || 'Anonymous' }}</span>
-            <span v-if="post.publishedAt">{{ longDate(post.publishedAt) }}</span>
+            <span v-if="post.publishedAt">{{ formatDateLong(post.publishedAt) }}</span>
             <span>{{ post.viewCount }} lượt xem</span>
           </div>
         </header>

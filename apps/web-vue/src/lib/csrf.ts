@@ -69,11 +69,3 @@ export function clearCsrfToken(): void {
   csrfToken = null;
   tokenPromise = null;
 }
-
-/**
- * Get current CSRF token (synchronous)
- * Returns null if token hasn't been fetched yet
- */
-export function getCurrentCsrfToken(): string | null {
-  return csrfToken;
-}

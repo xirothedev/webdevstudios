@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 import BlogPostList from '@/components/blog/blog-post-list.vue';
-import { useBlogPosts } from '@/components/blog/use-blog';
+import { useBlogPosts } from '@/lib/api/hooks/use-blog';
 import { usePageMeta } from '@/lib/metadata';
 
 usePageMeta({

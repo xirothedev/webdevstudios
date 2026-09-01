@@ -1,125 +1,221 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 
 import { authStoreReady } from '@/composables/use-auth';
-import About from '@/pages/about.vue';
-import AccountProfile from '@/pages/account/profile.vue';
-import AccountSettings from '@/pages/account/settings.vue';
-import Achievements from '@/pages/achievements.vue';
-import Activities from '@/pages/activities.vue';
-import AdminBlogEdit from '@/pages/admin/blog/[id].vue';
-import AdminBlog from '@/pages/admin/blog/index.vue';
-import AdminBlogNew from '@/pages/admin/blog/new.vue';
-import Admin from '@/pages/admin/index.vue';
-import AdminOrders from '@/pages/admin/orders.vue';
-import AdminProducts from '@/pages/admin/products.vue';
-import AdminTransactions from '@/pages/admin/transactions.vue';
-import AdminUsers from '@/pages/admin/users.vue';
-import Auth2fa from '@/pages/auth/2fa.vue';
-import AuthForgotPassword from '@/pages/auth/forgot-password.vue';
-import AuthLogin from '@/pages/auth/login.vue';
-import AuthOauthCallback from '@/pages/auth/oauth-callback.vue';
-import AuthResetPassword from '@/pages/auth/reset-password.vue';
-import AuthSignup from '@/pages/auth/signup.vue';
-import AuthVerifyEmail from '@/pages/auth/verify-email.vue';
-import Blog from '@/pages/blog/index.vue';
-import BlogPost from '@/pages/blog/[slug].vue';
-import Calendar from '@/pages/calendar.vue';
-import Cart from '@/pages/cart.vue';
-import Checkout from '@/pages/checkout.vue';
-import Faq from '@/pages/faq.vue';
-import Generation from '@/pages/generation.vue';
-import Home from '@/pages/home.vue';
-import LegalPrivacy from '@/pages/legal/privacy.vue';
-import LegalRefund from '@/pages/legal/refund.vue';
-import LegalTerms from '@/pages/legal/terms.vue';
-import NotFound from '@/pages/not-found.vue';
-import Orders from '@/pages/orders/index.vue';
-import OrderDetail from '@/pages/orders/[id].vue';
-import Partner from '@/pages/partner.vue';
-import PaymentsCancel from '@/pages/payments/cancel.vue';
-import PaymentsReturn from '@/pages/payments/return.vue';
-import PaymentDetail from '@/pages/payments/[orderId].vue';
-import ShopAoThun from '@/pages/shop/ao-thun.vue';
-import ShopDayDeo from '@/pages/shop/day-deo.vue';
-import Shop from '@/pages/shop/index.vue';
-import ShopMocKhoa from '@/pages/shop/moc-khoa.vue';
-import ShopPadChuot from '@/pages/shop/pad-chuot.vue';
+import { isPublicRoute } from '@/lib/api-client';
 
 declare module 'vue-router' {
   interface RouteMeta {
     /** mirrors apps/web app/admin/layout.tsx guard */
     admin?: boolean;
+    /** derived from PUBLIC_ROUTES in lib/api-client.ts — single source of truth */
+    public?: boolean;
+    /** pages that render their own chrome (auth/admin layouts) hide the App.vue Navbar/Footer */
+    chrome?: 'none';
+    /** apps/web Navbar variant per route (default dark) */
+    navbarVariant?: 'dark' | 'light';
   }
 }
 
 // Same URL paths as apps/web; dynamic params use the apps/web segment names.
 // meta.admin is the ONLY guard apps/web has (admin layout); every other route is
 // public and its pages self-redirect on 401 — do not add auth gates they don't have.
+// navbarVariant/chrome mirror the per-page <Navbar variant> / own-chrome usage in apps/web.
 const routes: RouteRecordRaw[] = [
-  { path: '/', name: 'home', component: Home },
-  { path: '/about', name: 'about', component: About },
-  { path: '/account/profile', name: 'account-profile', component: AccountProfile },
-  { path: '/account/settings', name: 'account-settings', component: AccountSettings },
-  { path: '/achievements', name: 'achievements', component: Achievements },
-  { path: '/activities', name: 'activities', component: Activities },
-  { path: '/admin', name: 'admin', component: Admin, meta: { admin: true } },
-  { path: '/admin/blog', name: 'admin-blog', component: AdminBlog, meta: { admin: true } },
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/pages/home.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  {
+    path: '/about',
+    name: 'about',
+    component: () => import('@/pages/about.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  {
+    path: '/account/profile',
+    name: 'account-profile',
+    component: () => import('@/pages/account/profile.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  {
+    path: '/account/settings',
+    name: 'account-settings',
+    component: () => import('@/pages/account/settings.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  {
+    path: '/achievements',
+    name: 'achievements',
+    component: () => import('@/pages/achievements.vue'),
+  },
+  { path: '/activities', name: 'activities', component: () => import('@/pages/activities.vue') },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/pages/admin/index.vue'),
+    meta: { admin: true, chrome: 'none' },
+  },
+  {
+    path: '/admin/blog',
+    name: 'admin-blog',
+    component: () => import('@/pages/admin/blog/index.vue'),
+    meta: { admin: true, chrome: 'none' },
+  },
   {
     path: '/admin/blog/new',
     name: 'admin-blog-new',
-    component: AdminBlogNew,
-    meta: { admin: true },
+    component: () => import('@/pages/admin/blog/new.vue'),
+    meta: { admin: true, chrome: 'none' },
   },
   {
     path: '/admin/blog/:id',
     name: 'admin-blog-edit',
-    component: AdminBlogEdit,
-    meta: { admin: true },
+    component: () => import('@/pages/admin/blog/[id].vue'),
+    meta: { admin: true, chrome: 'none' },
   },
-  { path: '/admin/orders', name: 'admin-orders', component: AdminOrders, meta: { admin: true } },
+  {
+    path: '/admin/orders',
+    name: 'admin-orders',
+    component: () => import('@/pages/admin/orders.vue'),
+    meta: { admin: true, chrome: 'none' },
+  },
   {
     path: '/admin/products',
     name: 'admin-products',
-    component: AdminProducts,
-    meta: { admin: true },
+    component: () => import('@/pages/admin/products.vue'),
+    meta: { admin: true, chrome: 'none' },
   },
   {
     path: '/admin/transactions',
     name: 'admin-transactions',
-    component: AdminTransactions,
-    meta: { admin: true },
+    component: () => import('@/pages/admin/transactions.vue'),
+    meta: { admin: true, chrome: 'none' },
   },
-  { path: '/admin/users', name: 'admin-users', component: AdminUsers, meta: { admin: true } },
-  { path: '/auth/2fa', name: 'auth-2fa', component: Auth2fa },
-  { path: '/auth/forgot-password', name: 'auth-forgot-password', component: AuthForgotPassword },
-  { path: '/auth/login', name: 'auth-login', component: AuthLogin },
-  { path: '/auth/oauth/callback', name: 'auth-oauth-callback', component: AuthOauthCallback },
-  { path: '/auth/reset-password', name: 'auth-reset-password', component: AuthResetPassword },
-  { path: '/auth/signup', name: 'auth-signup', component: AuthSignup },
-  { path: '/auth/verify-email', name: 'auth-verify-email', component: AuthVerifyEmail },
-  { path: '/blog', name: 'blog', component: Blog },
-  { path: '/blog/:slug', name: 'blog-post', component: BlogPost },
-  { path: '/calendar', name: 'calendar', component: Calendar },
-  { path: '/cart', name: 'cart', component: Cart },
-  { path: '/checkout', name: 'checkout', component: Checkout },
-  { path: '/faq', name: 'faq', component: Faq },
-  { path: '/generation', name: 'generation', component: Generation },
-  { path: '/privacy', name: 'legal-privacy', component: LegalPrivacy },
-  { path: '/refund', name: 'legal-refund', component: LegalRefund },
-  { path: '/terms', name: 'legal-terms', component: LegalTerms },
-  { path: '/orders', name: 'orders', component: Orders },
-  { path: '/orders/:id', name: 'order-detail', component: OrderDetail },
-  { path: '/partner', name: 'partner', component: Partner },
-  { path: '/payments/cancel', name: 'payments-cancel', component: PaymentsCancel },
-  { path: '/payments/return', name: 'payments-return', component: PaymentsReturn },
-  { path: '/payments/:orderId', name: 'payments-detail', component: PaymentDetail },
-  { path: '/shop', name: 'shop', component: Shop },
-  { path: '/shop/ao-thun', name: 'shop-ao-thun', component: ShopAoThun },
-  { path: '/shop/day-deo', name: 'shop-day-deo', component: ShopDayDeo },
-  { path: '/shop/moc-khoa', name: 'shop-moc-khoa', component: ShopMocKhoa },
-  { path: '/shop/pad-chuot', name: 'shop-pad-chuot', component: ShopPadChuot },
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
+  {
+    path: '/admin/users',
+    name: 'admin-users',
+    component: () => import('@/pages/admin/users.vue'),
+    meta: { admin: true, chrome: 'none' },
+  },
+  {
+    path: '/auth/2fa',
+    name: 'auth-2fa',
+    component: () => import('@/pages/auth/2fa.vue'),
+    meta: { chrome: 'none' },
+  },
+  {
+    path: '/auth/forgot-password',
+    name: 'auth-forgot-password',
+    component: () => import('@/pages/auth/forgot-password.vue'),
+    meta: { chrome: 'none' },
+  },
+  {
+    path: '/auth/login',
+    name: 'auth-login',
+    component: () => import('@/pages/auth/login.vue'),
+    meta: { chrome: 'none' },
+  },
+  {
+    path: '/auth/oauth/callback',
+    name: 'auth-oauth-callback',
+    component: () => import('@/pages/auth/oauth-callback.vue'),
+    meta: { chrome: 'none' },
+  },
+  {
+    path: '/auth/reset-password',
+    name: 'auth-reset-password',
+    component: () => import('@/pages/auth/reset-password.vue'),
+    meta: { chrome: 'none' },
+  },
+  {
+    path: '/auth/signup',
+    name: 'auth-signup',
+    component: () => import('@/pages/auth/signup.vue'),
+    meta: { chrome: 'none' },
+  },
+  {
+    path: '/auth/verify-email',
+    name: 'auth-verify-email',
+    component: () => import('@/pages/auth/verify-email.vue'),
+    meta: { chrome: 'none' },
+  },
+  { path: '/blog', name: 'blog', component: () => import('@/pages/blog/index.vue') },
+  { path: '/blog/:slug', name: 'blog-post', component: () => import('@/pages/blog/[slug].vue') },
+  {
+    path: '/calendar',
+    name: 'calendar',
+    component: () => import('@/pages/calendar.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  { path: '/cart', name: 'cart', component: () => import('@/pages/cart.vue') },
+  { path: '/checkout', name: 'checkout', component: () => import('@/pages/checkout.vue') },
+  {
+    path: '/faq',
+    name: 'faq',
+    component: () => import('@/pages/faq.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  {
+    path: '/generation',
+    name: 'generation',
+    component: () => import('@/pages/generation.vue'),
+    meta: { navbarVariant: 'light' },
+  },
+  { path: '/privacy', name: 'legal-privacy', component: () => import('@/pages/legal/privacy.vue') },
+  { path: '/refund', name: 'legal-refund', component: () => import('@/pages/legal/refund.vue') },
+  { path: '/terms', name: 'legal-terms', component: () => import('@/pages/legal/terms.vue') },
+  { path: '/orders', name: 'orders', component: () => import('@/pages/orders/index.vue') },
+  { path: '/orders/:id', name: 'order-detail', component: () => import('@/pages/orders/[id].vue') },
+  { path: '/partner', name: 'partner', component: () => import('@/pages/partner.vue') },
+  {
+    path: '/payments/cancel',
+    name: 'payments-cancel',
+    component: () => import('@/pages/payments/cancel.vue'),
+  },
+  {
+    path: '/payments/return',
+    name: 'payments-return',
+    component: () => import('@/pages/payments/return.vue'),
+  },
+  {
+    path: '/payments/:orderId',
+    name: 'payments-detail',
+    component: () => import('@/pages/payments/[orderId].vue'),
+  },
+  { path: '/shop', name: 'shop', component: () => import('@/pages/shop/index.vue') },
+  {
+    path: '/shop/ao-thun',
+    name: 'shop-ao-thun',
+    component: () => import('@/pages/shop/ao-thun.vue'),
+  },
+  {
+    path: '/shop/day-deo',
+    name: 'shop-day-deo',
+    component: () => import('@/pages/shop/day-deo.vue'),
+  },
+  {
+    path: '/shop/moc-khoa',
+    name: 'shop-moc-khoa',
+    component: () => import('@/pages/shop/moc-khoa.vue'),
+  },
+  {
+    path: '/shop/pad-chuot',
+    name: 'shop-pad-chuot',
+    component: () => import('@/pages/shop/pad-chuot.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('@/pages/not-found.vue'),
+  },
 ];
+
+// One source of truth for public-ness: annotate every route from isPublicRoute (lib/api-client).
+for (const route of routes) {
+  route.meta = { ...route.meta, public: isPublicRoute(route.path) };
+}
 
 export const router = createRouter({
   history: createWebHistory(),

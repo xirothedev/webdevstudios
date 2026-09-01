@@ -41,5 +41,7 @@ export function useEvents() {
     events: computed(() =>
       query.isError.value || query.data.value === undefined ? mockEvents : query.data.value,
     ),
+    // true when the calendar falls back to mock events because the API call failed
+    isUsingMockData: computed(() => query.isError.value),
   };
 }
