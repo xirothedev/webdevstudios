@@ -2,16 +2,9 @@
 import { RouterLink } from 'vue-router';
 
 import type { BlogPost } from '@/lib/api/blog';
+import { formatDateShortMonth } from '@/lib/date';
 
 defineProps<{ post: BlogPost }>();
-
-function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 </script>
 
 <template>
@@ -43,7 +36,7 @@ function shortDate(iso: string): string {
 
       <div class="text-wds-text/50 mt-auto flex items-center justify-between text-xs">
         <span>{{ post.author.fullName || 'Anonymous' }}</span>
-        <span v-if="post.publishedAt">{{ shortDate(post.publishedAt) }}</span>
+        <span v-if="post.publishedAt">{{ formatDateShortMonth(post.publishedAt) }}</span>
       </div>
     </div>
   </RouterLink>

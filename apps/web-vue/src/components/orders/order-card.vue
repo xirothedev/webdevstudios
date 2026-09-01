@@ -6,6 +6,7 @@ import { ChevronRight, X } from 'lucide-vue-next';
 
 import { Button } from '@/components/ui/button.vue';
 import type { Order, OrderStatus, PaymentStatus } from '@/lib/api/orders';
+import { formatDate } from '@/lib/date';
 import { formatPrice } from '@/lib/utils';
 
 const props = defineProps<{ order: Order; isCancelling?: boolean }>();
@@ -40,14 +41,6 @@ const canCancel = computed(
   () => props.order.status === 'PENDING' && props.order.paymentStatus !== 'PAID',
 );
 const displayedItems = computed(() => props.order.items.slice(0, 3));
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-}
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import { computed, ref } from 'vue';
 
 import { Button } from '@/components/ui/button.vue';
 import { useDeleteReview } from '@/lib/api/hooks/use-reviews';
+import { formatDateLong } from '@/lib/date';
 
 import DeleteReviewDialog from './delete-review-dialog.vue';
 import ReviewEditForm from './review-edit-form.vue';
@@ -19,13 +20,6 @@ const props = defineProps<{
 const isEditing = ref(false);
 const showDeleteDialog = ref(false);
 const deleteReviewMutation = useDeleteReview();
-
-const formatDate = (dateString: string) =>
-  new Date(dateString).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
 
 const canEdit = computed(() => props.currentUserId === props.review.userId);
 const canDelete = computed(() => props.currentUserRole === 'ADMIN');
@@ -76,7 +70,7 @@ const handleDeleteConfirm = () => {
                     "
                   />
                 </div>
-                <span class="text-sm text-white/60">{{ formatDate(review.createdAt) }}</span>
+                <span class="text-sm text-white/60">{{ formatDateLong(review.createdAt) }}</span>
               </div>
             </div>
             <div v-if="canEdit || canDelete" class="flex items-center gap-2">
