@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import FeaturesGrid from '@/components/FeaturesGrid.vue';
+import Hero from '@/components/Hero.vue';
+import TrustSection from '@/components/TrustSection.vue';
 import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
 
-// apps/web /shop renders Hero + TrustSection + FeaturesGrid (marketing components owned
-// by T4, not yet ported). Wire those three imports here when they land.
 usePageMeta({
   title: 'E-commerce Platform',
   description:
@@ -14,7 +15,12 @@ usePageMeta({
 </script>
 
 <template>
+  <!-- apps/web shop/page.tsx: Navbar + Hero + TrustSection + FeaturesGrid + Footer; the shell provides the chrome -->
   <div
     class="bg-wds-background text-wds-text selection:bg-wds-accent/30 selection:text-wds-text min-h-screen"
-  />
+  >
+    <Hero />
+    <TrustSection />
+    <FeaturesGrid />
+  </div>
 </template>
