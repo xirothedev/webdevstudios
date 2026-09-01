@@ -5,9 +5,8 @@ import { useRouter } from 'vue-router';
 
 import QuantitySelector from '@/components/shop/quantity-selector.vue';
 import { Button } from '@/components/ui/button.vue';
-import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
+import { cartTotals, useCart, useCartActions } from '@/lib/api/hooks/use-cart';
 import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
-import { isFreeShipping, shippingFee } from '@/lib/shipping';
 import { formatPrice } from '@/lib/utils';
 
 usePageMeta({
@@ -29,31 +28,16 @@ usePageMeta({
 const router = useRouter();
 
 const { data: cart, error: cartError, isLoading } = useCart();
-
-const updateCartItemMutation = useUpdateCartItem();
-const removeFromCartMutation = useRemoveFromCart();
+const {
+  updateQuantity: handleUpdateQuantity,
+  removeItem: handleRemoveItem,
+  isUpdating: isItemUpdating,
+} = useCartActions();
+const { subtotal, shippingLabel, totalLabel } = cartTotals(cart);
 
 const isEmpty = computed(
   () => !!cartError.value || !cart.value || !cart.value.items || cart.value.items.length === 0,
 );
-
-const handleUpdateQuantity = (itemId: string, quantity: number) => {
-  if (quantity < 1) return;
-  updateCartItemMutation.mutate({ cartItemId: itemId, data: { quantity } });
-};
-
-const handleRemoveItem = (itemId: string) => {
-  removeFromCartMutation.mutate(itemId);
-};
-
-// Check if specific item is being updated (only during actual API call, not during debounce)
-const isItemUpdating = (itemId: string) => {
-  return (
-    (updateCartItemMutation.isPending.value &&
-      updateCartItemMutation.variables.value?.cartItemId === itemId) ||
-    (removeFromCartMutation.isPending.value && removeFromCartMutation.variables.value === itemId)
-  );
-};
 </script>
 
 <template>
@@ -169,25 +153,17 @@ const isItemUpdating = (itemId: string) => {
                 <div class="mb-6 space-y-3">
                   <div class="flex justify-between text-white/80">
                     <span>Tạm tính:</span>
-                    <span>{{ formatPrice(cart.totalAmount) }}₫</span>
+                    <span>{{ formatPrice(subtotal) }}₫</span>
                   </div>
                   <div class="flex justify-between text-white/80">
                     <span>Phí vận chuyển:</span>
-                    <span>
-                      {{
-                        isFreeShipping(cart.totalAmount)
-                          ? 'Miễn phí'
-                          : formatPrice(shippingFee(cart.totalAmount)) + '₫'
-                      }}
-                    </span>
+                    <span>{{ shippingLabel }}</span>
                   </div>
                   <div
                     class="flex justify-between border-t border-white/10 pt-3 text-lg font-bold text-white"
                   >
                     <span>Tổng cộng:</span>
-                    <span
-                      >{{ formatPrice(cart.totalAmount + shippingFee(cart.totalAmount)) }}₫</span
-                    >
+                    <span>{{ totalLabel }}</span>
                   </div>
                 </div>
                 <Button

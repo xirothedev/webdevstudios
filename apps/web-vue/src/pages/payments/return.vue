@@ -4,9 +4,11 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { Button } from '@/components/ui/button.vue';
+import { usePendingOrder } from '@/composables/use-pending-order';
 import { useOrders } from '@/lib/api/hooks/use-orders';
 
 const router = useRouter();
+const pendingOrder = usePendingOrder();
 const isChecking = ref(true);
 const { data: ordersData, refetch } = useOrders(1, 10);
 
@@ -19,8 +21,7 @@ refetch().then(({ data }) => {
   const recentOrder = data?.orders[0];
   if (recentOrder) {
     // Clear localStorage
-    localStorage.removeItem('pendingOrderId');
-    localStorage.removeItem(`paymentUrl_${recentOrder.id}`);
+    pendingOrder.clearFor(recentOrder.id);
 
     // Redirect to order detail page
     setTimeout(() => {

@@ -3,15 +3,16 @@
 import { useRouter } from 'vue-router';
 
 import { Button } from '@/components/ui/button.vue';
+import { usePendingOrder } from '@/composables/use-pending-order';
 
 const router = useRouter();
+const pendingOrder = usePendingOrder();
 
 // Get pending order ID from localStorage
-const pendingOrderId = localStorage.getItem('pendingOrderId');
+const pendingOrderId = pendingOrder.id();
 if (pendingOrderId) {
   // Clear localStorage
-  localStorage.removeItem('pendingOrderId');
-  localStorage.removeItem(`paymentUrl_${pendingOrderId}`);
+  pendingOrder.clearFor(pendingOrderId);
 
   // Redirect to order detail page after 3 seconds
   setTimeout(() => {
@@ -22,7 +23,7 @@ if (pendingOrderId) {
 // Mirrors apps/web: the button re-reads localStorage on click (already cleared above →
 // falls back to /orders whenever a pending order existed). Quirk preserved.
 function viewOrder() {
-  const id = localStorage.getItem('pendingOrderId');
+  const id = pendingOrder.id();
   if (id) {
     router.push(`/orders/${id}`);
   } else {
