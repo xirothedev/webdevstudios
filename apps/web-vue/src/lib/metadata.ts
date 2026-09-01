@@ -86,7 +86,7 @@ export function createPageMetadata({
 }): UseHeadInput {
   const url = `${siteUrl}${path}`;
   const fullTitle = `${title} | ${siteName}`;
-  const ogImage = image ? `${siteUrl}${image}` : `${siteUrl}/icon-512x512.png`;
+  const ogImage = `${siteUrl}${image ?? SEO_IMAGES[path] ?? '/icon-512x512.png'}`;
 
   return {
     title: fullTitle,

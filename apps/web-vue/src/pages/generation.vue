@@ -6,14 +6,13 @@ import { onMounted, ref } from 'vue';
 import DesktopBentoGrid from '@/components/generation/desktop-bento-grid.vue';
 import ExpandableGenerationSection from '@/components/generation/expandable-generation-section.vue';
 import { generations } from '@/data/generations';
-import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
+import { usePageMeta } from '@/lib/metadata';
 
 usePageMeta({
   title: 'Các thế hệ lãnh đạo',
   description:
     'Khám phá hành trình của WebDev Studios qua các thế hệ lãnh đạo tận tụy đã kiến tạo cộng đồng của chúng tôi.',
   path: '/generation',
-  image: SEO_IMAGES['/generation'],
   keywords: [
     'Thế hệ lãnh đạo WebDev Studios',
     'Lịch sử WebDev Studios',

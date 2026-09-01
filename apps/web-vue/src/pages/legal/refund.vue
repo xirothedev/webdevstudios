@@ -4,7 +4,7 @@
 import { computed } from 'vue';
 
 import LegalLayout from '@/components/legal/legal-layout.vue';
-import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
+import { usePageMeta } from '@/lib/metadata';
 import { renderLegalMarkdown } from './markdown';
 import contentSrc from './refund.md?raw';
 
@@ -13,7 +13,6 @@ usePageMeta({
   description:
     'Chính sách đổi trả và hoàn tiền của WebDev Studios - Quy định và quy trình đổi trả sản phẩm.',
   path: '/refund',
-  image: SEO_IMAGES['/refund'],
   keywords: ['Chính sách đổi trả', 'Refund Policy', 'WebDev Studios', 'Hoàn tiền'],
 });
 
