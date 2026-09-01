@@ -254,4 +254,3 @@ export function cartTotals(cart: { value: Cart | undefined }) {
     totalLabel: computed(() => `${formatPrice(subtotal.value + fee.value)}₫`),
   };
 }
-

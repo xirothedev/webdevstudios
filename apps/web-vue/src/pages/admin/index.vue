@@ -73,9 +73,7 @@ const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);
             class="border-wds-accent/30 bg-wds-accent/10 hover:shadow-wds-accent/20 rounded-2xl border p-6 backdrop-blur-sm transition-shadow duration-200"
           >
             <h3 class="text-wds-text/70 text-sm font-medium">Doanh thu</h3>
-            <p class="text-wds-text mt-2 text-3xl font-bold">
-              {{ formatPrice(totalRevenue) }}₫
-            </p>
+            <p class="text-wds-text mt-2 text-3xl font-bold">{{ formatPrice(totalRevenue) }}₫</p>
           </div>
         </div>
 

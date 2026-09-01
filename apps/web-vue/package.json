@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit",
-    "test": "bun test --pass-with-no-tests"
+    "test": "bun test --pass-with-no-tests",
+    "format": "bunx --bun --no-install prettier --write \"**/*.{js,ts,vue,json,css}\"",
+    "format:check": "bunx --bun --no-install prettier --check \"**/*.{js,ts,vue,json,css}\""
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.21",

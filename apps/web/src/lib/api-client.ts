@@ -100,7 +100,11 @@ apiClient.interceptors.response.use(
 
     // Handle network errors
     if (!error.response) {
-      return Promise.reject(Object.assign(new Error('Không thể kết nối đến server. Vui lòng thử lại sau.'), { status: 0 }));
+      return Promise.reject(
+        Object.assign(new Error('Không thể kết nối đến server. Vui lòng thử lại sau.'), {
+          status: 0,
+        }),
+      );
     }
 
     const status = error.response.status;
@@ -197,7 +201,11 @@ apiClient.interceptors.response.use(
           }
         }
 
-        return Promise.reject(Object.assign(new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'), { status: 401 }));
+        return Promise.reject(
+          Object.assign(new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'), {
+            status: 401,
+          }),
+        );
       } finally {
         isRefreshing = false;
       }
@@ -205,7 +213,11 @@ apiClient.interceptors.response.use(
 
     // If refresh endpoint returns 401, don't retry - just reject
     if (status === 401 && isRefreshEndpoint) {
-      return Promise.reject(Object.assign(new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'), { status: 401 }));
+      return Promise.reject(
+        Object.assign(new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'), {
+          status: 401,
+        }),
+      );
     }
 
     // Handle 403 Forbidden - might be CSRF token issue

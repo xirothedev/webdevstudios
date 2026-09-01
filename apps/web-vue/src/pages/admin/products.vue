@@ -43,7 +43,6 @@ const filteredData = computed(
         product.slug.toLowerCase().includes(search.value.toLowerCase()),
     ) || [],
 );
-
 </script>
 
 <template>
@@ -97,9 +96,7 @@ const filteredData = computed(
                 :on-clear="() => (search = '')"
               />
             </template>
-            <template #cell-priceCurrent="{ row }">
-              {{ formatPrice(row.priceCurrent) }}₫
-            </template>
+            <template #cell-priceCurrent="{ row }"> {{ formatPrice(row.priceCurrent) }}₫ </template>
             <template #cell-isPublished="{ row }">
               {{ row.isPublished ? 'Published' : 'Draft' }}
             </template>

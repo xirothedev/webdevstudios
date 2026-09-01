@@ -80,9 +80,7 @@ const options = {
     legend: { display: false },
     tooltip: ChartTooltip(chartConfig.value, {
       formatter: (value: number) =>
-        props.dataKey === 'revenue'
-          ? `${formatPrice(value)}₫`
-          : value.toLocaleString('vi-VN'),
+        props.dataKey === 'revenue' ? `${formatPrice(value)}₫` : value.toLocaleString('vi-VN'),
     }),
   },
   scales: {
