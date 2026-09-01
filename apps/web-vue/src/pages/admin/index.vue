@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import AdminChart from '@/components/admin/admin-chart.vue';
 import AdminHeader from '@/components/admin/admin-header.vue';
 import AdminLayout from '@/components/admin/admin-layout.vue';
-import { useAdminOrders, useAdminProducts, useAdminUsers } from '@/components/admin/use-admin';
+import { useAdminOrders, useAdminProducts, useAdminUsers } from '@/lib/api/hooks/use-admin';
 import { usePageMeta } from '@/lib/metadata';
 
 usePageMeta({

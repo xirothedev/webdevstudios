@@ -11,7 +11,7 @@ import MarkdownEditor from '@/components/ui/markdown-editor.vue';
 import { adminApi } from '@/lib/api/admin';
 import { toast } from '@/lib/toast';
 
-import { adminKeys, useAdminProducts } from './use-admin';
+import { adminKeys, useAdminProducts } from '@/lib/api/hooks/use-admin';
 
 // apps/web ProductEditor edits name/description/prices only — it has no stock/sizes UI
 // despite the ticket wording; mirroring the reference as-is.
