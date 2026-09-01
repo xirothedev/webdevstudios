@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "test": "bun test --pass-with-no-tests"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.21",
