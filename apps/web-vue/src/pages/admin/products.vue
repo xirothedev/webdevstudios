@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
+import AdminDataTable from '@/components/admin/admin-data-table.vue';
 import AdminHeader from '@/components/admin/admin-header.vue';
 import AdminLayout from '@/components/admin/admin-layout.vue';
-import ColumnVisibilityToggle from '@/components/admin/column-visibility-toggle.vue';
-import DataTable from '@/components/admin/data-table.vue';
 import ProductEditor from '@/components/admin/product-editor.vue';
 import TableActions from '@/components/admin/table-actions.vue';
 import TableFilters from '@/components/admin/table-filters.vue';
-import { useAdminProducts } from '@/components/admin/use-admin';
+import { useAdminProducts } from '@/lib/api/hooks/use-admin';
 import { toast } from '@/lib/toast';
 import { usePageMeta } from '@/lib/metadata';
 
@@ -32,7 +31,6 @@ const columns = [
 const activeTab = ref<'table' | 'editor'>('table');
 const selectedProduct = ref<string | null>(null);
 const search = ref('');
-const visibleColumns = ref<string[]>(columns.map((c) => c.id));
 
 const { data, isLoading } = useAdminProducts();
 
@@ -85,22 +83,20 @@ const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: '
         </div>
 
         <template v-if="activeTab === 'table'">
-          <div class="flex items-center justify-between">
-            <TableFilters
-              search-placeholder="Search by name or slug..."
-              :search="search"
-              @update:search="search = $event"
-              :on-clear="() => (search = '')"
-            />
-            <ColumnVisibilityToggle v-model="visibleColumns" :columns="columns" />
-          </div>
-          <DataTable
+          <AdminDataTable
             :columns="columns"
             :data="filteredData"
-            :visible-columns="visibleColumns"
             :is-loading="!!isLoading"
             empty-message="No products found"
           >
+            <template #filters>
+              <TableFilters
+                search-placeholder="Search by name or slug..."
+                :search="search"
+                @update:search="search = $event"
+                :on-clear="() => (search = '')"
+              />
+            </template>
             <template #cell-priceCurrent="{ row }">
               {{ currency.format(row.priceCurrent) }}
             </template>
@@ -117,7 +113,7 @@ const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: '
                 "
               />
             </template>
-          </DataTable>
+          </AdminDataTable>
         </template>
 
         <ProductEditor
