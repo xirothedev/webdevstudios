@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>Lesson 0001 — ref & computed: không có re-render</title>
+    <link rel="stylesheet" href="../assets/course.css" />
+  </head>
+  <body>
+    <p class="lesson-nav">
+      Lesson 0001 · <a href="../reference/react-to-vue.html">Cheat sheet React→Vue</a> · Mission:
+      đọc hiểu <code>apps/web-vue</code>
+    </p>
+
+    <h1>ref &amp; computed: không có re-render</h1>
+    <p class="subtitle">
+      15 phút · một thắng lợi: giải thích được vì sao code Vue dưới đây chạy được trong khi bản
+      React tương đương thì không
+    </p>
+
+    <h2>1. Kiến thức nền (5 phút đọc)</h2>
+
+    <p>
+      Trong React, component là một <em>hàm bị gọi lại mãi</em>: mỗi <code>setState</code> → chạy
+      lại entire function → JSX mới → diff. Đó là lý do mọi thứ React phải "đóng băng": snapshot của
+      <code>count</code>, deps array của <code>useMemo</code>, stale closure.
+    </p>
+
+    <p>
+      Vue ngược lại: <strong>setup chạy đúng một lần</strong>. Bạn khai báo state bằng
+      <code>ref()</code> — một object có <code>.value</code> được bọc bằng Proxy. Khi template hay
+      computed nào <em>đọc</em> <code>.value</code>, Vue ghi nhớ đúng chỗ đó. Khi bạn <em>ghi</em>,
+      Vue chỉ cập nhật đúng chỗ đã đọc. Không có vòng render, không có hàm chạy lại. (<a
+        href="https://vuejs.org/guide/extras/reactivity-in-depth"
+        >Reactivity in Depth</a
+      >)
+    </p>
+
+    <pre><code>// React — hàm chạy lại sau mỗi click
+const [count, setCount] = useState(0);
+const double = useMemo(() =&gt; count * 2, [count]);
+setCount(count + 1);          // phải tạo giá trị mới
+
+// Vue — setup chạy 1 lần, suốt đời component
+const count = ref(0);
+const double = computed(() =&gt; count.value * 2);
+count.value++;                // mutate thẳng, hợp lệ</code></pre>
+
+    <p>Ba hệ quả phải khắc:</p>
+    <ul>
+      <li>
+        <strong><code>computed</code> không cần deps array</strong> — nó biết phụ thuộc vào gì vì
+        hàm của nó <em>vừa đọc</em> <code>count.value</code> ngay bên trong. Đọc phải
+        <code>.value</code> thì mới bị track. (Đó là cả cơ chế, không phải quy ước.)
+      </li>
+      <li>
+        <strong>Template tự unwrap</strong> — trong <code>&lt;template&gt;</code> viết
+        <code>{{ count }}</code>, không cần <code>.value</code>. Trong script thì
+        <code>.value</code> là bắt buộc — quên là mất reactive, <em>không báo lỗi</em>.
+      </li>
+      <li>
+        <strong>Không có stale closure</strong> — <code>count.value</code> lúc nào cũng là giá trị
+        hiện tại, vì chỉ có một object.
+      </li>
+    </ul>
+
+    <blockquote>
+      Đọc tiếp nguồn chính (bắt buộc, 10 phút):
+      <a href="https://vuejs.org/guide/essentials/reactivity-fundamentals"
+        >Vue docs — Reactivity Fundamentals</a
+      >, mục Declaring Reactive State + Computed Properties.
+    </blockquote>
+
+    <h2>2. Luyện tập — đoán kết quả trước, chạy trong đầu sau</h2>
+    <p>
+      Đoán theo trí nhớ, không lướt lên trên. Đây là bài tập khó có chủ đích (retrieval practice).
+    </p>
+
+    <div class="quiz" data-answer="1">
+      <h3>Q1. Đoạn Vue này in ra gì?</h3>
+      <pre><code>const n = ref(1)
+function tick() { n.value = n.value + 1; n.value = n.value + 1 }
+tick()
+console.log(n.value)</code></pre>
+      <button
+        class="opt"
+        data-fb="Không có batcher nào ở đây — mỗi lần ghi .value là một phép gán thường."
+      >
+        In ra 1, vì hai lần gán bị gộp và chỉ lần cuối giữ lại giá trị
+      </button>
+      <button
+        class="opt"
+        data-fb="Đúng. Mutation tức thì — hai lệnh gán chạy tuần tự, không có 'snapshot giữa hiệp' như React."
+      >
+        In ra 3, vì mỗi lần gán là một phép ghi tức thì vào cùng object
+      </button>
+      <button
+        class="opt"
+        data-fb="Nhầm với React rồi — bên React hai setCount liên tiếp đều nhìn thấy state cũ của render này."
+      >
+        In ra 2, vì lần gán sau đọc phải giá trị cũ đã đóng băng từ đầu
+      </button>
+      <p class="fb"></p>
+    </div>
+
+    <div class="quiz" data-answer="0">
+      <h3>
+        Q2. Vì sao <code>double</code> trong Vue không cần deps array như <code>useMemo</code>?
+      </h3>
+      <button
+        class="opt"
+        data-fb="Đúng. Lần chạy đầu của computed đọc count.value → Vue ghi edge count→double. Ghi vào count thì double tự invalidate."
+      >
+        Hàm computed vừa chạy vừa để lộ dependency, Vue ghi lại rồi tự theo dõi dependency đó
+      </button>
+      <button
+        class="opt"
+        data-fb="Không — computed không chạy mọi lần ghi của mọi ref; nó lazy và cache, chỉ tính lại khi dep bị invalidate."
+      >
+        Computed chạy lại mỗi lần bất kỳ ref nào thay đổi nên không cần khai báo dependency nào
+      </button>
+      <button
+        class="opt"
+        data-fb="Không — đó chỉ là API shorthand của thư viện khác; ở đây có cơ chế thật đứng sau, xem Reactivity in Depth."
+      >
+        Compiler tự sinh deps array lúc build nên ta khỏi cần viết deps array thủ công lúc runtime
+      </button>
+      <p class="fb"></p>
+    </div>
+
+    <div class="quiz" data-answer="2">
+      <h3>Q3. Bug nào đang chờ ở file này?</h3>
+      <pre><code>&lt;script setup&gt;
+const msg = ref('hi')
+function shout() { msg = msg.value.toUpperCase() }
+&lt;/script&gt;
+&lt;template&gt;&lt;p&gt;{{ msg }}&lt;/p&gt;&lt;button @click="shout"&gt;Lên&lt;/button&gt;&lt;/template&gt;</code></pre>
+      <button class="opt" data-fb="Không — template unwrap msg tự ra .value, chỗ này hợp lệ.">
+        Template phải viết {{ msg.value }} thì mới đọc đúng giá trị của ref hiện tại
+      </button>
+      <button
+        class="opt"
+        data-fb="Không — setup không chạy lại, nên không có chuyện 'mất handler' như re-render React."
+      >
+        Phải bọc shout trong onMounted để button tìm thấy handler khi mount xong
+      </button>
+      <button
+        class="opt"
+        data-fb="Đúng. Gán đè biến msg = mất object Proxy, UI vẫn đọc object cũ. Sửa: msg.value = msg.value.toUpperCase()."
+      >
+        Hàm shout gán đè biến msg thay vì ghi vào msg.value nên UI không bao giờ cập nhật
+      </button>
+      <p class="fb"></p>
+    </div>
+
+    <h2>3. Thắng lợi của bài</h2>
+    <p>
+      Mở file thật:
+      <a href="../../apps/web-vue/src/pages/auth/login.vue"
+        ><code>apps/web-vue/src/pages/auth/login.vue</code></a
+      >. Tìm <em>ít nhất 2 chỗ</em> mà nếu viết bằng React sẽ cần <code>useState</code> setter hoặc
+      deps array — và giải thích (đọc to, cho chính mình) vì sao Vue không cần. Không giải thích
+      được chỗ nào → hỏi lại agent, đó là chức năng của nó.
+    </p>
+
+    <footer class="lesson-foot">
+      Ghi chú cho lần sau: học xong → agent tạo learning record.<br />
+      Tài liệu đi kèm: <a href="../reference/react-to-vue.html">Cheat sheet React→Vue</a> · Cộng
+      đồng: <a href="https://discord.com/invite/VbqE5Vy">Vue Land</a><br />
+      Có gì chưa rõ? Quay lại CLI hỏi thẳng agent — nó là gia sư của bạn, không phải Google.
+    </footer>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

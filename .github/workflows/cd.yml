@@ -10,7 +10,7 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
+  id-token: write # OIDC role assumption for AWS
 
 jobs:
   build-push:
@@ -22,57 +22,69 @@ jobs:
       matrix:
         include:
           - app: api
-            context: .
             dockerfile: apps/api/Dockerfile
+            stack: prod
+            role: production
           - app: web
-            context: .
             dockerfile: apps/web/Dockerfile
+            stack: prod
+            role: production
+          - app: api-go
+            dockerfile: apps/api-go/Dockerfile
+            stack: lab
+            role: lab
+          - app: api-axum
+            dockerfile: apps/api-axum/Dockerfile
+            stack: lab
+            role: lab
+          - app: api-elysia
+            dockerfile: apps/api-elysia/Dockerfile
+            stack: lab
+            role: lab
     steps:
       - uses: actions/checkout@v7
       - uses: docker/setup-buildx-action@v4
         with:
           driver: docker
-      - uses: docker/login-action@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/webdev-deploy-${{ matrix.role }}
+          aws-region: ap-southeast-1
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr
       - uses: docker/build-push-action@v7
         with:
-          context: ${{ matrix.context }}
+          context: .
           file: ${{ matrix.dockerfile }}
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ github.ref_name }}
-            ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest
+            ${{ steps.ecr.outputs.registry }}/webdev-${{ matrix.stack }}-${{ matrix.app }}:${{ github.ref_name }}
+            ${{ steps.ecr.outputs.registry }}/webdev-${{ matrix.stack }}-${{ matrix.app }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy (VPS)
+    name: Deploy (AWS)
     needs: build-push
     runs-on: ubuntu-latest
+    environment: production # manual approval gate lives here
     steps:
-      - name: Deploy production
-        uses: appleboy/ssh-action@v1
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          timeout: 30m
-          script: |
-            set -e
-            COMPOSE_DIR="/opt/webdevstudios-prod"
-            mkdir -p $COMPOSE_DIR
-            curl -fsSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.raw" \
-              -o $COMPOSE_DIR/docker-compose.prod.yml \
-              "https://api.github.com/repos/${{ github.repository }}/contents/docker-compose.prod.yml?ref=main"
-            curl -fsSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.raw" \
-              -o $COMPOSE_DIR/deploy.sh \
-              "https://api.github.com/repos/${{ github.repository }}/contents/scripts/deploy.sh?ref=main"
-            chmod +x $COMPOSE_DIR/deploy.sh
-            cd $COMPOSE_DIR
-            ./deploy.sh production
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/webdev-deploy-production
+          aws-region: ap-southeast-1
+      - uses: oven-sh/setup-bun@v2
+      - name: Build web-vue static bundle for BucketDeployment
+        run: |
+          bun install --frozen-lockfile
+          bun run --cwd apps/web-vue build
+      - name: Deploy CDK stacks
+        working-directory: infra
+        env:
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          CDK_DEFAULT_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID }}
+          CDK_DEFAULT_REGION: ap-southeast-1
+        run: |
+          bun install --frozen-lockfile
+          bunx --bun cdk deploy --all --require-approval never -c tag=${{ github.ref_name }}

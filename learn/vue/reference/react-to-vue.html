@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>React → Vue cheat sheet</title>
+    <link rel="stylesheet" href="../assets/course.css" />
+  </head>
+  <body>
+    <h1>React → Vue cheat sheet</h1>
+    <p class="subtitle">Tra nhanh cho người vững React. Cập nhật sau mỗi lesson.</p>
+
+    <h2>Bảng mapping core</h2>
+    <table>
+      <tr>
+        <th>React</th>
+        <th>Vue</th>
+        <th>Khác nhau cần nhớ</th>
+      </tr>
+      <tr>
+        <td><code>useState</code> + setter immutable</td>
+        <td><code>const x = ref(0)</code>, sửa bằng <code>x.value++</code></td>
+        <td>Vue mutate trực tiếp; không có "state cũ bị đóng băng"</td>
+      </tr>
+      <tr>
+        <td><code>useMemo(fn, [deps])</code></td>
+        <td><code>const y = computed(() =&gt; x.value * 2)</code></td>
+        <td>Không cần deps array — Vue tự track qua <code>.value</code></td>
+      </tr>
+      <tr>
+        <td><code>useEffect(fn, [dep])</code></td>
+        <td><code>watch(x, fn)</code> / <code>watchEffect(fn)</code></td>
+        <td><code>watchEffect</code> tự gom dep; tự dọn khi unmount</td>
+      </tr>
+      <tr>
+        <td>Component re-run mỗi render</td>
+        <td>Setup chỉ chạy 1 lần</td>
+        <td>Vue cập nhật DOM qua effect nhỏ, không chạy lại function</td>
+      </tr>
+      <tr>
+        <td><code>{cond && &lt;X/&gt;}</code></td>
+        <td><code>&lt;X v-if="cond"/&gt;</code></td>
+        <td>Directive trong template, không phải JS expression</td>
+      </tr>
+      <tr>
+        <td><code>list.map(i =&gt; &lt;X key/&gt;)</code></td>
+        <td><code>&lt;X v-for="(i, n) in list" :key="i.id"/&gt;</code></td>
+        <td><code>v-for</code> đặt trên chính element</td>
+      </tr>
+      <tr>
+        <td><code>value={v} onChange={e}</code></td>
+        <td><code>v-model="x"</code></td>
+        <td>Two-way binding một phát, khỏi viết handler</td>
+      </tr>
+      <tr>
+        <td>props + callback prop</td>
+        <td><code>defineProps</code> / <code>defineEmits</code></td>
+        <td>Macro trong <code>&lt;script setup&gt;</code></td>
+      </tr>
+      <tr>
+        <td>children</td>
+        <td><code>&lt;slot&gt;</code></td>
+        <td>Named/slot props cho API giàu hơn</td>
+      </tr>
+      <tr>
+        <td>react-hook-form</td>
+        <td>vee-validate (<code>useForm</code>/<code>useField</code>) + zod</td>
+        <td><code>toTypedSchema</code> ≈ <code>zodResolver</code></td>
+      </tr>
+      <tr>
+        <td>@tanstack/react-query</td>
+        <td>@tanstack/vue-query</td>
+        <td>Params là ref/getter, đọc bằng <code>toValue()</code></td>
+      </tr>
+      <tr>
+        <td>next/link</td>
+        <td><code>&lt;RouterLink to="..."/&gt;</code></td>
+        <td>vue-router, history mode</td>
+      </tr>
+    </table>
+
+    <h2>Vòng đời (ít khi cần — setup ≈ mount)</h2>
+    <table>
+      <tr>
+        <th>React</th>
+        <th>Vue</th>
+      </tr>
+      <tr>
+        <td>effect chạy khi mount</td>
+        <td>Code trực tiếp trong setup, hoặc <code>onMounted</code></td>
+      </tr>
+      <tr>
+        <td>cleanup return</td>
+        <td><code>onUnmounted</code>, hoặc <code>watch</code> tự stop</td>
+      </tr>
+    </table>
+
+    <h2>Bẫy cho người từ React sang</h2>
+    <ul>
+      <li>
+        Quên <code>.value</code> trong script → không lỗi, chỉ không reactive. Template tự unwrap,
+        script thì không.
+      </li>
+      <li>
+        Phá reactive: <code>const { x } = props</code> hoặc gán <code>obj = {...}</code> mới → mất
+        track. Dùng <code>toRefs</code>, mutate từng field.
+      </li>
+      <li>Đừng bọc mọi thứ trong state — biến không render thì là biến thường.</li>
+    </ul>
+
+    <p class="lesson-nav">
+      Nguồn chính:
+      <a href="https://vuejs.org/guide/essentials/reactivity-fundamentals"
+        >Reactivity Fundamentals</a
+      >
+      · <a href="https://vuejs.org/guide/extras/reactivity-in-depth">Reactivity in Depth</a>
+    </p>
+    <footer class="lesson-foot">
+      Xem bài học liên quan:
+      <a href="../lessons/0001-ref-va-computed-khong-co-re-render.html">Lesson 0001</a>
+    </footer>
+  </body>
+</html>

@@ -63,3 +63,4 @@ apps/api-go/.env
 apps/api-go/server
 apps/api-go/api-go
 *.exe
+infra/cdk.out

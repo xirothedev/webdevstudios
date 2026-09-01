@@ -32,10 +32,9 @@ import { MailService } from './mail.service';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         transport: {
-          host: 'smtp.ethereal.email',
-          port: 587,
-          secure: false,
-          service: 'gmail',
+          host: config.get<string>('MAIL_HOST', 'smtp.ethereal.email'),
+          port: Number(config.get<string>('MAIL_PORT') ?? '587'),
+          secure: config.get<string>('MAIL_HOST') === 'smtp.resend.com',
           auth: {
             user: config.getOrThrow<string>('MAIL_USER'),
             pass: config.getOrThrow<string>('MAIL_PASS'),

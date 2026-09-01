@@ -1,0 +1,8 @@
+{
+  "app": "bun bin/app.ts",
+  "context": {
+    "domain": "webdevstudio.resonance.io.vn",
+    "natGateways": "2",
+    "tag": "latest"
+  }
+}

@@ -63,3 +63,19 @@ _Avoid_: feedback, rating
 **SecurityLog**:
 An append-only audit record of security-relevant actions (auth successes, authorization failures, rate-limit hits).
 _Avoid_: log entry, audit entry
+
+**Service**:
+One deployable application — each backend and each frontend is its own Service, deployed and scaled on its own.
+_Avoid_: app, microservice, container
+
+**Mirror**:
+A re-implementation of the api or web Service in another language or framework, built for learning; it shares the schema and the business rules (see ShippingFee) but serves no real traffic.
+_Avoid_: port, clone, fork
+
+**Prod stack**:
+The Services that serve real traffic — api and web — with high availability, blue/green deploys, and paid-tier isolation.
+_Avoid_: live, main
+
+**Lab stack**:
+The Mirrors plus web-vue, deployed for learning and comparison: single-AZ, no WAF, off on a nightly schedule.
+_Avoid_: staging, test
