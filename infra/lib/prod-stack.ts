@@ -32,7 +32,6 @@ interface BlueGreen {
   service: ecs.FargateService;
   blue: elbv2.ApplicationTargetGroup;
   green: elbv2.ApplicationTargetGroup;
-  listener: elbv2.IListenerRef;
 }
 
 /**
@@ -133,8 +132,8 @@ export class ProdStack extends Stack {
       managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeDeployRole')],
     });
 
-    const webAlb = this.edge('web', vpc, cert, web);
-    const apiAlb = this.edge('api', vpc, cert, api);
+    const webEdge = this.edge('web', vpc, cert, web);
+    const apiEdge = this.edge('api', vpc, cert, api);
 
     // CloudFront wants its certificate and WAF in us-east-1 (see WafStack).
     const cfCert = acm.Certificate.fromCertificateArn(
@@ -159,8 +158,8 @@ export class ProdStack extends Stack {
     });
 
     for (const [name, alb, host] of [
-      ['web', webAlb, SUBDOMAINS.web],
-      ['api', apiAlb, SUBDOMAINS.api],
+      ['web', webEdge.alb, SUBDOMAINS.web],
+      ['api', apiEdge.alb, SUBDOMAINS.api],
     ] as const) {
       // ponytail: the ALB is internet-facing for CloudFront; tighten it to the
       // CloudFront managed prefix list when per-region prefix IDs are pinned.
@@ -187,9 +186,9 @@ export class ProdStack extends Stack {
       });
     }
 
-    for (const [name, bg] of [
-      ['api', api],
-      ['web', web],
+    for (const [name, bg, listener] of [
+      ['api', api, apiEdge.listener],
+      ['web', web, webEdge.listener],
     ] as const) {
       new codedeploy.EcsDeploymentGroup(this, `${name}Deploy`, {
         application: new codedeploy.EcsApplication(this, `${name}App`),
@@ -199,7 +198,7 @@ export class ProdStack extends Stack {
         blueGreenDeploymentConfig: {
           blueTargetGroup: bg.blue,
           greenTargetGroup: bg.green,
-          listener: bg.listener,
+          listener,
           terminationWaitTime: Duration.minutes(5),
         },
       });
@@ -244,7 +243,7 @@ export class ProdStack extends Stack {
     const repo = new ecr.Repository(this, `${name}Repo`, {
       repositoryName: `webdev-prod-${name}`,
       removalPolicy: RemovalPolicy.DESTROY,
-        emptyOnDelete: true,
+      emptyOnDelete: true,
       lifecycleRules: [{ rulePriority: 1, description: 'keep 50 images', maxImageCount: 50 }],
     });
     taskDef.addContainer(name, {
@@ -295,7 +294,7 @@ export class ProdStack extends Stack {
       { containerName: name, containerPort: opts.port, targetGroupArn: green.targetGroupArn },
     ];
 
-    return { service, blue, green } as BlueGreen;
+    return { service, blue, green };
   }
 
   /** One public ALB per app, HTTPS with the wildcard cert, weighted blue/green default. */
@@ -304,7 +303,7 @@ export class ProdStack extends Stack {
     vpc: ec2.IVpc,
     cert: acm.ICertificate,
     bg: Omit<BlueGreen, 'listener'>,
-  ): elbv2.ApplicationLoadBalancer {
+  ): { alb: elbv2.ApplicationLoadBalancer; listener: elbv2.IListenerRef } {
     const alb = new elbv2.ApplicationLoadBalancer(this, `${name}Alb`, {
       vpc,
       internetFacing: true,
@@ -334,7 +333,6 @@ export class ProdStack extends Stack {
         },
       },
     ]);
-    (bg as BlueGreen).listener = listener;
-    return alb;
+    return { alb, listener: listener as elbv2.IListenerRef };
   }
 }

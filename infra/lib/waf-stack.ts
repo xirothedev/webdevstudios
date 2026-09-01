@@ -1,9 +1,14 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import { Construct } from 'constructs';
 import { DOMAIN } from './config';
+
+export interface WafStackProps extends StackProps {
+  hostedZoneId: string;
+}
 
 /**
  * CloudFront forces WAF and its certificate into us-east-1. This tiny stack
@@ -11,12 +16,19 @@ import { DOMAIN } from './config';
  * Deploy WafStack before ProdStack.
  */
 export class WafStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, props: WafStackProps) {
     super(scope, id, props);
 
+    // Route53 is global: the TXT validation record this us-east-1 stack emits
+    // still lands in the delegated zone. zoneId comes from the network stack.
+    const zone = route53.PublicHostedZone.fromHostedZoneAttributes(this, 'ZoneRef', {
+      hostedZoneId: props.hostedZoneId,
+      zoneName: DOMAIN,
+    });
     const cert = new acm.Certificate(this, 'CloudFrontCert', {
       domainName: DOMAIN,
       subjectAlternativeNames: [`*.${DOMAIN}`],
+      validation: acm.CertificateValidation.fromDns(zone),
     });
     new ssm.StringParameter(this, 'CertArn', {
       parameterName: '/webdev/cloudfront/cert-arn',

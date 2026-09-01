@@ -12,6 +12,7 @@ function build() {
   const app = new App();
   const network = new NetworkStack(app, 'webdev-network', { env });
   const waf = new WafStack(app, 'webdev-waf', {
+    hostedZoneId: network.zone.hostedZoneId,
     env: { account: env.account, region: 'us-east-1' },
   });
   const prod = new ProdStack(app, 'webdev-prod', {
@@ -101,5 +102,9 @@ describe('waf stack', () => {
     const t = build().waf;
     t.hasResourceProperties('AWS::WAFv2::WebACL', { Scope: 'CLOUDFRONT' });
     t.resourceCountIs('AWS::SSM::Parameter', 2);
+    // DNS validation is CFN-native (DomainValidationOptions + HostedZoneId);
+    // the hosted-zone id reaches us-east-1 through a cross-region export reader.
+    t.resourceCountIs('AWS::CertificateManager::Certificate', 1);
+    t.resourceCountIs('Custom::CrossRegionExportReader', 1);
   });
 });

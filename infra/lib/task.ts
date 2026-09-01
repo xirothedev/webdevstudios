@@ -34,9 +34,9 @@ export function secretEnv(secret: secretsmanager.ISecret): Record<string, ecs.Se
 export function awsLogging(scope: Construct, stage: string, name: string): ecs.LogDriver {
   return ecs.LogDrivers.awsLogs({
     streamPrefix: name,
+    // Log group uses the RETAIN default: logs survive stack destroy.
     logGroup: new logs.LogGroup(scope, `${name}LogGroup`, {
       retention: logs.RetentionDays.ONE_YEAR,
-      removalPolicy: undefined, // default RETAIN: logs survive stack destroy
     }),
   });
 }

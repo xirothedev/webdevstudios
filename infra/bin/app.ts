@@ -21,7 +21,10 @@ const network = new NetworkStack(app, 'webdev-network', {
 new OidcStack(app, 'webdev-oidc', { env });
 
 // CloudFront insists on us-east-1; the prod stack reads its cert/WAF arns from SSM.
-const waf = new WafStack(app, 'webdev-waf', { env: { account, region: 'us-east-1' } });
+const waf = new WafStack(app, 'webdev-waf', {
+  hostedZoneId: network.zone.hostedZoneId,
+  env: { account, region: 'us-east-1' },
+});
 
 const prod = new ProdStack(app, 'webdev-prod', {
   network,

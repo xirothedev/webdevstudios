@@ -233,6 +233,7 @@
     "infra": {
       "name": "infra",
       "devDependencies": {
+        "@types/bun": "^1.2.0",
         "@types/node": "^22.15.0",
         "aws-cdk": "^2.180.0",
         "aws-cdk-lib": "^2.180.0",

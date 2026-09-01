@@ -29,8 +29,9 @@ const DEPLOY_SERVICES = [
 ];
 
 /**
- * One role per GitHub environment. The `production` environment carries the
- * manual approval gate; CI assumes these roles via OIDC — no static AWS keys.
+ * One role per GitHub environment the workflow uses. `build` (no gate) pushes
+ * images; `production` carries the manual approval gate and deploys.
+ * CI assumes these roles via OIDC — no static AWS keys.
  *
  * ponytail: the deploy policy is write-all on the listed services (what CDK
  * itself needs). Scope it per-stack when the blast radius starts to matter.
@@ -44,7 +45,7 @@ export class OidcStack extends Stack {
       clientIds: ['sts.amazonaws.com'],
     });
 
-    for (const environment of ['lab', 'production']) {
+    for (const environment of ['build', 'production']) {
       const role = new iam.Role(this, `Deploy${environment}`, {
         roleName: `webdev-deploy-${environment}`,
         description: `${GITHUB_REPO} deploy role for GitHub environment '${environment}'`,

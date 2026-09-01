@@ -104,10 +104,10 @@ export class LabStack extends Stack {
       defaultAction: elbv2.ListenerAction.fixedResponse(404, { contentType: 'text/plain' }),
     });
 
-    for (const [name, host, port] of [
-      ['api-go', SUBDOMAINS.apiGo, 4000],
-      ['api-axum', SUBDOMAINS.apiAxum, 4000],
-      ['api-elysia', SUBDOMAINS.apiElysia, 4000],
+    for (const [i, name, host, port] of [
+      [1, 'api-go', SUBDOMAINS.apiGo, 4000],
+      [2, 'api-axum', SUBDOMAINS.apiAxum, 4000],
+      [3, 'api-elysia', SUBDOMAINS.apiElysia, 4000],
     ] as const) {
       const repo = new ecr.Repository(this, `${name}Repo`, {
         repositoryName: `webdev-lab-${name}`,
@@ -141,10 +141,18 @@ export class LabStack extends Stack {
         desiredCount: 1,
         assignPublicIp: false,
       });
-      // Sleep 23:00, wake 07:00 ICT (= 16:00 / 01:00 UTC).
+      // Sleep 23:00, wake 08:00 ICT (= 16:00 / 01:00 UTC).
       const scaling = service.autoScaleTaskCount({ minCapacity: 0, maxCapacity: 1 });
-      scaling.scaleOnSchedule(`${name}Wake`, { schedule: Schedule.cron({ minute: '0', hour: '1' }), minCapacity: 1, maxCapacity: 1 });
-      scaling.scaleOnSchedule(`${name}Sleep`, { schedule: Schedule.cron({ minute: '0', hour: '16' }), minCapacity: 0, maxCapacity: 0 });
+      scaling.scaleOnSchedule(`${name}Wake`, {
+        schedule: Schedule.cron({ minute: '0', hour: '1' }),
+        minCapacity: 1,
+        maxCapacity: 1,
+      });
+      scaling.scaleOnSchedule(`${name}Sleep`, {
+        schedule: Schedule.cron({ minute: '0', hour: '16' }),
+        minCapacity: 0,
+        maxCapacity: 0,
+      });
 
       const tg = new elbv2.ApplicationTargetGroup(this, `${name}Tg`, {
         vpc,
@@ -159,7 +167,7 @@ export class LabStack extends Stack {
       new elbv2.ApplicationListenerRule(this, `${name}Rule`, {
         listener: https,
         conditions: [elbv2.ListenerCondition.hostHeaders([host])],
-        priority: 1 + (name === 'api-go' ? 0 : name === 'api-axum' ? 1 : 2),
+        priority: i,
         action: elbv2.ListenerAction.forward([tg]),
       });
       new route53.CfnRecordSet(this, `${name}Alias`, {
@@ -199,7 +207,9 @@ export class LabStack extends Stack {
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
-        functionAssociations: [{ function: spa, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }],
+        functionAssociations: [
+          { function: spa, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST },
+        ],
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
     });

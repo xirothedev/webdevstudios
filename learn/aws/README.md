@@ -4,21 +4,21 @@ Học AWS trong khi dựng hạ tầng thật cho repo này. Mỗi bài: **đọ
 
 ## Thứ tự
 
-| # | Bài | Hạ tầng thật tương ứng |
-| - | --- | ---------------------- |
-| 0 | [localstack/README.md](./localstack/README.md) — AWS giả lập trên xiroserver-lan | `scripts/localstack/` |
-| 1 | [01-account-and-bootstrap.md](./01-account-and-bootstrap.md) | account, OIDC role, `cdk bootstrap` |
-| 2 | [02-network-and-dns.md](./02-network-and-dns.md) | `infra/lib/network-stack.ts` |
-| 3 | [03-ecs-and-services.md](./03-ecs-and-services.md) | `infra/lib/prod-stack.ts`, `lab-stack.ts` (ECS) |
-| 4 | [04-data-plane.md](./04-data-plane.md) | RDS, ElastiCache, Secrets Manager |
-| 5 | [05-edge-cloudfront-waf.md](./05-edge-cloudfront-waf.md) | `waf-stack.ts`, CloudFront |
-| 6 | [06-cicd-oidc-blue-green.md](./06-cicd-oidc-blue-green.md) | `.github/workflows/cd.yml`, CodeDeploy |
+| #   | Bài                                                                              | Hạ tầng thật tương ứng                          |
+| --- | -------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 0   | [localstack/README.md](./localstack/README.md) — AWS giả lập trên xiroserver-lan | `scripts/localstack/`                           |
+| 1   | [01-account-and-bootstrap.md](./01-account-and-bootstrap.md)                     | account, OIDC role, `cdk bootstrap`             |
+| 2   | [02-network-and-dns.md](./02-network-and-dns.md)                                 | `infra/lib/network-stack.ts`                    |
+| 3   | [03-ecs-and-services.md](./03-ecs-and-services.md)                               | `infra/lib/prod-stack.ts`, `lab-stack.ts` (ECS) |
+| 4   | [04-data-plane.md](./04-data-plane.md)                                           | RDS, ElastiCache, Secrets Manager               |
+| 5   | [05-edge-cloudfront-waf.md](./05-edge-cloudfront-waf.md)                         | `waf-stack.ts`, CloudFront                      |
+| 6   | [06-cicd-oidc-blue-green.md](./06-cicd-oidc-blue-green.md)                       | `.github/workflows/cd.yml`, CodeDeploy          |
 
 ## Human-only steps (không có tool nào làm thay)
 
 - [ ] Tạo AWS account; bật MFA cho root; đặt billing alert.
 - [ ] Trong GitHub repo settings: add **variable** `AWS_ACCOUNT_ID`; add **secret** `ALERT_EMAIL` (email nhận budget alarm — xác nhận email SNS sau khi deploy).
-- [ ] Trong GitHub environments: tạo `production`, bật **Required reviewers** (cổng approval trước khi deploy prod).
+- [ ] Trong GitHub environments: tạo `production` (bật **Required reviewers** — cổng approval trước deploy) và `build` (không gate, dùng cho push image).
 - [ ] Trong Cloudflare zone `resonance.io.vn`: tạo record NS `webdevstudio` trỏ 4 nameserver của Route 53 zone (lấy từ console hoặc `aws route53 list-hosted-zones`).
 - [ ] Lần đầu, trước tag đầu tiên: `cdk bootstrap` rồi `bun run --cwd infra cdk deploy --all` từ laptop (ECR repo phải tồn tại trước khi CI push image).
 - [ ] Sau deploy đầu: điền giá trị thật cho secret `webdev/prod/app` và `webdev/lab/app` trong Secrets Manager (keys = `infra/lib/config.ts`).
