@@ -33,6 +33,7 @@ import type { ChartOptions } from 'chart.js';
 
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart.vue';
 import { cn } from '@/lib/cn';
+import { formatPrice } from '@/lib/utils';
 
 // mirrors apps/web AdminChart (recharts area/bar → chart.js line-with-fill / bar)
 const props = withDefaults(
@@ -80,7 +81,7 @@ const options = {
     tooltip: ChartTooltip(chartConfig.value, {
       formatter: (value: number) =>
         props.dataKey === 'revenue'
-          ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+          ? `${formatPrice(value)}₫`
           : value.toLocaleString('vi-VN'),
     }),
   },

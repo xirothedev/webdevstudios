@@ -10,6 +10,7 @@ import TableFilters from '@/components/admin/table-filters.vue';
 import { useAdminProducts } from '@/lib/api/hooks/use-admin';
 import { toast } from '@/lib/toast';
 import { usePageMeta } from '@/lib/metadata';
+import { formatPrice } from '@/lib/utils';
 
 usePageMeta({
   title: 'Quản lý Products',
@@ -43,7 +44,6 @@ const filteredData = computed(
     ) || [],
 );
 
-const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
 </script>
 
 <template>
@@ -98,7 +98,7 @@ const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: '
               />
             </template>
             <template #cell-priceCurrent="{ row }">
-              {{ currency.format(row.priceCurrent) }}
+              {{ formatPrice(row.priceCurrent) }}₫
             </template>
             <template #cell-isPublished="{ row }">
               {{ row.isPublished ? 'Published' : 'Draft' }}

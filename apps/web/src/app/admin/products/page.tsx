@@ -23,6 +23,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { formatPrice } from '@/lib/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -65,10 +66,7 @@ export default function ProductsPage() {
 
   const tableData = filteredData.map((product) => ({
     ...product,
-    priceCurrent: new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(product.priceCurrent),
+    priceCurrent: `${formatPrice(product.priceCurrent)}₫`,
     isPublished: product.isPublished ? 'Published' : 'Draft',
     actions: (
       <TableActions

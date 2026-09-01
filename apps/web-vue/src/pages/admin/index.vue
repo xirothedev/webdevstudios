@@ -6,6 +6,7 @@ import AdminHeader from '@/components/admin/admin-header.vue';
 import AdminLayout from '@/components/admin/admin-layout.vue';
 import { useAdminOrders, useAdminProducts, useAdminUsers } from '@/lib/api/hooks/use-admin';
 import { usePageMeta } from '@/lib/metadata';
+import { formatPrice } from '@/lib/utils';
 
 usePageMeta({
   title: 'Admin Dashboard',
@@ -73,11 +74,7 @@ const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);
           >
             <h3 class="text-wds-text/70 text-sm font-medium">Doanh thu</h3>
             <p class="text-wds-text mt-2 text-3xl font-bold">
-              {{
-                new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                  totalRevenue,
-                )
-              }}
+              {{ formatPrice(totalRevenue) }}₫
             </p>
           </div>
         </div>
