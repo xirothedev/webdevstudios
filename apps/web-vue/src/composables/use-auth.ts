@@ -1,16 +1,7 @@
 // Port of apps/web auth.context.tsx + hooks/use-auth.ts: state comes from the cached
 // useCurrentUser query; App.vue calls provideAuth() once, descendants useAuth() via inject,
 // and the router guard (outside any component) uses authStoreReady()/the module fallback.
-import {
-  computed,
-  inject,
-  provide,
-  ref,
-  watch,
-  type ComputedRef,
-  type InjectionKey,
-  type Ref,
-} from 'vue';
+import { computed, inject, provide, watch, type ComputedRef, type InjectionKey } from 'vue';
 
 import {
   useCurrentUser,
@@ -25,7 +16,6 @@ export interface AuthStore {
   user: ComputedRef<User | undefined>;
   isAuthenticated: ComputedRef<boolean>;
   isLoading: ComputedRef<boolean>;
-  requires2FA: Ref<boolean>;
   login: (data: LoginRequest) => Promise<LoginResponse>;
   register: (data: RegisterRequest) => Promise<unknown>;
   logout: (sessionId?: string) => Promise<void>;
@@ -54,8 +44,6 @@ export function provideAuth(): AuthStore {
   const logoutMutation = useLogout();
   const verifyEmailMutation = useVerifyEmail();
 
-  const requires2FA = ref(false);
-
   const user = computed(() => currentUser.data.value);
 
   let loadedPromise: Promise<void> | null = null;
@@ -81,12 +69,8 @@ export function provideAuth(): AuthStore {
     user,
     isAuthenticated: computed(() => !!user.value),
     isLoading: computed(() => currentUser.isLoading.value),
-    requires2FA,
-    login: async (data) => {
-      const response = await loginMutation.mutateAsync(data);
-      requires2FA.value = !!response.requires2FA;
-      return response;
-    },
+    // 2FA redirect happens inside useLogin().onSuccess — no state needed here
+    login: (data) => loginMutation.mutateAsync(data),
     register: (data) => registerMutation.mutateAsync(data),
     logout: (sessionId) => logoutMutation.mutateAsync(sessionId),
     verifyEmail: (token) => verifyEmailMutation.mutateAsync(token),
@@ -97,11 +81,6 @@ export function provideAuth(): AuthStore {
     isVerifyingEmail: computed(() => verifyEmailMutation.isPending.value),
     whenLoaded,
   };
-
-  // Once a user loads, the 2FA interstitial is no longer pending
-  watch(user, (u) => {
-    if (u) requires2FA.value = false;
-  });
 
   fallback = store;
   resolveStore(store);

@@ -1,14 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 
-import { authKeys } from '@/lib/api/hooks/use-auth';
+import { syncUserCache, userKeys } from '@/lib/auth';
 import { type UpdateProfileRequest, usersApi } from '@/lib/api/users';
 import { toast } from '@/lib/toast';
 
-// Query Keys
-export const userKeys = {
-  all: ['users'] as const,
-  profile: () => [...userKeys.all, 'profile'] as const,
-};
+// Keys live in the auth module (one user cache story); re-exported for existing call sites.
+export { userKeys };
 
 // Query: Get user profile
 export function useUserProfile() {
@@ -27,9 +24,7 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (data: UpdateProfileRequest) => usersApi.updateProfile(data),
     onSuccess: (updatedUser) => {
-      // Update both user profile cache and current user cache
-      queryClient.setQueryData(userKeys.profile(), updatedUser);
-      queryClient.setQueryData(authKeys.currentUser(), updatedUser);
+      syncUserCache(queryClient, updatedUser);
       toast.success('Cập nhật hồ sơ thành công!');
     },
     onError: (error: unknown) => {
@@ -47,9 +42,7 @@ export function useUpdateAvatar() {
   return useMutation({
     mutationFn: (file: File) => usersApi.updateAvatar(file),
     onSuccess: (updatedUser) => {
-      // Update both user profile cache and current user cache
-      queryClient.setQueryData(userKeys.profile(), updatedUser);
-      queryClient.setQueryData(authKeys.currentUser(), updatedUser);
+      syncUserCache(queryClient, updatedUser);
       toast.success('Cập nhật ảnh đại diện thành công!');
     },
     onError: (error: unknown) => {
