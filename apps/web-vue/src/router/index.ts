@@ -1,14 +1,12 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 
 import { authStoreReady } from '@/composables/use-auth';
-import { isPublicRoute } from '@/lib/api-client';
+import { adminRedirectFor } from '@/lib/auth';
 
 declare module 'vue-router' {
   interface RouteMeta {
     /** mirrors apps/web app/admin/layout.tsx guard */
     admin?: boolean;
-    /** derived from PUBLIC_ROUTES in lib/api-client.ts — single source of truth */
-    public?: boolean;
     /** pages that render their own chrome (auth/admin layouts) hide the App.vue Navbar/Footer */
     chrome?: 'none';
     /** apps/web Navbar variant per route (default dark) */
@@ -212,11 +210,6 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
-// One source of truth for public-ness: annotate every route from isPublicRoute (lib/api-client).
-for (const route of routes) {
-  route.meta = { ...route.meta, public: isPublicRoute(route.path) };
-}
-
 export const router = createRouter({
   history: createWebHistory(),
   routes,
@@ -229,7 +222,5 @@ router.beforeEach(async (to) => {
   if (!to.meta.admin) return true;
   const store = await authStoreReady();
   await store.whenLoaded();
-  if (!store.user.value) return '/auth/login';
-  if (store.user.value.role !== 'ADMIN') return '/';
-  return true;
+  return adminRedirectFor(store.user.value);
 });

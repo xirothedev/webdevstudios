@@ -1,8 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { onScopeDispose, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { authApi } from '@/lib/api/auth';
+import { invalidateUserCaches } from '@/lib/auth';
 import { API_URL, SITE_URL } from '@/lib/constants';
 import { clearCsrfToken } from '@/lib/csrf';
 import { toast } from '@/lib/toast';
@@ -13,39 +14,9 @@ import type {
   RegisterRequest,
 } from '@/types/auth.types';
 
-// Query Keys
-export const authKeys = {
-  all: ['auth'] as const,
-  currentUser: () => [...authKeys.all, 'currentUser'] as const,
-};
-
-// Shared options so the router guard can await the same cached query
-export function currentUserQueryOptions() {
-  return {
-    queryKey: authKeys.currentUser(),
-    queryFn: () => authApi.getCurrentUser(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: false,
-    // Don't refetch on window focus if we're on auth pages
-    refetchOnWindowFocus: false,
-    // Don't refetch on mount if we're on auth pages
-    refetchOnMount: () => {
-      if (typeof window !== 'undefined') {
-        const path = window.location.pathname;
-        // Skip refetch if on auth pages
-        if (path.startsWith('/auth/')) {
-          return false;
-        }
-      }
-      return true;
-    },
-  };
-}
-
-// Query: Get current user
-export function useCurrentUser() {
-  return useQuery(currentUserQueryOptions());
-}
+// The currentUser query and both user cache keys live in the auth module;
+// re-exported here so existing call sites keep their imports.
+export { authKeys, currentUserQueryOptions, useCurrentUser } from '@/lib/auth';
 
 // Helper function to get redirect URL from query params
 function getRedirectUrlFromQuery(): string | null {
@@ -94,8 +65,8 @@ export function useLogin() {
         return;
       }
 
-      // Invalidate and refetch current user
-      await queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+      // Invalidate and refetch the user (both cache keys)
+      await invalidateUserCaches(queryClient);
       toast.success('Đăng nhập thành công!');
 
       // Get redirect URL from query params only after successful login
@@ -231,9 +202,7 @@ export function useVerify2FA() {
     onSuccess: async (response) => {
       // If login flow (has tokens), invalidate queries and redirect
       if (response.accessToken && response.refreshToken) {
-        await queryClient.invalidateQueries({
-          queryKey: authKeys.currentUser(),
-        });
+        await invalidateUserCaches(queryClient);
         toast.success('Xác thực 2FA thành công!');
         router.push('/');
       } else {
@@ -305,7 +274,7 @@ export function useOAuth() {
 
         const redirectUrl = event.data.data?.redirectUrl || '/';
 
-        queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+        void invalidateUserCaches(queryClient);
         toast.success('Đăng nhập thành công!');
 
         sessionStorage.setItem('oauth_redirect_url', redirectUrl);

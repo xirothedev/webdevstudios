@@ -45,28 +45,12 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Single source of truth for "routes that never force a login redirect".
-// The router annotates route meta from this too — keep the two in sync here only.
-export const PUBLIC_ROUTES = [
-  '/', // Home page
-  '/shop', // Shop listing
-  '/about', // About page
-  '/faq', // FAQ page
-  '/generation', // Generation page
-  '/calendar', // Calendar page
-  '/achievements', // Achievements page
-  '/activities', // Activities page
-  '/partner', // Partner page
-  '/blog', // Blog listing page
-] as const;
+// Injected by the auth module (src/lib/auth). Called when a refresh attempt fails;
+// the auth module decides whether/where to redirect. Transport stays route-blind.
+let onAuthLost: (() => void) | null = null;
 
-export const PUBLIC_ROUTE_PREFIXES = ['/shop/', '/auth/', '/legal/', '/blog/'] as const;
-
-export function isPublicRoute(path: string): boolean {
-  return (
-    (PUBLIC_ROUTES as readonly string[]).includes(path) ||
-    PUBLIC_ROUTE_PREFIXES.some((prefix) => path.startsWith(prefix))
-  );
+export function registerAuthLostHandler(fn: () => void) {
+  onAuthLost = fn;
 }
 
 // Create axios instance
@@ -188,16 +172,10 @@ apiClient.interceptors.response.use(
         // Retry original request
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // Refresh failed - clear queue
+        // Refresh failed - clear queue, then hand the decision to the auth module
         processQueue(refreshError, null);
 
-        // Only redirect if we're in the browser and not on public pages
-        if (typeof window !== 'undefined') {
-          if (!isPublicRoute(window.location.pathname)) {
-            // Clear any auth-related state
-            window.location.href = '/auth/login';
-          }
-        }
+        onAuthLost?.();
 
         return Promise.reject({
           message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
