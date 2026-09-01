@@ -23,6 +23,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { formatPrice } from '@/lib/utils';
 
 import { AdminChart } from '@/components/admin/AdminChart';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -90,12 +91,7 @@ export function AdminDashboardContent() {
           </div>
           <div className="border-wds-accent/30 bg-wds-accent/10 hover:shadow-wds-accent/20 rounded-2xl border p-6 backdrop-blur-sm transition-shadow duration-200">
             <h3 className="text-wds-text/70 text-sm font-medium">Doanh thu</h3>
-            <p className="text-wds-text mt-2 text-3xl font-bold">
-              {new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND',
-              }).format(totalRevenue)}
-            </p>
+            <p className="text-wds-text mt-2 text-3xl font-bold">{formatPrice(totalRevenue)}₫</p>
           </div>
         </div>
 

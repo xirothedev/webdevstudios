@@ -24,6 +24,8 @@
 
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
+import { formatPrice } from '@/lib/utils';
+
 import {
   type ChartConfig,
   ChartContainer,
@@ -95,10 +97,7 @@ export function AdminChart({
                     if (typeof value === 'number') {
                       // Format revenue as currency
                       if (dataKey === 'revenue') {
-                        return new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                        }).format(value);
+                        return `${formatPrice(value)}₫`;
                       }
                       // Format other numbers
                       return value.toLocaleString('vi-VN');
@@ -141,10 +140,7 @@ export function AdminChart({
                     if (typeof value === 'number') {
                       // Format revenue as currency
                       if (dataKey === 'revenue') {
-                        return new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                        }).format(value);
+                        return `${formatPrice(value)}₫`;
                       }
                       // Format other numbers
                       return value.toLocaleString('vi-VN');
