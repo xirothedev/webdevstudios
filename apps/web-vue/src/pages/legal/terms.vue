@@ -4,7 +4,7 @@
 import { computed } from 'vue';
 
 import LegalLayout from '@/components/legal/legal-layout.vue';
-import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
+import { usePageMeta } from '@/lib/metadata';
 import { renderLegalMarkdown } from './markdown';
 import contentSrc from './terms.md?raw';
 
@@ -13,7 +13,6 @@ usePageMeta({
   description:
     'Điều khoản sử dụng của WebDev Studios - Quy định và điều kiện khi sử dụng website và dịch vụ của chúng tôi.',
   path: '/terms',
-  image: SEO_IMAGES['/terms'],
   keywords: ['Điều khoản sử dụng', 'Terms of Service', 'WebDev Studios', 'Quy định'],
 });
 

@@ -1,3 +1,4 @@
+import { relativeTime } from '@/lib/date';
 import { EventType, type Event } from '@/lib/events/types';
 
 // ponytail: apps/web imports these from src/lib/events/utils.ts, which was not
@@ -61,28 +62,9 @@ export function formatEventTime(event: Event): string {
     : `${startDate} ${fmtTime(event.start)} - ${endDate} ${fmtTime(event.end)}`;
 }
 
-const rtf = new Intl.RelativeTimeFormat('vi', { numeric: 'auto' });
-
-// Replaces date-fns formatDistance(..., { addSuffix: true, locale: vi }).
-function distanceToNow(date: Date): string {
-  const diffMs = date.getTime() - Date.now();
-  const abs = Math.abs(diffMs);
-  const units: [Intl.RelativeTimeFormatUnit, number][] = [
-    ['year', 31536e6],
-    ['month', 2592e6],
-    ['day', 864e5],
-    ['hour', 36e5],
-    ['minute', 6e4],
-  ];
-  for (const [unit, ms] of units) {
-    if (abs >= ms) return rtf.format(Math.round(diffMs / ms), unit);
-  }
-  return rtf.format(Math.round(diffMs / 6e4), 'minute');
-}
-
 export function getRelativeTime(event: Event): string {
   const now = Date.now();
-  if (event.start.getTime() > now) return `Bắt đầu ${distanceToNow(event.start)}`;
-  if (event.end.getTime() > now) return `Đang diễn ra - Kết thúc ${distanceToNow(event.end)}`;
-  return `Đã kết thúc ${distanceToNow(event.end)}`;
+  if (event.start.getTime() > now) return `Bắt đầu ${relativeTime(event.start)}`;
+  if (event.end.getTime() > now) return `Đang diễn ra - Kết thúc ${relativeTime(event.end)}`;
+  return `Đã kết thúc ${relativeTime(event.end)}`;
 }

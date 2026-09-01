@@ -1,14 +1,13 @@
 <script setup lang="ts">
 // Port of apps/web src/app/faq. Navbar/Footer are rendered by the shell (App.vue).
 import { faqItems } from '@/data/faq';
-import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
+import { usePageMeta } from '@/lib/metadata';
 
 usePageMeta({
   title: 'FAQ',
   description:
     'Câu hỏi thường gặp về WebDev Studios: tuyển thành viên, hoạt động, cơ hội phát triển và cách tham gia câu lạc bộ.',
   path: '/faq',
-  image: SEO_IMAGES['/faq'],
   keywords: ['FAQ WebDev Studios', 'Câu hỏi thường gặp', 'CLB lập trình web'],
 });
 </script>

@@ -19,3 +19,23 @@ export const formatDateTime = (iso: string) => {
   const p = (n: number) => String(n).padStart(2, '0');
   return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
+
+// Replaces date-fns formatDistanceToNow/formatDistance ({ addSuffix: true, locale: vi }).
+// One unit table shared by account sessions-list and calendar getRelativeTime.
+const rtf = new Intl.RelativeTimeFormat('vi', { numeric: 'auto' });
+const RT_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ['year', 31536e6],
+  ['month', 2592e6],
+  ['day', 864e5],
+  ['hour', 36e5],
+  ['minute', 6e4],
+];
+
+export function relativeTime(date: Date, now: number = Date.now()): string {
+  const diffMs = date.getTime() - now;
+  const abs = Math.abs(diffMs);
+  for (const [unit, ms] of RT_UNITS) {
+    if (abs >= ms) return rtf.format(Math.round(diffMs / ms), unit);
+  }
+  return rtf.format(Math.round(diffMs / 6e4), 'minute');
+}

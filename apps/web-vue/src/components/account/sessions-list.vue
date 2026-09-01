@@ -5,7 +5,7 @@ import { LogOut, Monitor, Smartphone, Tablet } from 'lucide-vue-next';
 
 import { Button } from '@/components/ui/button.vue';
 import { useRevokeSession, useSessions } from '@/lib/api/hooks/use-settings';
-import { formatDistanceToNowVi } from '@/components/account/relative-time';
+import { relativeTime } from '@/lib/date';
 import type { Session } from '@/types/auth.types';
 
 const sessions = useSessions();
@@ -47,7 +47,7 @@ const currentSessionId = computed(
 );
 
 function lastSeen(session: Session): string {
-  return formatDistanceToNowVi(new Date(session.device?.lastSeenAt || session.createdAt));
+  return relativeTime(new Date(session.device?.lastSeenAt || session.createdAt));
 }
 
 function handleRevoke(sessionId: string) {

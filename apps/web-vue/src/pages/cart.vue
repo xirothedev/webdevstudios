@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router';
 import QuantitySelector from '@/components/shop/quantity-selector.vue';
 import { Button } from '@/components/ui/button.vue';
 import { cartTotals, useCart, useCartActions } from '@/lib/api/hooks/use-cart';
-import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
+import { usePageMeta } from '@/lib/metadata';
 import { formatPrice } from '@/lib/utils';
 
 usePageMeta({
@@ -14,7 +14,6 @@ usePageMeta({
   description:
     'Xem và quản lý giỏ hàng của bạn tại WebDev Studios. Kiểm tra sản phẩm, số lượng và tổng tiền trước khi thanh toán.',
   path: '/cart',
-  image: SEO_IMAGES['/cart'],
   keywords: [
     'Giỏ hàng',
     'Shopping cart',

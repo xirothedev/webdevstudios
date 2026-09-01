@@ -4,7 +4,7 @@
 import { computed } from 'vue';
 
 import LegalLayout from '@/components/legal/legal-layout.vue';
-import { SEO_IMAGES, usePageMeta } from '@/lib/metadata';
+import { usePageMeta } from '@/lib/metadata';
 import { renderLegalMarkdown } from './markdown';
 import contentSrc from './privacy.md?raw';
 
@@ -13,7 +13,6 @@ usePageMeta({
   description:
     'Chính sách quyền riêng tư của WebDev Studios - Cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn.',
   path: '/privacy',
-  image: SEO_IMAGES['/privacy'],
   keywords: ['Chính sách quyền riêng tư', 'Privacy Policy', 'WebDev Studios', 'Bảo mật'],
 });
 
