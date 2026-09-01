@@ -4,17 +4,19 @@ import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { Button } from '@/components/ui/button.vue';
+import { usePendingOrder } from '@/composables/use-pending-order';
 import { useOrder } from '@/lib/api/hooks/use-orders';
 import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments';
 import { formatPrice } from '@/lib/utils';
 
 const route = useRoute();
 const router = useRouter();
+const pendingOrder = usePendingOrder();
 const orderId = String(route.params.orderId);
 
 const { data: order, isLoading: isLoadingOrder } = useOrder(orderId);
 const createPaymentLink = useCreatePaymentLink();
-const paymentUrl = ref<string | null>(localStorage.getItem(`paymentUrl_${orderId}`));
+const paymentUrl = ref<string | null>(pendingOrder.paymentUrl(orderId));
 const isLoadingPayment = createPaymentLink.isPending;
 
 // Create payment link if the order is pending and no URL was saved yet
@@ -29,7 +31,7 @@ watch(
         {
           onSuccess: (data) => {
             paymentUrl.value = data.paymentUrl;
-            localStorage.setItem(`paymentUrl_${orderId}`, data.paymentUrl);
+            pendingOrder.savePaymentUrl(orderId, data.paymentUrl);
           },
         },
       );

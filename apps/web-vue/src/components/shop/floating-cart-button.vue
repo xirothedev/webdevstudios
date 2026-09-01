@@ -6,8 +6,7 @@ import { RouterLink } from 'vue-router';
 
 import { Button } from '@/components/ui/button.vue';
 import { useCartDrawer } from '@/composables/use-cart-drawer';
-import { useCart, useRemoveFromCart, useUpdateCartItem } from '@/lib/api/hooks/use-cart';
-import { isFreeShipping, shippingFee } from '@/lib/shipping';
+import { cartTotals, useCart, useCartActions } from '@/lib/api/hooks/use-cart';
 import { formatPrice } from '@/lib/utils';
 
 import QuantitySelector from './quantity-selector.vue';
@@ -16,28 +15,15 @@ import QuantitySelector from './quantity-selector.vue';
 // standalone CartDrawer component).
 const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
 const { data: cart, isLoading } = useCart();
-const updateCartItemMutation = useUpdateCartItem();
-const removeFromCartMutation = useRemoveFromCart();
+const {
+  updateQuantity: handleUpdateQuantity,
+  removeItem: handleRemoveItem,
+  isUpdating: isItemUpdating,
+} = useCartActions();
+const { subtotal, shippingLabel, totalLabel } = cartTotals(cart);
 
 const totalItems = computed(() => cart.value?.totalItems ?? 0);
 const hasItems = computed(() => totalItems.value > 0 && !isLoading.value);
-
-const handleUpdateQuantity = (itemId: string, quantity: number) => {
-  if (quantity < 1) return;
-  updateCartItemMutation.mutate({ cartItemId: itemId, data: { quantity } });
-};
-
-const handleRemoveItem = (itemId: string) => {
-  removeFromCartMutation.mutate(itemId);
-};
-
-const isItemUpdating = (itemId: string) => {
-  return (
-    (updateCartItemMutation.isPending.value &&
-      updateCartItemMutation.variables.value?.cartItemId === itemId) ||
-    (removeFromCartMutation.isPending.value && removeFromCartMutation.variables.value === itemId)
-  );
-};
 
 const handleClickOutside = (e: MouseEvent) => {
   if (!isOpen.value) return;
@@ -193,25 +179,17 @@ onUnmounted(() => {
           <div class="mb-4 space-y-2">
             <div class="flex justify-between text-white/80">
               <span>Tạm tính:</span>
-              <span class="font-semibold">{{ formatPrice(cart?.totalAmount ?? 0) }}₫</span>
+              <span class="font-semibold">{{ formatPrice(subtotal) }}₫</span>
             </div>
             <div class="flex justify-between text-white/80">
               <span>Phí vận chuyển:</span>
-              <span class="font-semibold">
-                {{
-                  isFreeShipping(cart?.totalAmount ?? 0)
-                    ? 'Miễn phí'
-                    : formatPrice(shippingFee(cart?.totalAmount ?? 0)) + '₫'
-                }}
-              </span>
+              <span class="font-semibold">{{ shippingLabel }}</span>
             </div>
             <div
               class="flex justify-between border-t border-white/10 pt-2 text-lg font-bold text-white"
             >
               <span>Tổng cộng:</span>
-              <span>
-                {{ formatPrice((cart?.totalAmount ?? 0) + shippingFee(cart?.totalAmount ?? 0)) }}₫
-              </span>
+              <span>{{ totalLabel }}</span>
             </div>
           </div>
           <RouterLink to="/cart" @click="closeDrawer">

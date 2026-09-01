@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { computed } from 'vue';
 
 import { useCartDrawer } from '@/composables/use-cart-drawer';
 import {
@@ -8,7 +9,9 @@ import {
   type UpdateCartItemRequest,
 } from '@/lib/api/cart';
 import { useDebouncedCallback } from '@/lib/hooks/use-debounce';
+import { isFreeShipping, shippingFee } from '@/lib/shipping';
 import { toast } from '@/lib/toast';
+import { formatPrice } from '@/lib/utils';
 
 // Query Keys
 export const cartKeys = {
@@ -211,7 +214,48 @@ export function useRemoveFromCart() {
   });
 }
 
-// Mutation: Clear cart
+// Shared cart behavior for cart.vue, floating-cart-button.vue: optimistic
+// quantity/remove wiring plus per-item pending state, so UIs keep only markup.
+export function useCartActions() {
+  const updateCartItemMutation = useUpdateCartItem();
+  const removeFromCartMutation = useRemoveFromCart();
+
+  const updateQuantity = (itemId: string, quantity: number) => {
+    if (quantity < 1) return;
+    updateCartItemMutation.mutate({ cartItemId: itemId, data: { quantity } });
+  };
+
+  const removeItem = (itemId: string) => {
+    removeFromCartMutation.mutate(itemId);
+  };
+
+  // Check if specific item is being updated (only during actual API call, not during debounce)
+  const isUpdating = (itemId: string) => {
+    return (
+      (updateCartItemMutation.isPending.value &&
+        updateCartItemMutation.variables.value?.cartItemId === itemId) ||
+      (removeFromCartMutation.isPending.value && removeFromCartMutation.variables.value === itemId)
+    );
+  };
+
+  return { updateQuantity, removeItem, isUpdating };
+}
+
+// Shared footer math for cart.vue, floating-cart-button.vue, checkout.vue.
+// Structural `{ value }` so both Refs and computed unions (checkout's Buy Now branch) fit.
+export function cartTotals(cart: { value: Cart | undefined }) {
+  const subtotal = computed(() => cart.value?.totalAmount ?? 0);
+  const fee = computed(() => shippingFee(subtotal.value));
+  return {
+    subtotal,
+    fee,
+    total: computed(() => subtotal.value + fee.value),
+    isFreeShipping: computed(() => isFreeShipping(subtotal.value)),
+    shippingLabel: computed(() => (fee.value === 0 ? 'Miễn phí' : `${formatPrice(fee.value)}₫`)),
+    totalLabel: computed(() => `${formatPrice(subtotal.value + fee.value)}₫`),
+  };
+}
+
 export function useClearCart() {
   const queryClient = useQueryClient();
 

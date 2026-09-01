@@ -7,11 +7,11 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button.vue';
 import { Input } from '@/components/ui/input.vue';
-import { useCart } from '@/lib/api/hooks/use-cart';
+import { usePendingOrder } from '@/composables/use-pending-order';
+import { cartTotals, useCart } from '@/lib/api/hooks/use-cart';
 import { useCreateOrder, useOrders } from '@/lib/api/hooks/use-orders';
 import { useCreatePaymentLink } from '@/lib/api/hooks/use-payments';
 import { toast } from '@/lib/toast';
-import { shippingFee } from '@/lib/shipping';
 import { formatPrice } from '@/lib/utils';
 
 import type { CreateOrderRequest, ShippingAddress } from '@/lib/api/orders';
@@ -37,6 +37,7 @@ const shippingAddressSchema = z.object({
 
 const route = useRoute();
 const router = useRouter();
+const pendingOrderStore = usePendingOrder();
 const isBuyNow = route.query.buyNow === 'true';
 const buyNowProductId = route.query.productId as string | undefined;
 const buyNowProductSlug = route.query.productSlug as string | undefined;
@@ -98,7 +99,7 @@ watch(
 watch(pendingOrder, (order) => {
   if (order) {
     // Save orderId to localStorage for recovery
-    localStorage.setItem('pendingOrderId', order.id);
+    pendingOrderStore.remember(order.id);
     router.push(`/payments/${order.id}`);
   }
 });
@@ -145,7 +146,7 @@ const onSubmit = handleSubmit((data) => {
   createOrderMutation.mutate(orderData, {
     onSuccess: async (order) => {
       // Save orderId to localStorage for recovery
-      localStorage.setItem('pendingOrderId', order.id);
+      pendingOrderStore.remember(order.id);
 
       // Create payment link (PayOS); redirect to the payment page either way
       try {
@@ -161,9 +162,7 @@ const onSubmit = handleSubmit((data) => {
 });
 
 // Calculate totals (Buy Now subtotal is calculated on the backend)
-const subtotal = computed(() => cart.value?.totalAmount ?? 0);
-const fee = computed(() => shippingFee(subtotal.value));
-const total = computed(() => subtotal.value + fee.value);
+const { shippingLabel, totalLabel } = cartTotals(cart);
 </script>
 
 <template>
@@ -336,13 +335,13 @@ const total = computed(() => subtotal.value + fee.value);
                 </div>
                 <div class="flex justify-between text-white/80">
                   <span>Phí vận chuyển:</span>
-                  <span>{{ fee === 0 ? 'Miễn phí' : formatPrice(fee) + '₫' }}</span>
+                  <span>{{ shippingLabel }}</span>
                 </div>
                 <div
                   class="flex justify-between border-t border-white/10 pt-3 text-lg font-bold text-white"
                 >
                   <span>Tổng cộng:</span>
-                  <span>{{ formatPrice(total) }}₫</span>
+                  <span>{{ totalLabel }}</span>
                 </div>
               </div>
               <Button
