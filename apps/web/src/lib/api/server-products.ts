@@ -20,23 +20,20 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-import { fetchProductForSSR } from '@/lib/api/server-products';
-import { ProductDescription } from '@/components/shop/ProductDescription';
+import type { Product } from '@/lib/api/products';
 
-import { ProductPageContent } from '../ProductPageContent';
+const API_URL =
+  process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4001/v1';
 
-export default async function AoThunPage() {
-  const initialProduct = await fetchProductForSSR('AO_THUN');
-  return (
-    <ProductPageContent
-      productSlug="ao-thun"
-      productName="Áo thun"
-      initialProduct={initialProduct}
-      descriptionNode={
-        initialProduct ? (
-          <ProductDescription markdown={initialProduct.description ?? ''} />
-        ) : undefined
-      }
-    />
-  );
+// SSR preseed for the product pages: renders H1/prices in the document instead
+// of a skeleton swap. Undefined on failure — client falls back to its own fetch.
+export async function fetchProductForSSR(slug: string): Promise<Product | undefined> {
+  try {
+    const res = await fetch(`${API_URL}/products/${slug}`, { cache: 'no-store' });
+    if (!res.ok) return undefined;
+    const json = (await res.json()) as { data?: Product };
+    return json.data;
+  } catch {
+    return undefined;
+  }
 }

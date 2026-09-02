@@ -31,6 +31,18 @@ func Register(v1 *gin.RouterGroup, db *gorm.DB, secret string, authRequired gin.
 	u.GET("", h.adminList)
 	// /users/:id is @Public in Nest but needs OPTIONAL auth to pick Private vs Public shape
 	v1.GET("/users/:id", h.optionalAuth(db, secret), h.getByID)
+	// GET /auth/me exists in Nest and the web probes it on every page load;
+	// answer 200+null when anonymous so a logged-out visit logs no console error.
+	v1.GET("/auth/me", h.optionalAuth(db, secret), h.softMe)
+}
+
+func (h *Handler) softMe(c *gin.Context) {
+	id := c.GetString("viewerId")
+	if id == "" {
+		c.JSON(http.StatusOK, nil)
+		return
+	}
+	h.me(c)
 }
 
 func (h *Handler) me(c *gin.Context) {

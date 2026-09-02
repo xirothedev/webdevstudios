@@ -113,7 +113,9 @@ export function Footer({ variant = 'dark' }: FooterProps) {
           </div>
         </div>
       </div>
-      <div className="mt-10 space-y-2 text-center text-xs text-gray-500">
+      <div
+        className={`mt-10 space-y-2 text-center text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}
+      >
         <div>© 2025 WebDev Studios. All rights reserved.</div>
         <div className="flex items-center justify-center gap-2">
           <span>Developed & Designed by</span>

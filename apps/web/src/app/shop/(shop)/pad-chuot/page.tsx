@@ -20,10 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+import { fetchProductForSSR } from '@/lib/api/server-products';
+import { ProductDescription } from '@/components/shop/ProductDescription';
 
 import { ProductPageContent } from '../ProductPageContent';
 
-export default function PadChuotPage() {
-  return <ProductPageContent productSlug="pad-chuot" productName="Pad chuột" />;
+export default async function PadChuotPage() {
+  const initialProduct = await fetchProductForSSR('PAD_CHUOT');
+  return (
+    <ProductPageContent
+      productSlug="pad-chuot"
+      productName="Pad chuột"
+      initialProduct={initialProduct}
+      descriptionNode={
+        initialProduct ? (
+          <ProductDescription markdown={initialProduct.description ?? ''} />
+        ) : undefined
+      }
+    />
+  );
 }

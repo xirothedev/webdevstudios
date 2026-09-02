@@ -23,9 +23,7 @@
 'use client';
 
 import { Star } from 'lucide-react';
-import { motion } from 'motion/react';
 
-import { ProductDescription } from '@/components/shop/ProductDescription';
 import { formatPrice } from '@/lib/utils';
 
 interface ProductInfoProps {
@@ -39,22 +37,17 @@ interface ProductInfoProps {
     original?: number;
     discount?: number;
   };
-  description: string;
+  descriptionNode?: React.ReactNode;
   priceNote?: string;
 }
 
-export function ProductInfo({ name, rating, price, description, priceNote }: ProductInfoProps) {
+export function ProductInfo({ name, rating, price, descriptionNode, priceNote }: ProductInfoProps) {
   const discountPercentage = price.discount
     ? Math.round((price.discount / (price.original || price.current)) * 100)
     : null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.1 }}
-      className="flex flex-col justify-center"
-    >
+    <div className="flex flex-col justify-center">
       {/* Product Title */}
       <div className="mb-6">
         <h1 className="mb-3 text-4xl font-bold tracking-tight text-white md:text-5xl">{name}</h1>
@@ -89,9 +82,7 @@ export function ProductInfo({ name, rating, price, description, priceNote }: Pro
       </div>
 
       {/* Description */}
-      <div className="mb-8">
-        <ProductDescription markdown={description} />
-      </div>
-    </motion.div>
+      <div className="mb-8">{descriptionNode}</div>
+    </div>
   );
 }

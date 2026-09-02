@@ -23,7 +23,6 @@
 'use client';
 
 import { ShoppingCart } from 'lucide-react';
-import { motion } from 'motion/react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -56,18 +55,10 @@ export function ProductActions({
         )}
       >
         {isAddingToCart ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2"
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="h-5 w-5 rounded-full border-2 border-black border-t-transparent"
-            />
+          <div className="animate-in fade-in-0 flex items-center gap-2 duration-200">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-black border-t-transparent" />
             <span>Đang thêm...</span>
-          </motion.div>
+          </div>
         ) : (
           <>
             <ShoppingCart className="mr-2 h-5 w-5" />

@@ -23,7 +23,7 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -76,7 +76,11 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
       )}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 md:h-16">
-        <Link href="/" className="group flex cursor-pointer items-center gap-2">
+        <Link
+          href="/"
+          aria-label="WebDev Studios"
+          className="group flex cursor-pointer items-center gap-2"
+        >
           <div className="relative h-6 w-6">
             <Image
               src="/image/wds-logo.svg"
@@ -157,159 +161,114 @@ export function Navbar({ variant = 'dark' }: NavbarProps) {
             )}
             aria-label="Toggle menu"
           >
-            <AnimatePresence mode="wait">
-              {isMobileMenuOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X className="h-6 w-6" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Menu className="h-6 w-6" />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-9998 bg-black/50 md:hidden"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
+      {/* Mobile Sidebar — ponytail: entrance-only CSS anims; motion exit removed with the lib */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="animate-in fade-in-0 fixed inset-0 z-9998 bg-black/50 duration-300 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
 
-            {/* Sidebar */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={cn(
-                'fixed top-0 right-0 z-9999 h-full w-80 max-w-[85vw] overflow-y-auto shadow-2xl md:hidden',
-                isDark
-                  ? 'glass border-l border-white/10 bg-black/98 backdrop-blur-xl'
-                  : 'border-l border-gray-200 bg-white',
-              )}
-            >
-              <div className="flex flex-col p-6">
-                {/* Mobile Logo */}
-                <div className="mb-8 flex items-center gap-2">
-                  <div className="relative h-10 w-10">
-                    <Image
-                      src="/image/wds-logo.svg"
-                      alt="WebDev Studios"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  <span
-                    className={cn(
-                      'text-sm font-semibold tracking-tight',
-                      isDark ? 'text-white' : 'text-black',
-                    )}
-                  >
-                    WebDev Studios
-                  </span>
+          {/* Sidebar */}
+          <div
+            className={cn(
+              'animate-in slide-in-from-right fixed top-0 right-0 z-9999 h-full w-80 max-w-[85vw] overflow-y-auto shadow-2xl duration-300 md:hidden',
+              isDark
+                ? 'glass border-l border-white/10 bg-black/98 backdrop-blur-xl'
+                : 'border-l border-gray-200 bg-white',
+            )}
+          >
+            <div className="flex flex-col p-6">
+              {/* Mobile Logo */}
+              <div className="mb-8 flex items-center gap-2">
+                <div className="relative h-10 w-10">
+                  <Image
+                    src="/image/wds-logo.svg"
+                    alt="WebDev Studios"
+                    fill
+                    className="object-contain"
+                  />
                 </div>
+                <span
+                  className={cn(
+                    'text-sm font-semibold tracking-tight',
+                    isDark ? 'text-white' : 'text-black',
+                  )}
+                >
+                  WebDev Studios
+                </span>
+              </div>
 
-                {/* Navigation Items */}
-                <nav className="flex flex-col gap-2">
-                  {navItems.map((item, index) => {
-                    const isActive = pathname === item.href;
-                    return (
-                      <motion.div
-                        key={item.href}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{
-                          delay: index * 0.1,
-                          duration: 0.3,
-                          ease: [0.6, -0.05, 0.01, 0.99],
-                        }}
-                      >
-                        <Link
-                          href={item.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={cn(
-                            'flex items-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
-                            isActive
-                              ? isDark
-                                ? 'text-wds-accent bg-white/10'
-                                : 'bg-wds-accent/10 text-wds-accent'
-                              : isDark
-                                ? 'text-white/70 hover:bg-white/5 hover:text-white'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-black',
-                          )}
-                        >
-                          {item.label}
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-                </nav>
-
-                {/* Mobile Actions */}
-                <div className="mt-8 flex flex-col gap-3">
-                  {mounted && user ? (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        delay: navItems.length * 0.1,
-                        duration: 0.3,
-                      }}
-                    >
-                      <div className="flex justify-center">
-                        <UserAvatar variant={isDark ? 'dark' : 'light'} />
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        delay: navItems.length * 0.1,
-                        duration: 0.3,
-                      }}
+              {/* Navigation Items */}
+              <nav className="flex flex-col gap-2">
+                {navItems.map((item, index) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <div
+                      key={item.href}
+                      className="animate-in fade-in-0 slide-in-from-right-4 fill-mode-backwards duration-300"
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <Link
-                        href="/auth/login"
+                        href={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
-                          'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
-                          'bg-wds-accent hover:bg-wds-accent/90 text-black',
+                          'flex items-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
+                          isActive
+                            ? isDark
+                              ? 'text-wds-accent bg-white/10'
+                              : 'bg-wds-accent/10 text-wds-accent'
+                            : isDark
+                              ? 'text-white/70 hover:bg-white/5 hover:text-white'
+                              : 'text-gray-600 hover:bg-gray-100 hover:text-black',
                         )}
                       >
-                        Đăng nhập
+                        {item.label}
                       </Link>
-                    </motion.div>
-                  )}
-                </div>
+                    </div>
+                  );
+                })}
+              </nav>
+
+              {/* Mobile Actions */}
+              <div className="mt-8 flex flex-col gap-3">
+                {mounted && user ? (
+                  <div
+                    className="animate-in fade-in-0 slide-in-from-right-4 fill-mode-backwards duration-300"
+                    style={{ animationDelay: `${navItems.length * 0.1}s` }}
+                  >
+                    <div className="flex justify-center">
+                      <UserAvatar variant={isDark ? 'dark' : 'light'} />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="animate-in fade-in-0 slide-in-from-right-4 fill-mode-backwards duration-300"
+                    style={{ animationDelay: `${navItems.length * 0.1}s` }}
+                  >
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'flex w-full items-center justify-center rounded-lg px-4 py-3 text-base font-medium transition-colors',
+                        'bg-wds-accent hover:bg-wds-accent/90 text-black',
+                      )}
+                    >
+                      Đăng nhập
+                    </Link>
+                  </div>
+                )}
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   );
 }

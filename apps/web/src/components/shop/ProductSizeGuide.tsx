@@ -22,8 +22,6 @@
 
 'use client';
 
-import { motion } from 'motion/react';
-
 interface SizeMeasurement {
   size: string;
   chest: string; // Chest width
@@ -70,13 +68,7 @@ interface ProductSizeGuideProps {
 
 export function ProductSizeGuide({ title = 'Bảng size', delay = 0.3 }: ProductSizeGuideProps) {
   return (
-    <motion.section
-      id="size-guide"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay }}
-      className="mt-20 scroll-mt-24"
-    >
+    <section id="size-guide" className="reveal mt-20 scroll-mt-24">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
         <h2 className="mb-6 text-2xl font-bold text-white">{title}</h2>
         <p className="mb-6 text-sm text-white/60">
@@ -107,12 +99,10 @@ export function ProductSizeGuide({ title = 'Bảng size', delay = 0.3 }: Product
             </thead>
             <tbody>
               {sizeChart.map((row, index) => (
-                <motion.tr
+                <tr
                   key={row.size}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: delay + index * 0.1 }}
-                  className="border-b border-white/5 transition-colors hover:bg-white/5"
+                  className="animate-in fade-in-0 slide-in-from-left-2 fill-mode-backwards border-b border-white/5 transition-colors duration-300 hover:bg-white/5"
+                  style={{ animationDelay: `${delay + index * 0.1}s` }}
                 >
                   <td className="px-4 py-3">
                     <span className="text-wds-accent font-semibold">{row.size}</span>
@@ -121,7 +111,7 @@ export function ProductSizeGuide({ title = 'Bảng size', delay = 0.3 }: Product
                   <td className="px-4 py-3 text-sm text-white/70">{row.length}</td>
                   <td className="px-4 py-3 text-sm text-white/70">{row.shoulder}</td>
                   <td className="px-4 py-3 text-sm text-white/70">{row.sleeve}</td>
-                </motion.tr>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -171,6 +161,6 @@ export function ProductSizeGuide({ title = 'Bảng size', delay = 0.3 }: Product
           </p>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

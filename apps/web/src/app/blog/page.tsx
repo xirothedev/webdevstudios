@@ -24,12 +24,14 @@ import { BlogPostList } from '@/components/blog/BlogPostList';
 import { Footer } from '@/components/Footer';
 import { Navbar } from '@/components/Navbar';
 import { blogApi } from '@/lib/api/blog';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata = {
-  title: 'Blog - WebDev Studios',
+export const metadata = createPageMetadata({
+  title: 'Blog',
   description:
     'Khám phá các bài viết về công nghệ, phát triển web và nhiều chủ đề thú vị khác từ WebDev Studios',
-};
+  path: '/blog',
+});
 
 export default async function BlogPage({
   searchParams,

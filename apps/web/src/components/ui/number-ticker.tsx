@@ -22,8 +22,7 @@
 
 'use client';
 
-import { useInView, useMotionValue, useSpring } from 'motion/react';
-import { ComponentPropsWithoutRef, useEffect, useRef } from 'react';
+import { ComponentPropsWithoutRef, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -35,6 +34,7 @@ interface NumberTickerProps extends ComponentPropsWithoutRef<'span'> {
   decimalPlaces?: number;
 }
 
+// ponytail: rAF tween replaces motion/react spring — no animation lib on this page
 export function NumberTicker({
   value,
   startValue = 0,
@@ -45,52 +45,59 @@ export function NumberTicker({
   ...props
 }: NumberTickerProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const motionValue = useMotionValue(direction === 'down' ? value : startValue);
-  const springValue = useSpring(motionValue, {
-    damping: 60,
-    stiffness: 100,
+  const [display, setDisplay] = useState(startValue);
+  const displayRef = useRef(startValue);
+  const animated = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    let raf = 0;
+    let timer = 0;
+    const tween = (from: number, to: number) => {
+      const t0 = performance.now();
+      const step = (t: number) => {
+        const p = Math.min(1, (t - t0) / 900);
+        const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+        displayRef.current = from + (to - from) * eased;
+        setDisplay(displayRef.current);
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting || animated.current) return;
+        animated.current = true;
+        io.disconnect();
+        const from = direction === 'down' ? value : startValue;
+        const to = direction === 'down' ? startValue : value;
+        timer = window.setTimeout(() => tween(from, to), delay * 1000);
+      },
+      { rootMargin: '0px' },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Follow dynamic updates (e.g. cart quantity) once the intro run is done
+  useEffect(() => {
+    if (!animated.current) return;
+    displayRef.current = value;
+    setDisplay(value);
+  }, [value]);
+
+  const fmt = Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
   });
-  const isInView = useInView(ref, { once: true, margin: '0px' });
-  const previousValue = useRef(value);
-  const hasAnimated = useRef(false);
-
-  // Initial animation when in view (only once)
-  useEffect(() => {
-    if (isInView && !hasAnimated.current) {
-      const timer = setTimeout(() => {
-        motionValue.set(direction === 'down' ? startValue : value);
-        previousValue.current = value;
-        hasAnimated.current = true;
-      }, delay * 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [motionValue, isInView, delay, direction, startValue, value]);
-
-  // Animate when value changes (for dynamic updates)
-  useEffect(() => {
-    if (isInView && previousValue.current !== value) {
-      // Set current value as starting point, then animate to new value
-      motionValue.set(previousValue.current);
-      // Use requestAnimationFrame to ensure smooth transition
-      requestAnimationFrame(() => {
-        motionValue.set(value);
-      });
-      previousValue.current = value;
-    }
-  }, [motionValue, isInView, value]);
-
-  useEffect(
-    () =>
-      springValue.on('change', (latest) => {
-        if (ref.current) {
-          ref.current.textContent = Intl.NumberFormat('en-US', {
-            minimumFractionDigits: decimalPlaces,
-            maximumFractionDigits: decimalPlaces,
-          }).format(Number(latest.toFixed(decimalPlaces)));
-        }
-      }),
-    [springValue, decimalPlaces],
-  );
 
   return (
     <span
@@ -98,7 +105,7 @@ export function NumberTicker({
       className={cn('inline-block tracking-wider text-black tabular-nums', className)}
       {...props}
     >
-      {startValue}
+      {fmt.format(Math.round(display * 10 ** decimalPlaces) / 10 ** decimalPlaces)}
     </span>
   );
 }
