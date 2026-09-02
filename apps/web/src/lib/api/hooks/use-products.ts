@@ -24,7 +24,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 
-import { productsApi, ProductSize, ProductSlug } from '@/lib/api/products';
+import { Product, productsApi, ProductSize, ProductSlug } from '@/lib/api/products';
 
 // Query Keys
 const productKeys = {
@@ -56,10 +56,11 @@ export function useProduct(slug: ProductSlug) {
 }
 
 // Suspense Query: Get product by slug (for Suspense boundary)
-export function useSuspenseProduct(slug: ProductSlug) {
+export function useSuspenseProduct(slug: ProductSlug, initialData?: Product) {
   return useSuspenseQuery({
     queryKey: productKeys.detail(slug),
     queryFn: () => productsApi.getProductBySlug(slug),
+    initialData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

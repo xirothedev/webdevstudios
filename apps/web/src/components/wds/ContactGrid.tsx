@@ -23,124 +23,15 @@
 'use client';
 
 import { Building2, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
-import { m } from 'motion/react';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
-import { AnimatedBeam } from '@/components/ui/animated-beam';
+import { LazyInView } from '@/components/common/lazy-in-view';
 import { BentoCard, BentoGrid } from '@/components/ui/bento-grid';
 import { Button } from '@/components/ui/button';
 
-function Circle({
-  className,
-  children,
-  style,
-  ref,
-}: {
-  className?: string;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  ref?: React.Ref<HTMLDivElement>;
-}) {
-  return (
-    <div
-      ref={ref}
-      style={style}
-      className={`z-10 flex size-12 items-center justify-center rounded-full border-2 border-white/60 bg-white/90 p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] ${className ?? ''}`}
-    >
-      {children}
-    </div>
-  );
-}
-Circle.displayName = 'Circle';
-
-function OnlineBeamBackground() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const centerRef = useRef<HTMLDivElement>(null);
-  const mailRef = useRef<HTMLDivElement>(null);
-  const fbRef = useRef<HTMLDivElement>(null);
-  const msgRef = useRef<HTMLDivElement>(null);
-  const phoneRef = useRef<HTMLDivElement>(null);
-
-  return (
-    <div className="pointer-events-none absolute inset-0">
-      <div
-        ref={containerRef}
-        className="relative flex size-full items-center justify-center overflow-hidden bg-white/60"
-      >
-        {/* Absolute positioning to keep arcs aligned like mock */}
-        <Circle ref={mailRef} style={{ position: 'absolute', top: '18%', left: '26%' }}>
-          <Image src="/icons/gmail.webp" alt="Email" width={20} height={20} />
-        </Circle>
-        <Circle ref={fbRef} style={{ position: 'absolute', top: '18%', right: '22%' }}>
-          <Image src="/icons/facebook.webp" alt="Facebook" width={20} height={20} />
-        </Circle>
-        <Circle ref={phoneRef} style={{ position: 'absolute', top: '72%', left: '24%' }}>
-          <Image src="/icons/telephone.webp" alt="Phone" width={20} height={20} />
-        </Circle>
-        <Circle ref={msgRef} style={{ position: 'absolute', top: '72%', right: '18%' }}>
-          <Image src="/icons/messenger.webp" alt="Messenger" width={20} height={20} />
-        </Circle>
-        <Circle
-          ref={centerRef}
-          className="size-16 border-2"
-          style={{
-            position: 'absolute',
-            top: '55%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <Image
-            src="/image/wds-logo.svg"
-            alt="WebDev Studios"
-            width={32}
-            height={32}
-            className="size-8"
-          />
-        </Circle>
-
-        <AnimatedBeam
-          containerRef={containerRef}
-          fromRef={mailRef}
-          toRef={centerRef}
-          curvature={-60}
-          endYOffset={-10}
-          gradientStartColor="#ff9f43"
-          gradientStopColor="#ff6f91"
-        />
-        <AnimatedBeam
-          containerRef={containerRef}
-          fromRef={fbRef}
-          toRef={centerRef}
-          curvature={-55}
-          endYOffset={-6}
-          gradientStartColor="#3b82f6"
-          gradientStopColor="#a855f7"
-        />
-        <AnimatedBeam
-          containerRef={containerRef}
-          fromRef={phoneRef}
-          toRef={centerRef}
-          curvature={-5}
-          startYOffset={0}
-          endYOffset={-2}
-          gradientStartColor="#22c55e"
-          gradientStopColor="#14b8a6"
-        />
-        <AnimatedBeam
-          containerRef={containerRef}
-          fromRef={msgRef}
-          toRef={centerRef}
-          curvature={30}
-          endYOffset={6}
-          gradientStartColor="#ec4899"
-          gradientStopColor="#a855f7"
-        />
-      </div>
-    </div>
-  );
-}
+// ponytail: motion-powered beam chunk is fetched only when the card nears the viewport
+const loadBeam = () => import('./ContactBeam');
 
 export function WDSContactGrid() {
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -155,7 +46,13 @@ export function WDSContactGrid() {
       className: 'col-span-3 lg:col-span-2',
       background: (
         <div className="absolute inset-0">
-          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/uit-school.webp')] bg-cover bg-center opacity-50" />
+          <Image
+            src="/image/uit-school.webp"
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 100vw, 64vw"
+            className="scale-105 object-cover opacity-50"
+          />
           <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/60 to-white/30" />
         </div>
       ),
@@ -169,7 +66,13 @@ export function WDSContactGrid() {
       className: 'col-span-3 lg:col-span-1',
       background: (
         <div className="absolute inset-0">
-          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/chunhiem-lamchidinh.webp')] bg-cover bg-center opacity-50" />
+          <Image
+            src="/image/chunhiem-lamchidinh.webp"
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 100vw, 32vw"
+            className="scale-105 object-cover opacity-50"
+          />
           <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/60 to-white/30" />
         </div>
       ),
@@ -183,7 +86,13 @@ export function WDSContactGrid() {
       className: 'col-span-3 lg:col-span-1',
       background: (
         <div className="absolute inset-0">
-          <div className="blur-0 absolute inset-0 scale-105 bg-[url('/image/ceremony-20-12-2025.webp')] bg-cover bg-center opacity-50" />
+          <Image
+            src="/image/ceremony-20-12-2025.webp"
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 100vw, 64vw"
+            className="scale-105 object-cover opacity-50"
+          />
           <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/60 to-white/30" />
         </div>
       ),
@@ -195,7 +104,7 @@ export function WDSContactGrid() {
       cta: 'Chọn kênh',
       className: 'col-span-3 lg:col-span-2',
       onClick: () => setDialogOpen(true),
-      background: <OnlineBeamBackground />,
+      background: <LazyInView className="pointer-events-none absolute inset-0" load={loadBeam} />,
     },
   ];
 
@@ -209,13 +118,7 @@ export function WDSContactGrid() {
 
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <m.div
-          className="mb-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="reveal mb-12 text-center">
           <h2 className="text-3xl font-semibold text-black sm:text-4xl md:text-5xl">
             Liên hệ với chúng tôi
           </h2>
@@ -224,7 +127,7 @@ export function WDSContactGrid() {
             Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các kênh
             sau:
           </p>
-        </m.div>
+        </div>
 
         {/* Bento Grid */}
         <BentoGrid className="md:auto-rows-72">
@@ -242,12 +145,7 @@ export function WDSContactGrid() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setDialogOpen(false)}
           />
-          <m.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="relative z-10 w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl"
-          >
+          <div className="animate-in fade-in-0 zoom-in-95 relative z-10 w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl motion-reduce:animate-none">
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-xl font-semibold text-neutral-900">Chọn kênh liên hệ</h3>
@@ -299,7 +197,7 @@ export function WDSContactGrid() {
                 <p className="text-xs text-neutral-600">Chat nhanh với đội ngũ hỗ trợ.</p>
               </a>
             </div>
-          </m.div>
+          </div>
         </div>
       ) : null}
     </section>

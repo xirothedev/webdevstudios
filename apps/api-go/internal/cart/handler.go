@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/xirothedev/webdevstudios/apps/api-go/internal/auth"
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/web"
 	"gorm.io/gorm"
 )
@@ -14,14 +15,41 @@ type Handler struct {
 	svc *Service
 }
 
-func Register(v1 *gin.RouterGroup, db *gorm.DB, authRequired gin.HandlerFunc) {
+func Register(v1 *gin.RouterGroup, db *gorm.DB, authRequired gin.HandlerFunc, secret string) {
 	h := &Handler{svc: NewService(db)}
 	g := v1.Group("/cart", authRequired)
-	g.GET("", h.get)
+	// GET answers 200+null for anonymous visitors: the web polls the cart badge
+	// on every page, and a 401 would log a console error on a logged-out visit.
+	v1.GET("/cart", softAuth(db, secret), h.softGet)
 	g.POST("/items", h.add)
 	g.PATCH("/items/:id", h.update)
 	g.DELETE("/items/:id", h.remove)
 	g.DELETE("", h.clear)
+}
+
+func softAuth(db *gorm.DB, secret string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := ""
+		if ck, err := c.Cookie("access_token"); err == nil && ck != "" {
+			token = ck
+		} else if ah := c.GetHeader("Authorization"); len(ah) > 7 && ah[:7] == "Bearer " {
+			token = ah[7:]
+		}
+		if token != "" {
+			if claims, err := auth.VerifyToken(secret, token); err == nil {
+				c.Set("userId", claims.Sub)
+			}
+		}
+		c.Next()
+	}
+}
+
+func (h *Handler) softGet(c *gin.Context) {
+	if c.GetString("userId") == "" {
+		c.JSON(http.StatusOK, nil)
+		return
+	}
+	h.get(c)
 }
 
 func (h *Handler) get(c *gin.Context) {

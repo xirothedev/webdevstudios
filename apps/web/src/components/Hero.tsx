@@ -20,10 +20,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
-
 import { Package, Users } from 'lucide-react';
-import { motion } from 'motion/react';
 import Image from 'next/image';
 
 export function Hero() {
@@ -48,46 +45,26 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
         {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur-sm"
-        >
+        <div className="animate-in fade-in-0 slide-in-from-bottom-2 mb-8 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur-sm duration-500">
           <span className="bg-wds-accent flex h-2 w-2 rounded-full"></span>
           <span className="text-[10px] font-medium tracking-wider text-white uppercase">
             WebDev Studios Official Store
           </span>
-        </motion.div>
+        </div>
 
         {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-6 bg-linear-to-b from-white to-white/60 bg-clip-text text-5xl leading-[1.1] font-semibold tracking-tight text-transparent md:text-7xl"
-        >
+        <h1 className="animate-in fade-in-0 slide-in-from-bottom-3 mb-6 bg-linear-to-b from-white to-white/60 bg-clip-text text-5xl leading-[1.1] font-semibold tracking-tight text-transparent delay-100 duration-600 md:text-7xl">
           Vật phẩm câu lạc bộ <br />
           chính thức của WDS.
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mx-auto mb-12 max-w-xl text-lg text-white/70"
-        >
+        <p className="animate-in fade-in-0 slide-in-from-bottom-3 mx-auto mb-12 max-w-xl text-lg text-white/70 delay-200 duration-600">
           Khám phá bộ sưu tập độc quyền áo thun, huy hiệu, dây đeo, pad chuột và nhiều vật phẩm khác
           mang đậm dấu ấn WebDev Studios.
-        </motion.p>
+        </p>
 
         {/* 3D Mockup */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
-          animate={{ opacity: 1, scale: 1, rotateX: 15 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="group relative mx-auto max-w-4xl perspective-distant"
-        >
+        <div className="animate-in fade-in-0 zoom-in-90 group relative mx-auto max-w-4xl delay-300 duration-800 perspective-distant">
           {/* Glow behind */}
           <div className="bg-wds-accent/20 absolute top-1/2 left-1/2 h-[50%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px]"></div>
 
@@ -142,16 +119,11 @@ export function Hero() {
                 {/* Chart Placeholder */}
                 <div className="from-wds-accent/5 relative flex h-48 w-full items-end gap-2 overflow-hidden rounded-lg border border-white/5 bg-linear-to-b to-transparent px-4 pb-2">
                   {[40, 60, 45, 80, 55, 90, 70, 60, 50, 75, 85, 95].map((h, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      initial={{ height: 0 }}
-                      animate={{ height: `${h}%` }}
-                      transition={{
-                        duration: 1,
-                        delay: 0.5 + i * 0.05,
-                      }}
-                      className="bg-wds-accent/40 hover:bg-wds-accent/60 flex-1 rounded-t-sm transition-colors"
-                    ></motion.div>
+                      style={{ height: `${h}%`, animationDelay: `${0.5 + i * 0.05}s` }}
+                      className="bg-wds-accent/40 animate-in grow-in-50 fill-mode-backwards hover:bg-wds-accent/60 flex-1 origin-bottom rounded-t-sm transition-colors duration-700"
+                    ></div>
                   ))}
                 </div>
 
@@ -172,7 +144,7 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

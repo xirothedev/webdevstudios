@@ -20,10 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+import { fetchProductForSSR } from '@/lib/api/server-products';
+import { ProductDescription } from '@/components/shop/ProductDescription';
 
 import { ProductPageContent } from '../ProductPageContent';
 
-export default function MocKhoaPage() {
-  return <ProductPageContent productSlug="moc-khoa" productName="Móc khóa" />;
+export default async function MocKhoaPage() {
+  const initialProduct = await fetchProductForSSR('MOC_KHOA');
+  return (
+    <ProductPageContent
+      productSlug="moc-khoa"
+      productName="Móc khóa"
+      initialProduct={initialProduct}
+      descriptionNode={
+        initialProduct ? (
+          <ProductDescription markdown={initialProduct.description ?? ''} />
+        ) : undefined
+      }
+    />
+  );
 }

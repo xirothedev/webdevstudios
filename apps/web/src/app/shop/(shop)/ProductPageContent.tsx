@@ -42,14 +42,22 @@ import { useAddToCart } from '@/lib/api/hooks/use-cart';
 import { useSuspenseProduct } from '@/lib/api/hooks/use-products';
 import { getBackendSlug } from '@/lib/product-slug-mapping';
 import { getProductStaticContent } from '@/lib/product-static-content';
+import type { Product } from '@/lib/api/products';
 import { ProductSize } from '@/types/product';
 
 interface ProductPageContentProps {
   productSlug: 'ao-thun' | 'pad-chuot' | 'day-deo' | 'moc-khoa';
   productName: string;
+  initialProduct?: Product;
+  descriptionNode?: React.ReactNode;
 }
 
-function ProductContentInner({ productSlug, productName }: ProductPageContentProps) {
+function ProductContentInner({
+  productSlug,
+  productName,
+  initialProduct,
+  descriptionNode,
+}: ProductPageContentProps) {
   const [selectedSize, setSelectedSize] = useState<ProductSize>('M');
   const [quantity, setQuantity] = useState(1);
 
@@ -58,7 +66,7 @@ function ProductContentInner({ productSlug, productName }: ProductPageContentPro
   const { user, isAuthenticated } = useAuth();
 
   // Fetch product data using Suspense Query
-  const { data: product } = useSuspenseProduct(BACKEND_SLUG);
+  const { data: product } = useSuspenseProduct(BACKEND_SLUG, initialProduct);
 
   // Get static content (images, features, additionalInfo)
   const staticContent = getProductStaticContent(BACKEND_SLUG);
@@ -203,7 +211,7 @@ function ProductContentInner({ productSlug, productName }: ProductPageContentPro
             name={product.name}
             rating={rating}
             price={price}
-            description={product.description}
+            descriptionNode={descriptionNode ?? null}
             priceNote="Giá đã bao gồm VAT. Miễn phí vận chuyển cho đơn hàng trên 500.000₫"
           />
 
@@ -303,10 +311,20 @@ function ProductLoading() {
   );
 }
 
-export function ProductPageContent({ productSlug, productName }: ProductPageContentProps) {
+export function ProductPageContent({
+  productSlug,
+  productName,
+  initialProduct,
+  descriptionNode,
+}: ProductPageContentProps) {
   return (
     <Suspense fallback={<ProductLoading />}>
-      <ProductContentInner productSlug={productSlug} productName={productName} />
+      <ProductContentInner
+        productSlug={productSlug}
+        productName={productName}
+        initialProduct={initialProduct}
+        descriptionNode={descriptionNode}
+      />
     </Suspense>
   );
 }

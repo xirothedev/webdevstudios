@@ -20,10 +20,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-'use client';
+import { fetchProductForSSR } from '@/lib/api/server-products';
+import { ProductDescription } from '@/components/shop/ProductDescription';
 
 import { ProductPageContent } from '../ProductPageContent';
 
-export default function DayDeoPage() {
-  return <ProductPageContent productSlug="day-deo" productName="Dây đeo" />;
+export default async function DayDeoPage() {
+  const initialProduct = await fetchProductForSSR('DAY_DEO');
+  return (
+    <ProductPageContent
+      productSlug="day-deo"
+      productName="Dây đeo"
+      initialProduct={initialProduct}
+      descriptionNode={
+        initialProduct ? (
+          <ProductDescription markdown={initialProduct.description ?? ''} />
+        ) : undefined
+      }
+    />
+  );
 }

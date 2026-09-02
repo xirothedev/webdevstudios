@@ -23,7 +23,6 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { motion } from 'motion/react';
 
 import { ProductSize } from '@/lib/api/products';
 import { cn } from '@/lib/utils';
@@ -74,13 +73,9 @@ export function ProductSizeSelector({
                 {size}
               </span>
               {isSelected && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="bg-wds-accent absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full"
-                >
+                <div className="animate-in zoom-in-50 bg-wds-accent absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full duration-200">
                   <Check className="h-3 w-3 text-black" />
-                </motion.div>
+                </div>
               )}
               {stock !== undefined && stock > 0 && (
                 <span className="mt-0.5 text-[10px] text-white/60">{stock}</span>

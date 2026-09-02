@@ -425,3 +425,20 @@ body {
   /* Do NOT override inline styles - Shiki uses inline styles for colors */
   /* React will automatically apply inline styles from Shiki */
 }
+
+/* ponytail: CSS scroll-driven reveals — replaces motion/react whileInView everywhere */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes mw-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+    }
+    .reveal {
+      animation: mw-reveal 0.6s cubic-bezier(0.34, 0.7, 0.25, 1) backwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}

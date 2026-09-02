@@ -22,6 +22,7 @@ import (
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/blog"
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/cart"
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/events"
+	"github.com/xirothedev/webdevstudios/apps/api-go/internal/httput"
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/orders"
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/payments"
 	"github.com/xirothedev/webdevstudios/apps/api-go/internal/products"
@@ -76,8 +77,10 @@ func main() {
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
 
-	csrfGuard := auth.NewCSRF(envOr("CSRF_SECRET", "derived-"+secret)) // ponytail: derive from JWT secret when CSRF_SECRET unset
+	csrfGuard := auth.NewCSRF(envOr("CSRF_SECRET", "derived-"+secret))      // ponytail: derive from JWT secret when CSRF_SECRET unset
+	r.Use(httput.CORSPolicy(envOr("CORS_ORIGIN", "http://localhost:3000"))) // must precede all handlers, mirrors Nest main.ts
 	r.Use(csrfGuard.Middleware())
+	r.Use(httput.Envelope())
 
 	v1 := r.Group("/v1", defaultThrottle)
 	v1.GET("/csrf-token", func(c *gin.Context) {
@@ -96,7 +99,7 @@ func main() {
 	authRequired := auth.AuthRequired(db, secret)
 	auth.Register(v1, db, secret, rdb, mail, strictThrottle)
 	users.Register(v1, db, secret, authRequired, store)
-	cart.Register(v1, db, authRequired)
+	cart.Register(v1, db, authRequired, secret)
 	adminOnly := auth.RequireRole("ADMIN")
 	payClient := payments.NewClient()
 	markPaid := payments.NewService(db, payClient).MarkPaid
