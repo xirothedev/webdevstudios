@@ -84,6 +84,10 @@ const SweepDaemon = Layer.effectDiscard(
 );
 
 const program = Effect.gen(function* () {
+  // Fail fast on required secrets before the server accepts traffic.
+  yield* Effect.all([Config.redacted('DATABASE_URL'), Config.redacted('JWT_SECRET_KEY')], {
+    concurrency: 'unbounded',
+  });
   const port = yield* Config.int('PORT').pipe(Config.withDefault(4003));
   const corsOrigin = yield* Config.string('CORS_ORIGIN').pipe(
     Config.withDefault('http://localhost:3000'),

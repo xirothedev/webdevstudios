@@ -22,7 +22,6 @@
     "@prisma/client-runtime-utils": "^7.10.0",
     "argon2": "^0.45.1",
     "effect": "4.0.0-rc.112",
-    "ioredis": "^6.0.0",
     "jose": "^6.2.10",
     "nodemailer": "^9.0.6",
     "qrcode": "^1.5.4",

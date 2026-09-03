@@ -1,4 +1,6 @@
 import { createHmac } from 'node:crypto';
+import { Effect } from 'effect';
+import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/unstable/http';
 
 import { safeEqual } from './util';
 
@@ -59,16 +61,24 @@ export async function createPaymentLink(
     cancelUrl,
     items,
   };
-  const resp = await fetch('https://api-merchant.payos.vn/v2/payment-requests', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-client-id': c.clientId,
-      'x-api-key': c.apiKey,
-    },
-    body: JSON.stringify(payload),
-  });
-  const out = (await resp.json()) as { code?: string; desc?: string; data?: unknown };
+  // Platform HttpClient instead of raw fetch; FetchHttpClient.layer is scoped.
+  const out = (await Effect.runPromise(
+    Effect.gen(function* () {
+      const http = yield* HttpClient.HttpClient;
+      const request = yield* HttpClientRequest.post('https://api-merchant.payos.vn/v2/payment-requests').pipe(
+        HttpClientRequest.setHeader('content-type', 'application/json'),
+        HttpClientRequest.setHeader('x-client-id', c.clientId),
+        HttpClientRequest.setHeader('x-api-key', c.apiKey),
+        HttpClientRequest.bodyJson(payload),
+      );
+      const res = yield* http.execute(request);
+      return yield* res.json;
+    }).pipe(
+      Effect.scoped,
+      Effect.provide(FetchHttpClient.layer),
+      Effect.mapError((e) => new Error(`payos: ${String(e)}`)),
+    ),
+  )) as { code?: string; desc?: string; data?: unknown };
   if (out.code !== '00') {
     throw new Error(`payos: ${out.code} ${out.desc ?? ''}`.trimEnd());
   }
