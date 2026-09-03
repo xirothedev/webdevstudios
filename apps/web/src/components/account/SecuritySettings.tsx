@@ -26,7 +26,7 @@ import { CheckCircle2, Info, Key, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 import type { User } from '@/types/auth.types';
 
 interface SecuritySettingsProps {

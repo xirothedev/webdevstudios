@@ -26,7 +26,7 @@ import { Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 interface NavItem {
   href: string;

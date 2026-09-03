@@ -25,7 +25,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 interface ProductImageGalleryProps {
   images: Array<{ src: string; alt: string }>;

@@ -2,7 +2,7 @@
 import { AnimatePresence, Motion } from 'motion-v';
 import { ref } from 'vue';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 const props = defineProps<{
   images: Array<{ src: string; alt: string }>;

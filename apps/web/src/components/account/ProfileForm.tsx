@@ -27,7 +27,7 @@ import { type FormEvent, type InputHTMLAttributes, type ReactNode, useState } fr
 
 import { Button } from '@/components/ui/button';
 import { useUpdateProfile } from '@/lib/api/hooks/use-user';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 import type { User } from '@/types/auth.types';
 
 interface ProfileFormProps {

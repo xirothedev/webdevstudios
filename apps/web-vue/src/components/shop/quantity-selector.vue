@@ -4,7 +4,7 @@ import { Minus, Plus } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import NumberTicker from '@/components/ui/number-ticker.vue';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 const quantitySelectorVariants = cva('flex items-center gap-2 rounded-lg border border-white/10', {
   variants: {

@@ -3,7 +3,7 @@ import { ShoppingCart } from 'lucide-vue-next';
 import { Motion } from 'motion-v';
 
 import { Button } from '@/components/ui/button.vue';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 // apps/web gates the Buy Now button on the optional onBuyNow prop; the only caller
 // always passes it, so the button renders unconditionally here.

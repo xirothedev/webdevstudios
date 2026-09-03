@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/navigation-menu.vue';
 import UserAvatar from '@/components/wds/user-avatar.vue';
 import { useCurrentUser } from '@/lib/api/hooks/use-auth';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 // Port of apps/web Navbar.tsx. ponytail: motion-v open/close animations dropped for v-if —
 // add <Motion> wrappers back if the sidebar transition matters.

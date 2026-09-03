@@ -2,7 +2,7 @@
 import { motion } from 'motion-v';
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, type PropType, type Ref } from 'vue';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 let uid = 0;
 

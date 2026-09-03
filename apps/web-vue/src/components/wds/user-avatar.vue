@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.vue';
 import { useCurrentUser, useLogout } from '@/lib/api/hooks/use-auth';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 import { getAvatarInitials } from '@/lib/utils/avatar';
 
 const props = withDefaults(defineProps<{ variant?: 'dark' | 'light' }>(), { variant: 'light' });

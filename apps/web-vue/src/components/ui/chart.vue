@@ -13,7 +13,7 @@ import {
   type VNode,
 } from 'vue';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 const THEMES = { light: '', dark: '.dark' } as const;
 

@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser, useLogout } from '@/lib/api/hooks/use-auth';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 import { getAvatarInitials } from '@/lib/utils/avatar';
 
 interface UserAvatarProps {

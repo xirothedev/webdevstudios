@@ -2,7 +2,7 @@
 import { Check } from 'lucide-vue-next';
 import { Motion } from 'motion-v';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 import type { ProductSize } from '@/lib/api/products';
 

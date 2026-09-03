@@ -24,7 +24,7 @@
 
 import { EventType } from '@/lib/events/types';
 import { getEventTypeColor, getEventTypeLabel } from '@/lib/events/utils';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 interface EventFilterProps {
   selectedTypes: EventType[];
