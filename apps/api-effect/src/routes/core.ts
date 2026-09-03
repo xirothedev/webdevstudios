@@ -1,10 +1,22 @@
-import { HttpApiBuilder } from 'effect/unstable/httpapi';
+import { Schema } from 'effect';
+import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi';
 
-import { api } from '../api';
 import { wrap } from '../lib/http';
 import { generateCsrfToken, issueCsrfToken } from '../lib/csrf';
 
-export const coreHandlers = HttpApiBuilder.group(api, 'core', (h) =>
+export const coreGroup = HttpApiGroup.make('core')
+  .add(
+    HttpApiEndpoint.get('ping', '/v1/ping', {
+      success: Schema.Struct({ message: Schema.String }),
+    }),
+    HttpApiEndpoint.get('csrfToken', '/v1/csrf-token', {
+      success: Schema.Struct({ csrfToken: Schema.String }),
+    }),
+  );
+
+export const coreLocal = HttpApi.make('api-effect').add(coreGroup);
+
+export const coreHandlers = HttpApiBuilder.group(coreLocal, 'core', (h) =>
   h
     .handle(
       'ping',

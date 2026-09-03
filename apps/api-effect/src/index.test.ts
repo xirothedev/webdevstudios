@@ -188,15 +188,12 @@ describe('validate.bindBody', () => {
 
   it('skips omitempty fields on zero values', () => {
     expect(
-      bindBody<{ fullName?: string }>(
-        { fullName: '' },
-        { FullName: { type: 'string', omitempty: true, minLen: 1 } },
-      ),
+      bindBody({ fullName: '' }, { FullName: { type: 'string', omitempty: true, minLen: 1 } }),
     ).toEqual({
       fullName: '',
     });
     expect(() =>
-      bindBody<{ x?: number }>({ x: 1.5 }, { X: { type: 'number', omitempty: true } }),
+      bindBody({ x: 1.5 }, { X: { type: 'number', omitempty: true } }),
     ).not.toThrow();
   });
 });

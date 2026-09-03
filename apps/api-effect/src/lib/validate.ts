@@ -45,7 +45,45 @@ export async function readJsonBody(request: Request): Promise<Record<string, unk
   return parsed as Record<string, unknown>;
 }
 
-export function bindBody<T>(raw: Record<string, unknown>, fields: Record<string, FieldDef>): T {
+// ---- type-level bridge: the field table is the single source of truth ----
+// JSON keys are the Go field name lowercased (jsonKey above).
+type JsonKeyOf<K extends string> = K extends `${infer H}${infer Rest}`
+  ? `${Lowercase<H>}${Rest}`
+  : K;
+
+type OneOfValues<F> = F extends { oneOf: readonly (infer V extends string)[] } ? V : never;
+
+type FieldValueType<F> = F extends { type: 'string' }
+  ? [OneOfValues<F>] extends [never]
+    ? string
+    : OneOfValues<F>
+  : F extends { type: 'number' }
+    ? number
+    : F extends { type: 'boolean' }
+      ? boolean
+      : F extends { type: 'array' }
+        ? unknown[]
+        : F extends { type: 'object' }
+          ? F extends { fields: infer G extends Record<string, FieldDef> }
+            ? BindResult<G>
+            : Record<string, unknown>
+          : never;
+
+// required: true -> proven value; everything else arrives as an optional that
+// may be null (Go zero-values pass through untouched, callers branch on them).
+type IsRequired<F> = F extends { required: true } ? true : false;
+
+export type BindResult<F extends Record<string, FieldDef>> = {
+  [K in keyof F as K extends string ? JsonKeyOf<K> : never]: IsRequired<F[K]> extends true
+    ? FieldValueType<F[K]>
+    : FieldValueType<F[K]> | null | undefined;
+};
+
+// The ONLY structural cast in the app: bindBody has just proven `raw` matches F.
+export function bindBody<const F extends Record<string, FieldDef>>(
+  raw: Record<string, unknown>,
+  fields: F,
+): BindResult<F> {
   checkDecode(raw, fields);
 
   const messages: string[] = [];
@@ -54,13 +92,13 @@ export function bindBody<T>(raw: Record<string, unknown>, fields: Record<string,
   }
 
   if (messages.length > 0) throw new ApiError(400, messages);
-  return raw as T;
+  return raw as BindResult<F>;
 }
 
-export async function bindJson<T>(
+export async function bindJson<const F extends Record<string, FieldDef>>(
   ctx: { request: Request },
-  fields: Record<string, FieldDef>,
-): Promise<T> {
+  fields: F,
+): Promise<BindResult<F>> {
   const raw = await readJsonBody(ctx.request);
   return bindBody(raw, fields);
 }

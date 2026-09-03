@@ -1,6 +1,6 @@
-import { HttpApiBuilder } from 'effect/unstable/httpapi';
+import { Schema } from 'effect';
+import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi';
 
-import { api } from '../api';
 import { wrap, bodyOf } from '../lib/http';
 import type { BlogPost, User } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
@@ -62,7 +62,52 @@ async function fetchPost(
   return p;
 }
 
-export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
+const IdParams = Schema.Struct({ id: Schema.String });
+const SlugParams = Schema.Struct({ slug: Schema.String });
+
+// Field order mirrors toDTO — the success codec renders the 200 response body.
+const PostDto = Schema.Struct({
+  id: Schema.String,
+  slug: Schema.String,
+  title: Schema.String,
+  contentKey: Schema.String,
+  content: Schema.optional(Schema.String),
+  contentSize: Schema.NullOr(Schema.Number),
+  excerpt: Schema.NullOr(Schema.String),
+  coverImage: Schema.NullOr(Schema.String),
+  author: Schema.Struct({
+    id: Schema.String,
+    fullName: Schema.NullOr(Schema.String),
+    avatar: Schema.NullOr(Schema.String),
+  }),
+  isPublished: Schema.Boolean,
+  publishedAt: Schema.NullOr(Schema.String),
+  viewCount: Schema.Number,
+  metaTitle: Schema.NullOr(Schema.String),
+  metaDescription: Schema.NullOr(Schema.String),
+  createdAt: Schema.NullOr(Schema.String),
+  updatedAt: Schema.NullOr(Schema.String),
+});
+
+const PostListDto = Schema.Struct({ posts: Schema.Array(PostDto), total: Schema.Number });
+const SuccessDto = Schema.Struct({ success: Schema.Boolean });
+
+export const blogGroup = HttpApiGroup.make('blog').add(
+  HttpApiEndpoint.get('listPosts', '/v1/blog/posts', { success: PostListDto }),
+  HttpApiEndpoint.get('searchPosts', '/v1/blog/posts/search', { success: PostListDto }),
+  HttpApiEndpoint.get('listAllPosts', '/v1/blog/posts/admin/all', { success: PostListDto }),
+  HttpApiEndpoint.post('createPost', '/v1/blog/posts', { success: PostDto }),
+  HttpApiEndpoint.patch('updatePost', '/v1/blog/posts/:id', { success: PostDto, params: IdParams }),
+  HttpApiEndpoint.delete('deletePost', '/v1/blog/posts/:id', {
+    success: SuccessDto,
+    params: IdParams,
+  }),
+  HttpApiEndpoint.get('getPost', '/v1/blog/posts/:slug', { success: PostDto, params: SlugParams }),
+);
+
+export const blogLocal = HttpApi.make('api-effect').add(blogGroup);
+
+export const blogHandlers = HttpApiBuilder.group(blogLocal, 'blog', (h) =>
   h
     .handle(
       'listPosts',
@@ -124,16 +169,7 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
       'createPost',
       wrap(true, async (ctx) => {
         const auth = await requireAdmin(ctx);
-        const in1 = bindBody<{
-          slug?: string;
-          title?: string;
-          content?: string;
-          excerpt?: string | null;
-          coverImage?: string | null;
-          isPublished?: boolean | null;
-          metaTitle?: string | null;
-          metaDescription?: string | null;
-        }>(await bodyOf(ctx), {
+        const in1 = bindBody(await bodyOf(ctx), {
           Slug: { type: 'string', required: true },
           Title: { type: 'string', required: true, maxLen: 255 },
           Content: { type: 'string', required: true },
@@ -143,12 +179,12 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
           MetaTitle: { type: 'string' },
           MetaDescription: { type: 'string' },
         });
-        const slug = in1.slug!;
+        const slug = in1.slug;
         const dup = await ctx.db.blogPost.count({ where: { slug } });
         if (dup > 0) {
           throw new ApiError(409, `Blog post with slug "${slug}" already exists`);
         }
-        let excerpt = autoExcerpt(in1.content!);
+        let excerpt = autoExcerpt(in1.content);
         if (typeof in1.excerpt === 'string') excerpt = in1.excerpt;
         const published = in1.isPublished === true;
         const id = newId();
@@ -156,9 +192,9 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
           data: {
             id,
             slug,
-            title: in1.title!,
+            title: in1.title,
             contentKey: '',
-            contentSize: in1.content!.length,
+            contentSize: in1.content.length,
             excerpt,
             coverImage: in1.coverImage ?? null,
             authorId: auth.user.id,
@@ -171,7 +207,7 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
         });
         const key = `blog/posts/${id}/content.md`;
         try {
-          await putObject(key, new TextEncoder().encode(in1.content!), 'text/markdown');
+          await putObject(key, new TextEncoder().encode(in1.content), 'text/markdown');
         } catch (e) {
           await ctx.db.blogPost.delete({ where: { id } }).catch(() => {});
           throw e instanceof StorageUnavailableError
@@ -179,7 +215,7 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
             : new ApiError(500, e instanceof Error ? e.message : String(e));
         }
         await ctx.db.blogPost.update({ where: { id }, data: { contentKey: key } });
-        ctx.status = 201;
+        ctx.setStatus(201);
         return toDTO({ ...created, contentKey: key });
       }),
     )
@@ -187,16 +223,8 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
       'updatePost',
       wrap(true, async (ctx) => {
         await requireAdmin(ctx);
-        const p = await fetchPost(ctx.db, 'id', ctx.params.id!);
-        const in1 = bindBody<{
-          title?: string | null;
-          content?: string | null;
-          excerpt?: string | null;
-          coverImage?: string | null;
-          isPublished?: boolean | null;
-          metaTitle?: string | null;
-          metaDescription?: string | null;
-        }>(await bodyOf(ctx), {
+        const p = await fetchPost(ctx.db, 'id', ctx.param('id'));
+        const in1 = bindBody(await bodyOf(ctx), {
           Title: { type: 'string' },
           Content: { type: 'string' },
           Excerpt: { type: 'string' },
@@ -238,7 +266,7 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
       'deletePost',
       wrap(true, async (ctx) => {
         await requireAdmin(ctx);
-        const p = await fetchPost(ctx.db, 'id', ctx.params.id!);
+        const p = await fetchPost(ctx.db, 'id', ctx.param('id'));
         await ctx.db.blogPost.delete({ where: { id: p.id } });
         void deleteObject(p.contentKey).catch(() => {});
         return { success: true };
@@ -247,7 +275,7 @@ export const blogHandlers = HttpApiBuilder.group(api, 'blog', (h) =>
     .handle(
       'getPost',
       wrap(true, async (ctx) => {
-        const p = await fetchPost(ctx.db, 'slug', ctx.params.slug!);
+        const p = await fetchPost(ctx.db, 'slug', ctx.param('slug'));
         if (ctx.query.includeContent === 'true') {
           let content: string;
           try {

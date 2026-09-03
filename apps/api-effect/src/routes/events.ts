@@ -1,8 +1,8 @@
-import { HttpApiBuilder } from 'effect/unstable/httpapi';
+import { Schema } from 'effect';
+import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi';
 
-import { api } from '../api';
 import { wrap, bodyOf } from '../lib/http';
-import type { Event, EventType } from '../generated/prisma/client';
+import { EventType, type Event } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
 import { bindBody, readJsonObject } from '../lib/validate';
 import { requireAdmin } from '../lib/auth';
@@ -10,6 +10,8 @@ import { goTime, newId } from '../lib/util';
 
 // Mirrors events.validTypes
 const VALID_TYPES = ['MEETING', 'WORKSHOP', 'SOCIAL', 'COMPETITION', 'SURVEY', 'OTHER'];
+
+const isEventType = (s: string): s is EventType => VALID_TYPES.includes(s);
 
 const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/;
 
@@ -21,7 +23,7 @@ function parseIso(v: unknown): Date | null {
 }
 
 function toDTO(e: Event) {
-  const out: Record<string, unknown> = {
+  return {
     id: e.id,
     title: e.title,
     description: e.description,
@@ -34,12 +36,51 @@ function toDTO(e: Event) {
     surveyLink: e.surveyLink,
     createdAt: goTime(e.createdAt),
     updatedAt: goTime(e.updatedAt),
+    // ponytail: key stays absent when null, same as the old conditional assignment.
+    ...(e.createdBy !== null ? { createdBy: e.createdBy } : {}),
   };
-  if (e.createdBy !== null) out.createdBy = e.createdBy;
-  return out;
 }
 
-export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
+const EventDto = Schema.Struct({
+  id: Schema.String,
+  title: Schema.String,
+  description: Schema.NullOr(Schema.String),
+  startDate: Schema.NullOr(Schema.String),
+  endDate: Schema.NullOr(Schema.String),
+  location: Schema.NullOr(Schema.String),
+  type: Schema.Enum(EventType),
+  organizer: Schema.NullOr(Schema.String),
+  attendees: Schema.NullOr(Schema.Number),
+  surveyLink: Schema.NullOr(Schema.String),
+  createdAt: Schema.NullOr(Schema.String),
+  updatedAt: Schema.NullOr(Schema.String),
+  createdBy: Schema.optional(Schema.String),
+});
+
+const DeleteResult = Schema.Struct({ success: Schema.Boolean });
+
+const Id = { id: Schema.String };
+
+export const eventsGroup = HttpApiGroup.make('events').add(
+  HttpApiEndpoint.get('listEvents', '/v1/events', { success: Schema.Array(EventDto) }),
+  HttpApiEndpoint.get('getEvent', '/v1/events/:id', {
+    success: EventDto,
+    params: Schema.Struct(Id),
+  }),
+  HttpApiEndpoint.post('createEvent', '/v1/events', { success: EventDto }),
+  HttpApiEndpoint.patch('updateEvent', '/v1/events/:id', {
+    success: EventDto,
+    params: Schema.Struct(Id),
+  }),
+  HttpApiEndpoint.delete('deleteEvent', '/v1/events/:id', {
+    success: DeleteResult,
+    params: Schema.Struct(Id),
+  }),
+);
+
+export const eventsLocal = HttpApi.make('api-effect').add(eventsGroup);
+
+export const eventsHandlers = HttpApiBuilder.group(eventsLocal, 'events', (h) =>
   h
     .handle(
       'listEvents',
@@ -62,8 +103,8 @@ export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
     .handle(
       'getEvent',
       wrap(true, async (ctx) => {
-        const e = await ctx.db.event.findUnique({ where: { id: ctx.params.id! } });
-        if (e === null) throw new ApiError(404, `Event with ID ${ctx.params.id} not found`);
+        const e = await ctx.db.event.findUnique({ where: { id: ctx.param('id') } });
+        if (e === null) throw new ApiError(404, `Event with ID ${ctx.param('id')} not found`);
         return toDTO(e);
       }),
     )
@@ -71,17 +112,7 @@ export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
       'createEvent',
       wrap(true, async (ctx) => {
         await requireAdmin(ctx);
-        const in1 = bindBody<{
-          title?: string;
-          description?: string | null;
-          startDate?: string;
-          endDate?: string;
-          location?: string | null;
-          type?: string;
-          organizer?: string | null;
-          attendees?: number | null;
-          surveyLink?: string | null;
-        }>(await bodyOf(ctx), {
+        const in1 = bindBody(await bodyOf(ctx), {
           Title: { type: 'string', required: true, maxLen: 255 },
           StartDate: { type: 'string', required: true },
           EndDate: { type: 'string', required: true },
@@ -92,7 +123,7 @@ export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
           Attendees: { type: 'number', integer: true },
           SurveyLink: { type: 'string' },
         });
-        if (!VALID_TYPES.includes(in1.type ?? '')) {
+        if (!isEventType(in1.type)) {
           throw new ApiError(
             400,
             'type must be one of MEETING, WORKSHOP, SOCIAL, COMPETITION, SURVEY, OTHER',
@@ -106,18 +137,18 @@ export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
         const e = await ctx.db.event.create({
           data: {
             id: newId(),
-            title: in1.title!,
+            title: in1.title,
             description: in1.description ?? null,
             startDate: sd,
             endDate: ed,
             location: in1.location ?? null,
-            type: in1.type! as EventType,
+            type: in1.type,
             organizer: in1.organizer ?? null,
             attendees: in1.attendees ?? null,
             surveyLink: in1.surveyLink ?? null,
           },
         });
-        ctx.status = 201;
+        ctx.setStatus(201);
         return toDTO(e);
       }),
     )
@@ -126,8 +157,8 @@ export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
       wrap(true, async (ctx) => {
         await requireAdmin(ctx);
         const in1 = await readJsonObject(ctx.http);
-        const e = await ctx.db.event.findUnique({ where: { id: ctx.params.id! } });
-        if (e === null) throw new ApiError(404, `Event with ID ${ctx.params.id} not found`);
+        const e = await ctx.db.event.findUnique({ where: { id: ctx.param('id') } });
+        if (e === null) throw new ApiError(404, `Event with ID ${ctx.param('id')} not found`);
         const updates: Record<string, unknown> = {};
         for (const k of ['title', 'description', 'location', 'organizer', 'surveyLink']) {
           const v = in1[k];
@@ -162,8 +193,8 @@ export const eventsHandlers = HttpApiBuilder.group(api, 'events', (h) =>
       'deleteEvent',
       wrap(true, async (ctx) => {
         await requireAdmin(ctx);
-        const res = await ctx.db.event.deleteMany({ where: { id: ctx.params.id! } });
-        if (res.count === 0) throw new ApiError(404, `Event with ID ${ctx.params.id} not found`);
+        const res = await ctx.db.event.deleteMany({ where: { id: ctx.param('id') } });
+        if (res.count === 0) throw new ApiError(404, `Event with ID ${ctx.param('id')} not found`);
         return { success: true };
       }),
     ),

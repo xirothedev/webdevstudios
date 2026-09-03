@@ -27,11 +27,13 @@ export type Ctx = {
   request: HttpServerRequest.HttpServerRequest;
   // Endpoint path as declared in the HttpApi (e.g. /v1/blog/posts/:slug).
   path: string;
-  params: Record<string, string | undefined>;
   query: Record<string, string | undefined>;
   cookies: Record<string, string>;
   db: DatabaseClient;
-  status: number;
+  // Checked path-param access; the router guarantees presence (checked, not asserted).
+  param(name: string): string;
+  // Response status for 201 endpoints (default 200).
+  setStatus(code: number): void;
   setCookie(name: string, value: string, options?: CookieOptions): void;
 };
 
@@ -84,10 +86,11 @@ type HandlerCtx = {
 // ApiError becomes a Nest-shaped response; anything else dies and is logged +
 // 500'd by errorBody. Guards run on the declared endpoint path (same key
 // Elysia used: route pattern, not concrete path).
-export function wrap(
+// A is checked against the endpoint's declared success schema at .handle time.
+export function wrap<A>(
   guarded: boolean,
-  fn: (ctx: Ctx) => Promise<unknown>,
-): (ctx: HandlerCtx) => Effect.Effect<HttpServerResponse.HttpServerResponse, never, Db> {
+  fn: (ctx: Ctx) => Promise<A>,
+): (ctx: HandlerCtx) => Effect.Effect<A | HttpServerResponse.HttpServerResponse, never, Db> {
   return (handlerCtx) =>
     Effect.gen(function* () {
       const request = handlerCtx.request;
@@ -95,16 +98,30 @@ export function wrap(
       const db = (yield* Db).client;
       const pattern = handlerCtx.endpoint.path;
       const url = new URL(request.url, 'http://localhost');
+      const rawParams: Record<string, string | undefined> = Object.fromEntries(
+        Object.entries(handlerCtx.params ?? {}).flatMap(([k, v]) =>
+          typeof v === 'string' ? [[k, v]] : [],
+        ),
+      );
       const setCookies: { name: string; value: string; options?: CookieOptions }[] = [];
+      let status = 200;
       const ctx: Ctx = {
         http: web,
         request,
         path: pattern,
-        params: (handlerCtx.params ?? {}) as Record<string, string | undefined>,
         query: Object.fromEntries(url.searchParams),
         cookies: request.cookies,
         db,
-        status: 200,
+        param: (name) => {
+          const value = rawParams[name];
+          if (value === undefined) {
+            throw new ApiError(500, `missing path param ${name}`);
+          }
+          return value;
+        },
+        setStatus: (code) => {
+          status = code;
+        },
         setCookie: (name, value, options) => {
           setCookies.push({ name, value, options });
         },
@@ -130,11 +147,12 @@ export function wrap(
             }
 
             const result = await fn(ctx);
-            const res =
-              ctx.status === 204
-                ? HttpServerResponse.empty({ status: 204 })
-                : HttpServerResponse.jsonUnsafe(result, { status: ctx.status });
-            return renderCookies(res, setCookies);
+            // Custom status or cookies: render raw (A is still type-checked against
+            // the success schema; the codec only runs on plain 200 value returns).
+            if (status !== 200 || setCookies.length > 0) {
+              return renderCookies(HttpServerResponse.jsonUnsafe(result, { status }), setCookies);
+            }
+            return result;
           } catch (e) {
             if (e instanceof ApiError) return apiErrorBody(e);
             throw e;

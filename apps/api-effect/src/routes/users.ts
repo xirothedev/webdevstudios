@@ -1,6 +1,6 @@
-import { HttpApiBuilder } from 'effect/unstable/httpapi';
+import { Schema } from 'effect';
+import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi';
 
-import { api } from '../api';
 import { wrap, bodyOf } from '../lib/http';
 import type { User } from '../generated/prisma/client';
 import type { DatabaseClient } from '../lib/prisma';
@@ -11,6 +11,65 @@ import { goTime, paging } from '../lib/util';
 import { putObject, resolveMediaUrl, storageEnabled } from '../lib/storage';
 
 const VALID_ROLES = ['ADMIN', 'CUSTOMER'] as const;
+
+// Success schemas mirror the handler returns key-for-key (codec identity).
+const PrivateUser = Schema.Struct({
+  id: Schema.String,
+  email: Schema.String,
+  fullName: Schema.NullOr(Schema.String),
+  phone: Schema.NullOr(Schema.String),
+  avatar: Schema.NullOr(Schema.String),
+  role: Schema.String,
+  emailVerified: Schema.Boolean,
+  phoneVerified: Schema.Boolean,
+  mfaEnabled: Schema.Boolean,
+  createdAt: Schema.NullOr(Schema.String),
+  updatedAt: Schema.NullOr(Schema.String),
+});
+
+const AvatarUser = Schema.Struct({
+  id: Schema.String,
+  email: Schema.String,
+  fullName: Schema.NullOr(Schema.String),
+  phone: Schema.NullOr(Schema.String),
+  avatar: Schema.String,
+  role: Schema.String,
+  emailVerified: Schema.Boolean,
+  phoneVerified: Schema.Boolean,
+  mfaEnabled: Schema.Boolean,
+  createdAt: Schema.NullOr(Schema.String),
+  updatedAt: Schema.NullOr(Schema.String),
+});
+
+const PublicUser = Schema.Struct({
+  id: Schema.String,
+  fullName: Schema.NullOr(Schema.String),
+  avatar: Schema.NullOr(Schema.String),
+});
+
+const UserList = Schema.Struct({
+  users: Schema.Array(PrivateUser),
+  pagination: Schema.Struct({
+    page: Schema.Number,
+    limit: Schema.Number,
+    total: Schema.Number,
+    totalPages: Schema.Number,
+  }),
+});
+
+export const usersGroup = HttpApiGroup.make('users').add(
+  HttpApiEndpoint.get('me', '/v1/users/me', { success: PrivateUser }),
+  HttpApiEndpoint.patch('updateProfile', '/v1/users/profile', { success: PrivateUser }),
+  HttpApiEndpoint.patch('updateAvatar', '/v1/users/avatar', { success: AvatarUser }),
+  HttpApiEndpoint.get('listUsers', '/v1/users', { success: UserList }),
+  HttpApiEndpoint.get('getUser', '/v1/users/:id', {
+    // privateDTO branch first: the union encoder picks the widest match.
+    success: Schema.Union([PrivateUser, PublicUser]),
+    params: Schema.Struct({ id: Schema.String }),
+  }),
+);
+
+export const usersLocal = HttpApi.make('api-effect').add(usersGroup);
 
 function privateDTO(u: User) {
   return {
@@ -35,7 +94,7 @@ async function byID(db: DatabaseClient, id: string): Promise<User> {
   return u;
 }
 
-export const usersHandlers = HttpApiBuilder.group(api, 'users', (h) =>
+export const usersHandlers = HttpApiBuilder.group(usersLocal, 'users', (h) =>
   h
     .handle(
       'me',
@@ -48,7 +107,7 @@ export const usersHandlers = HttpApiBuilder.group(api, 'users', (h) =>
       'updateProfile',
       wrap(true, async (ctx) => {
         const auth = await requireAuth(ctx);
-        const in1 = bindBody<{ fullName?: string; phone?: string }>(await bodyOf(ctx), {
+        const in1 = bindBody(await bodyOf(ctx), {
           FullName: { type: 'string', omitempty: true, minLen: 1, maxLen: 100 },
           Phone: { type: 'string', omitempty: true, maxLen: 15 },
         });
@@ -129,10 +188,11 @@ export const usersHandlers = HttpApiBuilder.group(api, 'users', (h) =>
     .handle(
       'getUser',
       wrap(true, async (ctx) => {
+        const id = ctx.param('id');
         const viewer = await optionalAuth(ctx);
-        const u = await ctx.db.user.findUnique({ where: { id: ctx.params.id! } });
+        const u = await ctx.db.user.findUnique({ where: { id } });
         if (u === null) {
-          throw new ApiError(404, `User with id ${ctx.params.id} not found`);
+          throw new ApiError(404, `User with id ${id} not found`);
         }
         if (viewer !== null && (viewer.user.id === u.id || viewer.user.role === 'ADMIN')) {
           return privateDTO(u);

@@ -1,6 +1,5 @@
-import { HttpApiBuilder } from 'effect/unstable/httpapi';
-
-import { api } from '../api';
+import { Schema } from 'effect';
+import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi';
 import { wrap } from '../lib/http';
 import type { Product, ProductSizeStock, ProductSlug } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
@@ -16,6 +15,60 @@ function statusOf(stock: number): string {
 }
 
 type ProductRow = Product & { sizeStocks: ProductSizeStock[] };
+
+const Str = Schema.String;
+const Opt = Schema.NullOr;
+
+// Checked conversion of the validated slug against the Prisma enum.
+const isProductSlug = (s: string): s is ProductSlug =>
+  (VALID_SLUGS as readonly string[]).includes(s);
+
+const SizeStock = Schema.Struct({ size: Str, stock: Schema.Number });
+
+const ProductDto = Schema.Struct({
+  id: Str,
+  slug: Str,
+  name: Str,
+  description: Opt(Str),
+  priceCurrent: Schema.Number,
+  priceOriginal: Opt(Schema.Number),
+  priceDiscount: Opt(Schema.Number),
+  stock: Schema.Number,
+  hasSizes: Schema.Boolean,
+  badge: Opt(Str),
+  ratingValue: Schema.Number,
+  ratingCount: Schema.Number,
+  sizeStocks: Schema.Array(SizeStock),
+  stockStatus: Str,
+  isPublished: Schema.Boolean,
+  createdAt: Opt(Str),
+  updatedAt: Opt(Str),
+});
+
+const ProductList = Schema.Struct({
+  products: Schema.Array(ProductDto),
+  total: Schema.Number,
+});
+
+const StockDto = Schema.Struct({
+  stock: Schema.Number,
+  stockStatus: Str,
+  sizeStocks: Opt(Schema.Array(SizeStock)),
+});
+
+export const productsGroup = HttpApiGroup.make('products').add(
+  HttpApiEndpoint.get('listProducts', '/v1/products', { success: ProductList }),
+  HttpApiEndpoint.get('getProduct', '/v1/products/:slug', {
+    params: Schema.Struct({ slug: Str }),
+    success: ProductDto,
+  }),
+  HttpApiEndpoint.get('getProductStock', '/v1/products/:slug/stock', {
+    params: Schema.Struct({ slug: Str }),
+    success: StockDto,
+  }),
+);
+
+export const productsLocal = HttpApi.make('api-effect').add(productsGroup);
 
 function toDTO(p: ProductRow) {
   let stock = p.stock;
@@ -44,18 +97,18 @@ function toDTO(p: ProductRow) {
 }
 
 async function productBySlug(db: DatabaseClient, slug: string): Promise<ProductRow> {
-  if (!(VALID_SLUGS as readonly string[]).includes(slug)) {
+  if (!isProductSlug(slug)) {
     throw new ApiError(404, `Product with slug ${slug} not found`);
   }
   const p = await db.product.findFirst({
-    where: { slug: slug as ProductSlug },
+    where: { slug },
     include: { sizeStocks: true },
   });
   if (p === null) throw new ApiError(404, `Product with slug ${slug} not found`);
   return p;
 }
 
-export const productsHandlers = HttpApiBuilder.group(api, 'products', (h) =>
+export const productsHandlers = HttpApiBuilder.group(productsLocal, 'products', (h) =>
   h
     .handle(
       'listProducts',
@@ -69,12 +122,12 @@ export const productsHandlers = HttpApiBuilder.group(api, 'products', (h) =>
     )
     .handle(
       'getProduct',
-      wrap(true, async (ctx) => toDTO(await productBySlug(ctx.db, ctx.params.slug!))),
+      wrap(true, async (ctx) => toDTO(await productBySlug(ctx.db, ctx.param('slug')))),
     )
     .handle(
       'getProductStock',
       wrap(true, async (ctx) => {
-        const slug = ctx.params.slug!;
+        const slug = ctx.param('slug');
         const p = await productBySlug(ctx.db, slug);
         const size = ctx.query.size ?? '';
         if (!p.hasSizes) {
