@@ -1,7 +1,6 @@
 import type { User } from '../generated/prisma/client';
 import { ApiError } from './errors';
 import { verifyToken } from './jwt';
-import { db } from './prisma';
 import type { Ctx } from './http';
 
 export interface AuthResult {
@@ -26,7 +25,7 @@ async function authenticate(ctx: Ctx): Promise<AuthResult> {
   if (token === null) throw new ApiError(401, 'Unauthorized');
   const claims = await verifyToken(process.env.JWT_SECRET_KEY ?? '', token);
   if (claims === null) throw new ApiError(401, 'Unauthorized');
-  const user = await db().user.findUnique({ where: { id: claims.sub } });
+  const user = await ctx.db.user.findUnique({ where: { id: claims.sub } });
   if (user === null) throw new ApiError(401, 'User not found');
   return { user, sessionId: claims.jti ?? null };
 }

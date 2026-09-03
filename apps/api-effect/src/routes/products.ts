@@ -1,8 +1,11 @@
+import { HttpApiBuilder } from 'effect/unstable/httpapi';
+
+import { api } from '../api';
+import { wrap } from '../lib/http';
 import type { Product, ProductSizeStock, ProductSlug } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
-import { db } from '../lib/prisma';
+import type { DatabaseClient } from '../lib/prisma';
 import { goTime } from '../lib/util';
-import { route } from '../lib/http';
 
 export const VALID_SLUGS = ['AO_THUN', 'PAD_CHUOT', 'DAY_DEO', 'MOC_KHOA'] as const;
 
@@ -40,11 +43,11 @@ function toDTO(p: ProductRow) {
   };
 }
 
-async function productBySlug(slug: string): Promise<ProductRow> {
+async function productBySlug(db: DatabaseClient, slug: string): Promise<ProductRow> {
   if (!(VALID_SLUGS as readonly string[]).includes(slug)) {
     throw new ApiError(404, `Product with slug ${slug} not found`);
   }
-  const p = await db().product.findFirst({
+  const p = await db.product.findFirst({
     where: { slug: slug as ProductSlug },
     include: { sizeStocks: true },
   });
@@ -52,29 +55,40 @@ async function productBySlug(slug: string): Promise<ProductRow> {
   return p;
 }
 
-export const productsRoutes = [
-  route('GET', '/products', async () => {
-    const rows = await db().product.findMany({
-      where: { isPublished: true },
-      include: { sizeStocks: true },
-    });
-    return { products: rows.map(toDTO), total: rows.length };
-  }),
-  route('GET', '/products/:slug', async (ctx) => toDTO(await productBySlug(ctx.params.slug!))),
-  route('GET', '/products/:slug/stock', async (ctx) => {
-    const slug = ctx.params.slug!;
-    const p = await productBySlug(slug);
-    const size = ctx.query.size ?? '';
-    if (!p.hasSizes) {
-      return { stock: p.stock, stockStatus: statusOf(p.stock), sizeStocks: null };
-    }
-    const sizes = p.sizeStocks.map((s) => ({ size: s.size, stock: s.stock }));
-    if (size !== '') {
-      const hit = p.sizeStocks.find((s) => s.size === size);
-      if (hit === undefined) throw new ApiError(404, `Size ${size} not found for product ${slug}`);
-      return { stock: hit.stock, stockStatus: statusOf(hit.stock), sizeStocks: sizes };
-    }
-    const total = p.sizeStocks.reduce((sum, s) => sum + s.stock, 0);
-    return { stock: total, stockStatus: statusOf(total), sizeStocks: sizes };
-  }),
-];
+export const productsHandlers = HttpApiBuilder.group(api, 'products', (h) =>
+  h
+    .handle(
+      'listProducts',
+      wrap(true, async (ctx) => {
+        const rows = await ctx.db.product.findMany({
+          where: { isPublished: true },
+          include: { sizeStocks: true },
+        });
+        return { products: rows.map(toDTO), total: rows.length };
+      }),
+    )
+    .handle(
+      'getProduct',
+      wrap(true, async (ctx) => toDTO(await productBySlug(ctx.db, ctx.params.slug!))),
+    )
+    .handle(
+      'getProductStock',
+      wrap(true, async (ctx) => {
+        const slug = ctx.params.slug!;
+        const p = await productBySlug(ctx.db, slug);
+        const size = ctx.query.size ?? '';
+        if (!p.hasSizes) {
+          return { stock: p.stock, stockStatus: statusOf(p.stock), sizeStocks: null };
+        }
+        const sizes = p.sizeStocks.map((s) => ({ size: s.size, stock: s.stock }));
+        if (size !== '') {
+          const hit = p.sizeStocks.find((s) => s.size === size);
+          if (hit === undefined)
+            throw new ApiError(404, `Size ${size} not found for product ${slug}`);
+          return { stock: hit.stock, stockStatus: statusOf(hit.stock), sizeStocks: sizes };
+        }
+        const total = p.sizeStocks.reduce((sum, s) => sum + s.stock, 0);
+        return { stock: total, stockStatus: statusOf(total), sizeStocks: sizes };
+      }),
+    ),
+);

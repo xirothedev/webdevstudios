@@ -1,4 +1,7 @@
-import { db } from '../lib/prisma';
+import { HttpApiBuilder } from 'effect/unstable/httpapi';
+
+import { api } from '../api';
+import { wrap, bodyOf } from '../lib/http';
 import {
   addToCart,
   clearCart,
@@ -9,48 +12,63 @@ import {
 } from '../lib/cart';
 import { bindBody } from '../lib/validate';
 import { requireAuth } from '../lib/auth';
-import { route, bodyOf } from '../lib/http';
 
-export const cartRoutes = [
-  route('GET', '/cart', async (ctx) => {
-    const auth = await requireAuth(ctx);
-    const c = await getOrCreateCart(db(), auth.user.id);
-    return mapToCartDTO(db(), c.id);
-  }),
-  route('POST', '/cart/items', async (ctx) => {
-    const auth = await requireAuth(ctx);
-    const in1 = bindBody<{ productId: string; size?: string; quantity?: number }>(
-      await bodyOf(ctx),
-      {
-        productId: { type: 'string', required: true },
-        size: { type: 'string' },
-        quantity: { type: 'number', integer: true },
-      },
-    );
-    const dto = await addToCart(
-      db(),
-      auth.user.id,
-      in1.productId,
-      in1.size ?? null,
-      in1.quantity ?? 0,
-    );
-    ctx.status = 201;
-    return dto;
-  }),
-  route('PATCH', '/cart/items/:id', async (ctx) => {
-    const auth = await requireAuth(ctx);
-    const in1 = bindBody<{ quantity?: number }>(await bodyOf(ctx), {
-      quantity: { type: 'number', integer: true },
-    });
-    return updateCartItem(db(), auth.user.id, ctx.params.id!, in1.quantity ?? 0);
-  }),
-  route('DELETE', '/cart/items/:id', async (ctx) => {
-    const auth = await requireAuth(ctx);
-    return removeFromCart(db(), auth.user.id, ctx.params.id!);
-  }),
-  route('DELETE', '/cart', async (ctx) => {
-    const auth = await requireAuth(ctx);
-    const c = await clearCart(db(), auth.user.id);
-    return mapToCartDTO(db(), c.id);
-  }),
-];
+export const cartHandlers = HttpApiBuilder.group(api, 'cart', (h) =>
+  h
+    .handle(
+      'getCart',
+      wrap(true, async (ctx) => {
+        const auth = await requireAuth(ctx);
+        const c = await getOrCreateCart(ctx.db, auth.user.id);
+        return mapToCartDTO(ctx.db, c.id);
+      }),
+    )
+    .handle(
+      'addItem',
+      wrap(true, async (ctx) => {
+        const auth = await requireAuth(ctx);
+        const in1 = bindBody<{ productId: string; size?: string; quantity?: number }>(
+          await bodyOf(ctx),
+          {
+            productId: { type: 'string', required: true },
+            size: { type: 'string' },
+            quantity: { type: 'number', integer: true },
+          },
+        );
+        const dto = await addToCart(
+          ctx.db,
+          auth.user.id,
+          in1.productId,
+          in1.size ?? null,
+          in1.quantity ?? 0,
+        );
+        ctx.status = 201;
+        return dto;
+      }),
+    )
+    .handle(
+      'updateItem',
+      wrap(true, async (ctx) => {
+        const auth = await requireAuth(ctx);
+        const in1 = bindBody<{ quantity?: number }>(await bodyOf(ctx), {
+          quantity: { type: 'number', integer: true },
+        });
+        return updateCartItem(ctx.db, auth.user.id, ctx.params.id!, in1.quantity ?? 0);
+      }),
+    )
+    .handle(
+      'removeItem',
+      wrap(true, async (ctx) => {
+        const auth = await requireAuth(ctx);
+        return removeFromCart(ctx.db, auth.user.id, ctx.params.id!);
+      }),
+    )
+    .handle(
+      'clearCart',
+      wrap(true, async (ctx) => {
+        const auth = await requireAuth(ctx);
+        const c = await clearCart(ctx.db, auth.user.id);
+        return mapToCartDTO(ctx.db, c.id);
+      }),
+    ),
+);

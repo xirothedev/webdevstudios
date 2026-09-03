@@ -1,12 +1,17 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import speakeasy from 'speakeasy';
+import { Layer } from 'effect';
 import { HttpRouter } from 'effect/unstable/http';
+import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 
 // Fail fast on the closed port so getRedis() resolves null instead of hanging.
 process.env.REDIS_PORT = '6399';
+// DbLive builds at layer-build time; the pool never connects unless a query runs,
+// and these smoke tests never query.
+process.env.DATABASE_URL ??= 'postgresql://postgres:postgres@localhost:5439/webdevstudios';
 process.env.PAYOS_CHECKSUM_KEY = 'testsecret';
 
-import { appLayer } from './index';
+import { appLayer, corsMiddleware } from './index';
 import { generateCsrfToken, validCsrfToken } from './lib/csrf';
 import { signAccess, verifyToken } from './lib/jwt';
 import { hashPassword, verifyPassword } from './lib/password';
@@ -15,10 +20,19 @@ import { buildCanonicalString, verifyWebhookSignature } from './lib/payos';
 import { bindBody } from './lib/validate';
 import { goTime } from './lib/util';
 
-let server: { handler: (request: Request) => Promise<Response>; dispose: () => Promise<void> };
+let server: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-explicit-any
+  handler: (request: Request, context?: any) => Promise<Response>;
+  dispose: () => Promise<void>;
+};
 
 beforeAll(() => {
-  server = HttpRouter.toWebHandler(appLayer('http://localhost:3000'));
+  // ponytail: rc-HttpApi's Request-marker requirements leak past toWebHandler's
+  // R constraint; the runtime resolves them from the router context (see index.ts).
+  server = HttpRouter.toWebHandler(
+    Layer.mergeAll(appLayer(), BunHttpServer.layerHttpServices) as never,
+    { middleware: corsMiddleware('http://localhost:3000') },
+  );
 });
 
 afterAll(() => server.dispose());
