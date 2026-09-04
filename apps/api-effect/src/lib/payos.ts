@@ -3,6 +3,7 @@ import { Effect } from 'effect';
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/unstable/http';
 
 import { safeEqual } from './util';
+import { isRecord } from './validate';
 
 // PayOS REST client, mirrors api-go payments/payos.go.
 // Ponytail: no official PayOS SDK, so call api-merchant.payos.vn directly.
@@ -62,7 +63,7 @@ export async function createPaymentLink(
     items,
   };
   // Platform HttpClient instead of raw fetch; FetchHttpClient.layer is scoped.
-  const out = (await Effect.runPromise(
+  const json = await Effect.runPromise(
     Effect.gen(function* () {
       const http = yield* HttpClient.HttpClient;
       const request = yield* HttpClientRequest.post('https://api-merchant.payos.vn/v2/payment-requests').pipe(
@@ -78,22 +79,20 @@ export async function createPaymentLink(
       Effect.provide(FetchHttpClient.layer),
       Effect.mapError((e) => new Error(`payos: ${String(e)}`)),
     ),
-  )) as { code?: string; desc?: string; data?: unknown };
-  if (out.code !== '00') {
-    throw new Error(`payos: ${out.code} ${out.desc ?? ''}`.trimEnd());
+  );
+  const out = isRecord(json) ? json : {};
+  if (out['code'] !== '00') {
+    throw new Error(`payos: ${String(out['code'])} ${out['desc'] ?? ''}`.trimEnd());
   }
 
-  const data = out.data as
-    | { checkoutUrl?: string; paymentLinkId?: string; orderCode?: number }
-    | undefined;
-  let code = data?.paymentLinkId ?? '';
-  if (code === '') {
-    code = String(data?.orderCode ?? '');
-  }
+  const data = isRecord(out['data']) ? out['data'] : {};
+  const linkId = typeof data['paymentLinkId'] === 'string' ? data['paymentLinkId'] : '';
+  const code =
+    linkId !== '' ? linkId : String(typeof data['orderCode'] === 'number' ? data['orderCode'] : '');
   return {
-    checkoutUrl: data?.checkoutUrl ?? '',
+    checkoutUrl: typeof data['checkoutUrl'] === 'string' ? data['checkoutUrl'] : '',
     paymentLinkId: code,
-    raw: (out.data as Record<string, unknown>) ?? {},
+    raw: data,
   };
 }
 
@@ -110,10 +109,10 @@ export function verifyWebhookSignature(envelope: Record<string, unknown>): boole
   if (c === null || c.checksumKey === '') return false;
   const sig = typeof envelope.signature === 'string' ? envelope.signature : '';
   const data = envelope.data;
-  if (sig === '' || typeof data !== 'object' || data === null || Array.isArray(data)) return false;
+  if (sig === '' || !isRecord(data)) return false;
 
   const expected = createHmac('sha256', c.checksumKey)
-    .update(buildCanonicalString(data as Record<string, unknown>))
+    .update(buildCanonicalString(data))
     .digest('hex');
   return safeEqual(expected, sig);
 }

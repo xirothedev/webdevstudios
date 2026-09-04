@@ -26,7 +26,9 @@ export const VALID_ORDER_STATUSES = [
   'RETURNED',
 ] as const;
 
-export function assertValidStatus(status: string | undefined): void {
+export function assertValidStatus(
+  status: string | undefined,
+): asserts status is (typeof VALID_ORDER_STATUSES)[number] | undefined {
   if (status && !(VALID_ORDER_STATUSES as readonly string[]).includes(status)) {
     throw new ApiError(
       400,
@@ -204,6 +206,9 @@ export async function createOrder(db: DatabaseClient, userId: string, in1: Creat
     orderItems.push({
       id: newId(),
       productId: in1.productId,
+      // ponytail: productSlug/size are unvalidated enum pass-throughs — the DB
+      // rejects invalid values with a 500, matching the Go mirror. Add explicit
+      // 400s only if a caller starts sending untrusted enums.
       productSlug: in1.productSlug as ProductSlug,
       productName: p.name,
       size: (in1.size ?? null) as ProductSize | null,
@@ -274,9 +279,10 @@ export async function listOrders(
   limit: number,
   status?: string,
 ) {
+  assertValidStatus(status);
   const where = {
     userId,
-    ...(status ? { status: status as Order['status'] } : {}),
+    ...(status ? { status } : {}),
   };
   const total = await db.order.count({ where });
   const rows = await db.order.findMany({
@@ -296,7 +302,7 @@ export async function listAllOrders(
   status?: string,
 ) {
   assertValidStatus(status);
-  const where = status ? { status: status as Order['status'] } : {};
+  const where = status ? { status } : {};
   const total = await db.order.count({ where });
   const rows = await db.order.findMany({
     where,
@@ -360,7 +366,8 @@ export async function cancelOrder(db: DatabaseClient, orderID: string, userId: s
 }
 
 export async function adminUpdateStatus(db: DatabaseClient, orderID: string, status: string) {
-  if (!(VALID_ORDER_STATUSES as readonly string[]).includes(status)) {
+  assertValidStatus(status);
+  if (status === undefined) {
     throw new ApiError(
       400,
       'status must be one of PENDING, CONFIRMED, PROCESSING, SHIPPING, DELIVERED, CANCELLED, RETURNED',
@@ -368,7 +375,7 @@ export async function adminUpdateStatus(db: DatabaseClient, orderID: string, sta
   }
   const res = await db.order.updateMany({
     where: { id: orderID },
-    data: { status: status as Order['status'], updatedAt: new Date() },
+    data: { status, updatedAt: new Date() },
   });
   if (res.count === 0) throw new ApiError(404, `Order with id ${orderID} not found`);
   const o = await orderById(db, orderID);

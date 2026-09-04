@@ -1,12 +1,14 @@
 import { Schema } from 'effect';
 import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi';
 import { wrap } from '../lib/http';
-import type { Product, ProductSizeStock, ProductSlug } from '../generated/prisma/client';
+import type { Product, ProductSizeStock } from '../generated/prisma/client';
 import { ApiError } from '../lib/errors';
 import type { DatabaseClient } from '../lib/prisma';
 import { goTime } from '../lib/util';
 
-export const VALID_SLUGS = ['AO_THUN', 'PAD_CHUOT', 'DAY_DEO', 'MOC_KHOA'] as const;
+import { VALID_SLUGS, isProductSlug } from '../lib/slugs';
+
+export { VALID_SLUGS };
 
 function statusOf(stock: number): string {
   if (stock === 0) return 'out_of_stock';
@@ -18,10 +20,6 @@ type ProductRow = Product & { sizeStocks: ProductSizeStock[] };
 
 const Str = Schema.String;
 const Opt = Schema.NullOr;
-
-// Checked conversion of the validated slug against the Prisma enum.
-const isProductSlug = (s: string): s is ProductSlug =>
-  (VALID_SLUGS as readonly string[]).includes(s);
 
 const SizeStock = Schema.Struct({ size: Str, stock: Schema.Number });
 

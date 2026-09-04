@@ -8,14 +8,10 @@ import type { DatabaseClient } from '../lib/prisma';
 import { bindBody } from '../lib/validate';
 import { requireAuth } from '../lib/auth';
 import { goTime, newId, paging } from '../lib/util';
-import { VALID_SLUGS } from './products';
+import { isProductSlug } from '../lib/slugs';
 
 type ReviewRow = Review & { user: User; product?: { slug: string } };
 
-// VALID_SLUGS and the generated ProductSlug union carry the same literals;
-// the guard retires the `as ProductSlug` casts at the Prisma calls.
-const isProductSlug = (s: string): s is ProductSlug =>
-  (VALID_SLUGS as readonly string[]).includes(s);
 
 // Success schemas mirror the handler returns key-for-key (codec identity).
 const ReviewDto = Schema.Struct({

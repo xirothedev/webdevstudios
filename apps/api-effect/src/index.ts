@@ -1,7 +1,7 @@
 import { Config, Effect, Layer, Schedule } from 'effect';
 import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 import { HttpMiddleware, HttpRouter } from 'effect/unstable/http';
-import { HttpApiBuilder } from 'effect/unstable/httpapi';
+import { HttpApiBuilder, HttpApiSwagger } from 'effect/unstable/httpapi';
 
 import { api } from './api';
 import { coreHandlers } from './routes/core';
@@ -44,7 +44,7 @@ export function appLayer() {
     ),
     DbLive,
   );
-  return HttpRouter.provideRequest(DbLive)(
+  const appWithDb = HttpRouter.provideRequest(DbLive)(
     Layer.mergeAll(
       Layer.provideMerge(HttpApiBuilder.layer(api), groups),
       wildcard404('GET'),
@@ -54,6 +54,8 @@ export function appLayer() {
       wildcard404('DELETE'),
     ),
   );
+  // Swagger outside the provideRequest wrapper: plain HttpRouter registration.
+  return Layer.mergeAll(appWithDb, HttpApiSwagger.layer(api, { path: '/docs' }));
 }
 
 // CORS as a chain middleware (answers preflights with 204 before routing).

@@ -37,12 +37,12 @@ export async function readJsonBody(request: Request): Promise<Record<string, unk
 
   if (parsed === null) return {};
 
-  if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+  if (!isRecord(parsed)) {
     // ponytail: Go's web.Bind panics here (empty field path) and gin recovery 500s; 400 is saner.
     throw new ApiError(400, [`property  must be a ${jsonKind(parsed)}`]);
   }
 
-  return parsed as Record<string, unknown>;
+  return parsed;
 }
 
 // ---- type-level bridge: the field table is the single source of truth ----
@@ -103,6 +103,11 @@ export async function bindJson<const F extends Record<string, FieldDef>>(
   return bindBody(raw, fields);
 }
 
+// The unknown->typed boundary predicate for JSON objects.
+export function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
 // Mirrors Go json.Decode with DisallowUnknownFields: the first decode error in
 // document order wins, unknown keys reported by raw JSON key.
 function checkDecode(object: Record<string, unknown>, fields: Record<string, FieldDef>): void {
@@ -114,13 +119,8 @@ function checkDecode(object: Record<string, unknown>, fields: Record<string, Fie
     if (value !== null && value !== undefined) {
       const mismatch = typeMismatchMessage(key, def, value);
       if (mismatch !== null) throw new ApiError(400, [mismatch]);
-      if (
-        def.type === 'object' &&
-        def.fields !== undefined &&
-        typeof value === 'object' &&
-        !Array.isArray(value)
-      ) {
-        checkDecode(value as Record<string, unknown>, def.fields);
+      if (def.type === 'object' && def.fields !== undefined && isRecord(value)) {
+        checkDecode(value, def.fields);
       }
     }
   }
@@ -149,13 +149,8 @@ function collect(name: string, def: FieldDef, value: unknown, out: string[]): vo
   }
   if (def.omitempty && (value === '' || value === 0 || value === false)) return;
 
-  if (
-    def.type === 'object' &&
-    def.fields !== undefined &&
-    typeof value === 'object' &&
-    !Array.isArray(value)
-  ) {
-    const obj = value as Record<string, unknown>;
+  if (def.type === 'object' && def.fields !== undefined && isRecord(value)) {
+    const obj = value;
     // Go WithRequiredStructEnabled: a `required` zero struct fails once with
     // "should not be empty" and its inner fields are skipped; a zero struct
     // without `required` still validates its inner fields.
@@ -252,12 +247,12 @@ export async function readJsonObject(request: Request): Promise<Record<string, u
   } catch {
     throw new ApiError(400, ['Malformed JSON body']);
   }
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+  if (!isRecord(parsed)) {
     throw new ApiError(400, [
       `json: cannot unmarshal ${Array.isArray(parsed) ? 'array' : typeof parsed} into Go value of type map[string]interface {}`,
     ]);
   }
-  return parsed as Record<string, unknown>;
+  return parsed;
 }
 
 export function jsonKey(goFieldName: string): string {
