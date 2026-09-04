@@ -26,7 +26,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Minus, Plus } from 'lucide-react';
 
 import { NumberTicker } from '@/components/ui/number-ticker';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 const quantitySelectorVariants = cva('flex items-center gap-2 rounded-lg border border-white/10', {
   variants: {

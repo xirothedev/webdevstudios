@@ -28,7 +28,7 @@ import { LogOut, Monitor, Smartphone, Tablet } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useRevokeSession, useSessions } from '@/lib/api/hooks/use-settings';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 import type { Session } from '@/types/auth.types';
 
 function getDeviceIcon(type: string | null) {

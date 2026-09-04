@@ -25,7 +25,7 @@
 import { Check } from 'lucide-react';
 
 import { ProductSize } from '@/lib/api/products';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 interface ProductSizeSelectorProps {
   sizes: ProductSize[];

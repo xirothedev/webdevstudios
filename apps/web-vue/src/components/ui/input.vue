@@ -1,7 +1,7 @@
 <script lang="ts">
 import { h, type VNode } from 'vue';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 export function Input(props: any, { attrs }: any): VNode {
   return h('input', {

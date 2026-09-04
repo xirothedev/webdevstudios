@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { EventType } from '@/lib/events/types';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 import { getEventTypeColor, getEventTypeLabel } from './event-helpers';
 

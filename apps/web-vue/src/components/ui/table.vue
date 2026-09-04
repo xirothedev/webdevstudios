@@ -1,7 +1,7 @@
 <script lang="ts">
 import { h, type VNode } from 'vue';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 function el(tag: any, base: string, slot: string) {
   return function (props: any, { attrs, slots }: any): VNode {

@@ -10,7 +10,7 @@ import {
 } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 import { useLogout } from '@/lib/api/hooks/use-auth';
 
 // mirrors apps/web AdminSidebar (BarChart3 → ChartColumn: lucide renamed the icon)

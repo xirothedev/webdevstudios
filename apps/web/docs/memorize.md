@@ -418,8 +418,7 @@ apps/web/
 - `lucide-react`: Icon library
 - `@radix-ui/react-navigation-menu`: Navigation menu primitives
 - `class-variance-authority`: For component variants
-- `clsx`: Class name utility
-- `tailwind-merge`: Tailwind class merging utility
+- `cn`: Class merging utility (shadcn-ui/cn)
 - `tw-animate-css`: Tailwind CSS v4 compatible animation utilities
 
 ### shadcn/ui Components

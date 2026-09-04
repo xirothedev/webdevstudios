@@ -1,0 +1,77 @@
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// PRODUCT MANAGEMENT (Simplified for 4 fixed products)
+// =========================================
+
+
+model Product {
+  id          String      @id @default(cuid())
+  slug        ProductSlug @unique // Enum ensures only 4 products
+  name        String      @db.VarChar(255)
+  description String      @db.Text
+
+  // Product pricing
+  priceCurrent  Decimal @db.Money // Current price
+  priceOriginal Decimal? @db.Money // Original price (if discounted)
+  priceDiscount Decimal? @db.Money // Discount amount
+
+  // Product information
+  stock       Int     @default(0) // Total stock quantity
+  hasSizes    Boolean @default(false) // Whether size selection is supported (only t-shirt)
+  badge       String? @db.VarChar(50) // Display badge (Limited Edition, Official Merch)
+
+  // Product ratings
+  ratingValue Decimal @default(0) @db.Decimal(3, 2) // Rating score (0-5)
+  ratingCount  Int     @default(0) // Number of ratings
+
+  // Metadata
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  sizeStocks ProductSizeStock[] // Manage stock by size (only t-shirt)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@index([slug])
+  @@map("products")
+}
+
+/**
+ * Manage stock by size (only for t-shirt)
+ * If product doesn't have sizes, stock is stored directly in Product.stock
+ */
+model ProductSizeStock {
+  id     String      @id @default(cuid())
+  size   ProductSize // S, M, L, XL
+  stock  Int         @default(0)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, size]) // Each size of a product has only 1 record
+  @@index([productId])
+  @@map("product_size_stocks")
+}
+

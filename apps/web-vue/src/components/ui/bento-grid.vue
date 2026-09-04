@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router';
 import { defineComponent, h, type VNode } from 'vue';
 
 import { Button } from '@/components/ui/button.vue';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 export const BentoGrid = function (props: any, { attrs, slots }: any): VNode {
   return h(

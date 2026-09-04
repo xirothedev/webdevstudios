@@ -1,0 +1,98 @@
+// Copyright (c) 2026 Xiro The Dev <lethanhtrung.trungle@gmail.com>
+//
+// Source Available License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to:
+// - View and study the Software for educational purposes
+// - Fork this repository on GitHub for personal reference
+// - Share links to this repository
+//
+// THE FOLLOWING ARE PROHIBITED:
+// - Using the Software in production or commercial applications
+// - Copying substantial portions of the Software into other projects
+// - Distributing modified versions of the Software
+// - Removing or altering copyright notices
+//
+// For commercial licensing or usage permissions, contact: lethanhtrung.trungle@gmail.com
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+//
+// =========================================
+// ENUMS (Define fixed value sets)
+// =========================================
+
+enum UserRole {
+  ADMIN // Shop owner
+  CUSTOMER // Customer
+}
+
+enum OrderStatus {
+  PENDING // Awaiting payment
+  CONFIRMED // Confirmed
+  PROCESSING // Packaging
+  SHIPPING // Shipping
+  DELIVERED // Delivered successfully
+  CANCELLED // Cancelled
+  RETURNED // Returned
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum DiscountType {
+  PERCENTAGE // Discount by percentage
+  FIXED_AMOUNT // Fixed amount discount
+}
+
+enum OAuthProvider {
+  GOOGLE
+  FACEBOOK
+  GITHUB
+  APPLE
+}
+
+enum MFAMethod {
+  TOTP // Time-based One-Time Password (Google Authenticator, Authy)
+  SMS // SMS OTP
+  EMAIL // Email OTP
+  BACKUP_CODE // Backup codes
+}
+
+enum DeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  UNKNOWN
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+// =========================================
+// PRODUCT ENUMS
+// =========================================
+
+enum ProductSlug {
+  AO_THUN    // T-shirt WebDev Studios
+  PAD_CHUOT  // Mouse pad WebDev Studios
+  DAY_DEO    // Lanyard WebDev Studios
+  MOC_KHOA   // Keychain WebDev Studios
+}
+
+/**
+ * Product size (only t-shirt has sizes)
+ */
+enum ProductSize {
+  S
+  M
+  L
+  XL
+}

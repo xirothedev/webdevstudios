@@ -2,7 +2,7 @@
 import { CountUp } from 'countup.js';
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 // ponytail: countup.js owns the in-view + easing + i18n grouping that the React
 // version hand-rolled with motion's useSpring/useInView. Upgrade path: motion-v if a

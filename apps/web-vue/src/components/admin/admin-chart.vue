@@ -32,7 +32,7 @@ import { Bar, Line } from 'vue-chartjs';
 import type { ChartOptions } from 'chart.js';
 
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart.vue';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 import { formatPrice } from '@/lib/utils';
 
 // mirrors apps/web AdminChart (recharts area/bar → chart.js line-with-fill / bar)

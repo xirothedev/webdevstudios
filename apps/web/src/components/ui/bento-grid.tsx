@@ -25,7 +25,7 @@ import Link from 'next/link';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 interface BentoGridProps extends ComponentPropsWithoutRef<'div'> {
   children: ReactNode;

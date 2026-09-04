@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/navigation-menu';
 import { UserAvatar } from '@/components/wds/UserAvatar';
 import { useCurrentUser } from '@/lib/api/hooks/use-auth';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 
 interface NavbarProps {
   variant?: 'dark' | 'light';

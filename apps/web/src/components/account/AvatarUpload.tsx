@@ -29,7 +29,7 @@ import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useUpdateAvatar } from '@/lib/api/hooks/use-user';
-import { cn } from '@/lib/utils';
+import { cn } from 'cn';
 import { getAvatarInitials } from '@/lib/utils/avatar';
 import type { User } from '@/types/auth.types';
 

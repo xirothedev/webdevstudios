@@ -35,7 +35,7 @@ import { computed, ref, watch } from 'vue';
 
 import { Button } from '@/components/ui/button.vue';
 import { Input } from '@/components/ui/input.vue';
-import { cn } from '@/lib/cn';
+import { cn } from 'cn';
 
 const props = withDefaults(
   defineProps<{
