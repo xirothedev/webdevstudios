@@ -8,7 +8,7 @@ services:
     ports:
       - '4566:4566' # single edge port cho mọi service
     environment:
-      - SERVICES=s3,sqs,sns,dynamodb,secretsmanager,iam,lambda
+      - SERVICES=s3
       - DEBUG=0
     volumes:
       - './init:/etc/localstack/init/ready.d' # chạy sau khi edge sẵn sàng

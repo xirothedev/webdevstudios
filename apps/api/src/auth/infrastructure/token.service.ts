@@ -34,6 +34,13 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
+  // jsonwebtoken parses a bare numeric string as milliseconds; JWT_*_EXPIRES_IN config is in seconds.
+  private expiresIn(key: string, fallbackSeconds: number): number | StringValue {
+    const raw = this.configService.get<string>(key, String(fallbackSeconds));
+    const seconds = Number(raw);
+    return Number.isNaN(seconds) ? (raw as StringValue) : seconds;
+  }
+
   generateAccessToken(
     payload: { sub: string; email: string; role?: string },
     sessionId?: string,
@@ -41,13 +48,13 @@ export class TokenService {
     // jti carries the Session id so identity survives refresh rotation
     const claims = sessionId ? { ...payload, jti: sessionId } : payload;
     return this.jwtService.sign(claims, {
-      expiresIn: this.configService.get<StringValue>('JWT_ACCESS_TOKEN_EXPIRES_IN', '3600'),
+      expiresIn: this.expiresIn('JWT_ACCESS_TOKEN_EXPIRES_IN', 3600),
     });
   }
 
   generateRefreshToken(payload: { sub: string }): string {
     return this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<StringValue>('JWT_REFRESH_TOKEN_EXPIRES_IN', '604800'),
+      expiresIn: this.expiresIn('JWT_REFRESH_TOKEN_EXPIRES_IN', 604800),
     });
   }
 

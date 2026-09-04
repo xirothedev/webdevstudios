@@ -53,4 +53,9 @@ export class StorageConfig {
       `https://${this.accountId}.r2.cloudflarestorage.com`
     );
   }
+
+  // LocalStack/S3 dev servers only resolve bucket via path; R2 uses virtual-host style.
+  get forcePathStyle(): boolean {
+    return this.configService.get<string>('R2_FORCE_PATH_STYLE') === 'true';
+  }
 }

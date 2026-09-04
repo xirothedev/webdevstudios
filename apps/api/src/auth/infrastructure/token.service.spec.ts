@@ -45,6 +45,19 @@ describe('TokenService', () => {
     expect(refreshExp - Date.now()).toBeGreaterThan(accessExp - Date.now());
   });
 
+  test('numeric-string JWT TTLs mean seconds, not milliseconds', () => {
+    const service = makeService({
+      JWT_ACCESS_TOKEN_EXPIRES_IN: '3600',
+      JWT_REFRESH_TOKEN_EXPIRES_IN: '7200',
+    });
+
+    const access = service.generateAccessToken({ sub: 'user-1', email: 'u@example.com' });
+    const refresh = service.verifyToken(service.generateRefreshToken({ sub: 'user-1' }));
+
+    expect(service.verifyToken(access).exp! - Math.floor(Date.now() / 1000)).toBeGreaterThan(3000);
+    expect(refresh.exp! - Math.floor(Date.now() / 1000)).toBeGreaterThan(6000);
+  });
+
   test('access tokens carry the session id as jti when given', () => {
     const service = makeService();
 

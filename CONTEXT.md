@@ -64,6 +64,10 @@ _Avoid_: feedback, rating
 An append-only audit record of security-relevant actions (auth successes, authorization failures, rate-limit hits).
 _Avoid_: log entry, audit entry
 
+**Media store**:
+The object store holding stored media (avatars, images, blog content), reached through one S3-compatible endpoint per environment: Cloudflare R2 serves the Prod stack; LocalStack stands in for it under development.
+_Avoid_: R2 (the config names are `R2_*`, not the concept), file storage, bucket
+
 **Service**:
 One deployable application — each backend and each frontend is its own Service, deployed and scaled on its own.
 _Avoid_: app, microservice, container
