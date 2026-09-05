@@ -92,7 +92,7 @@ jobs:
     timeout-minutes: 10
     services:
       localstack:
-        image: localstack/localstack:s3-latest
+        image: localstack/localstack:4.4
         env:
           SERVICES: s3
         ports:
