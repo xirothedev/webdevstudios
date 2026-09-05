@@ -64,3 +64,6 @@ apps/api-go/server
 apps/api-go/api-go
 *.exe
 infra/cdk.out
+
+# CDK context cache (regenerated per environment)
+infra/cdk.context.json

@@ -8,6 +8,11 @@ FROM base AS deps
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
+COPY apps/api-axum/package.json ./apps/api-axum/
+COPY apps/api-effect/package.json ./apps/api-effect/
+COPY apps/api-elysia/package.json ./apps/api-elysia/
+COPY apps/web-vue/package.json ./apps/web-vue/
+COPY infra/package.json ./infra/
 # Copy Prisma schema and config for postinstall script
 COPY apps/api/prisma.config.ts ./apps/api/
 COPY apps/api/prisma ./apps/api/prisma
@@ -16,7 +21,7 @@ COPY apps/api/tsconfig.json ./apps/api/
 ENV CI=true
 # Cache mount: bun's download store persists even when the layer invalidates
 RUN --mount=type=cache,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile --linker isolated
+    bun install --frozen-lockfile --ignore-scripts --linker isolated
 
 # Prisma stage — client regenerates only when schema or lockfile changes
 FROM deps AS prisma
@@ -48,6 +53,11 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
+COPY apps/api-axum/package.json ./apps/api-axum/
+COPY apps/api-effect/package.json ./apps/api-effect/
+COPY apps/api-elysia/package.json ./apps/api-elysia/
+COPY apps/web-vue/package.json ./apps/web-vue/
+COPY infra/package.json ./infra/
 
 ENV CI=true
 RUN --mount=type=cache,target=/root/.bun/install/cache \
@@ -58,8 +68,8 @@ COPY --from=builder --chown=nestjs:nodejs /app/apps/api/src ./apps/api/src
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
 
 # Runtime tsconfig: aliases must resolve into dist so bun loads ONE copy of each
 # class. Mapping @/* to ./src/* instead makes Nest register a class from dist
