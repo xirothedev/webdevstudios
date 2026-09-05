@@ -1,0 +1,65 @@
+name: CD Rehearsal (LocalStack)
+
+# Exercises everything the real CD (cd.yml) needs, without an AWS account.
+# Not a live `cdk deploy` against LocalStack: the bootstrap-ECR lookup at
+# synth time refuses endpoint overrides, and ECR/ECS push + blue/green are
+# Pro-only services. S3-level simulator coverage lives in ci.yml's
+# storage-smoke job. What actually breaks real deploys — Dockerfiles, the
+# CDK app, the BucketDeployment asset — is fully covered here.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: cd-rehearsal-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  images:
+    name: Build (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - app: api
+            dockerfile: apps/api/Dockerfile
+          - app: web
+            dockerfile: apps/web/Dockerfile
+          - app: api-go
+            dockerfile: apps/api-go/Dockerfile
+          - app: api-axum
+            dockerfile: apps/api-axum/Dockerfile
+          - app: api-elysia
+            dockerfile: apps/api-elysia/Dockerfile
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: false
+          cache-from: type=gha,scope=rehearsal-${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=rehearsal-${{ matrix.app }}
+
+  cdk-app:
+    name: CDK app + static assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-bun-node
+      - name: Build web-vue static bundle (BucketDeployment asset)
+        run: bun run --cwd apps/web-vue build
+      - name: Typecheck and stack tests (offline CDK Template assertions)
+        run: |
+          bun run --cwd infra typecheck
+          bun run --cwd infra test
