@@ -8,11 +8,16 @@ FROM base AS deps
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
+COPY apps/api-axum/package.json ./apps/api-axum/
+COPY apps/api-effect/package.json ./apps/api-effect/
+COPY apps/api-elysia/package.json ./apps/api-elysia/
+COPY apps/web-vue/package.json ./apps/web-vue/
+COPY infra/package.json ./infra/
 # Copy Prisma schema and config for the API workspace postinstall script
 COPY apps/api/prisma.config.ts ./apps/api/
 COPY apps/api/prisma ./apps/api/prisma
 COPY apps/api/tsconfig.json ./apps/api/
-RUN bun install --frozen-lockfile --linker isolated
+RUN bun install --frozen-lockfile --ignore-scripts --linker isolated
 
 # Builder stage
 FROM base AS builder
@@ -38,7 +43,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy necessary files
-COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 
