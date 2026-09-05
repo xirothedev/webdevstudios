@@ -4,7 +4,8 @@ name: localstack
 
 services:
   localstack:
-    image: localstack/localstack:latest
+    # 4.4 = last free community release; :latest and service tags became Pro-with-auth images in 2026.03
+    image: localstack/localstack:4.4
     ports:
       - '4566:4566' # single edge port cho mọi service
     environment:
