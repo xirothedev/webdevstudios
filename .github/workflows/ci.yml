@@ -84,6 +84,37 @@ jobs:
       - uses: ./.github/actions/setup-bun-node
       - run: bunx --bun --no-install turbo run build
 
+  storage-smoke:
+    name: Storage smoke (LocalStack)
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      localstack:
+        image: localstack/localstack:4.4
+        env:
+          SERVICES: s3
+        ports:
+          - 4566:4566
+        options: >-
+          --health-cmd "awslocal s3 ls"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-bun-node
+      - name: Seed bucket
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
+        run: aws --endpoint-url=http://127.0.0.1:4566 s3 mb s3://webdevstudios-storage
+      - name: Smoke StorageService against LocalStack
+        working-directory: apps/api
+        run: bun run smoke:localstack
+
   go-test:
     name: Go Test
     needs: changes
