@@ -33,6 +33,8 @@ function getClient(): ClientOptions | null {
         client: new S3Client({
           region: 'auto',
           endpoint: process.env.R2_ENDPOINT,
+          // LocalStack/S3 dev servers only resolve the bucket via path; R2 uses virtual-host style.
+          forcePathStyle: process.env.R2_FORCE_PATH_STYLE === 'true',
           credentials: {
             accessKeyId: key,
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? '',
