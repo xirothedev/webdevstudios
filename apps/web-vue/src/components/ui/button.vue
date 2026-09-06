@@ -44,6 +44,11 @@ export function Button(props: ButtonProps, { attrs, slots }: any): VNode {
   return h(
     Primitive,
     {
+      // Primitive defaults to <div>, which cannot submit forms or receive disabled.
+      // asChild=true swaps the element for the slot child; plain type="button" keeps
+      // in-form buttons from implicitly submitting.
+      as: 'button',
+      type: 'button',
       ...attrs,
       'data-slot': 'button',
       'data-variant': variant ?? 'default',
