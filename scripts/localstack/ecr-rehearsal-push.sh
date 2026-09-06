@@ -5,7 +5,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-REG=000000000000.dkr.ecr.us-east-1.localhost.localstack.cloud:4566
+# Region must match what CDK synthesizes into the task definitions (ap-southeast-1).
+AWS_DEFAULT_REGION=us-east-1
+REG="000000000000.dkr.ecr.$AWS_DEFAULT_REGION.localhost.localstack.cloud:4566"
 PAIRS="api:webdev-prod-api web:webdev-prod-web api-go:webdev-lab-api-go api-axum:webdev-lab-api-axum api-elysia:webdev-lab-api-elysia"
 
 docker exec localstack-aws awslocal ecr get-login-password | docker login --username AWS --password-stdin "$REG" >/dev/null
@@ -13,8 +15,8 @@ docker exec localstack-aws awslocal ecr get-login-password | docker login --user
 for pair in $PAIRS; do
   app=${pair%%:*}
   repo=${pair##*:}
-  docker exec localstack-aws awslocal ecr describe-repositories --repository-names "$repo" >/dev/null 2>&1 ||
-    docker exec localstack-aws awslocal ecr create-repository --repository-name "$repo" >/dev/null
+  docker exec localstack-aws awslocal ecr describe-repositories --region "$AWS_DEFAULT_REGION" --repository-names "$repo" >/dev/null 2>&1 ||
+    docker exec localstack-aws awslocal ecr create-repository --region "$AWS_DEFAULT_REGION" --repository-name "$repo" >/dev/null
   img="wds-$app-rehearsal"
   docker image inspect "$img" >/dev/null 2>&1 || docker build -q -f "apps/$app/Dockerfile" -t "$img" . >/dev/null
   docker tag "$img" "$REG/$repo:rehearsal"
@@ -23,6 +25,6 @@ for pair in $PAIRS; do
 done
 
 for pair in $PAIRS; do
-  docker exec localstack-aws awslocal ecr describe-images --repository-name "${pair##*:}" \
+  docker exec localstack-aws awslocal ecr describe-images --region "$AWS_DEFAULT_REGION" --repository-name "${pair##*:}" \
     --query 'imageDetails[0].imageTags[0]' --output text | xargs echo "verified ${pair##*:}:"
 done
