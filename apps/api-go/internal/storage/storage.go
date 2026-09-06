@@ -48,7 +48,8 @@ func New() *Service {
 	endpoint := os.Getenv("R2_ENDPOINT")
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.BaseEndpoint = &endpoint
-		o.UsePathStyle = false
+		// LocalStack/S3 dev servers only resolve the bucket via path; R2 uses virtual-host style.
+		o.UsePathStyle = os.Getenv("R2_FORCE_PATH_STYLE") == "true"
 	})
 	return &Service{client: client, bucket: os.Getenv("R2_BUCKET_NAME"), publicURL: strings.TrimSuffix(os.Getenv("R2_PUBLIC_URL"), "/")}
 }

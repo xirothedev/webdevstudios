@@ -34,7 +34,12 @@ impl StorageClient {
             loader = loader.endpoint_url(endpoint);
         }
         let conf = loader.load().await;
-        let s3 = Client::new(&conf);
+        // LocalStack/S3 dev servers only resolve the bucket via path; R2 uses virtual-host style.
+        let force_path_style = std::env::var("R2_FORCE_PATH_STYLE").as_deref() == Ok("true");
+        let s3_conf = aws_sdk_s3::config::Builder::from(&conf)
+            .force_path_style(force_path_style)
+            .build();
+        let s3 = Client::from_conf(s3_conf);
         Self {
             s3,
             bucket: bucket.into(),
